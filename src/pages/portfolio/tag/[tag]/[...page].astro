@@ -6,6 +6,7 @@ import { getCollection } from 'astro:content'
 import type { GetStaticPaths, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
 import projectImage1 from '@assets/images/projects/project-image-1.png'
@@ -82,16 +83,16 @@ const { page, currentTag, uniqueTags } = Astro.props
     <div class="container">
       <Heading level="h2" size="h5" class="mb-2">Tags</Heading>
       <div class="flex flex-wrap gap-4">
-        <Link href="/portfolio">All projects</Link>
+        <Link href={ensureTrailingSlash('/portfolio')}>All projects</Link>
         {
           uniqueTags.map((tag: { label: string; slug: string }) => {
             const isCurrentTag = tag.slug === currentTag.slug
             return isCurrentTag ? (
-              <Link href={'/portfolio/tag/' + tag.slug} disabled class="disabled">
+              <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)} disabled class="disabled">
                 {tag.label}
               </Link>
             ) : (
-              <Link href={'/portfolio/tag/' + tag.slug}>{tag.label}</Link>
+              <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
             )
           })
         }
@@ -109,7 +110,7 @@ const { page, currentTag, uniqueTags } = Astro.props
             <li>
               <Card
                 imageComponent={project.featuredImage}
-                url={'/portfolio/' + project.id}
+                url={ensureTrailingSlash('/portfolio/' + project.id)}
                 title={project.data.title}
                 headingLevel="h2"
                 footer={'Author: ' + project.data.author}

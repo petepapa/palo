@@ -3,6 +3,7 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import { Form, Input, Button, Textarea, Checkbox, Fieldset, Heading, Link, Radio } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 ---
 
 <DefaultLayout title="Contact">
@@ -101,19 +102,19 @@ import { Icon } from 'astro-icon/components'
 
         <ul class="flex flex-wrap gap-2">
           <li>
-            <Link href="/" isButton isExternal hideIcon animateOnHover animationType="boop">
+            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop">
               <Icon aria-hidden="true" name="lucide:facebook" size={32} />
               <span class="sr-only">Go to our Facebook page, opens in a new tab</span>
             </Link>
           </li>
           <li>
-            <Link href="/" isButton isExternal hideIcon animateOnHover animationType="boop">
+            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop">
               <Icon aria-hidden="true" name="lucide:twitter" size={32} />
               <span class="sr-only">Go to our Twitter page, opens in a new tab</span>
             </Link>
           </li>
           <li>
-            <Link href="/" isButton isExternal hideIcon animateOnHover animationType="boop">
+            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop">
               <Icon aria-hidden="true" name="lucide:linkedin" size={32} />
               <span class="sr-only">Go to our LinkedIn page, opens in a new tab</span>
             </Link>

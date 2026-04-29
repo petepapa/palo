@@ -3,6 +3,7 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import { Heading, Notification } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Get all portfolio projects
 const projects = await getCollection('projects')
@@ -83,7 +84,7 @@ const staticPages = [
             staticPages.map((page) => (
               <article>
                 <Heading level="h3" size="h6" class="mb-3">
-                  <a href={page.url}>{page.title}</a>
+                  <a href={ensureTrailingSlash(page.url)}>{page.title}</a>
                 </Heading>
                 <p class="mb-3">{page.description}</p>
                 <p class="text-xs">
@@ -110,7 +111,7 @@ const staticPages = [
             projects.map((project) => (
               <article>
                 <Heading level="h3" size="h6" class="mb-3">
-                  <a href={`/portfolio/${project.id}`}>{project.data.title}</a>
+                  <a href={ensureTrailingSlash(`/portfolio/${project.id}`)}>{project.data.title}</a>
                 </Heading>
                 <p class="mb-3">{project.data.description}</p>
                 <div class="text-xs">
@@ -135,7 +136,7 @@ const staticPages = [
         <Heading level="h2" class="mb-6">Blog</Heading>
         <article>
           <Heading level="h3" size="h6" class="mb-3">
-            <a href="/blog"> Blog posts </a>
+            <a href={ensureTrailingSlash('/blog')}> Blog posts </a>
           </Heading>
           <p>
             Discover articles about web accessibility, development best practices, and inclusive design. Our blog

@@ -6,6 +6,7 @@ import { getCollection } from 'astro:content'
 import type { GetStaticPaths, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
 import projectImage1 from '@assets/images/projects/project-image-1.png'
@@ -62,7 +63,7 @@ const { page, uniqueTags } = Astro.props
       <div class="flex flex-wrap gap-4">
         {
           uniqueTags.map((tag: { label: string; slug: string }) => (
-            <Link href={'/portfolio/tag/' + tag.slug}>{tag.label}</Link>
+            <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
           ))
         }
       </div>
@@ -75,7 +76,7 @@ const { page, uniqueTags } = Astro.props
             <li>
               <Card
                 imageComponent={project.featuredImage}
-                url={'/portfolio/' + project.id}
+                url={ensureTrailingSlash('/portfolio/' + project.id)}
                 title={project.data.title}
                 headingLevel="h2"
                 footer={'Author: ' + project.data.author}
@@ -96,7 +97,7 @@ const { page, uniqueTags } = Astro.props
         page && page.lastPage > 1 && (
           <div class="mt-12 grid place-content-center">
             <Pagination
-              firstPage={page.url.prev ? '/portfolio' : null}
+              firstPage={page.url.prev ? ensureTrailingSlash('/portfolio') : null}
               previousPage={page.url.prev ? page.url.prev : null}
               nextPage={page.url.next ? page.url.next : null}
               lastPage={page.url.next ? `/portfolio/${page.lastPage}` : null}

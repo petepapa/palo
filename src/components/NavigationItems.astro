@@ -3,6 +3,7 @@ import { Link, DarkMode } from 'accessible-astro-components'
 import { LauncherTrigger } from 'accessible-astro-launcher'
 import { Icon } from 'astro-icon/components'
 import themeConfig from '@config'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 /**
  * Navigation Items Component
@@ -23,7 +24,7 @@ import themeConfig from '@config'
             <Icon aria-hidden="true" name="lucide:chevron-down" size="32" />
           </button>
         ) : !item.type || item.type === 'link' ? (
-          <Link href={item.href} isExternal={item.external ?? false} hideIcon={!!item.icon}>
+          <Link href={ensureTrailingSlash(item.href)} isExternal={item.external ?? false} hideIcon={!!item.icon}>
             {item.icon ? (
               <>
                 <Icon aria-hidden="true" name={item.icon} size="32" />
@@ -38,7 +39,7 @@ import themeConfig from '@config'
           <ul class="dropdown-menu">
             {item.items.map((subItem: any) => (
               <li class="submenu-item">
-                <Link href={subItem.href} isExternal={subItem.external ?? false}>
+                <Link href={ensureTrailingSlash(subItem.href)} isExternal={subItem.external ?? false}>
                   {subItem.label}
                 </Link>
               </li>

@@ -8,9 +8,10 @@ import FeaturedProjects from '@components/FeaturedProjects.astro'
 import FeaturedPosts from '@components/FeaturedPosts.astro'
 import { Accordion, AccordionItem, Avatar, AvatarGroup, Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 ---
 
-<DefaultLayout title="Accessible Astro Starter - Build Faster, More Inclusive Websites" useTitleTemplate={false}>
+<DefaultLayout>
   <Hero />
   <section class="my-64">
     <div class="container">
@@ -76,7 +77,7 @@ import { Icon } from 'astro-icon/components'
           This section demonstrates how to effectively use the Accordion component to organize and display frequently
           asked questions in an accessible and user-friendly way.
         </p>
-        <Link href="/faq" isButton type="primary" animateOnHover animationType="boop">
+        <Link href={ensureTrailingSlash('/faq')} isButton type="primary" animateOnHover animationType="boop">
           <Icon aria-hidden="true" name="lucide:headset" size=" 1.5rem" />
           Contact support team
         </Link>

@@ -1,6 +1,7 @@
 ---
 import { Card, Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
 import postImage1 from '@assets/images/posts/post-image-1.png'
@@ -73,7 +74,7 @@ const featuredPosts: Post[] = data.slice(0, limit).map((post: any) => {
         featuredPosts.map((post) => (
           <Card
             imageComponent={post.featuredImage}
-            url={'/blog/' + post.shortUrl}
+            url={ensureTrailingSlash('/blog/' + post.shortUrl)}
             headingLevel="h2"
             title={post.title}
             footer={'User ID: ' + post.userId}
@@ -84,7 +85,7 @@ const featuredPosts: Post[] = data.slice(0, limit).map((post: any) => {
       }
     </div>
     <div class="mt-12">
-      <Link href="/blog/" isButton animateOnHover animationType="nudge">
+      <Link href={ensureTrailingSlash('/blog')} isButton animateOnHover animationType="nudge">
         Read all posts
         <Icon aria-hidden="true" name="lucide:arrow-right" size="1.5rem" />
       </Link>

@@ -2,6 +2,7 @@
 import { Card, Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
 import projectImage1 from '@assets/images/projects/project-image-1.png'
@@ -51,7 +52,7 @@ const featuredProjects = projects.slice(0, limit).map((project, index) => ({
         featuredProjects.map((project) => (
           <Card
             imageComponent={project.featuredImage}
-            url={'/portfolio/' + project.id}
+            url={ensureTrailingSlash('/portfolio/' + project.id)}
             headingLevel="h2"
             title={project.data.title}
             footer={'Author: ' + project.data.author}
@@ -62,7 +63,7 @@ const featuredProjects = projects.slice(0, limit).map((project, index) => ({
       }
     </div>
     <div class="mt-12">
-      <Link href="/portfolio/" isButton animateOnHover animationType="nudge">
+      <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
         View all projects
         <Icon aria-hidden="true" name="lucide:arrow-right" size="1.5rem" />
       </Link>

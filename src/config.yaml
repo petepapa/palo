@@ -15,7 +15,7 @@ site:
   # Whether generated URLs should end with a trailing slash.
   # false -> /about
   # true  -> /about/
-  trailingSlash: false
+  trailingSlash: true
 
 metadata:
   # Default SEO title for the site homepage and fallbacks.

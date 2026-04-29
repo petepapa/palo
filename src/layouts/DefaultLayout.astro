@@ -50,6 +50,22 @@ const {
   useTitleTemplate = true,
 } = Astro.props
 
+const isHomePage = Astro.url.pathname === '/'
+
+// ──────────────────────────────────────────────
+//  Dynamic title generation
+//  Rules:
+//    - Homepage without explicit title → show themeConfig.metadata.title directly
+//    - All other cases → {pageTitle} {titleSeparator} {siteName}
+// ──────────────────────────────────────────────
+const hasExplicitTitle = 'title' in Astro.props
+const shouldUseRawTitle = isHomePage && !hasExplicitTitle
+
+const seoTitle = shouldUseRawTitle ? themeConfig.metadata.title : title
+const seoTitleTemplate = shouldUseRawTitle || !useTitleTemplate
+  ? undefined
+  : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
+
 // For social sharing, we need the full absolute URL
 // If image is an ImageMetadata object, use its src, otherwise treat as string path
 const imagePath = image ? (typeof image === 'string' ? image : image.src) : '/social-preview-image.png'
@@ -127,8 +143,8 @@ for (let lvl = -2; lvl <= 8; lvl++) {
     </style>
 
     <SEO
-      title={title}
-      titleTemplate={useTitleTemplate ? `%s ${themeConfig.site.titleSeparator ?? '|'} ${themeConfig.metadata.title}` : undefined}
+      title={seoTitle}
+      titleTemplate={seoTitleTemplate}
       titleDefault={themeConfig.metadata.title}
       description={description}
       canonical={url}
