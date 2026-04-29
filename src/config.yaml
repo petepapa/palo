@@ -14,6 +14,9 @@ site:
   # true  -> /about/
   trailingSlash: true
 
+  # Whether to show the dark mode toggle in the navigation bar.
+  showDarkModeToggle: true
+
 metadata:
   # Your production site URL, including https://
   # Used for SEO canonical URLs, Open Graph, and sitemap generation.
@@ -68,61 +71,3 @@ typography:
   headingLineHeightScale: 0.75
   uppercaseDisplayText: true
 
-navigation:
-  # Whether to show the dark mode toggle in the navigation bar.
-  darkmode: true
-
-  # Navigation menu items.
-  # Supports:
-  #   - Regular links: { label, href, external?, icon?, highlight?, excludeFromLauncher? }
-  #   - Dropdown menus: { label, type: dropdown, items: [{ label, href, external? }], excludeFromLauncher? }
-  items:
-    - label: Home
-      href: /
-
-    - label: Blog
-      href: /blog
-
-    - label: Portfolio
-      href: /portfolio
-
-    - label: Features
-      type: dropdown
-      items:
-        - label: Accessibility statement
-          href: /accessibility-statement
-        - label: Accessible components
-          href: /accessible-components
-        - label: Accessible launcher
-          href: /accessible-launcher
-        - label: Color contrast checker
-          href: /color-contrast-checker
-        - label: Markdown page
-          href: /markdown-page
-        - label: MDX page
-          href: /mdx-page
-        - label: 404 page
-          href: /404
-        - label: Sitemap
-          href: /sitemap
-
-    - label: Contact
-      href: /contact
-
-    - label: 'Go to our GitHub page, opens in new tab'
-      href: 'https://github.com/incluud/accessible-astro-starter'
-      icon: lucide:github
-      external: true
-      excludeFromLauncher: true
-
-socials:
-  # Social links shown in launcher and related UI.
-  - label: GitHub
-    href: 'https://github.com/incluud/'
-    icon: 'lucide:github'
-  - label: Bluesky
-    href: 'https://bsky.app/profile/incluud.dev'
-    icon: 'lucide:bot-message-square'
-  - label: Open Collective
-    href: 'https://opencollective.com/incluud'
-    icon: 'lucide:hand-heart'

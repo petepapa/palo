@@ -10,7 +10,7 @@ import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { BLOG_API_URL } from 'astro:env/server'
 import { slugify } from '@utils/slugify'
-import themeConfig from '@config'
+import { navigationItems, socialItems } from '../navigation'
 
 /**
  * Launcher preferences for accessibility and theme.
@@ -92,12 +92,12 @@ const launcherProjectItems = (await getCollection('projects')).map((project) => 
 }))
 
 /**
- * Navigation items for the launcher, built from `themeConfig.navigation.items`.
+ * Navigation items for the launcher, built from the site-config navigation items.
  * Flattens dropdowns and applies external flags.
  *
  * @type {Array<{ label: string, href: string, external?: boolean }>}
  */
-const launcherNavigationItems = themeConfig.navigation.items.flatMap((item: any) => {
+const launcherNavigationItems = navigationItems.flatMap((item: any) => {
   if (item.excludeFromLauncher) {
     return []
   }
@@ -124,11 +124,11 @@ const launcherNavigationItems = themeConfig.navigation.items.flatMap((item: any)
 })
 
 /**
- * Social items for the launcher, from `themeConfig.socials`.
+ * Social items for the launcher, from the site-config social items.
  *
  * @type {Array<{ label: string, href: string, icon: string, external?: boolean }>}
  */
-const launcherSocialItems = (themeConfig.socials ?? []).map((item: any) => ({
+const launcherSocialItems = socialItems.map((item: any) => ({
   label: item.label,
   href: item.href,
   icon: item.icon,

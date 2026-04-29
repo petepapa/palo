@@ -46,6 +46,7 @@ export interface SiteConfig {
   name: string
   titleSeparator: string
   trailingSlash: boolean
+  showDarkModeToggle: boolean
 }
 
 export interface MetadataConfig {
@@ -88,6 +89,4 @@ export interface PaloConfig {
   branding: BrandingConfig
   layout: LayoutConfig
   typography: TypographyConfig
-  navigation: NavigationConfig
-  socials: SocialItem[]
 }

@@ -3,6 +3,7 @@ import { Link, DarkMode } from 'accessible-astro-components'
 import { LauncherTrigger } from 'accessible-astro-launcher'
 import { Icon } from 'astro-icon/components'
 import themeConfig from '@config'
+import { navigationItems } from '../navigation'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 /**
@@ -14,7 +15,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 <ul class="menu">
   {
-    themeConfig.navigation.items.map((item: any) => (
+    navigationItems.map((item: any) => (
       <li
         class={`menu-item ${item.type === 'dropdown' ? 'has-dropdown' : ''} ${item.icon ? 'type-icon animate-rotate' : ''}`}
       >
@@ -50,7 +51,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     ))
   }
   {
-    themeConfig.navigation.darkmode && (
+    themeConfig.site.showDarkModeToggle && (
       <li class="menu-item type-icon animate-rotate">
         <DarkMode>
           <Icon aria-hidden="true" name="lucide:moon" slot="light" />
