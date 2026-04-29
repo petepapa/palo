@@ -44,12 +44,12 @@ export interface SocialItem {
 
 export interface SiteConfig {
   name: string
-  site: string
   titleSeparator: string
   trailingSlash: boolean
 }
 
 export interface MetadataConfig {
+  siteUrl: string
   title: string
   description: string
   author: string

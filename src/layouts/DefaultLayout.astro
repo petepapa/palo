@@ -53,6 +53,62 @@ const {
 const isHomePage = Astro.url.pathname === '/'
 
 // ──────────────────────────────────────────────
+//  Canonical URL & Trailing Slash Logic
+// ──────────────────────────────────────────────
+// Strip trailing slash from siteUrl for safe concatenation
+const siteUrl = themeConfig.metadata.siteUrl.replace(/\/+$/, '')
+const shouldTrailingSlash = themeConfig.site.trailingSlash
+
+/**
+ * Build an absolute URL respecting trailingSlash setting.
+ * If the pathname is '/' (homepage), it always ends with '/'.
+ * For other paths, append '/' only if trailingSlash is enabled.
+ */
+function buildCanonicalUrl(pathname: string): string {
+  const normalized = pathname.replace(/\/+$/, '') || '/'
+  if (normalized === '/') {
+    return `${siteUrl}/`
+  }
+  if (shouldTrailingSlash) {
+    return `${siteUrl}${normalized}/`
+  }
+  return `${siteUrl}${normalized}`
+}
+
+/**
+ * Ensure a path starts with '/'.
+ * If path is empty or undefined, defaults to '/social-preview-image.png'.
+ */
+function ensureLeadingSlash(p: string): string {
+  if (!p || p.trim() === '') {
+    return '/social-preview-image.png'
+  }
+  return p.startsWith('/') ? p : `/${p}`
+}
+
+/**
+ * Build an absolute URL for an image path, with double-slash protection.
+ * Handles both ImageMetadata objects and string paths.
+ */
+function buildImageUrl(img: ImageMetadata | string | null): string {
+  if (!img) {
+    return `${siteUrl}/social-preview-image.png`
+  }
+
+  const path = typeof img === 'string' ? img : img.src
+  const safePath = ensureLeadingSlash(path)
+
+  // Use URL constructor for safe concatenation (handles double-slash)
+  return new URL(safePath, `${siteUrl}/`).href
+}
+
+// Generate canonical URL from the current request URL's pathname
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname)
+
+// Generate OG image URL
+const imageUrl = buildImageUrl(image)
+
+// ──────────────────────────────────────────────
 //  Dynamic title generation
 //  Rules:
 //    - Homepage without explicit title → show themeConfig.metadata.title directly
@@ -65,11 +121,6 @@ const seoTitle = shouldUseRawTitle ? themeConfig.metadata.title : title
 const seoTitleTemplate = shouldUseRawTitle || !useTitleTemplate
   ? undefined
   : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
-
-// For social sharing, we need the full absolute URL
-// If image is an ImageMetadata object, use its src, otherwise treat as string path
-const imagePath = image ? (typeof image === 'string' ? image : image.src) : '/social-preview-image.png'
-const imageUrl = new URL(imagePath, Astro.site).href
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -147,13 +198,13 @@ for (let lvl = -2; lvl <= 8; lvl++) {
       titleTemplate={seoTitleTemplate}
       titleDefault={themeConfig.metadata.title}
       description={description}
-      canonical={url}
+      canonical={canonicalUrl}
       openGraph={{
         basic: {
           title: title,
           type: type,
           image: imageUrl,
-          url: url,
+          url: canonicalUrl,
         },
         optional: {
           description: description,

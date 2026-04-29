@@ -66,7 +66,7 @@ const viteConfig = {
 // https://astro.build/config
 export default defineConfig({
   compressHTML: true,
-  site: yamlConfig.site.site,
+  site: yamlConfig.metadata.siteUrl,
   trailingSlash: yamlConfig.site.trailingSlash ? 'always' : 'never',
   integrations: [compress(), icon(), mdx(), sitemap()],
   vite: enhanceConfigForWorkspace(viteConfig),
