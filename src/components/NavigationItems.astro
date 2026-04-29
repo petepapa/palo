@@ -1,8 +1,8 @@
 ---
-import themeConfig from '@theme-config'
 import { Link, DarkMode } from 'accessible-astro-components'
 import { LauncherTrigger } from 'accessible-astro-launcher'
 import { Icon } from 'astro-icon/components'
+import themeConfig from '@config'
 
 /**
  * Navigation Items Component
@@ -13,7 +13,7 @@ import { Icon } from 'astro-icon/components'
 
 <ul class="menu">
   {
-    themeConfig.navigation.items.map((item) => (
+    themeConfig.navigation.items.map((item: any) => (
       <li
         class={`menu-item ${item.type === 'dropdown' ? 'has-dropdown' : ''} ${item.icon ? 'type-icon animate-rotate' : ''}`}
       >
@@ -36,7 +36,7 @@ import { Icon } from 'astro-icon/components'
         ) : null}
         {item.type === 'dropdown' && (
           <ul class="dropdown-menu">
-            {item.items.map((subItem) => (
+            {item.items.map((subItem: any) => (
               <li class="submenu-item">
                 <Link href={subItem.href} isExternal={subItem.external ?? false}>
                   {subItem.label}

@@ -1,0 +1,127 @@
+# Palo Framework Configuration
+# Edit this file to customize your site. All fields are documented below.
+
+site:
+  # The site name shown in the header and used as the default page title.
+  name: Palo
+
+  # Your production site URL, including https://
+  site: 'https://palo.petepa.com'
+
+  # The separator used in browser tab titles.
+  # Example: "About | Palo"
+  titleSeparator: '|'
+
+  # Whether generated URLs should end with a trailing slash.
+  # false -> /about
+  # true  -> /about/
+  trailingSlash: false
+
+metadata:
+  # Default SEO title for the site homepage and fallbacks.
+  title: 'Palo — The Highly Customizable Astro Framework for Creators'
+
+  # Default SEO description used across the site.
+  description: 'Break free from generic business templates. Palo is a minimalist Astro theme by PetePa, crafted for artists, musicians, and designers. Deeply customize your colors, radius, and typography within a logic-driven framework. Build your unique digital identity at palo.petepa.com.'
+
+  # Author name for metadata tags.
+  author: PetePa
+
+  # Social sharing image path.
+  # Put the image in /public and use a path starting with /
+  image: '/social-preview-image.png'
+
+branding:
+  # Logo path.
+  # Put the file in /public and use a path starting with /
+  logo: '/branding/logo.svg'
+
+  # Primary font family for the site (body and headings).
+  fontFamily: "'League Spartan', sans-serif"
+
+  colors:
+    # Main brand color.
+    primary: '#d648ff'
+
+    # Secondary accent color.
+    secondary: '#00d1b7'
+
+    # Neutral supporting color.
+    neutral: '#b9bec4'
+
+    # Focus/outline color used for accessibility states.
+    outline: '#ff4500'
+
+layout:
+  # Maximum width of the main page container.
+  containerMaxWidth: '1536px'
+
+typography:
+  # Body text.
+  baseFontSize: '16px'
+  lineHeightScale: 1.0
+
+  # Heading size.
+  mobileHeadingScale: 1.12
+  desktopHeadingScale: 1.72
+  headingLineHeightScale: 0.75
+  uppercaseDisplayText: true
+
+navigation:
+  # Whether to show the dark mode toggle in the navigation bar.
+  darkmode: true
+
+  # Navigation menu items.
+  # Supports:
+  #   - Regular links: { label, href, external?, icon?, highlight?, excludeFromLauncher? }
+  #   - Dropdown menus: { label, type: dropdown, items: [{ label, href, external? }], excludeFromLauncher? }
+  items:
+    - label: Home
+      href: /
+
+    - label: Blog
+      href: /blog
+
+    - label: Portfolio
+      href: /portfolio
+
+    - label: Features
+      type: dropdown
+      items:
+        - label: Accessibility statement
+          href: /accessibility-statement
+        - label: Accessible components
+          href: /accessible-components
+        - label: Accessible launcher
+          href: /accessible-launcher
+        - label: Color contrast checker
+          href: /color-contrast-checker
+        - label: Markdown page
+          href: /markdown-page
+        - label: MDX page
+          href: /mdx-page
+        - label: 404 page
+          href: /404
+        - label: Sitemap
+          href: /sitemap
+
+    - label: Contact
+      href: /contact
+
+    - label: 'Go to our GitHub page, opens in new tab'
+      href: 'https://github.com/incluud/accessible-astro-starter'
+      icon: lucide:github
+      external: true
+      excludeFromLauncher: true
+
+socials:
+  # Social links shown in launcher and related UI.
+  - label: GitHub
+    href: 'https://github.com/incluud/'
+    icon: 'lucide:github'
+  - label: Bluesky
+    href: 'https://bsky.app/profile/incluud.dev'
+    icon: 'lucide:bot-message-square'
+  - label: Open Collective
+    href: 'https://opencollective.com/incluud'
+    icon: 'lucide:hand-heart'

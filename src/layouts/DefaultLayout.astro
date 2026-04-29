@@ -1,12 +1,12 @@
 ---
 import '../styles/tailwind.css'
 import '../assets/scss/index.scss'
-import themeConfig from '@theme-config'
 import { SEO } from 'astro-seo'
 import Header from '@components/Header.astro'
 import Footer from '@components/Footer.astro'
 import { ClientRouter } from 'astro:transitions'
 import type { ImageMetadata } from 'astro'
+import themeConfig from '@config'
 
 interface Props {
   /**
@@ -41,11 +41,11 @@ interface Props {
 }
 
 const {
-  title = themeConfig.seo.title,
-  description = themeConfig.seo.description ?? '',
+  title = themeConfig.metadata.title,
+  description = themeConfig.metadata.description ?? '',
   url = Astro.url.href,
-  image = themeConfig.seo.image ?? null,
-  author = themeConfig.seo.author ?? '',
+  image = themeConfig.metadata.image ?? null,
+  author = themeConfig.metadata.author ?? '',
   type = 'website',
   useTitleTemplate = true,
 } = Astro.props
@@ -54,6 +54,44 @@ const {
 // If image is an ImageMetadata object, use its src, otherwise treat as string path
 const imagePath = image ? (typeof image === 'string' ? image : image.src) : '/social-preview-image.png'
 const imageUrl = new URL(imagePath, Astro.site).href
+
+// ──────────────────────────────────────────────
+//  Dynamic brand variables from config.yaml
+// ──────────────────────────────────────────────
+const {
+  branding: { colors, fontFamily },
+  layout,
+  typography,
+} = themeConfig
+
+// ──────────────────────────────────────────────
+//  Utopia fluid type scale generator
+//  Algorithm:
+//    minFont = baseFontSize * (mobileScale ^ level)
+//    maxFont = baseFontSize * (desktopScale ^ level)
+//    slope   = ((maxFont - minFont) / (viewportMax - viewportMin)) * 100
+//    clamp(minFont, slope cqi + intercept, maxFont)
+// ──────────────────────────────────────────────
+const baseFontSize = parseInt(typography.baseFontSize, 10) || 16
+const viewportMin = 320
+const viewportMax = 1240
+const mobileScale = typography.mobileHeadingScale
+const desktopScale = typography.desktopHeadingScale
+
+function clampFontSize(level: number): string {
+  const min = baseFontSize * Math.pow(mobileScale, level)
+  const max = baseFontSize * Math.pow(desktopScale, level)
+  const slope = ((max - min) / (viewportMax - viewportMin)) * 100
+  const intercept = min - (slope * viewportMin) / 100
+  return `clamp(${(min / baseFontSize).toFixed(4)}rem, ${slope.toFixed(4)}cqi + ${(intercept / baseFontSize).toFixed(4)}rem, ${(max / baseFontSize).toFixed(4)}rem)`
+}
+
+// Generate levels -2 through 8 to match _root.scss existing variable set
+const fontSizeLevels: Record<string, string> = {}
+for (let lvl = -2; lvl <= 8; lvl++) {
+  const label = lvl < 0 ? `--font-size-${lvl}` : `--font-size-${lvl}`
+  fontSizeLevels[label] = clampFontSize(lvl)
+}
 ---
 
 <html lang="en" dir="ltr">
@@ -65,27 +103,33 @@ const imageUrl = new URL(imagePath, Astro.site).href
     <!-- favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    <!-- theme colors from config -->
-    <style
-      define:vars={{
-        brandPrimary: themeConfig.colors.primary,
-        brandSecondary: themeConfig.colors.secondary,
-        brandNeutral: themeConfig.colors.neutral,
-        brandOutline: themeConfig.colors.outline,
-      }}
-    >
-      :global(:root) {
-        --brand-primary: var(--brandPrimary);
-        --brand-secondary: var(--brandSecondary);
-        --brand-neutral: var(--brandNeutral);
-        --brand-outline: var(--brandOutline);
+    <!-- theme: brand colors, fonts, layout, and fluid typography injected from config.yaml -->
+    <style is:global>
+      :root {
+        /* brand colors */
+        --brand-primary: {colors.primary};
+        --brand-secondary: {colors.secondary};
+        --brand-neutral: {colors.neutral};
+        --brand-outline: {colors.outline};
+
+        /* font family */
+        --font-family-default: {fontFamily};
+        --font-family-special: {fontFamily};
+        --font-heading: var(--font-family-special);
+        --font-body: var(--font-family-default);
+
+        /* layout */
+        --grid-max-width: {layout.containerMaxWidth};
+
+        /* fluid font sizes from Utopia algorithm */
+        {Object.entries(fontSizeLevels).map(([key, val]) => `        ${key}: ${val};`).join('\n')}
       }
     </style>
 
     <SEO
       title={title}
-      titleTemplate={useTitleTemplate ? `%s - ${themeConfig.seo.title}` : undefined}
-      titleDefault={themeConfig.seo.title}
+      titleTemplate={useTitleTemplate ? `%s ${themeConfig.site.titleSeparator ?? '|'} ${themeConfig.metadata.title}` : undefined}
+      titleDefault={themeConfig.metadata.title}
       description={description}
       canonical={url}
       openGraph={{

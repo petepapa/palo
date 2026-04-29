@@ -2,3 +2,23 @@
 
 @source '../../src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}';
 @custom-variant dark (&:where(.darkmode, .darkmode *));
+
+@theme {
+  --color-primary: var(--brand-primary);
+  --color-secondary: var(--brand-secondary);
+  --color-neutral: var(--brand-neutral);
+  --color-outline: var(--brand-outline);
+  --font-family-body: var(--font-body);
+  --font-family-heading: var(--font-heading);
+  --font-size--2: var(--font-size--2);
+  --font-size--1: var(--font-size--1);
+  --font-size-0: var(--font-size-0);
+  --font-size-1: var(--font-size-1);
+  --font-size-2: var(--font-size-2);
+  --font-size-3: var(--font-size-3);
+  --font-size-4: var(--font-size-4);
+  --font-size-5: var(--font-size-5);
+  --font-size-6: var(--font-size-6);
+  --font-size-7: var(--font-size-7);
+  --font-size-8: var(--font-size-8);
+}

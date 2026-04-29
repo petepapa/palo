@@ -9,8 +9,8 @@ import {
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { BLOG_API_URL } from 'astro:env/server'
-import themeConfig from '@theme-config'
 import { slugify } from '@utils/slugify'
+import themeConfig from '@config'
 
 /**
  * Launcher preferences for accessibility and theme.
@@ -97,13 +97,13 @@ const launcherProjectItems = (await getCollection('projects')).map((project) => 
  *
  * @type {Array<{ label: string, href: string, external?: boolean }>}
  */
-const launcherNavigationItems = themeConfig.navigation.items.flatMap((item) => {
+const launcherNavigationItems = themeConfig.navigation.items.flatMap((item: any) => {
   if (item.excludeFromLauncher) {
     return []
   }
 
   if (item.type === 'dropdown') {
-    return item.items.map((subItem) => ({
+    return item.items.map((subItem: any) => ({
       label: subItem.label,
       href: subItem.href,
       external: subItem.external ?? false,
@@ -128,7 +128,7 @@ const launcherNavigationItems = themeConfig.navigation.items.flatMap((item) => {
  *
  * @type {Array<{ label: string, href: string, icon: string, external?: boolean }>}
  */
-const launcherSocialItems = (themeConfig.socials ?? []).map((item) => ({
+const launcherSocialItems = (themeConfig.socials ?? []).map((item: any) => ({
   label: item.label,
   href: item.href,
   icon: item.icon,

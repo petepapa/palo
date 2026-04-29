@@ -1,0 +1,93 @@
+/**
+ * Palo Framework Configuration Types
+ *
+ * This file defines the TypeScript interfaces for the YAML configuration.
+ * While config.yaml itself is not type-checked, these types ensure:
+ * - Autocompletion in IDEs when importing config in .astro/.ts files
+ * - Type safety when accessing config properties in components
+ */
+
+export interface NavigationItemLink {
+  type?: 'link'
+  label: string
+  href: string
+  external?: boolean
+  highlight?: boolean
+  icon?: string
+  excludeFromLauncher?: boolean
+}
+
+export interface NavigationItemDropdown {
+  type: 'dropdown'
+  label: string
+  icon?: string
+  items: {
+    label: string
+    href: string
+    external?: boolean
+  }[]
+  excludeFromLauncher?: boolean
+}
+
+export type NavigationItem = NavigationItemLink | NavigationItemDropdown
+
+export interface NavigationConfig {
+  darkmode: boolean
+  items: NavigationItem[]
+}
+
+export interface SocialItem {
+  label: string
+  href: string
+  icon: string
+}
+
+export interface SiteConfig {
+  name: string
+  site: string
+  titleSeparator: string
+  trailingSlash: boolean
+}
+
+export interface MetadataConfig {
+  title: string
+  description: string
+  author: string
+  image: string
+}
+
+export interface BrandingColors {
+  primary: string
+  secondary: string
+  neutral: string
+  outline: string
+}
+
+export interface BrandingConfig {
+  logo: string
+  fontFamily: string
+  colors: BrandingColors
+}
+
+export interface LayoutConfig {
+  containerMaxWidth: string
+}
+
+export interface TypographyConfig {
+  baseFontSize: string
+  lineHeightScale: number
+  mobileHeadingScale: number
+  desktopHeadingScale: number
+  headingLineHeightScale: number
+  uppercaseDisplayText: boolean
+}
+
+export interface PaloConfig {
+  site: SiteConfig
+  metadata: MetadataConfig
+  branding: BrandingConfig
+  layout: LayoutConfig
+  typography: TypographyConfig
+  navigation: NavigationConfig
+  socials: SocialItem[]
+}

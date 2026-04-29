@@ -3,11 +3,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@config": ["src/config.yaml"],
       "@components/*": ["src/components/*"],
       "@layouts/*": ["src/layouts/*"],
       "@assets/*": ["src/assets/*"],
-      "@utils/*": ["src/utils/*"],
-      "@theme-config": ["theme.config.ts"]
+      "@utils/*": ["src/utils/*"]
     }
   }
 }
