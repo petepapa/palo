@@ -63,6 +63,15 @@ const viteConfig = {
   },
 }
 
+// Build-time configuration logging for production debugging
+console.log('\n[Build Config] ===== Astro Build Configuration =====')
+console.log('[Build Config] config.yaml path:', configPath)
+console.log('[Build Config] raw trailingSlash from config.yaml:', yamlConfig.site.trailingSlash)
+console.log('[Build Config] siteUrl:', yamlConfig.metadata.siteUrl)
+console.log('[Build Config] Astro trailingSlash mapping:', yamlConfig.site.trailingSlash ? 'always' : 'never')
+console.log('[Build Config] Astro build.format mapping:', yamlConfig.site.trailingSlash ? 'directory' : 'file')
+console.log('[Build Config] ==========================================\n')
+
 // https://astro.build/config
 export default defineConfig({
   compressHTML: true,
