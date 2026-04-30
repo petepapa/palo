@@ -36,6 +36,9 @@ function yamlPlugin() {
 
 // Vite configuration with path aliases, YAML plugin, and SCSS settings
 const viteConfig = {
+  define: {
+    __PALO_TRAILING_SLASH__: JSON.stringify(Boolean(yamlConfig.site.trailingSlash)),
+  },
   css: {
     preprocessorOptions: {
       scss: {

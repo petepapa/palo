@@ -15,3 +15,5 @@ declare module '*.yaml' {
   const config: PaloConfig
   export default config
 }
+
+declare const __PALO_TRAILING_SLASH__: boolean

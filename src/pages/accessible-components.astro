@@ -34,6 +34,7 @@ import {
   Tooltip,
   Video,
 } from 'accessible-astro-components'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 const components = [
   { name: 'Accordion', id: 'accordion' },
@@ -243,7 +244,7 @@ const components = [
         <Heading level="h3">Default</Heading>
         <Breadcrumbs>
           <BreadcrumbsItem href="/" label="Home" />
-          <BreadcrumbsItem href="/blog" label="Blog" />
+          <BreadcrumbsItem href={ensureTrailingSlash('/blog')} label="Blog" />
           <BreadcrumbsItem currentPage={true} label="My blog post" />
         </Breadcrumbs>
         <Heading level="h3">With icons</Heading>

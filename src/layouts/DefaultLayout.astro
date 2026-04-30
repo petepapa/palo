@@ -7,6 +7,7 @@ import Footer from '@components/Footer.astro'
 import { ClientRouter } from 'astro:transitions'
 import type { ImageMetadata } from 'astro'
 import themeConfig from '@config'
+import { getCanonical } from '@utils/trailingSlash'
 
 interface Props {
   /**
@@ -57,24 +58,6 @@ const isHomePage = Astro.url.pathname === '/'
 // ──────────────────────────────────────────────
 // Strip trailing slash from siteUrl for safe concatenation
 const siteUrl = themeConfig.metadata.siteUrl.replace(/\/+$/, '')
-const shouldTrailingSlash = themeConfig.site.trailingSlash
-
-/**
- * Build an absolute URL respecting trailingSlash setting.
- * If the pathname is '/' (homepage), it always ends with '/'.
- * For other paths, append '/' only if trailingSlash is enabled.
- */
-function buildCanonicalUrl(pathname: string): string {
-  const normalized = pathname.replace(/\/+$/, '') || '/'
-  if (normalized === '/') {
-    return `${siteUrl}/`
-  }
-  if (shouldTrailingSlash) {
-    return `${siteUrl}${normalized}/`
-  }
-  return `${siteUrl}${normalized}`
-}
-
 /**
  * Ensure a path starts with '/'.
  * If path is empty or undefined, defaults to '/social-preview-image.png'.
@@ -103,7 +86,7 @@ function buildImageUrl(img: ImageMetadata | string | null): string {
 }
 
 // Generate canonical URL from the current request URL's pathname
-const canonicalUrl = buildCanonicalUrl(Astro.url.pathname)
+const canonicalUrl = getCanonical(Astro.url.pathname, themeConfig.metadata.siteUrl)
 
 // Generate OG image URL
 const imageUrl = buildImageUrl(image)
