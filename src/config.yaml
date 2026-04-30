@@ -38,7 +38,7 @@ metadata:
 branding:
   # Logo path.
   # Put the file in /public and use a path starting with /
-  logo: '/branding/logo.svg'
+  logo: ''
 
   # Font settings used globally for body, navigation/buttons emphasis, and headings.
   font:
@@ -54,9 +54,9 @@ branding:
     # - accent: emphasized non-heading text (nav, buttons, labels)
     # - heading: headings
     weights:
-      body: 300
-      accent: 400
-      heading: 500
+      body: 700
+      accent: 100
+      heading: 700
 
   colors:
     # Main brand color.
@@ -85,4 +85,3 @@ typography:
   desktopHeadingScale: 1.72
   headingLineHeightScale: 0.75
   uppercaseDisplayText: true
-

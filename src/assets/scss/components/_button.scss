@@ -16,6 +16,12 @@
    1. DECORATIVE EFFECT REMOVAL (overrides component library)
    ============================================================ */
 
+.button,
+a.button,
+button.button {
+  font-weight: var(--font-weight-accent, 400);
+}
+
 :where(.button) {
   box-shadow: none !important;
   text-decoration: none !important;

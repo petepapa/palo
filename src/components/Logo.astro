@@ -13,8 +13,12 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 <Link href="/" class="flex items-center gap-2">
   {
     themeConfig.branding.logo && (
-      <img src={themeConfig.branding.logo} alt="" aria-hidden="true" width="47" height="37" loading="eager" />
+      <img src={themeConfig.branding.logo} alt={themeConfig.site.name} width="47" height="37" loading="eager" />
     )
   }
-  <span class="text-sm font-bold sm:text-lg">{themeConfig.site.name}</span>
+  {!themeConfig.branding.logo && (
+    <span class="text-sm sm:text-lg" style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading});`}>
+      {themeConfig.site.name}
+    </span>
+  )}
 </Link>

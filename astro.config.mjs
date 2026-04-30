@@ -31,6 +31,25 @@ function yamlPlugin() {
         }
       }
     },
+    handleHotUpdate(ctx) {
+      if (!ctx.file.endsWith('.yaml') && !ctx.file.endsWith('.yml')) {
+        return
+      }
+
+      const modules = ctx.server.moduleGraph.getModulesByFile(ctx.file)
+      if (modules) {
+        for (const mod of modules) {
+          ctx.server.moduleGraph.invalidateModule(mod)
+        }
+      }
+
+      ctx.server.ws.send({
+        type: 'full-reload',
+        path: '*',
+      })
+
+      return modules ? [...modules] : []
+    },
   }
 }
 
