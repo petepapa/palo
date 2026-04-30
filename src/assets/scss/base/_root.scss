@@ -1,4 +1,4 @@
-:root {
+:root:root {
   color-scheme: light;
   interpolate-size: allow-keywords;
 
@@ -32,6 +32,36 @@
   --color-neutral-700: oklch(from var(--brand-neutral) 40% c h);
   --color-neutral-800: oklch(from var(--brand-neutral) 30% c h);
   --color-neutral-900: oklch(from var(--brand-neutral) 15% c h);
+
+  // component library tokens (consumed by accessible-astro-components Button, Badge, Notification, etc.)
+  // Uses light-dark() so each token adapts: light mode = lighter tones, dark mode = deeper tones
+  --color-default-bg: light-dark(hsl(200 20% 97%), hsl(215 25% 13%));
+  --color-default-border: light-dark(hsl(204 8% 55%), hsl(215 15% 45%));
+  --color-default-text: light-dark(hsl(204 8% 14%), hsl(0 0% 100%));
+
+  --color-primary-bg: light-dark(var(--color-primary-200), var(--color-primary-500));
+  --color-primary-border: light-dark(var(--color-primary-500), var(--color-primary-100));
+  --color-primary-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+
+  --color-secondary-bg: light-dark(var(--color-secondary-200), var(--color-secondary-500));
+  --color-secondary-border: light-dark(var(--color-secondary-500), var(--color-secondary-100));
+  --color-secondary-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+
+  --color-info-bg: light-dark(hsl(198 100% 94%), hsl(234 54% 20%));
+  --color-info-border: light-dark(hsl(200 78% 46%), hsl(234 100% 60%));
+  --color-info-text: light-dark(hsl(200 96% 27%), hsl(0 0% 100%));
+
+  --color-success-bg: light-dark(hsl(160 71% 96%), hsl(101 39% 22%));
+  --color-success-border: light-dark(hsl(160 61% 41%), hsl(101 82% 63%));
+  --color-success-text: light-dark(hsl(170 96% 15%), hsl(0 0% 100%));
+
+  --color-warning-bg: light-dark(hsl(48 100% 96%), hsl(41 39% 22%));
+  --color-warning-border: light-dark(hsl(35 75% 49%), hsl(41 82% 63%));
+  --color-warning-text: light-dark(hsl(15 85% 30%), hsl(0 0% 100%));
+
+  --color-error-bg: light-dark(hsl(0 100% 94%), hsl(339 39% 22%));
+  --color-error-border: light-dark(hsl(355 73% 51%), hsl(339 82% 63%));
+  --color-error-text: light-dark(hsl(350 94% 19%), hsl(0 0% 100%));
 
   // color scheme
   --foreground-color: light-dark(var(--color-neutral-800), var(--color-neutral-100));
@@ -129,7 +159,8 @@
   --ratio-ultrawide: 18/5;
 
   // animations
-  --cubic-bezier: cubic-bezier(0.1, 0.1, 0, 1);
+  --animation-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --cubic-bezier: var(--animation-timing);
   --animation-speed-slow: 0.4s;
   --animation-speed-medium: 0.3s;
   --animation-speed-fast: 0.2s;
@@ -143,9 +174,20 @@
   --backdrop-blur: blur(3px);
 
   // kbd
-  --kbd-color-text: light-dark(var(--color-gray-200), var(--color-gray-800));
-  --kbd-color-border: light-dark(var(--color-gray-700), var(--color-gray-300));
-  --kbd-color-background: light-dark(var(--color-gray-1000), var(--color-gray-200));
+  --kbd-color-text: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+  --kbd-color-border: light-dark(var(--color-neutral-600), var(--color-neutral-300));
+  --kbd-color-background: light-dark(var(--color-neutral-900), var(--color-neutral-200));
+
+  // pulse colors for button/link glow animations
+  // Note: These are comma-separated RGB triplets consumed by the @keyframes pulse animation.
+  // Primary/secondary are derived from brand colors; info/success/warning/error are independent
+  --color-pulse-primary: 214, 72, 255;
+  --color-pulse-secondary: 0, 209, 183;
+  --color-pulse-default: 100, 100, 100;
+  --color-pulse-info: 0, 122, 255;
+  --color-pulse-success: 52, 199, 89;
+  --color-pulse-warning: 255, 149, 0;
+  --color-pulse-error: 255, 59, 48;
 }
 
 // dark color scheme overrides
