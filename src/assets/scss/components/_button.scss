@@ -73,8 +73,8 @@
 }
 
 :where(.button.type-primary:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* --- Secondary: brand color, always light text --- */
@@ -87,8 +87,8 @@
 }
 
 :where(.button.type-secondary:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* --- Info: solid blue background --- */
@@ -101,8 +101,8 @@
 }
 
 :where(.button.type-info:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* --- Success: solid green background --- */
@@ -115,8 +115,8 @@
 }
 
 :where(.button.type-success:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* --- Warning: solid orange background --- */
@@ -129,8 +129,8 @@
 }
 
 :where(.button.type-warning:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* --- Error: solid red background --- */
@@ -143,8 +143,8 @@
 }
 
 :where(.button.type-error:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: light-dark(#ffffff, #000000) !important;
+  color: light-dark(#000000, #ffffff) !important;
 }
 
 /* ============================================================
