@@ -73,7 +73,7 @@ console.log('[Build Config] raw trailingSlash from config.yaml:', yamlConfig.sit
 console.log('[Build Config] siteUrl:', yamlConfig.metadata.siteUrl)
 console.log('[Build Config] Astro trailingSlash mapping:', yamlConfig.site.trailingSlash ? 'always' : 'never')
 console.log('[Build Config] Astro build.format mapping:', yamlConfig.site.trailingSlash ? 'directory' : 'file')
-console.log(`[Build Config] Vercel cleanUrls + trailingSlash=${yamlConfig.site.trailingSlash} applied — /portfolio, /blog resolve from directory HTML files`)
+console.log('[Build Config] URL policy is controlled by config.yaml -> Astro trailingSlash/build.format')
 console.log('[Build Config] ==========================================\n')
 
 // https://astro.build/config
