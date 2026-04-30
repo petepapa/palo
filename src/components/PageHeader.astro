@@ -2,6 +2,7 @@
 import { Avatar, Breadcrumbs, BreadcrumbsItem, Heading } from 'accessible-astro-components'
 import { Image } from 'astro:assets'
 import sanitizeHtml from 'sanitize-html'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 /**
  * PageHeader Component
@@ -111,7 +112,7 @@ const sanitizedSubtitle: string = subtitle
                   return null
                 }
 
-                const url = `/${segments.slice(0, index + 1).join('/')}`
+                const url = ensureTrailingSlash(`/${segments.slice(0, index + 1).join('/')}`)
                 const isLast = index === segments.length - 1 || (joinLastBreadcrumb && index === segments.length - 2)
 
                 const formattedName = (() => {

@@ -43,16 +43,36 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       const mobileDesktopMenus = mainNav.querySelectorAll('nav > ul')
       const currentPathname = window.location.pathname
 
+      // Normalize a path by stripping trailing slash (for comparison purposes)
+      const normalizePath = (path: string): string => {
+        if (path.length > 1 && path.endsWith('/')) {
+          return path.slice(0, -1)
+        }
+        return path
+      }
+
+      const normalizedCurrent = normalizePath(currentPathname)
+
       mobileDesktopMenus.forEach((menu) => {
         const menuItems = [...menu.querySelectorAll('a[href]:not([rel*="external"])')] as HTMLAnchorElement[]
 
         menuItems.forEach((menuItem) => {
-          if (currentPathname.includes(menuItem.pathname.replaceAll('/', '')) && menuItem.textContent !== 'Home') {
-            menuItem.classList.add('is-active')
-            menuItem.setAttribute('aria-current', 'page')
-          } else if (menuItem.textContent === 'Home' && currentPathname === '/') {
-            menuItem.classList.add('is-active')
-            menuItem.setAttribute('aria-current', 'page')
+          const isHomeItem = menuItem.textContent?.trim() === 'Home'
+          const normalizedHref = normalizePath(menuItem.pathname)
+
+          if (isHomeItem) {
+            // Home only matches the root path exactly
+            if (normalizedCurrent === '/' || normalizedCurrent === '') {
+              menuItem.classList.add('is-active')
+              menuItem.setAttribute('aria-current', 'page')
+            }
+          } else {
+            // For other items, match if the current pathname starts with the item's href
+            // This handles both exact matches (/blog === /blog) and sub-pages (/blog/some-post starts with /blog)
+            if (normalizedCurrent === normalizedHref || normalizedCurrent.startsWith(normalizedHref + '/')) {
+              menuItem.classList.add('is-active')
+              menuItem.setAttribute('aria-current', 'page')
+            }
           }
         })
       })
