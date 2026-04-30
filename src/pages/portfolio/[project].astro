@@ -5,6 +5,7 @@ import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
 import { getCollection, render } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects')
@@ -45,7 +46,7 @@ const author = {
 }
 ---
 
-<DefaultLayout title={project.data.title} description={project.data.description} url={`/portfolio/${project.id}`}>
+<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)}>
   <PageHeader
     title={project.data.title}
     subtitle={project.data.description}

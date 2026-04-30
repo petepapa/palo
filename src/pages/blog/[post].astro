@@ -7,6 +7,7 @@ import { Heading } from 'accessible-astro-components'
 import { Image } from 'astro:assets'
 import { BLOG_API_URL } from 'astro:env/server'
 import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 interface ApiPost {
   id: number
@@ -75,7 +76,10 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as Props
 const postSlug = Astro.params.post ?? slugify(post.title)
-const canonicalUrl = new URL(`/blog/${postSlug}`, Astro.site ?? Astro.url).href
+const canonicalUrl = new URL(
+  ensureTrailingSlash(`/blog/${postSlug}`),
+  Astro.site ?? Astro.url
+).href
 const author = {
   name: 'A11Y Person',
   image: '/posts/post-image-1.png',
