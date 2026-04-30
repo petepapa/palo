@@ -68,6 +68,9 @@ export default defineConfig({
   compressHTML: true,
   site: yamlConfig.metadata.siteUrl,
   trailingSlash: yamlConfig.site.trailingSlash ? 'always' : 'never',
+  build: {
+    format: yamlConfig.site.trailingSlash ? 'directory' : 'file',
+  },
   integrations: [compress(), icon(), mdx(), sitemap()],
   vite: enhanceConfigForWorkspace(viteConfig),
   env: {
