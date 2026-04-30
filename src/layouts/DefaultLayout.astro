@@ -109,10 +109,11 @@ const seoTitleTemplate = shouldUseRawTitle || !useTitleTemplate
 //  Dynamic brand variables from config.yaml
 // ──────────────────────────────────────────────
 const {
-  branding: { colors, fontFamily },
+  branding: { colors, font },
   layout,
   typography,
 } = themeConfig
+const fontBasePath = `${font.path.replace(/\/?$/, '/')}`
 
 // ──────────────────────────────────────────────
 //  Utopia fluid type scale generator
@@ -163,10 +164,17 @@ for (let lvl = -2; lvl <= 8; lvl++) {
         --brand-outline: {colors.outline};
 
         /* font family */
-        --font-family-default: {fontFamily};
-        --font-family-special: {fontFamily};
+        --font-family-name: "{font.name}";
+        --font-body-family: "{font.name}";
+        --font-heading-family: "{font.name}";
+        --font-family-default: "{font.name}", sans-serif;
+        --font-family-special: "{font.name}", sans-serif;
         --font-heading: var(--font-family-special);
         --font-body: var(--font-family-default);
+        --font-file-base-path: "{fontBasePath}";
+        --font-weight-body: {font.weights.body};
+        --font-weight-accent: {font.weights.accent};
+        --font-weight-heading: {font.weights.heading};
 
         /* layout */
         --grid-max-width: {layout.containerMaxWidth};

@@ -40,8 +40,23 @@ branding:
   # Put the file in /public and use a path starting with /
   logo: '/branding/logo.svg'
 
-  # Primary font family for the site (body and headings).
-  fontFamily: "'League Spartan', sans-serif"
+  # Font settings used globally for body, navigation/buttons emphasis, and headings.
+  font:
+    # Font family name used in CSS.
+    name: 'League Spartan'
+
+    # Folder containing font files for the configured weights.
+    # Expected files: <weight>.ttf (e.g. 300.ttf, 400.ttf, 500.ttf)
+    path: '/fonts/League_Spartan/'
+
+    # Weight tokens:
+    # - body: body text
+    # - accent: emphasized non-heading text (nav, buttons, labels)
+    # - heading: headings
+    weights:
+      body: 300
+      accent: 400
+      heading: 500
 
   colors:
     # Main brand color.

@@ -297,6 +297,7 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
     a,
     button {
       color: var(--foreground-color);
+      font-weight: var(--font-weight-accent, 400);
     }
 
     nav {
@@ -322,7 +323,7 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
         }
 
         .is-active {
-          font-weight: bold;
+          font-weight: var(--font-weight-accent, 400);
         }
 
         .highlight a {

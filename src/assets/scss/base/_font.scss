@@ -1,62 +1,38 @@
 @use 'breakpoint' as *;
 
-// League Spartan font faces
+// Config-driven font faces from CSS custom properties injected in DefaultLayout.
 @font-face {
   font-style: normal;
-  font-weight: 300;
-  src:
-    local('League Spartan Light'),
-    local('LeagueSpartan-Light'),
-    url('/fonts/LeagueSpartan-Light.woff2') format('woff2');
-  font-family: 'League Spartan';
+  font-weight: var(--font-weight-body, 300);
+  src: url('#{var(--font-file-base-path, "/fonts/League_Spartan/")}#{var(--font-weight-body, 300)}.ttf')
+    format('truetype');
+  font-family: var(--font-family-name, 'League Spartan');
   font-display: swap;
 }
 
 @font-face {
   font-style: normal;
-  font-weight: 400;
-  src:
-    local('League Spartan Regular'),
-    local('LeagueSpartan-Regular'),
-    url('/fonts/LeagueSpartan-Regular.woff2') format('woff2');
-  font-family: 'League Spartan';
+  font-weight: var(--font-weight-accent, 400);
+  src: url('#{var(--font-file-base-path, "/fonts/League_Spartan/")}#{var(--font-weight-accent, 400)}.ttf')
+    format('truetype');
+  font-family: var(--font-family-name, 'League Spartan');
   font-display: swap;
 }
 
 @font-face {
   font-style: normal;
-  font-weight: 500;
-  src:
-    local('League Spartan Medium'),
-    local('LeagueSpartan-Medium'),
-    url('/fonts/LeagueSpartan-Medium.woff2') format('woff2');
-  font-family: 'League Spartan';
-  font-display: swap;
-}
-
-@font-face {
-  font-style: normal;
-  font-weight: 600;
-  src:
-    local('League Spartan SemiBold'),
-    local('LeagueSpartan-SemiBold'),
-    url('/fonts/LeagueSpartan-SemiBold.woff2') format('woff2');
-  font-family: 'League Spartan';
-  font-display: swap;
-}
-
-@font-face {
-  font-style: normal;
-  font-weight: 700;
-  src:
-    local('League Spartan Bold'),
-    local('LeagueSpartan-Bold'),
-    url('/fonts/LeagueSpartan-Bold.woff2') format('woff2');
-  font-family: 'League Spartan';
+  font-weight: var(--font-weight-heading, 500);
+  src: url('#{var(--font-file-base-path, "/fonts/League_Spartan/")}#{var(--font-weight-heading, 500)}.ttf')
+    format('truetype');
+  font-family: var(--font-family-name, 'League Spartan');
   font-display: swap;
 }
 
 @layer base {
+  body {
+    font-weight: var(--font-weight-body, 300);
+  }
+
   p {
     text-wrap: pretty;
   }
@@ -73,14 +49,14 @@
 
   h1,
   h2 {
-    font-weight: 600;
+    font-weight: var(--font-weight-heading, 500);
   }
 
   h3,
   h4,
   h5,
   h6 {
-    font-weight: 500;
+    font-weight: var(--font-weight-heading, 500);
   }
 
   h1 {

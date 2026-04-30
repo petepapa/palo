@@ -64,9 +64,21 @@ export interface BrandingColors {
   outline: string
 }
 
+export interface BrandingFontWeights {
+  body: number
+  accent: number
+  heading: number
+}
+
+export interface BrandingFontConfig {
+  name: string
+  path: string
+  weights: BrandingFontWeights
+}
+
 export interface BrandingConfig {
   logo: string
-  fontFamily: string
+  font: BrandingFontConfig
   colors: BrandingColors
 }
 
