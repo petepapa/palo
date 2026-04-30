@@ -34,18 +34,18 @@
   --color-neutral-900: oklch(from var(--brand-neutral) 15% c h);
 
   // component library tokens (consumed by accessible-astro-components Button, Badge, Notification, etc.)
-  // Uses light-dark() so each token adapts: light mode = lighter tones, dark mode = deeper tones
-  --color-default-bg: light-dark(hsl(200 20% 97%), hsl(215 25% 13%));
-  --color-default-border: light-dark(hsl(204 8% 55%), hsl(215 15% 45%));
-  --color-default-text: light-dark(hsl(204 8% 14%), hsl(0 0% 100%));
+  // Flat design: pure solid colors, no alpha channels, no gradient-like light/dark variants
+  --color-default-bg: light-dark(var(--color-neutral-200), var(--color-neutral-900));
+  --color-default-border: light-dark(var(--color-neutral-700), var(--color-neutral-300));
+  --color-default-text: light-dark(var(--color-neutral-900), var(--color-neutral-200));
 
-  --color-primary-bg: light-dark(var(--color-primary-200), var(--color-primary-500));
-  --color-primary-border: light-dark(var(--color-primary-500), var(--color-primary-100));
-  --color-primary-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+  --color-primary-bg: var(--brand-primary);
+  --color-primary-border: var(--brand-primary);
+  --color-primary-text: var(--color-neutral-100);
 
-  --color-secondary-bg: light-dark(var(--color-secondary-200), var(--color-secondary-500));
-  --color-secondary-border: light-dark(var(--color-secondary-500), var(--color-secondary-100));
-  --color-secondary-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+  --color-secondary-bg: var(--brand-secondary);
+  --color-secondary-border: var(--brand-secondary);
+  --color-secondary-text: var(--color-neutral-100);
 
   --color-info-bg: light-dark(hsl(198 100% 94%), hsl(234 54% 20%));
   --color-info-border: light-dark(hsl(200 78% 46%), hsl(234 100% 60%));
