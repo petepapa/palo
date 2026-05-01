@@ -54,34 +54,35 @@ branding:
     # - accent: emphasized non-heading text (nav, buttons, labels)
     # - heading: headings
     weights:
-      body: 700
-      accent: 100
-      heading: 700
+      body: 300
+      accent: 400
+      heading: 500
 
   colors:
     # Main brand color.
-    primary: '#d648ff'
+    primary: '#333333'
 
     # Secondary accent color.
-    secondary: '#00d1b7'
+    secondary: 'orange'
 
     # Neutral supporting color.
-    neutral: '#b9bec4'
+    neutral: '#000000'
 
     # Focus/outline color used for accessibility states.
     outline: '#ff4500'
 
 layout:
   # Maximum width of the main page container.
+  # Supports valid CSS length units such as px, rem, em, %, vw, vh.
   containerMaxWidth: '1536px'
 
 typography:
   # Body text.
-  baseFontSize: '16px'
+  baseFontSize: '21px'
   lineHeightScale: 1.0
 
   # Heading size.
   mobileHeadingScale: 1.12
   desktopHeadingScale: 1.72
   headingLineHeightScale: 0.75
-  uppercaseDisplayText: true
+  uppercaseDisplayText: false

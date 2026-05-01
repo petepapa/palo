@@ -103,9 +103,8 @@ const hasExplicitTitle = 'title' in Astro.props
 const shouldUseRawTitle = isHomePage && !hasExplicitTitle
 
 const seoTitle = shouldUseRawTitle ? themeConfig.metadata.title : title
-const seoTitleTemplate = shouldUseRawTitle || !useTitleTemplate
-  ? undefined
-  : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
+const seoTitleTemplate =
+  shouldUseRawTitle || !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -115,6 +114,28 @@ const {
   layout,
   typography,
 } = themeConfig
+
+const defaultContainerMaxWidth = '90rem'
+const containerMaxWidth = (() => {
+  const raw = String(layout.containerMaxWidth ?? '').trim()
+  if (!raw) {
+    return defaultContainerMaxWidth
+  }
+
+  if (/^\d+(\.\d+)?(px|rem|em|vw|vh|vmin|vmax|ch|cm|mm|in|pc|%)$/i.test(raw)) {
+    return raw
+  }
+
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    return `${raw}px`
+  }
+
+  console.warn(
+    `\n[Config Warning] layout.containerMaxWidth '${raw}' is not a valid CSS length. Falling back to ${defaultContainerMaxWidth}.\n`,
+  )
+  return defaultContainerMaxWidth
+})()
+
 const publicRoot = resolve(process.cwd(), 'public')
 const fontDirectory = resolve(publicRoot, font.path.replace(/^\//, ''))
 
@@ -181,7 +202,8 @@ const selectStaticFontFile = (weight: number): string | null => {
 }
 
 const variableFontFile =
-  availableFontFiles.find((filePath) => /variablefont/i.test(filePath) && /\.(woff2|woff|ttf|otf)$/i.test(filePath)) ?? null
+  availableFontFiles.find((filePath) => /variablefont/i.test(filePath) && /\.(woff2|woff|ttf|otf)$/i.test(filePath)) ??
+  null
 
 const buildFontFaceCss = (): string => {
   if (variableFontFile) {
@@ -306,7 +328,7 @@ const themeVariablesCss = `
   --text-8xl--line-height: calc(1 * var(--line-height-scale));
   --text-9xl--line-height: calc(1 * var(--line-height-scale));
 
-  --grid-max-width: ${layout.containerMaxWidth};
+  --grid-max-width: ${containerMaxWidth};
 
 ${Object.entries(fontSizeLevels)
   .map(([key, val]) => `  ${key}: ${val};`)
@@ -324,7 +346,7 @@ ${Object.entries(fontSizeLevels)
     <!-- favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
-    {fontFaceCss && <style is:global set:html={fontFaceCss}></style>}
+    {fontFaceCss && <style is:global set:html={fontFaceCss} />}
 
     <style is:global set:html={themeVariablesCss}></style>
 

@@ -57,16 +57,17 @@ button.button {
 
 /* --- Default: black/white extreme contrast --- */
 :where(.button.type-default) {
-  --btn-bg: light-dark(#000000, #ffffff) !important;
-  --btn-text: light-dark(#ffffff, #000000) !important;
+  --btn-bg: var(--color-default-bg) !important;
+  --btn-text: var(--color-default-text) !important;
   background-color: var(--btn-bg) !important;
-  border-color: var(--btn-bg) !important;
+  border-color: var(--color-default-border) !important;
   color: var(--btn-text) !important;
 }
 
 :where(.button.type-default:hover) {
-  background-color: var(--btn-text) !important;
-  color: var(--btn-bg) !important;
+  background-color: var(--color-default-text) !important;
+  border-color: var(--color-default-text) !important;
+  color: var(--color-default-bg) !important;
 }
 
 /* --- Primary: brand color, always light text --- */
@@ -79,8 +80,8 @@ button.button {
 }
 
 :where(.button.type-primary:hover) {
-  background-color: light-dark(#ffffff, #000000) !important;
-  color: light-dark(#000000, #ffffff) !important;
+  background-color: var(--color-neutral-100) !important;
+  color: var(--brand-primary) !important;
 }
 
 /* --- Secondary: brand color, always light text --- */
@@ -93,8 +94,8 @@ button.button {
 }
 
 :where(.button.type-secondary:hover) {
-  background-color: light-dark(#ffffff, #000000) !important;
-  color: light-dark(#000000, #ffffff) !important;
+  background-color: var(--color-neutral-100) !important;
+  color: var(--brand-secondary) !important;
 }
 
 /* --- Info: solid blue background --- */

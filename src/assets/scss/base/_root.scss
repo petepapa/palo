@@ -1,4 +1,4 @@
-:root:root {
+:root {
   color-scheme: light;
   interpolate-size: allow-keywords;
 
@@ -35,9 +35,9 @@
 
   // component library tokens (consumed by accessible-astro-components Button, Badge, Notification, etc.)
   // Flat design: pure solid colors, no alpha channels, no gradient-like light/dark variants
-  --color-default-bg: light-dark(var(--color-neutral-200), var(--color-neutral-900));
-  --color-default-border: light-dark(var(--color-neutral-700), var(--color-neutral-300));
-  --color-default-text: light-dark(var(--color-neutral-900), var(--color-neutral-200));
+  --color-default-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  --color-default-border: light-dark(var(--color-neutral-700), var(--color-neutral-400));
+  --color-default-text: light-dark(var(--color-neutral-900), var(--color-neutral-100));
 
   --color-primary-bg: var(--brand-primary);
   --color-primary-border: var(--brand-primary);
@@ -119,7 +119,6 @@
 
   // grid
   // https://utopia.fyi/grid/calculator?c=320,18,1.2,1240,20,1.25,5,2,&s=0.75%7C0.5%7C0.25,1.5%7C2%7C3%7C4%7C6,s-l&g=s,l,xl,12
-  --grid-max-width: 90rem;
   --grid-gutter: var(--space-s-l, clamp(1.125rem, 0.6467rem + 2.3913vw, 2.5rem));
   --grid-columns: 12;
 
