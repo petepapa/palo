@@ -101,7 +101,7 @@ export default defineConfig({
   site: yamlConfig.metadata.siteUrl,
   trailingSlash: yamlConfig.site.trailingSlash ? 'always' : 'never',
   build: {
-    format: yamlConfig.site.trailingSlash ? 'directory' : 'file',
+    format: 'directory',
   },
   integrations: [compress(), icon(), mdx(), sitemap()],
   vite: enhanceConfigForWorkspace(viteConfig),
