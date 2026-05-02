@@ -66,10 +66,17 @@ branding:
     secondary: 'green'
 
     # Neutral supporting color.
-    neutral: 'pink'
+    neutral: 'green'
 
     # Focus/outline color used for accessibility states.
-    outline: '#ff4500'
+    outline: '#ffffff'
+
+    # Semantic colors for info, success, warning, and error states.
+    # Used by buttons, alerts, badges, and other status indicators.
+    info: 'blue'
+    success: 'green'
+    warning: 'orange'
+    error: 'red'
 
 layout:
   # Maximum width of the main page container.

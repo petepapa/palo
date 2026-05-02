@@ -62,6 +62,10 @@ export interface BrandingColors {
   secondary: string
   neutral: string
   outline: string
+  info: string
+  success: string
+  warning: string
+  error: string
 }
 
 export interface BrandingFontWeights {

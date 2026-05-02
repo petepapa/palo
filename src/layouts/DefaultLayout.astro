@@ -151,7 +151,10 @@ function hexToRgbTriplet(hex: string): string {
   // Strip # and handle shorthand hex (e.g. #333 → #333333)
   let normalized = hex.replace(/^#/, '')
   if (normalized.length === 3) {
-    normalized = normalized.split('').map((c) => c + c).join('')
+    normalized = normalized
+      .split('')
+      .map((c) => c + c)
+      .join('')
   }
   const num = parseInt(normalized, 16)
   if (isNaN(num)) return '0, 0, 0'
@@ -336,13 +339,41 @@ const themeVariablesCss = `
 :root {
   font-size: ${typography.baseFontSize};
 
-  --brand-primary: ${colors.primary};
-  --brand-secondary: ${colors.secondary};
-  --brand-neutral: ${colors.neutral};
-  --brand-outline: ${colors.outline};
+  --brand-primary: ${colors.primary} !important;
+  --brand-secondary: ${colors.secondary} !important;
+  --brand-neutral: ${colors.neutral} !important;
+  --brand-outline: ${colors.outline} !important;
 
-  --color-pulse-primary: ${colorToRgbTriplet(colors.primary)};
-  --color-pulse-secondary: ${colorToRgbTriplet(colors.secondary)};
+  --color-pulse-primary: ${colorToRgbTriplet(colors.primary)} !important;
+  --color-pulse-secondary: ${colorToRgbTriplet(colors.secondary)} !important;
+
+  --brand-info: ${colors.info} !important;
+  --brand-success: ${colors.success} !important;
+  --brand-warning: ${colors.warning} !important;
+  --brand-error: ${colors.error} !important;
+
+  --color-pulse-info: ${colorToRgbTriplet(colors.info)} !important;
+  --color-pulse-success: ${colorToRgbTriplet(colors.success)} !important;
+  --color-pulse-warning: ${colorToRgbTriplet(colors.warning)} !important;
+  --color-pulse-error: ${colorToRgbTriplet(colors.error)} !important;
+
+  /* Semantic color variables — override accessible-astro-components hardcoded HSL values */
+  --color-default-border: light-dark(var(--color-neutral-700), var(--color-neutral-400)) !important;
+  --color-default-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800)) !important;
+  --color-default-text: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
+  --color-info-border: var(--brand-info) !important;
+  --color-info-bg: light-dark(oklch(from var(--brand-info) 95% c h), oklch(from var(--brand-info) 20% c h)) !important;
+  --color-info-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-success-border: var(--brand-success) !important;
+  --color-success-bg: light-dark(oklch(from var(--brand-success) 95% c h), oklch(from var(--brand-success) 20% c h)) !important;
+  --color-success-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-warning-border: var(--brand-warning) !important;
+  --color-warning-bg: light-dark(oklch(from var(--brand-warning) 95% c h), oklch(from var(--brand-warning) 20% c h)) !important;
+  --color-warning-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-error-border: var(--brand-error) !important;
+  --color-error-bg: light-dark(oklch(from var(--brand-error) 95% c h), oklch(from var(--brand-error) 20% c h)) !important;
+  --color-error-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-pulse-default: 100, 100, 100;
 
   --font-family-name: "${font.name}";
   --font-body-family: "${font.name}";
