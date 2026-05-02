@@ -2,12 +2,9 @@
   color-scheme: light;
   interpolate-size: allow-keywords;
 
-  // brand colors (change these to your own brand colors)
-  --brand-primary: #d648ff;
-  --brand-secondary: #00d1b7;
-  --brand-neutral: #b9bec4;
-  --brand-outline: #ff4500;
-
+  // brand colors — injected dynamically from config.yaml via DefaultLayout.astro
+  // (do not set static defaults here; they're overridden at runtime)
+  // The var() references below will use the values set in DefaultLayout.astro
   // pallet brand
   --color-primary-100: oklch(from var(--brand-primary) 90% c h);
   --color-primary-200: oklch(from var(--brand-primary) 80% c h);
@@ -179,9 +176,10 @@
 
   // pulse colors for button/link glow animations
   // Note: These are comma-separated RGB triplets consumed by the @keyframes pulse animation.
-  // Primary/secondary are derived from brand colors; info/success/warning/error are independent
-  --color-pulse-primary: 214, 72, 255;
-  --color-pulse-secondary: 0, 209, 183;
+  // Primary/secondary are injected dynamically from config.yaml via DefaultLayout.astro.
+  // info/success/warning/error are independent (no config.yaml equivalent)
+  --color-pulse-primary: 51, 51, 51;
+  --color-pulse-secondary: 255, 165, 0;
   --color-pulse-default: 100, 100, 100;
   --color-pulse-info: 0, 122, 255;
   --color-pulse-success: 52, 199, 89;

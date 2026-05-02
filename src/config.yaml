@@ -60,13 +60,13 @@ branding:
 
   colors:
     # Main brand color.
-    primary: '#333333'
+    primary: 'red'
 
     # Secondary accent color.
-    secondary: 'orange'
+    secondary: 'green'
 
     # Neutral supporting color.
-    neutral: '#000000'
+    neutral: 'pink'
 
     # Focus/outline color used for accessibility states.
     outline: '#ff4500'

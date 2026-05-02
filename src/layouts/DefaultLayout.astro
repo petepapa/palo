@@ -115,6 +115,52 @@ const {
   typography,
 } = themeConfig
 
+// ──────────────────────────────────────────────
+//  Color-to-RGB helper for pulse colors
+//  Accepts hex (#333, #333333) or named CSS colors ('orange').
+// ──────────────────────────────────────────────
+function colorToRgbTriplet(color: string): string {
+  // Named CSS color → hex map (common subset)
+  const namedColorMap: Record<string, string> = {
+    orange: '#ffa500',
+    red: '#ff0000',
+    blue: '#0000ff',
+    green: '#008000',
+    yellow: '#ffff00',
+    purple: '#800080',
+    pink: '#ffc0cb',
+    cyan: '#00ffff',
+    white: '#ffffff',
+    black: '#000000',
+    gray: '#808080',
+    grey: '#808080',
+    silver: '#c0c0c0',
+    maroon: '#800000',
+    navy: '#000080',
+    olive: '#808000',
+    teal: '#008080',
+    aqua: '#00ffff',
+    fuchsia: '#ff00ff',
+    lime: '#00ff00',
+  }
+  const hex = namedColorMap[color.toLowerCase()] ?? color
+  return hexToRgbTriplet(hex)
+}
+
+function hexToRgbTriplet(hex: string): string {
+  // Strip # and handle shorthand hex (e.g. #333 → #333333)
+  let normalized = hex.replace(/^#/, '')
+  if (normalized.length === 3) {
+    normalized = normalized.split('').map((c) => c + c).join('')
+  }
+  const num = parseInt(normalized, 16)
+  if (isNaN(num)) return '0, 0, 0'
+  const r = (num >> 16) & 255
+  const g = (num >> 8) & 255
+  const b = num & 255
+  return `${r}, ${g}, ${b}`
+}
+
 const defaultContainerMaxWidth = '90rem'
 const containerMaxWidth = (() => {
   const raw = String(layout.containerMaxWidth ?? '').trim()
@@ -294,6 +340,9 @@ const themeVariablesCss = `
   --brand-secondary: ${colors.secondary};
   --brand-neutral: ${colors.neutral};
   --brand-outline: ${colors.outline};
+
+  --color-pulse-primary: ${colorToRgbTriplet(colors.primary)};
+  --color-pulse-secondary: ${colorToRgbTriplet(colors.secondary)};
 
   --font-family-name: "${font.name}";
   --font-body-family: "${font.name}";
