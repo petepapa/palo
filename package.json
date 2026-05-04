@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "node scripts/dev-with-config-watch.mjs",
     "dev:astro": "astro dev",
-    "start": "astro dev",
+    "start": "node scripts/dev-with-config-watch.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },

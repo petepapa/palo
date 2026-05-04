@@ -85,11 +85,11 @@ layout:
 
 typography:
   # Body text.
-  baseFontSize: '21px'
+  baseFontSize: '16px'
   lineHeightScale: 1.0
 
   # Heading size.
   mobileHeadingScale: 1.12
   desktopHeadingScale: 1.72
-  headingLineHeightScale: 0.75
-  uppercaseDisplayText: false
+  headingLineHeightScale: 1
+  uppercaseDisplayText: true

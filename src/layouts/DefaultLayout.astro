@@ -306,38 +306,40 @@ const buildFontFaceCss = (): string => {
 
 const fontFaceCss = buildFontFaceCss()
 
-// ──────────────────────────────────────────────
-//  Utopia fluid type scale generator
-//  Algorithm:
-//    minFont = baseFontSize * (mobileScale ^ level)
-//    maxFont = baseFontSize * (desktopScale ^ level)
-//    slope   = ((maxFont - minFont) / (viewportMax - viewportMin)) * 100
-//    clamp(minFont, slope cqi + intercept, maxFont)
-// ──────────────────────────────────────────────
-const baseFontSize = parseInt(typography.baseFontSize, 10) || 16
-const viewportMin = 320
-const viewportMax = 1240
 const mobileScale = typography.mobileHeadingScale
 const desktopScale = typography.desktopHeadingScale
+const viewportMin = 375
+const viewportMax = 1440
+const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
 
-function clampFontSize(level: number): string {
-  const min = baseFontSize * Math.pow(mobileScale, level)
-  const max = baseFontSize * Math.pow(desktopScale, level)
-  const slope = ((max - min) / (viewportMax - viewportMin)) * 100
-  const intercept = min - (slope * viewportMin) / 100
-  return `clamp(${(min / baseFontSize).toFixed(4)}rem, ${slope.toFixed(4)}cqi + ${(intercept / baseFontSize).toFixed(4)}rem, ${(max / baseFontSize).toFixed(4)}rem)`
+const buildScaleStep = (step: number) => {
+  const mobileValueRem = step >= 0 ? Math.pow(mobileScale, step) : 1 / Math.pow(mobileScale, Math.abs(step))
+  const desktopValueRem = step >= 0 ? Math.pow(desktopScale, step) : 1 / Math.pow(desktopScale, Math.abs(step))
+  const mobileValuePx = mobileValueRem * rootFontSizePx
+  const desktopValuePx = desktopValueRem * rootFontSizePx
+  const slope = ((desktopValuePx - mobileValuePx) / (viewportMax - viewportMin)) * 100
+  const intercept = (mobileValuePx - (slope * viewportMin) / 100) / rootFontSizePx
+
+  return {
+    min: Math.min(mobileValueRem, desktopValueRem),
+    max: Math.max(mobileValueRem, desktopValueRem),
+    slope,
+    intercept,
+  }
 }
 
-// Generate levels -2 through 8 to match _root.scss existing variable set
-const fontSizeLevels: Record<string, string> = {}
-for (let lvl = -2; lvl <= 8; lvl++) {
-  const label = lvl < 0 ? `--font-size-${lvl}` : `--font-size-${lvl}`
-  fontSizeLevels[label] = clampFontSize(lvl)
-}
+const fontScaleSteps = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8] as const
+const fontScaleMap = Object.fromEntries(fontScaleSteps.map((step) => [step, buildScaleStep(step)])) as Record<
+  (typeof fontScaleSteps)[number],
+  { min: number; max: number; slope: number; intercept: number }
+>
 
 const themeVariablesCss = `
-:root {
+:root:root {
   font-size: ${typography.baseFontSize};
+  --m-scale: ${mobileScale};
+  --d-scale: ${desktopScale};
+  --heading-line-height-scale: ${typography.headingLineHeightScale};
 
   --brand-primary: ${colors.primary} !important;
   --brand-secondary: ${colors.secondary} !important;
@@ -386,14 +388,18 @@ const themeVariablesCss = `
   --font-weight-accent: ${font.weights.accent};
   --font-weight-heading: ${font.weights.heading};
   --line-height-scale: ${typography.lineHeightScale};
-  --heading-line-height-scale: ${typography.headingLineHeightScale};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
-  --heading-line-height-h1: calc(1.05 * var(--line-height-scale) * var(--heading-line-height-scale));
-  --heading-line-height-h2: calc(1.12 * var(--line-height-scale) * var(--heading-line-height-scale));
-  --heading-line-height-h3: calc(1.18 * var(--line-height-scale) * var(--heading-line-height-scale));
-  --heading-line-height-h4: calc(1.24 * var(--line-height-scale) * var(--heading-line-height-scale));
-  --heading-line-height-h5: calc(1.3 * var(--line-height-scale) * var(--heading-line-height-scale));
-  --heading-line-height-h6: calc(1.35 * var(--line-height-scale) * var(--heading-line-height-scale));
+  --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem);
+  --font-size--1: clamp(${fontScaleMap[-1].min}rem, calc(${fontScaleMap[-1].intercept}rem + ${fontScaleMap[-1].slope}vw), ${fontScaleMap[-1].max}rem);
+  --font-size-0: clamp(${fontScaleMap[0].min}rem, calc(${fontScaleMap[0].intercept}rem + ${fontScaleMap[0].slope}vw), ${fontScaleMap[0].max}rem);
+  --font-size-1: clamp(${fontScaleMap[1].min}rem, calc(${fontScaleMap[1].intercept}rem + ${fontScaleMap[1].slope}vw), ${fontScaleMap[1].max}rem);
+  --font-size-2: clamp(${fontScaleMap[2].min}rem, calc(${fontScaleMap[2].intercept}rem + ${fontScaleMap[2].slope}vw), ${fontScaleMap[2].max}rem);
+  --font-size-3: clamp(${fontScaleMap[3].min}rem, calc(${fontScaleMap[3].intercept}rem + ${fontScaleMap[3].slope}vw), ${fontScaleMap[3].max}rem);
+  --font-size-4: clamp(${fontScaleMap[4].min}rem, calc(${fontScaleMap[4].intercept}rem + ${fontScaleMap[4].slope}vw), ${fontScaleMap[4].max}rem);
+  --font-size-5: clamp(${fontScaleMap[5].min}rem, calc(${fontScaleMap[5].intercept}rem + ${fontScaleMap[5].slope}vw), ${fontScaleMap[5].max}rem);
+  --font-size-6: clamp(${fontScaleMap[6].min}rem, calc(${fontScaleMap[6].intercept}rem + ${fontScaleMap[6].slope}vw), ${fontScaleMap[6].max}rem);
+  --font-size-7: clamp(${fontScaleMap[7].min}rem, calc(${fontScaleMap[7].intercept}rem + ${fontScaleMap[7].slope}vw), ${fontScaleMap[7].max}rem);
+  --font-size-8: clamp(${fontScaleMap[8].min}rem, calc(${fontScaleMap[8].intercept}rem + ${fontScaleMap[8].slope}vw), ${fontScaleMap[8].max}rem);
   --text-xs--line-height: calc((1 / 0.75) * var(--line-height-scale));
   --text-sm--line-height: calc((1.25 / 0.875) * var(--line-height-scale));
   --text-base--line-height: calc(1.5 * var(--line-height-scale));
@@ -409,10 +415,6 @@ const themeVariablesCss = `
   --text-9xl--line-height: calc(1 * var(--line-height-scale));
 
   --grid-max-width: ${containerMaxWidth};
-
-${Object.entries(fontSizeLevels)
-  .map(([key, val]) => `  ${key}: ${val};`)
-  .join('\n')}
 }
 `.trim()
 ---

@@ -17,90 +17,68 @@
   p {
     text-wrap: pretty;
   }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: var(--font-weight-heading, 500);
-    font-family: var(--font-heading);
-    text-transform: var(--display-text-transform, none);
-    text-wrap: balance;
-  }
-
-  h1 {
-    font-size: var(--font-size-6);
-    line-height: var(--heading-line-height-h1, 1.05);
-  }
-
-  h2 {
-    font-size: var(--font-size-5);
-    line-height: var(--heading-line-height-h2, 1.12);
-  }
-
-  h3 {
-    font-size: var(--font-size-4);
-    line-height: var(--heading-line-height-h3, 1.18);
-  }
-
-  h4 {
-    font-size: var(--font-size-3);
-    line-height: var(--heading-line-height-h4, 1.24);
-  }
-
-  h5 {
-    font-size: var(--font-size-2);
-    line-height: var(--heading-line-height-h5, 1.3);
-  }
-
-  h6 {
-    font-size: var(--font-size-1);
-    line-height: var(--heading-line-height-h6, 1.35);
-  }
 }
 
-.heading,
-[class*='heading'] {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+h1.heading,
+h2.heading,
+h3.heading,
+h4.heading,
+h5.heading,
+h6.heading,
+.heading {
   font-weight: var(--font-weight-heading, 500);
   font-family: var(--font-heading);
+  text-transform: var(--display-text-transform, none);
+  text-wrap: balance;
+  line-height: calc(var(--heading-line-height, 1.2) * var(--line-height-scale, 1) * var(--heading-line-height-scale, 1));
 }
 
+h1.heading.h1,
+h1,
 .heading.h1 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h1, 1.05);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.05;
+  font-size: var(--font-size-5);
 }
 
+h2.heading.h2,
+h2,
 .heading.h2 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h2, 1.12);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.12;
+  font-size: var(--font-size-4);
 }
 
+h3.heading.h3,
+h3,
 .heading.h3 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h3, 1.18);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.18;
+  font-size: var(--font-size-3);
 }
 
+h4.heading.h4,
+h4,
 .heading.h4 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h4, 1.24);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.24;
+  font-size: var(--font-size-2);
 }
 
+h5.heading.h5,
+h5,
 .heading.h5 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h5, 1.3);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.3;
+  font-size: var(--font-size-1);
 }
 
+h6.heading.h6,
+h6,
 .heading.h6 {
-  font-weight: var(--font-weight-heading, 500);
-  line-height: var(--heading-line-height-h6, 1.35);
-  text-transform: var(--display-text-transform, none);
+  --heading-line-height: 1.35;
+  font-size: var(--font-size-0);
 }
 
 :where(header, nav, aside, footer) :where(a, button, [role='button'], summary),
