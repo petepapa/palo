@@ -10,14 +10,17 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  */
 ---
 
-<Link href="/" class="flex items-center gap-2">
+<Link href="/" class="flex items-center gap-2 logo-link">
   {
     themeConfig.branding.logo && (
       <img src={themeConfig.branding.logo} alt={themeConfig.site.name} width="47" height="37" loading="eager" />
     )
   }
   {!themeConfig.branding.logo && (
-    <span class="text-sm sm:text-lg" style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading});`}>
+    <span
+      class="logo-text"
+      style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading}); font-size: var(--logo-text-font-size, var(--navigation-desktop-font-size, 1rem)); text-transform: none;`}
+    >
       {themeConfig.site.name}
     </span>
   )}

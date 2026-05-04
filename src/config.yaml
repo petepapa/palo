@@ -1,11 +1,12 @@
-# Palo Framework Configuration
-# Edit this file to customize your site. All fields are documented below.
+# Site configuration
+# Edit this file to control the site's content, branding, layout, and typography.
 
 site:
-  # The site name shown in the header and used as the default page title.
+  # Site name.
+  # Used for the text logo and as the default page title fallback.
   name: Palo
 
-  # The separator used in browser tab titles.
+  # Separator used in browser tab titles.
   # Example: "About | Palo"
   titleSeparator: '|'
 
@@ -14,45 +15,49 @@ site:
   # true  -> /about/
   trailingSlash: false
 
-  # Whether to show the dark mode toggle in the navigation bar.
+  # Show the dark mode toggle in the header.
   showDarkModeToggle: true
 
 metadata:
-  # Your production site URL, including https://
-  # Used for SEO canonical URLs, Open Graph, and sitemap generation.
+  # Production site URL, including https://
+  # Used for canonical URLs, social sharing metadata, and sitemap generation.
   siteUrl: 'https://palo.petepa.com'
 
-  # Default SEO title for the site homepage and fallbacks.
-  title: 'Palo — The Highly Customizable Astro Framework for Creators'
+  # Default title for the homepage and SEO fallbacks.
+  title: 'Palo - A minimalist Astro theme for artists, musicians, and designers'
 
-  # Default SEO description used across the site.
+  # Default SEO description.
   description: 'Break free from generic business templates. Palo is a minimalist Astro theme by PetePa, crafted for artists, musicians, and designers. Deeply customize your colors, radius, and typography within a logic-driven framework. Build your unique digital identity at palo.petepa.com.'
 
-  # Author name for metadata tags.
+  # Author name used in metadata tags.
   author: PetePa
 
   # Social sharing image path.
-  # Put the image in /public and use a path starting with /
+  # Put the file in /public and use a path starting with /
   image: '/social-preview-image.png'
 
+  # Browser tab icon (favicon) path.
+  # Put the file in /public and use a path starting with /
+  favicon: '/favicon.svg'
+
 branding:
-  # Logo path.
+  # Logo image path.
+  # Leave empty to show the text logo (site.name) instead.
   # Put the file in /public and use a path starting with /
   logo: ''
 
-  # Font settings used globally for body, navigation/buttons emphasis, and headings.
   font:
-    # Font family name used in CSS.
+    # Font family name used across the whole site.
     name: 'League Spartan'
 
-    # Folder containing font files for the configured weights.
-    # Expected files: <weight>.ttf (e.g. 300.ttf, 400.ttf, 500.ttf)
+    # Folder containing the local font files.
+    # Put the files in /public and use a path starting with /
     path: '/fonts/League_Spartan/'
 
-    # Weight tokens:
-    # - body: body text
-    # - accent: emphasized non-heading text (nav, buttons, labels)
-    # - heading: headings
+    # Font weights used by the design system.
+    # body: paragraphs and long-form text
+    # accent: navigation, buttons, labels, and other emphasized UI text
+    # heading: all headings
     weights:
       body: 300
       accent: 400
@@ -62,34 +67,60 @@ branding:
     # Main brand color.
     primary: 'red'
 
-    # Secondary accent color.
+    # Secondary brand color.
     secondary: 'green'
 
-    # Neutral supporting color.
+    # Neutral base color used to derive text, borders, and surfaces.
     neutral: 'green'
 
-    # Focus/outline color used for accessibility states.
+    # Focus outline color used for accessibility states.
     outline: '#ffffff'
 
-    # Semantic colors for info, success, warning, and error states.
-    # Used by buttons, alerts, badges, and other status indicators.
+    # Semantic state colors.
+    # Used by buttons, badges, notifications, and other status UI.
     info: 'blue'
     success: 'green'
     warning: 'orange'
     error: 'red'
 
 layout:
-  # Maximum width of the main page container.
-  # Supports valid CSS length units such as px, rem, em, %, vw, vh.
+  # Maximum width of the main content container.
+  # Supports any valid CSS length unit such as px, rem, em, %, vw, or vh.
   containerMaxWidth: '1536px'
 
 typography:
-  # Body text.
+  # Base body font size.
+  # This sets the site's root font size, so 1rem will equal this value.
   baseFontSize: '16px'
+
+  # Global line-height multiplier.
+  # Affects body text and also participates in heading line-height calculation.
   lineHeightScale: 1.0
 
-  # Heading size.
+  # Desktop navigation font size.
+  # Leave empty to use the base body font size.
+  navigationDesktopFontSize: '21px'
+
+  # Mobile menu font size after the hamburger menu is expanded.
+  # Leave empty to use the base body font size.
+  navigationMobileFontSize: '24px'
+
+  # Text logo font size.
+  # Leave empty to use the desktop navigation font size.
+  logoTextFontSize: '24px'
+
+  # Heading size scale on small screens.
+  # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
   mobileHeadingScale: 1.12
+
+  # Heading size scale on large screens.
+  # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
   desktopHeadingScale: 1.72
-  headingLineHeightScale: 1
+
+  # Extra multiplier for heading line-height only.
+  # 1 = default, smaller = tighter, larger = looser
+  headingLineHeightScale: 0.75
+
+  # Force non-body display text to uppercase.
+  # Affects headings and emphasized UI text, not paragraph content.
   uppercaseDisplayText: true

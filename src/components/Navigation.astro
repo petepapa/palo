@@ -300,6 +300,13 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       font-weight: var(--font-weight-accent, 400);
     }
 
+    .desktop-menu {
+      a,
+      button {
+        font-size: var(--navigation-desktop-font-size, 1rem);
+      }
+    }
+
     nav {
       > ul {
         display: flex;
@@ -365,6 +372,7 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       a,
       button {
         display: block;
+        font-size: var(--navigation-mobile-font-size, 1rem);
         padding: var(--space-2xs) 0;
         inline-size: 100%;
       }

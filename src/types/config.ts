@@ -55,6 +55,7 @@ export interface MetadataConfig {
   description: string
   author: string
   image: string
+  favicon: string
 }
 
 export interface BrandingColors {
@@ -93,6 +94,9 @@ export interface LayoutConfig {
 export interface TypographyConfig {
   baseFontSize: string
   lineHeightScale: number
+  navigationDesktopFontSize: string
+  navigationMobileFontSize: string
+  logoTextFontSize: string
   mobileHeadingScale: number
   desktopHeadingScale: number
   headingLineHeightScale: number

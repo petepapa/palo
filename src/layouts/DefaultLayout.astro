@@ -96,15 +96,24 @@ const imageUrl = buildImageUrl(image)
 // ──────────────────────────────────────────────
 //  Dynamic title generation
 //  Rules:
-//    - Homepage without explicit title → show themeConfig.metadata.title directly
-//    - All other cases → {pageTitle} {titleSeparator} {siteName}
+//    - Homepage without explicit title + metadata.title set → show metadata.title directly
+//    - Homepage without explicit title + metadata.title empty → show Home {separator} {siteName}
+//    - All other cases → {pageTitle} {separator} {siteName}
 // ──────────────────────────────────────────────
 const hasExplicitTitle = 'title' in Astro.props
-const shouldUseRawTitle = isHomePage && !hasExplicitTitle
+const hasMetadataTitle = Boolean(themeConfig.metadata.title?.trim())
+const isHomeWithoutExplicitTitle = isHomePage && !hasExplicitTitle
+const homeFallbackTitle = 'Home'
+const formatDisplayTitleSegment = (value: string) =>
+  themeConfig.typography.uppercaseDisplayText ? value.toUpperCase() : value
 
-const seoTitle = shouldUseRawTitle ? themeConfig.metadata.title : title
+const seoTitle = isHomeWithoutExplicitTitle
+  ? hasMetadataTitle
+    ? formatDisplayTitleSegment(themeConfig.metadata.title)
+    : formatDisplayTitleSegment(homeFallbackTitle)
+  : formatDisplayTitleSegment(title)
 const seoTitleTemplate =
-  shouldUseRawTitle || !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
+  isHomeWithoutExplicitTitle && hasMetadataTitle ? undefined : !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -165,13 +174,15 @@ function hexToRgbTriplet(hex: string): string {
 }
 
 const defaultContainerMaxWidth = '90rem'
-const containerMaxWidth = (() => {
-  const raw = String(layout.containerMaxWidth ?? '').trim()
+const cssLengthPattern = /^\d+(\.\d+)?(px|rem|em|vw|vh|vmin|vmax|ch|cm|mm|in|pc|%)$/i
+
+const resolveCssLength = (rawValue: unknown, fallback: string): string => {
+  const raw = String(rawValue ?? '').trim()
   if (!raw) {
-    return defaultContainerMaxWidth
+    return fallback
   }
 
-  if (/^\d+(\.\d+)?(px|rem|em|vw|vh|vmin|vmax|ch|cm|mm|in|pc|%)$/i.test(raw)) {
+  if (cssLengthPattern.test(raw)) {
     return raw
   }
 
@@ -179,11 +190,25 @@ const containerMaxWidth = (() => {
     return `${raw}px`
   }
 
-  console.warn(
-    `\n[Config Warning] layout.containerMaxWidth '${raw}' is not a valid CSS length. Falling back to ${defaultContainerMaxWidth}.\n`,
-  )
-  return defaultContainerMaxWidth
+  return fallback
+}
+
+const containerMaxWidth = (() => {
+  const raw = String(layout.containerMaxWidth ?? '').trim()
+  const resolved = resolveCssLength(raw, defaultContainerMaxWidth)
+
+  if (raw && resolved === defaultContainerMaxWidth && raw !== defaultContainerMaxWidth) {
+    console.warn(
+      `\n[Config Warning] layout.containerMaxWidth '${raw}' is not a valid CSS length. Falling back to ${defaultContainerMaxWidth}.\n`,
+    )
+  }
+
+  return resolved
 })()
+
+const navigationDesktopFontSize = resolveCssLength(typography.navigationDesktopFontSize, typography.baseFontSize)
+const navigationMobileFontSize = resolveCssLength(typography.navigationMobileFontSize, typography.baseFontSize)
+const logoTextFontSize = resolveCssLength(typography.logoTextFontSize, navigationDesktopFontSize)
 
 const publicRoot = resolve(process.cwd(), 'public')
 const fontDirectory = resolve(publicRoot, font.path.replace(/^\//, ''))
@@ -388,6 +413,9 @@ const themeVariablesCss = `
   --font-weight-accent: ${font.weights.accent};
   --font-weight-heading: ${font.weights.heading};
   --line-height-scale: ${typography.lineHeightScale};
+  --navigation-desktop-font-size: ${navigationDesktopFontSize};
+  --navigation-mobile-font-size: ${navigationMobileFontSize};
+  --logo-text-font-size: ${logoTextFontSize};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
   --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem);
   --font-size--1: clamp(${fontScaleMap[-1].min}rem, calc(${fontScaleMap[-1].intercept}rem + ${fontScaleMap[-1].slope}vw), ${fontScaleMap[-1].max}rem);
@@ -426,7 +454,7 @@ const themeVariablesCss = `
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
     <!-- favicon -->
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={themeConfig.metadata.favicon || '/favicon.svg'} />
 
     {fontFaceCss && <style is:global set:html={fontFaceCss} />}
 
