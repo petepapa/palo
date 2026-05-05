@@ -2,15 +2,25 @@
 import Navigation from '@components/Navigation.astro'
 import LauncherConfig from '@components/LauncherConfig.astro'
 import { HighContrast, ReducedMotion, SkipLink } from 'accessible-astro-components'
+import themeConfig from '@config'
 
 /**
  * Header Component
  *
  * @description A component that displays the header of the website
  */
+const { layout } = themeConfig
+
+// Convert opacity (0–1) to a CSS alpha value for the fixed header background
+const headerBgOpacity = layout.headerBackgroundOpacity ?? 0.75
+// Blur strength for the fixed header background
+const headerBgBlur = layout.headerBackgroundBlur ?? '12px'
 ---
 
-<header>
+<header
+  class:list={[layout.fixedHeader && 'is-fixed']}
+  style={`--header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
+>
   <SkipLink />
   <!-- Initialize preference components -->
   <div hidden>
@@ -22,6 +32,59 @@ import { HighContrast, ReducedMotion, SkipLink } from 'accessible-astro-componen
   {/* To remove the launcher, delete this component and remove the LauncherTrigger from `Navigation.astro`. */}
   <LauncherConfig />
 </header>
+
+{
+  layout.fixedHeader && (
+    <style lang="scss" is:global>
+      body {
+        overflow-x: visible;
+      }
+
+      header.is-fixed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        z-index: 50;
+        background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
+        backdrop-filter: blur(var(--header-bg-blur, 12px));
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+        transition: all 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+      }
+
+      main {
+        padding-top: var(--header-height);
+      }
+
+      #main-content {
+        scroll-margin-top: var(--header-height);
+      }
+    </style>
+
+    <script>
+      /**
+       * Dynamically measures the fixed header height and sets
+       * --header-height on :root so content padding follows suit.
+       */
+      function observeHeaderHeight() {
+        const header = /** @type {HTMLElement} */ (document.querySelector('header.is-fixed'))
+        if (!header) return
+
+        const setHeight = () => {
+          document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px')
+        }
+
+        setHeight()
+
+        const ro = new ResizeObserver(setHeight)
+        ro.observe(header)
+      }
+
+      document.addEventListener('astro:page-load', observeHeaderHeight)
+    </script>
+  )
+}
 
 <style lang="scss" is:global>
   @use 'scss/base/breakpoint' as *;

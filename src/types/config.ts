@@ -89,6 +89,9 @@ export interface BrandingConfig {
 
 export interface LayoutConfig {
   containerMaxWidth: string
+  fixedHeader: boolean
+  headerBackgroundOpacity: number
+  headerBackgroundBlur: string
 }
 
 export interface TypographyConfig {
