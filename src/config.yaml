@@ -78,7 +78,7 @@ branding:
 
     # Semantic state colors.
     # Used by buttons, badges, notifications, and other status UI.
-    info: 'blue'
+    info: '#75878a'
     success: 'green'
     warning: 'orange'
     error: 'red'

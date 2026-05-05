@@ -647,30 +647,121 @@ const components = [
   </section>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const navLinks = document.querySelectorAll('.components-navigation a')
+    const paloInitComponentsNavigation = () => {
+      const navLinks = [...document.querySelectorAll('.components-navigation a')]
+      if (navLinks.length === 0) return
+
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      let activeScrollFrame = null
+      const setActiveLink = (activeLink) => {
+        navLinks.forEach((link) => {
+          const isActive = link === activeLink
+          link.classList.toggle('active', isActive)
+          if (isActive) {
+            link.setAttribute('aria-current', 'true')
+          } else {
+            link.removeAttribute('aria-current')
+          }
+        })
+      }
+
+      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+
+      const smoothScrollToHeading = (heading) => {
+        if (prefersReducedMotion) {
+          heading.scrollIntoView({ block: 'start' })
+          return
+        }
+
+        if (activeScrollFrame) {
+          cancelAnimationFrame(activeScrollFrame)
+          activeScrollFrame = null
+        }
+
+        const startY = window.scrollY
+        const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - 32)
+        const distance = targetY - startY
+        const duration = 600
+        const startTime = performance.now()
+        const rootStyle = document.documentElement.style
+        const previousScrollBehavior = rootStyle.scrollBehavior
+        rootStyle.scrollBehavior = 'auto'
+
+        if (Math.abs(distance) < 2) {
+          rootStyle.scrollBehavior = previousScrollBehavior
+          return
+        }
+
+        const step = (currentTime) => {
+          const elapsed = currentTime - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          const eased = easeOutCubic(progress)
+          window.scrollTo(0, startY + distance * eased)
+
+          if (progress < 1) {
+            activeScrollFrame = requestAnimationFrame(step)
+          } else {
+            rootStyle.scrollBehavior = previousScrollBehavior
+            activeScrollFrame = null
+          }
+        }
+
+        window.scrollTo(0, startY)
+        step(startTime)
+      }
 
       const observer = new IntersectionObserver(
         (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              const link = document.querySelector(`a[href="#${entry.target.id}"]`)
-              if (link) {
-                navLinks.forEach((l) => l.classList.remove('active'))
-                link.classList.add('active')
-              }
-            }
-          })
+          const visibleEntries = entries
+            .filter((entry) => entry.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+
+          const topEntry = visibleEntries[0]
+          if (!topEntry) return
+
+          const link = document.querySelector(`.components-navigation a[href="#${topEntry.target.id}"]`)
+          if (link instanceof HTMLAnchorElement) {
+            setActiveLink(link)
+          }
         },
-        { rootMargin: '0px 0px -70% 0px', threshold: 0.1 },
+        { rootMargin: '-12% 0px -55% 0px', threshold: [0.1, 0.25, 0.5, 0.75, 1] },
       )
 
       navLinks.forEach((link) => {
+        if (!(link instanceof HTMLAnchorElement)) return
+
         const id = link.getAttribute('href')?.replace('#', '')
         const heading = id && document.getElementById(id)
-        if (heading) observer.observe(heading)
+        if (!heading) return
+
+        observer.observe(heading)
+
+        if (link.dataset.paloBound === 'true') return
+
+        link.addEventListener('click', (event) => {
+          event.preventDefault()
+          setActiveLink(link)
+          history.replaceState(null, '', `#${id}`)
+          smoothScrollToHeading(heading)
+        })
+
+        link.dataset.paloBound = 'true'
       })
-    })
+
+      const initialHash = window.location.hash.replace('#', '')
+      if (initialHash) {
+        const initialLink = document.querySelector(`.components-navigation a[href="#${initialHash}"]`)
+        if (initialLink instanceof HTMLAnchorElement) {
+          setActiveLink(initialLink)
+        }
+      } else if (navLinks[0] instanceof HTMLAnchorElement) {
+        setActiveLink(navLinks[0])
+      }
+    }
+
+    document.addEventListener('astro:page-load', paloInitComponentsNavigation)
+    document.addEventListener('astro:after-swap', paloInitComponentsNavigation)
+    paloInitComponentsNavigation()
   </script>
 
   <style lang="scss">
@@ -711,12 +802,15 @@ const components = [
 
     .components-navigation a {
       display: inline-block;
-      transition: all var(--animation-speed-slow) var(--cubic-bezier);
+      transform-origin: left center;
+      transition:
+        transform 0.22s var(--cubic-bezier),
+        font-size 0.22s var(--cubic-bezier),
+        color 0.22s var(--cubic-bezier);
     }
 
     .active {
-      translate: 0.5rem 0;
-      scale: 1.1;
+      transform: translateX(0.5rem) scale(1.08);
       font-weight: var(--font-weight-heading, 500);
       font-size: 1.25rem;
     }
