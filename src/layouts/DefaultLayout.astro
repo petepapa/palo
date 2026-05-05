@@ -502,8 +502,181 @@ const themeVariablesCss = `
       <slot />
     </main>
     <Footer />
+    <script is:inline>
+      const paloInitAccordionFallback = () => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        document.querySelectorAll('.accordion details.wrapper').forEach((wrapper) => {
+          if (wrapper.dataset.paloAccordionBound === 'true') return
+
+          const summary = wrapper.querySelector('.title')
+          const content = wrapper.querySelector('.content')
+          if (!(summary instanceof HTMLElement) || !(content instanceof HTMLElement)) return
+
+          const setExpandedState = (isOpen) => {
+            summary.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+            if (isOpen) {
+              wrapper.setAttribute('open', '')
+            } else {
+              wrapper.removeAttribute('open')
+            }
+          }
+
+          const getContentHeight = () => content.scrollHeight
+
+          const stopTransition = () => {
+            content.style.transition = 'none'
+          }
+
+          const startTransition = () => {
+            content.style.transition = prefersReducedMotion
+              ? 'none'
+              : 'max-height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)'
+          }
+
+          const resetToClosedState = () => {
+            stopTransition()
+            content.style.maxHeight = '0px'
+            content.style.opacity = '0'
+            void content.offsetHeight
+            startTransition()
+          }
+
+          const resetToOpenState = () => {
+            stopTransition()
+            content.style.maxHeight = `${getContentHeight()}px`
+            content.style.opacity = '1'
+            void content.offsetHeight
+            startTransition()
+          }
+
+          const openAccordion = () => {
+            const groupName = wrapper.getAttribute('name')
+            if (groupName) {
+              document.querySelectorAll(`.accordion details.wrapper[name="${groupName}"]`).forEach((item) => {
+                if (item !== wrapper && item instanceof HTMLDetailsElement && item.open) {
+                  const otherSummary = item.querySelector('.title')
+                  const otherContent = item.querySelector('.content')
+                  if (!(otherSummary instanceof HTMLElement) || !(otherContent instanceof HTMLElement)) return
+
+                  if (prefersReducedMotion) {
+                    otherContent.style.maxHeight = '0px'
+                    otherContent.style.opacity = '0'
+                    item.removeAttribute('open')
+                    otherSummary.setAttribute('aria-expanded', 'false')
+                    return
+                  }
+
+                  otherContent.style.maxHeight = `${otherContent.scrollHeight}px`
+                  otherContent.style.opacity = '1'
+                  void otherContent.offsetHeight
+                  requestAnimationFrame(() => {
+                    otherContent.style.maxHeight = '0px'
+                    otherContent.style.opacity = '0'
+                  })
+                  otherContent.addEventListener(
+                    'transitionend',
+                    (event) => {
+                      if (event.propertyName !== 'max-height') return
+                      item.removeAttribute('open')
+                      otherSummary.setAttribute('aria-expanded', 'false')
+                    },
+                    { once: true },
+                  )
+                }
+              })
+            }
+
+            if (prefersReducedMotion) {
+              content.style.maxHeight = `${getContentHeight()}px`
+              content.style.opacity = '1'
+              setExpandedState(true)
+              return
+            }
+
+            setExpandedState(true)
+            resetToClosedState()
+
+            requestAnimationFrame(() => {
+              content.style.maxHeight = `${getContentHeight()}px`
+              content.style.opacity = '1'
+            })
+          }
+
+          const closeAccordion = () => {
+            if (prefersReducedMotion) {
+              content.style.maxHeight = '0px'
+              content.style.opacity = '0'
+              setExpandedState(false)
+              return
+            }
+
+            resetToOpenState()
+            setExpandedState(false)
+
+            requestAnimationFrame(() => {
+              content.style.maxHeight = '0px'
+              content.style.opacity = '0'
+            })
+
+            content.addEventListener(
+              'transitionend',
+              (event) => {
+                if (event.propertyName !== 'max-height') return
+                content.style.maxHeight = '0px'
+                content.style.opacity = '0'
+              },
+              { once: true },
+            )
+          }
+
+          summary.setAttribute('aria-expanded', wrapper.hasAttribute('open') ? 'true' : 'false')
+          content.style.overflow = 'hidden'
+          startTransition()
+
+          if (wrapper.hasAttribute('open')) {
+            content.style.maxHeight = `${getContentHeight()}px`
+            content.style.opacity = '1'
+          } else {
+            content.style.maxHeight = '0px'
+            content.style.opacity = '0'
+          }
+
+          summary.addEventListener('click', (event) => {
+            event.preventDefault()
+            wrapper.hasAttribute('open') ? closeAccordion() : openAccordion()
+          })
+
+          wrapper.dataset.paloAccordionBound = 'true'
+        })
+      }
+
+      document.addEventListener('astro:page-load', paloInitAccordionFallback)
+      document.addEventListener('astro:after-swap', paloInitAccordionFallback)
+      paloInitAccordionFallback()
+    </script>
     <style lang="scss" is:global>
       @use 'scss/base/mixins' as *;
+
+      .accordion details.wrapper > .content {
+        display: block;
+      }
+
+      .accordion details.wrapper.variant-default > .content {
+        padding: 0;
+      }
+
+      .accordion details.wrapper.variant-default > .content > * {
+        padding: 0 0 1.5rem 2.2rem;
+      }
+
+      .accordion details.wrapper.variant-chevron > .content {
+        padding-block-end: 0;
+      }
+
+      .accordion details.wrapper.variant-chevron > .content > * {
+        padding-block-end: 2.2rem;
+      }
 
       // sticky footer on low content pages
       html,

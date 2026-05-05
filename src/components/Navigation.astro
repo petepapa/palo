@@ -399,11 +399,13 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       }
 
       ul {
-        display: none;
+        display: flex;
         position: absolute;
         flex-direction: column;
         gap: var(--space-2xs);
-        translate: 0 1rem;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(1rem);
         opacity: 0;
         z-index: 100;
         inset-block-start: 125%;
@@ -416,24 +418,40 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
         padding: var(--space-m);
         min-inline-size: 275px;
 
-        @media (prefers-reduced-motion: no-preference) {
-          transition-behavior: allow-discrete;
-          transition-duration: var(--animation-speed-fast);
-          transition-property: display, opacity, translate;
-          transition-timing-function: var(--cubic-bezier);
-        }
+        transition:
+          opacity var(--animation-speed-fast) var(--cubic-bezier),
+          transform var(--animation-speed-fast) var(--cubic-bezier),
+          visibility 0s linear var(--animation-speed-fast);
       }
 
       > button.show ~ ul {
-        display: flex;
-        translate: 0;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
         opacity: 1;
-
-        @starting-style {
-          translate: 0 1rem;
-          opacity: 0;
-        }
+        transition-delay: 0s;
       }
+    }
+
+    .mobile-menu .has-dropdown ul {
+      display: none;
+      position: relative;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+      opacity: 1;
+      inset: auto;
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+      min-inline-size: auto;
+      transition: none;
+    }
+
+    .mobile-menu .has-dropdown > button.show ~ ul {
+      display: flex;
     }
 
     .darkmode-toggle {

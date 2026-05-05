@@ -1,0 +1,25 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<ul class:list={['accordion-stable', className]}>
+  <slot />
+</ul>
+
+<style>
+  :where(.accordion-stable) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :global(:where(.accordion-stable > .item:first-child .wrapper)) {
+    border-block-start: none !important;
+  }
+</style>

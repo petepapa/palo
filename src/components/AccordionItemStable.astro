@@ -1,0 +1,339 @@
+---
+import { Heading } from 'accessible-astro-components'
+
+interface Props {
+  class?: string
+  title: string
+  name?: string
+  headingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  headingSize?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  variant?: 'default' | 'chevron'
+  open?: boolean
+}
+
+const {
+  class: className,
+  title,
+  name,
+  headingLevel = 'h3',
+  headingSize = 'h6',
+  variant = 'default',
+  open = false,
+} = Astro.props
+
+const slug = title
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '')
+const uid = `${slug || 'accordion-item'}-${Math.random().toString(36).slice(2, 8)}`
+const triggerId = `${uid}-trigger`
+const panelId = `${uid}-panel`
+---
+
+<li class:list={['item', className]}>
+  <div class:list={['wrapper', `variant-${variant}`]} data-accordion-name={name} data-open={open ? 'true' : 'false'}>
+    <Heading level={headingLevel} size={headingSize} class="title-heading">
+      <button
+        id={triggerId}
+        class="title"
+        type="button"
+        aria-expanded={open ? 'true' : 'false'}
+        aria-controls={panelId}
+      >
+        {
+          variant === 'chevron' ? (
+            <>
+              {title}
+              <span class="icon-chevron">
+                <svg aria-hidden="true" width="12" height="8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M1.4 1.6L6 6.2l4.6-4.6"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            </>
+          ) : (
+            <>
+              <span class="icon-plus">
+                <svg aria-hidden="true" width="20" height="2" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="currentColor" d="M20 .5v1H0v-1z" />
+                </svg>
+                <svg width="2" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill="currentColor" d="M1.5 20h-1V0h1z" />
+                </svg>
+              </span>
+              {title}
+            </>
+          )
+        }
+      </button>
+    </Heading>
+    <div
+      id={panelId}
+      class="content"
+      role="region"
+      aria-labelledby={triggerId}
+      hidden={!open}
+      style={open ? undefined : 'max-height: 0; opacity: 0;'}
+    >
+      <div class="content-inner">
+        <slot />
+      </div>
+    </div>
+  </div>
+</li>
+
+<script>
+  type AccordionWrapper = HTMLDivElement & { dataset: DOMStringMap }
+
+  const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const initializeAccordionStable = () => {
+    document.querySelectorAll<AccordionWrapper>('.accordion-stable .wrapper').forEach((wrapper) => {
+      if (wrapper.dataset.accordionBound === 'true') return
+
+      const trigger = wrapper.querySelector<HTMLButtonElement>('.title')
+      const content = wrapper.querySelector<HTMLElement>('.content')
+      const contentInner = wrapper.querySelector<HTMLElement>('.content-inner')
+      if (!trigger || !content || !contentInner) return
+
+      const setExpandedState = (isOpen: boolean) => {
+        wrapper.dataset.open = isOpen ? 'true' : 'false'
+        trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+      }
+
+      const getContentHeight = () => contentInner.scrollHeight
+
+      const closeImmediate = () => {
+        setExpandedState(false)
+        content.hidden = true
+        content.style.maxHeight = '0px'
+        content.style.opacity = '0'
+      }
+
+      const openImmediate = () => {
+        setExpandedState(true)
+        content.hidden = false
+        content.style.maxHeight = `${getContentHeight()}px`
+        content.style.opacity = '1'
+      }
+
+      const openAnimated = () => {
+        setExpandedState(true)
+        content.hidden = false
+        content.style.maxHeight = '0px'
+        content.style.opacity = '0'
+        void content.offsetHeight
+        content.style.maxHeight = `${getContentHeight()}px`
+        content.style.opacity = '1'
+      }
+
+      const closeAnimated = () => {
+        content.hidden = false
+        content.style.maxHeight = `${getContentHeight()}px`
+        content.style.opacity = '1'
+        void content.offsetHeight
+        setExpandedState(false)
+        content.style.maxHeight = '0px'
+        content.style.opacity = '0'
+        content.addEventListener(
+          'transitionend',
+          (event) => {
+            if (event.propertyName !== 'max-height') return
+            content.hidden = true
+          },
+          { once: true },
+        )
+      }
+
+      if (prefersReducedMotion()) {
+        content.style.transition = 'none'
+      } else {
+        content.style.transition =
+          'max-height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)'
+      }
+
+      if (wrapper.dataset.open === 'true') {
+        openImmediate()
+      } else {
+        closeImmediate()
+      }
+
+      trigger.addEventListener('click', () => {
+        const isOpen = wrapper.dataset.open === 'true'
+        const groupName = wrapper.dataset.accordionName
+
+        if (groupName && !isOpen) {
+          document.querySelectorAll<AccordionWrapper>(`.accordion-stable .wrapper[data-accordion-name="${groupName}"]`).forEach((item) => {
+            if (item !== wrapper && item.dataset.open === 'true') {
+              const itemContent = item.querySelector<HTMLElement>('.content')
+              if (!itemContent) return
+              if (prefersReducedMotion()) {
+                item.dataset.open = 'false'
+                const itemTrigger = item.querySelector<HTMLButtonElement>('.title')
+                itemTrigger?.setAttribute('aria-expanded', 'false')
+                itemContent.hidden = true
+                itemContent.style.maxHeight = '0px'
+                itemContent.style.opacity = '0'
+              } else {
+                const itemInner = item.querySelector<HTMLElement>('.content-inner')
+                const itemTrigger = item.querySelector<HTMLButtonElement>('.title')
+                if (!itemInner || !itemTrigger) return
+                itemContent.hidden = false
+                itemContent.style.maxHeight = `${itemInner.scrollHeight}px`
+                itemContent.style.opacity = '1'
+                void itemContent.offsetHeight
+                item.dataset.open = 'false'
+                itemTrigger.setAttribute('aria-expanded', 'false')
+                itemContent.style.maxHeight = '0px'
+                itemContent.style.opacity = '0'
+                itemContent.addEventListener(
+                  'transitionend',
+                  (event) => {
+                    if (event.propertyName !== 'max-height') return
+                    itemContent.hidden = true
+                  },
+                  { once: true },
+                )
+              }
+            }
+          })
+        }
+
+        if (prefersReducedMotion()) {
+          isOpen ? closeImmediate() : openImmediate()
+        } else {
+          isOpen ? closeAnimated() : openAnimated()
+        }
+      })
+
+      if ('ResizeObserver' in window) {
+        const resizeObserver = new ResizeObserver(() => {
+          if (wrapper.dataset.open === 'true') {
+            content.style.maxHeight = `${getContentHeight()}px`
+          }
+        })
+        resizeObserver.observe(contentInner)
+      }
+
+      wrapper.dataset.accordionBound = 'true'
+    })
+  }
+
+  initializeAccordionStable()
+
+  document.addEventListener('astro:after-swap', () => {
+    initializeAccordionStable()
+  })
+</script>
+
+<style>
+  :where(.wrapper) {
+    --transition-duration: 0.3s;
+    --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+    border-block-start: 2px solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
+    padding-block: 0;
+  }
+
+  .title-heading {
+    margin: 0;
+  }
+
+  .title-heading :global(.heading) {
+    font-weight: normal;
+    font-size: 1.25rem;
+  }
+
+  :where(.title) {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding-block: 0.75rem;
+    padding-inline: 0;
+    min-inline-size: 100%;
+    color: inherit;
+    text-align: start;
+    font: inherit;
+  }
+
+  :where(.content) {
+    overflow: hidden;
+    opacity: 0;
+  }
+
+  .wrapper.variant-default .content-inner {
+    padding: 0 0 1.5rem 2.2rem;
+  }
+
+  .wrapper.variant-chevron .title {
+    justify-content: space-between;
+  }
+
+  .wrapper.variant-chevron .content-inner {
+    padding-block-end: 2.2rem;
+  }
+
+  :where(.title:hover),
+  :where(.title:focus-visible) {
+    color: light-dark(hsl(215 25% 27%), hsl(215 25% 89%));
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  :where(.icon-plus) {
+    display: inline-block;
+    position: relative;
+    aspect-ratio: 1;
+    block-size: 20px;
+  }
+
+  :where(.icon-plus svg) {
+    position: absolute;
+  }
+
+  :where(.icon-plus svg:first-of-type) {
+    transform: translateY(-50%);
+    inset-block-start: 50%;
+    inset-inline-start: 0;
+  }
+
+  :where(.icon-plus svg:last-of-type) {
+    transform: translateY(-50%);
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+  :where(.icon-chevron) {
+    flex-shrink: 0;
+  }
+
+  :where(.icon-chevron svg) {
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+  :where(.content a) {
+    display: inline-block;
+  }
+
+  :where(.content > *:not(:first-child)) {
+    margin-block-start: 0.75rem;
+  }
+
+  :where(.wrapper[data-open='true'] .icon-plus svg:last-of-type) {
+    transform: rotate(90deg);
+    inset-block-start: 0;
+  }
+
+  :where(.wrapper[data-open='true'] .icon-chevron svg) {
+    transform: scaleY(-1);
+  }
+</style>

@@ -65,13 +65,13 @@ branding:
 
   colors:
     # Main brand color.
-    primary: 'red'
+    primary: '#ff4b00'
 
     # Secondary brand color.
-    secondary: 'green'
+    secondary: '#632a1b'
 
     # Neutral base color used to derive text, borders, and surfaces.
-    neutral: 'green'
+    neutral: '#75878a'
 
     # Focus outline color used for accessibility states.
     outline: '#ffffff'
@@ -107,7 +107,7 @@ typography:
 
   # Text logo font size.
   # Leave empty to use the desktop navigation font size.
-  logoTextFontSize: '24px'
+  logoTextFontSize: '32px'
 
   # Heading size scale on small screens.
   # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
