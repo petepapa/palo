@@ -13,7 +13,7 @@ site:
   # Whether generated URLs should end with a trailing slash.
   # false -> /about
   # true  -> /about/
-  trailingSlash: false
+  trailingSlash: true
 
   # Show the dark mode toggle in the header.
   showDarkModeToggle: true
