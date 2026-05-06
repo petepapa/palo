@@ -21,7 +21,7 @@ site:
 metadata:
   # Production site URL, including https://
   # Used for canonical URLs, social sharing metadata, and sitemap generation.
-  siteUrl: 'palo.petepa.com'
+  siteUrl: 'https://palo.petepa.com'
 
   # Default title for the homepage and SEO fallbacks.
   title: 'Palo - A minimalist Astro theme for artists, musicians, and designers'
