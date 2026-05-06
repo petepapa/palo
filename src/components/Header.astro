@@ -81,8 +81,18 @@ const headerBgBlur = layout.headerBackgroundBlur ?? '12px'
         ro.observe(header)
       }
 
-      document.addEventListener('astro:page-load', observeHeaderHeight)
-    </script>
+    const initHeaderHeight = () => {
+      if (document.readyState === 'loading') {
+        window.addEventListener('DOMContentLoaded', observeHeaderHeight, { once: true })
+      } else {
+        observeHeaderHeight()
+      }
+    }
+
+    document.addEventListener('astro:page-load', initHeaderHeight)
+    document.addEventListener('astro:after-swap', initHeaderHeight)
+    initHeaderHeight()
+  </script>
   )
 }
 
