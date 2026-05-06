@@ -259,6 +259,12 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       display: flex;
       align-items: center;
       gap: var(--space-2xs);
+
+      svg {
+        width: 26px;
+        height: 21px;
+        flex-shrink: 0;
+      }
     }
 
     .mobile-launcher {
@@ -304,6 +310,11 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       a,
       button {
         font-size: var(--navigation-desktop-font-size, 1rem);
+      }
+
+      svg {
+        width: 1em;
+        height: 1em;
       }
     }
 
@@ -375,6 +386,11 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
         font-size: var(--navigation-mobile-font-size, 1rem);
         padding: var(--space-2xs) 0;
         inline-size: 100%;
+      }
+
+      svg {
+        width: 1em;
+        height: 1em;
       }
     }
 
@@ -459,8 +475,8 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
       padding: 0;
 
       .icon {
-        inline-size: 30px;
-        block-size: 30px;
+        inline-size: 1em;
+        block-size: 1em;
       }
 
       &:where(:hover, :focus-visible) {
@@ -476,5 +492,13 @@ import { LauncherTrigger } from 'accessible-astro-launcher'
         }
       }
     }
+  }
+</style>
+
+<style is:global>
+  #main-navigation .mobile-launcher .launcher-trigger svg,
+  #main-navigation .desktop-launcher .launcher-trigger svg {
+    width: 20px !important;
+    height: 20px !important;
   }
 </style>
