@@ -54,36 +54,11 @@ const {
 } = Astro.props
 
 const isHomePage = Astro.url.pathname === '/'
-const vercelEnv = String(process.env.VERCEL_ENV ?? '').trim().toLowerCase()
-const isPreviewDeployment = vercelEnv === 'preview'
 
 // ──────────────────────────────────────────────
 //  Canonical URL & Trailing Slash Logic
 // ──────────────────────────────────────────────
-function withHttps(domainOrUrl: string): string {
-  const value = String(domainOrUrl ?? '').trim()
-  if (!value) return ''
-  if (/^https?:\/\//i.test(value)) return value.replace(/\/+$/, '')
-  return `https://${value}`.replace(/\/+$/, '')
-}
-
-function resolveSiteUrl(): string {
-  const configuredSiteUrl = String(themeConfig.metadata.siteUrl ?? '').trim()
-  const deploymentDomain = String(import.meta.env.VERCEL_BRANCH_URL || import.meta.env.VERCEL_URL || '').trim()
-  const productionDomain = String(import.meta.env.VERCEL_PROJECT_PRODUCTION_URL || '').trim()
-
-  if (vercelEnv === 'production') {
-    return withHttps(productionDomain || configuredSiteUrl)
-  }
-
-  if (isPreviewDeployment) {
-    return withHttps(deploymentDomain)
-  }
-
-  return withHttps(configuredSiteUrl)
-}
-
-const rawSiteUrl = resolveSiteUrl()
+const rawSiteUrl = String(themeConfig.metadata.siteUrl ?? '').trim()
 const siteUrl = rawSiteUrl.replace(/\/\/+$/, '')
 const hasSiteUrl = Boolean(siteUrl)
 /**
@@ -113,7 +88,7 @@ function buildImageUrl(img: ImageMetadata | string | null): string {
 }
 
 // Generate canonical URL from the current request URL's pathname
-const canonicalUrl = getCanonical(Astro.url.pathname, siteUrl)
+const canonicalUrl = getCanonical(Astro.url.pathname, themeConfig.metadata.siteUrl)
 
 // Generate OG image URL
 const imageUrl = buildImageUrl(image)
@@ -492,8 +467,6 @@ const themeVariablesCss = `
       titleDefault={themeConfig.metadata.title}
       description={description}
       canonical={canonicalUrl}
-      noindex={isPreviewDeployment}
-      nofollow={isPreviewDeployment}
       openGraph={{
         basic: {
           title: title,
