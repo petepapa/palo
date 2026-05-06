@@ -91,12 +91,12 @@ layout:
 
   # Background opacity of the fixed header (0 = fully transparent, 1 = fully opaque).
   # Only applies when fixedHeader is true.
-  headerBackgroundOpacity: 0.25
+  headerBackgroundOpacity: 0.45
 
   # Blur strength of the fixed header background.
   # Set to 0 to disable the blur effect.
   # Only applies when fixedHeader is true.
-  headerBackgroundBlur: 10px
+  headerBackgroundBlur: 12px
 
   # Maximum width of the main content container.
   # Supports any valid CSS length unit such as px, rem, em, %, vw, or vh.
