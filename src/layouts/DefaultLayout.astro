@@ -58,8 +58,7 @@ const isHomePage = Astro.url.pathname === '/'
 // ──────────────────────────────────────────────
 //  Canonical URL & Trailing Slash Logic
 // ──────────────────────────────────────────────
-const isVercelPreview = String(process.env.VERCEL_ENV ?? '').trim().toLowerCase() === 'preview'
-const rawSiteUrl = isVercelPreview ? '' : String(themeConfig.metadata.siteUrl ?? '').trim()
+const rawSiteUrl = String(themeConfig.metadata.siteUrl ?? '').trim()
 const siteUrl = rawSiteUrl.replace(/\/\/+$/, '')
 const hasSiteUrl = Boolean(siteUrl)
 /**
