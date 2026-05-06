@@ -208,6 +208,14 @@ const containerMaxWidth = (() => {
 
 const navigationDesktopFontSize = resolveCssLength(typography.navigationDesktopFontSize, typography.baseFontSize)
 const navigationMobileFontSize = resolveCssLength(typography.navigationMobileFontSize, typography.baseFontSize)
+const navigationDropdownDesktopFontSize = resolveCssLength(
+  typography.navigationDropdownDesktopFontSize,
+  navigationDesktopFontSize,
+)
+const navigationDropdownMobileFontSize = resolveCssLength(
+  typography.navigationDropdownMobileFontSize,
+  navigationMobileFontSize,
+)
 const logoTextFontSize = resolveCssLength(typography.logoTextFontSize, navigationDesktopFontSize)
 
 const publicRoot = resolve(process.cwd(), 'public')
@@ -416,6 +424,8 @@ const themeVariablesCss = `
   --line-height-scale: ${typography.lineHeightScale};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};
+  --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};
+  --navigation-dropdown-mobile-font-size: ${navigationDropdownMobileFontSize};
   --logo-text-font-size: ${logoTextFontSize};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
   --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem);

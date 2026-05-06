@@ -113,11 +113,19 @@ typography:
 
   # Desktop navigation font size.
   # Leave empty to use the base body font size.
-  navigationDesktopFontSize: '48px'
+  navigationDesktopFontSize: '21px'
 
   # Mobile menu font size after the hamburger menu is expanded.
   # Leave empty to use the base body font size.
   navigationMobileFontSize: '24px'
+
+  # Desktop dropdown menu font size.
+  # Leave empty to inherit navigationDesktopFontSize.
+  navigationDropdownDesktopFontSize: '16px'
+
+  # Mobile dropdown menu font size.
+  # Leave empty to inherit navigationMobileFontSize.
+  navigationDropdownMobileFontSize: '21px'
 
   # Text logo font size.
   # Leave empty to use the desktop navigation font size.

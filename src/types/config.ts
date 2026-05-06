@@ -99,6 +99,8 @@ export interface TypographyConfig {
   lineHeightScale: number
   navigationDesktopFontSize: string
   navigationMobileFontSize: string
+  navigationDropdownDesktopFontSize: string
+  navigationDropdownMobileFontSize: string
   logoTextFontSize: string
   mobileHeadingScale: number
   desktopHeadingScale: number
