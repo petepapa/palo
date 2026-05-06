@@ -14,7 +14,10 @@ import { enhanceConfigForWorkspace } from './scripts/workspace-config.js'
 const configPath = path.resolve(fileURLToPath(new URL('./src/config.yaml', import.meta.url)))
 const rawYaml = fs.readFileSync(configPath, 'utf-8')
 const yamlConfig = yaml.load(rawYaml)
-const siteUrl = String(yamlConfig.metadata?.siteUrl ?? '').trim()
+const configuredSiteUrl = String(yamlConfig.metadata?.siteUrl ?? '').trim()
+const vercelEnv = String(process.env.VERCEL_ENV ?? '').trim().toLowerCase()
+const isVercelPreview = vercelEnv === 'preview'
+const siteUrl = isVercelPreview ? '' : configuredSiteUrl
 
 /**
  * Vite plugin to import .yaml/.yml files as ES modules.
@@ -90,7 +93,9 @@ const viteConfig = {
 console.log('\n[Build Config] ===== Astro Build Configuration =====')
 console.log('[Build Config] config.yaml path:', configPath)
 console.log('[Build Config] raw trailingSlash from config.yaml:', yamlConfig.site.trailingSlash)
-console.log('[Build Config] siteUrl:', siteUrl || '(empty)')
+console.log('[Build Config] configured siteUrl:', configuredSiteUrl || '(empty)')
+console.log('[Build Config] Vercel env:', vercelEnv || '(not set)')
+console.log('[Build Config] effective siteUrl:', siteUrl || '(empty)')
 console.log('[Build Config] Astro trailingSlash mapping:', yamlConfig.site.trailingSlash ? 'always' : 'never')
 console.log('[Build Config] Astro build.format mapping:', yamlConfig.site.trailingSlash ? 'directory' : 'file')
 console.log('[Build Config] URL policy is controlled by config.yaml -> Astro trailingSlash/build.format')
