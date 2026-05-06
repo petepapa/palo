@@ -57,5 +57,9 @@ export function ensureTrailingSlash(href: string): string {
  */
 export function getCanonical(path = '', site = ''): string {
   const normalizedPath = normalizePath(path)
-  return String(new URL(normalizedPath, site))
+  const trimmedSite = String(site ?? '').trim()
+  if (!trimmedSite) {
+    return normalizedPath
+  }
+  return String(new URL(normalizedPath, trimmedSite))
 }

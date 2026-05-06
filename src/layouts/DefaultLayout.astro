@@ -58,8 +58,9 @@ const isHomePage = Astro.url.pathname === '/'
 // ──────────────────────────────────────────────
 //  Canonical URL & Trailing Slash Logic
 // ──────────────────────────────────────────────
-// Strip trailing slash from siteUrl for safe concatenation
-const siteUrl = themeConfig.metadata.siteUrl.replace(/\/+$/, '')
+const rawSiteUrl = String(themeConfig.metadata.siteUrl ?? '').trim()
+const siteUrl = rawSiteUrl.replace(/\/\/+$/, '')
+const hasSiteUrl = Boolean(siteUrl)
 /**
  * Ensure a path starts with '/'.
  * If path is empty or undefined, defaults to '/social-preview-image.png'.
@@ -72,18 +73,17 @@ function ensureLeadingSlash(p: string): string {
 }
 
 /**
- * Build an absolute URL for an image path, with double-slash protection.
- * Handles both ImageMetadata objects and string paths.
+ * Build a URL for an image path.
+ * If siteUrl is not configured, return a site-relative path.
  */
 function buildImageUrl(img: ImageMetadata | string | null): string {
-  if (!img) {
-    return `${siteUrl}/social-preview-image.png`
-  }
-
-  const path = typeof img === 'string' ? img : img.src
+  const path = !img ? '/social-preview-image.png' : typeof img === 'string' ? img : img.src
   const safePath = ensureLeadingSlash(path)
 
-  // Use URL constructor for safe concatenation (handles double-slash)
+  if (!hasSiteUrl) {
+    return safePath
+  }
+
   return new URL(safePath, `${siteUrl}/`).href
 }
 
