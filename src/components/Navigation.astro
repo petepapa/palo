@@ -539,6 +539,8 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       border-radius: 0;
       background: transparent;
       padding: 0;
+      padding-inline-start: 0;
+      margin-inline-start: 0;
       min-inline-size: auto;
 
       // Animate dropdown open/close
@@ -547,9 +549,11 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       transition:
         max-block-size var(--animation-speed-medium) var(--cubic-bezier),
         margin-block-start var(--animation-speed-medium) var(--cubic-bezier),
+        margin-inline-start var(--animation-speed-medium) var(--cubic-bezier),
         padding-block-start var(--animation-speed-medium) var(--cubic-bezier),
         padding-block-end var(--animation-speed-medium) var(--cubic-bezier);
       margin-block-start: 0;
+      margin-inline-start: 0;
       padding-block-start: 0;
       padding-block-end: 0;
     }
@@ -559,6 +563,20 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       margin-block-start: var(--space-m);
       padding-block-start: var(--space-2xs);
       padding-block-end: var(--space-2xs);
+      transform: none;
+    }
+
+    .mobile-menu .has-dropdown .submenu-item {
+      padding-inline: 0;
+    }
+
+    // Ensure dropdown ul is left-aligned with its parent button in mobile
+    .mobile-menu li.menu-item.has-dropdown {
+      padding-inline: 0;
+    }
+
+    .mobile-menu .has-dropdown > button {
+      padding-inline: 0;
     }
 
     .mobile-menu .menu-item:not(.type-icon) {

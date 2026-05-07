@@ -133,7 +133,7 @@ typography:
 
   # Text logo font size.
   # Leave empty to use the desktop navigation font size.
-  logoTextFontSize: '32px'
+  logoTextFontSize: '36px'
 
   # Heading size scale on small screens.
   # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
