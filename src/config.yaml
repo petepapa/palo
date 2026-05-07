@@ -137,15 +137,15 @@ typography:
 
   # Heading size scale on small screens.
   # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
-  mobileHeadingScale: 1.2
+  mobileHeadingScale: 1.25
 
   # Heading size scale on large screens.
   # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
-  desktopHeadingScale: 1.7
+  desktopHeadingScale: 1.65
 
   # Extra multiplier for heading line-height only.
   # 1 = default, smaller = tighter, larger = looser
-  headingLineHeightScale: 0.8
+  headingLineHeightScale: 0.85
 
   # Force non-body display text to uppercase.
   # Affects headings and emphasized UI text, not paragraph content.
