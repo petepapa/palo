@@ -155,4 +155,4 @@ typography:
   # 'wavy'      - wavy underline (default)
   # 'underline' - solid underline
   # 'bold'      - bold weight (uses heading font weight) with solid underline on hover/focus
-  navigationActiveStyle: 'bold'
+  navigationActiveStyle: 'wavy'

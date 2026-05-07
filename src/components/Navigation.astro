@@ -421,14 +421,9 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     .mobile-menu {
-      flex-basis: 100%;
-      margin-block-start: var(--space-m);
-      border: 1px solid var(--border-color-subtle);
-      border-radius: var(--radius-l);
-      padding: var(--space-m);
-
       > ul {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
         align-items: flex-start;
 
         ul {
@@ -533,6 +528,20 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
 
     .mobile-menu .has-dropdown > button.show ~ ul {
       display: flex;
+      transform: none;
+    }
+
+    .mobile-menu .menu-item:not(.type-icon) {
+      flex: 0 0 100%;
+    }
+
+    .mobile-menu .menu-item.type-icon {
+      display: inline-flex;
+      flex: 0 0 auto;
+    }
+
+    .mobile-menu .menu-item.type-icon + .menu-item.type-icon {
+      margin-inline-start: var(--space-xs);
     }
 
     .darkmode-toggle {
