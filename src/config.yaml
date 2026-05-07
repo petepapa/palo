@@ -1,158 +1,111 @@
-# Site configuration
-# Edit this file to control the site's content, branding, layout, and typography.
+# ============================================================
+# 基本信息 / Site Info
+# 网站名称、标题分隔符、URL 格式、Header 功能开关
+# Site name, title separator, URL format, header toggles
+# ============================================================
 
 site:
-  # Site name.
-  # Used for the text logo and as the default page title fallback.
-  name: Palo
+  name: Palo Theme
+  titleSeparator: '|'                    # 标签页标题分隔符，例如 "About | Palo" / Browser tab title separator, e.g. "About | Palo"
+  trailingSlash: false                   # URL 尾部斜杠：false → /about，true → /about/ / Trailing slash: false → /about, true → /about/
+  showDarkModeToggle: true               # 显示深色模式切换按钮 / Show dark mode toggle button
+  showLauncher: true                     # 显示快捷启动器按钮（Cmd+K / Ctrl+K）/ Show launcher button (Cmd+K / Ctrl+K)
 
-  # Separator used in browser tab titles.
-  # Example: "About | Palo"
-  titleSeparator: '|'
 
-  # Whether generated URLs should end with a trailing slash.
-  # false -> /about
-  # true  -> /about/
-  trailingSlash: false
-
-  # Show the dark mode toggle in the header.
-  showDarkModeToggle: true
-
-  # Show the launcher button in the header.
-  # The launcher provides keyboard shortcuts (Cmd+K / Ctrl+K) for quick navigation.
-  showLauncher: true
+# ============================================================
+# SEO & 元数据 / SEO & Metadata
+# 站点 URL、默认标题、描述、作者、社交分享图、网站图标
+# Site URL, default title, description, author, social image, favicon
+# ============================================================
 
 metadata:
-  # Production site URL, including https://
-  # Used for canonical URLs, social sharing metadata, and sitemap generation.
   siteUrl: 'https://palo.petepa.com/'
-
-  # Default title for the homepage and SEO fallbacks.
   title: 'Palo - A minimalist Astro theme for artists, musicians, and designers'
-
-  # Default SEO description.
   description: 'Break free from generic business templates. Palo is a minimalist Astro theme by PetePa, crafted for artists, musicians, and designers. Deeply customize your colors, radius, and typography within a logic-driven framework. Build your unique digital identity at palo.petepa.com.'
-
-  # Author name used in metadata tags.
   author: PetePa
+  image: '/social-preview-image.png'    # 社交分享预览图，放在 /public 下 / Social sharing image, place in /public
+  favicon: '/favicon.svg'               # 浏览器标签页图标，放在 /public 下 / Favicon, place in /public
 
-  # Social sharing image path.
-  # Put the file in /public and use a path starting with /
-  image: '/social-preview-image.png'
 
-  # Browser tab icon (favicon) path.
-  # Put the file in /public and use a path starting with /
-  favicon: '/favicon.svg'
+# ============================================================
+# 品牌：Logo · 颜色 · 字体 / Branding: Logo · Colors · Font
+# ============================================================
 
 branding:
-  # Logo image path.
-  # Leave empty to show the text logo (site.name) instead.
-  # Put the file in /public and use a path starting with /
+
+  # Logo：留空显示文字 Logo，填写路径显示图片（放在 /public 下）
+  # Logo: leave empty to show text logo, or provide an image path (place file in /public)
   logo: ''
 
-  font:
-    # Font family name used across the whole site.
-    name: 'League Spartan'
-
-    # Folder containing the local font files.
-    # Put the files in /public and use a path starting with /
-    path: '/fonts/League_Spartan/'
-
-    # Font weights used by the design system.
-    # body: paragraphs and long-form text
-    # accent: navigation, buttons, labels, and other emphasized UI text
-    # heading: all headings
-    weights:
-      body: 300
-      accent: 400
-      heading: 500
-
+  # --- 颜色 / Colors ---
   colors:
-    # Main brand color.
-    primary: '#ff4b00'
+    primary: '#ff4b00'                   # 主品牌色 / Primary brand color
+    secondary: '#632a1b'                 # 副品牌色 / Secondary brand color
+    neutral: '#75878a'                   # 中性色，用于文字、边框、背景 / Neutral color for text, borders, surfaces
+    outline: '#ffffff'                   # 无障碍焦点轮廓色 / Accessibility focus outline color
 
-    # Secondary brand color.
-    secondary: '#632a1b'
-
-    # Neutral base color used to derive text, borders, and surfaces.
-    neutral: '#75878a'
-
-    # Focus outline color used for accessibility states.
-    outline: '#ffffff'
-
-    # Semantic state colors.
-    # Used by buttons, badges, notifications, and other status UI.
+    # 状态色，用于按钮、徽章、通知等 / Semantic state colors for buttons, badges, notifications
     info: '#75878a'
     success: 'green'
     warning: 'orange'
     error: 'red'
 
+  # --- 字体 / Font ---
+  font:
+    name: 'League Spartan'              # 字体族名称 / Font family name
+    path: '/fonts/League_Spartan/'      # 字体文件目录，放在 /public 下 / Font files folder, place in /public
+
+    # 各场景字重 / Font weights per context
+    weights:
+      body: 300                         # 正文段落 / Body paragraphs
+      accent: 400                       # 导航、按钮、标签等强调文字 / Navigation, buttons, labels
+      heading: 500                      # 所有标题 / All headings
+
+
+# ============================================================
+# 布局 / Layout
+# 内容区宽度、固定导航栏及其透明度与模糊效果
+# Content width, sticky header, background opacity and blur
+# ============================================================
+
 layout:
-  # Whether the header stays fixed at the top of the viewport.
-  # true  → the header stays fixed at the top when scrolling
-  # false → the header scrolls with the page
+  containerMaxWidth: '1536px'           # 内容区最大宽度，支持 px / rem / % 等 / Max content width, accepts px, rem, %, etc.
+
+  # 固定顶部导航，滚动时始终可见 / Sticky header — stays visible while scrolling
   fixedHeader: true
+  headerBackgroundOpacity: 0.45         # 背景透明度（0 全透明 → 1 不透明）/ Background opacity (0 = transparent, 1 = opaque)
+  headerBackgroundBlur: 10px            # 背景模糊强度（设为 0 可关闭）/ Background blur strength (0 = disabled)
 
-  # Background opacity of the fixed header (0 = fully transparent, 1 = fully opaque).
-  # Only applies when fixedHeader is true.
-  headerBackgroundOpacity: 0.45
 
-  # Blur strength of the fixed header background.
-  # Set to 0 to disable the blur effect.
-  # Only applies when fixedHeader is true.
-  headerBackgroundBlur: 10px
-
-  # Maximum width of the main content container.
-  # Supports any valid CSS length unit such as px, rem, em, %, vw, or vh.
-  containerMaxWidth: '1536px'
+# ============================================================
+# 版式 & 文字大小 / Typography & Font Sizes
+# 根字号、行高、标题缩放、导航字号、导航高亮样式
+# Base size, line height, heading scale, nav sizes, active style
+# ============================================================
 
 typography:
-  # Base body font size.
-  # This sets the site's root font size, so 1rem will equal this value.
-  baseFontSize: '16px'
 
-  # Global line-height multiplier.
-  # Affects body text and also participates in heading line-height calculation.
-  lineHeightScale: 1.0
+  # --- 全局 / Global ---
+  baseFontSize: '16px'                   # 根字号，全站 1rem = 此值 / Root font size, 1rem equals this value site-wide
+  lineHeightScale: 1.0                   # 行高倍数（影响正文与标题）/ Line height multiplier (affects body and headings)
+  uppercaseDisplayText: true             # 标题和强调文字是否强制大写 / Force headings and UI text to uppercase
 
-  # Desktop navigation font size.
-  # Leave empty to use the base body font size.
-  navigationDesktopFontSize: '21px'
+  # --- 标题大小阶梯 / Heading Scale ---
+  # 公式：h1 = 1rem × scale^5，h2 = scale^4 … 以此类推
+  # Formula: h1 = 1rem × scale^5, h2 = scale^4 … and so on
+  mobileHeadingScale: 1.25             # 小屏标题缩放比 / Heading scale on small screens
+  desktopHeadingScale: 1.65            # 大屏标题缩放比 / Heading scale on large screens
+  headingLineHeightScale: 0.85         # 标题行高微调（< 1 更紧凑，> 1 更宽松）/ Heading line height (< 1 tighter, > 1 looser)
 
-  # Mobile menu font size after the hamburger menu is expanded.
-  # Leave empty to use the base body font size.
-  navigationMobileFontSize: '24px'
+  # --- 导航字号 / Navigation Font Sizes ---
+  navigationDesktopFontSize: '21px'         # 桌面端主导航 / Desktop main nav
+  navigationDropdownDesktopFontSize: '16px' # 桌面端下拉子菜单 / Desktop dropdown
+  navigationMobileFontSize: '24px'          # 手机端展开菜单 / Mobile expanded menu
+  navigationDropdownMobileFontSize: '21px'  # 手机端下拉子菜单 / Mobile dropdown
+  logoTextFontSize: '36px'                  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (leave empty to inherit desktop nav size)
 
-  # Desktop dropdown menu font size.
-  # Leave empty to inherit navigationDesktopFontSize.
-  navigationDropdownDesktopFontSize: '16px'
-
-  # Mobile dropdown menu font size.
-  # Leave empty to inherit navigationMobileFontSize.
-  navigationDropdownMobileFontSize: '21px'
-
-  # Text logo font size.
-  # Leave empty to use the desktop navigation font size.
-  logoTextFontSize: '36px'
-
-  # Heading size scale on small screens.
-  # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
-  mobileHeadingScale: 1.25
-
-  # Heading size scale on large screens.
-  # Formula: h1 = 1rem * scale^5 ... h6 = 1rem * scale^0
-  desktopHeadingScale: 1.65
-
-  # Extra multiplier for heading line-height only.
-  # 1 = default, smaller = tighter, larger = looser
-  headingLineHeightScale: 0.85
-
-  # Force non-body display text to uppercase.
-  # Affects headings and emphasized UI text, not paragraph content.
-  uppercaseDisplayText: true
-
-  # Active navigation item indicator style.
-  # 'wavy'      - wavy underline (default)
-  # 'underline' - solid underline
-  # 'bold'      - bold weight (uses heading font weight) with solid underline on hover/focus
+  # --- 导航高亮样式 / Navigation Active Style ---
+  # 'wavy'      → 波浪下划线（默认）/ Wavy underline (default)
+  # 'underline' → 直线下划线 / Solid underline
+  # 'bold'      → 加粗，悬停时显示下划线 / Bold weight, underline on hover
   navigationActiveStyle: 'bold'
