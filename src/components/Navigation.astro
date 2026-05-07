@@ -337,11 +337,11 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
 
     // --- Active / hover / focus indicator styles (shared between desktop & mobile) ---
 
-    // Base: all interactive states get underline styling
+    // Base: all interactive states get underline styling (except responsive-toggle)
     a:hover,
     a:focus-visible,
     .is-active,
-    button[aria-expanded='true'],
+    button[aria-expanded='true']:not(.responsive-toggle),
     .has-dropdown > button:hover,
     .has-dropdown > button:focus-visible {
       text-decoration: underline;
@@ -349,11 +349,11 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       text-underline-offset: 7px;
     }
 
-    // Default (wavy mode): wavy underline
+    // Default (wavy mode): wavy underline (except responsive-toggle)
     a:hover,
     a:focus-visible,
     .is-active,
-    button[aria-expanded='true'],
+    button[aria-expanded='true']:not(.responsive-toggle),
     .has-dropdown > button:hover,
     .has-dropdown > button:focus-visible {
       text-decoration-style: wavy;
@@ -363,23 +363,23 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       font-weight: var(--font-weight-accent, 400);
     }
 
-    // Underline mode: solid underline
+    // Underline mode: solid underline (except responsive-toggle)
     &[data-nav-active-style='underline'] {
       a:hover,
       a:focus-visible,
       .is-active,
-      button[aria-expanded='true'],
+      button[aria-expanded='true']:not(.responsive-toggle),
       .has-dropdown > button:hover,
       .has-dropdown > button:focus-visible {
         text-decoration-style: solid;
       }
     }
 
-    // Bold mode: hover/focus → solid underline, active → bold heading weight
+    // Bold mode: hover/focus → solid underline, active → bold heading weight (except responsive-toggle)
     &[data-nav-active-style='bold'] {
       a:hover,
       a:focus-visible,
-      button[aria-expanded='true'],
+      button[aria-expanded='true']:not(.responsive-toggle),
       .has-dropdown > button:hover,
       .has-dropdown > button:focus-visible {
         text-decoration-style: solid;

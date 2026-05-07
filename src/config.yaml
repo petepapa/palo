@@ -100,7 +100,7 @@ layout:
   # Blur strength of the fixed header background.
   # Set to 0 to disable the blur effect.
   # Only applies when fixedHeader is true.
-  headerBackgroundBlur: 12px
+  headerBackgroundBlur: 10px
 
   # Maximum width of the main content container.
   # Supports any valid CSS length unit such as px, rem, em, %, vw, or vh.
@@ -121,7 +121,7 @@ typography:
 
   # Mobile menu font size after the hamburger menu is expanded.
   # Leave empty to use the base body font size.
-  navigationMobileFontSize: '30px'
+  navigationMobileFontSize: '24px'
 
   # Desktop dropdown menu font size.
   # Leave empty to inherit navigationDesktopFontSize.
@@ -129,7 +129,7 @@ typography:
 
   # Mobile dropdown menu font size.
   # Leave empty to inherit navigationMobileFontSize.
-  navigationDropdownMobileFontSize: '24px'
+  navigationDropdownMobileFontSize: '21px'
 
   # Text logo font size.
   # Leave empty to use the desktop navigation font size.
@@ -155,4 +155,4 @@ typography:
   # 'wavy'      - wavy underline (default)
   # 'underline' - solid underline
   # 'bold'      - bold weight (uses heading font weight) with solid underline on hover/focus
-  navigationActiveStyle: 'wavy'
+  navigationActiveStyle: 'bold'

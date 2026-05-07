@@ -124,7 +124,9 @@ const { class: className } = Astro.props
       }
     }
 
-    &:where(:hover, :focus-visible) {
+    &:where(:hover, :focus-visible, [aria-expanded='true']) {
+      text-decoration: none;
+
       span {
         text-decoration: none;
       }
