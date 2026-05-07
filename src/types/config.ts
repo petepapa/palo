@@ -107,6 +107,7 @@ export interface TypographyConfig {
   desktopHeadingScale: number
   headingLineHeightScale: number
   uppercaseDisplayText: boolean
+  navigationActiveStyle: 'wavy' | 'underline' | 'bold'
 }
 
 export interface PaloConfig {

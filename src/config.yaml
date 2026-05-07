@@ -150,3 +150,9 @@ typography:
   # Force non-body display text to uppercase.
   # Affects headings and emphasized UI text, not paragraph content.
   uppercaseDisplayText: true
+
+  # Active navigation item indicator style.
+  # 'wavy'      - wavy underline (default)
+  # 'underline' - solid underline
+  # 'bold'      - bold weight (uses heading font weight) with solid underline on hover/focus
+  navigationActiveStyle: 'bold'

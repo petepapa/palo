@@ -45,7 +45,15 @@ Components import from `accessible-astro-components` package for UI widgets, and
 - **Feature components** → `src/components/` (Hero, FeaturedPosts, etc.)
 - **Third-party UI** → `accessible-astro-components` (Accordion, Avatar, Badge, etc.)
 
-### 6. Workspace Development Pattern
+### 6. Navigation Active Style Configuration
+The active navigation item indicator is configurable via `typography.navigationActiveStyle` in `src/config.yaml`:
+- `wavy` (default): Wavy underline for hover, focus, and active states
+- `underline`: Solid underline for all interaction states
+- `bold`: Solid underline on hover/focus, bold heading weight (`--font-weight-heading`) for active state with no underline
+
+The value is passed to the `#main-navigation` element as a `data-nav-active-style` attribute, and SCSS selectors target this attribute to apply the correct styles.
+
+### 7. Workspace Development Pattern
 `scripts/workspace-config.js` detects symlinked packages and enables:
 - Auto-reload on package changes
 - Filesystem access to parent directories
