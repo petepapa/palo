@@ -421,6 +421,10 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     .mobile-menu {
+      margin-block-start: var(--space-m);
+      max-block-size: calc(100vh - 100px);
+      overflow-y: auto;
+
       > ul {
         flex-direction: row;
         flex-wrap: wrap;
@@ -541,7 +545,7 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     .mobile-menu .menu-item.type-icon + .menu-item.type-icon {
-      margin-inline-start: var(--space-xs);
+      margin-inline-start: 0;
     }
 
     .darkmode-toggle {
