@@ -274,8 +274,9 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       padding-block-end: 0;
 
       &.show {
-        max-block-size: 2000px;
+        max-block-size: calc(100vh - 8rem);
         opacity: 1;
+        overflow-y: auto;
         // Restore margin-block-start that was set further down
         margin-block-start: var(--space-m);
         padding-block-start: var(--space-2xs);
@@ -436,10 +437,7 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       }
     }
 
-    // Remove override to preserve animation, only keep overflow
     .mobile-menu {
-      overflow-y: auto;
-
       > ul {
         flex-direction: row;
         flex-wrap: wrap;
