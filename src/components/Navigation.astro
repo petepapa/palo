@@ -260,10 +260,26 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
 
     // Mobile-first: show mobile menu by default
     .mobile-menu {
-      display: none;
+      max-block-size: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition:
+        max-block-size var(--animation-speed-medium) var(--cubic-bezier),
+        opacity var(--animation-speed-medium) var(--cubic-bezier),
+        margin-block-start var(--animation-speed-medium) var(--cubic-bezier),
+        padding-block-start var(--animation-speed-medium) var(--cubic-bezier),
+        padding-block-end var(--animation-speed-medium) var(--cubic-bezier);
+      margin-block-start: 0;
+      padding-block-start: 0;
+      padding-block-end: 0;
 
       &.show {
-        display: block;
+        max-block-size: 2000px;
+        opacity: 1;
+        // Restore margin-block-start that was set further down
+        margin-block-start: var(--space-m);
+        padding-block-start: var(--space-2xs);
+        padding-block-end: var(--space-2xs);
       }
     }
 
@@ -420,9 +436,8 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       }
     }
 
+    // Remove override to preserve animation, only keep overflow
     .mobile-menu {
-      margin-block-start: var(--space-m);
-      max-block-size: calc(100vh - 100px);
       overflow-y: auto;
 
       > ul {
@@ -514,7 +529,7 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     .mobile-menu .has-dropdown ul {
-      display: none;
+      display: flex;
       position: relative;
       visibility: visible;
       pointer-events: auto;
@@ -527,12 +542,25 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       background: transparent;
       padding: 0;
       min-inline-size: auto;
-      transition: none;
+
+      // Animate dropdown open/close
+      max-block-size: 0;
+      overflow: hidden;
+      transition:
+        max-block-size var(--animation-speed-medium) var(--cubic-bezier),
+        margin-block-start var(--animation-speed-medium) var(--cubic-bezier),
+        padding-block-start var(--animation-speed-medium) var(--cubic-bezier),
+        padding-block-end var(--animation-speed-medium) var(--cubic-bezier);
+      margin-block-start: 0;
+      padding-block-start: 0;
+      padding-block-end: 0;
     }
 
     .mobile-menu .has-dropdown > button.show ~ ul {
-      display: flex;
-      transform: none;
+      max-block-size: 500px;
+      margin-block-start: var(--space-m);
+      padding-block-start: var(--space-2xs);
+      padding-block-end: var(--space-2xs);
     }
 
     .mobile-menu .menu-item:not(.type-icon) {

@@ -2,7 +2,7 @@
 /**
  * ResponsiveToggle Component
  *
- * @description A toggle button for mobile navigation
+ * @description A toggle button for mobile navigation with animated hamburger icon
  */
 interface Props {
   /**
@@ -16,14 +16,11 @@ const { class: className } = Astro.props
 
 <button class:list={[className, 'responsive-toggle']} aria-expanded="false" aria-label="Open menu navigation">
   <span>Menu</span>
-  <svg width="26" height="21" aria-hidden="true" fill="var(--link-color)" xmlns="http://www.w3.org/2000/svg"
-    ><path
-      d="M2 1.667h24m-24 8h24m-24 8h24"
-      stroke="var(--foreground-color)"
-      stroke-width="2.667"
-      stroke-linecap="round"
-      stroke-linejoin="round"></path></svg
-  >
+  <div class="hamburger-box" aria-hidden="true">
+    <span class="hamburger-line hamburger-line--top"></span>
+    <span class="hamburger-line hamburger-line--middle"></span>
+    <span class="hamburger-line hamburger-line--bottom"></span>
+  </div>
 </button>
 
 <script>
@@ -31,38 +28,49 @@ const { class: className } = Astro.props
     // variables
     const responsiveToggle = document.querySelector('.responsive-toggle')
     if (!responsiveToggle) return
+    const mobileNavigation = document.querySelector('.mobile-menu')
+    if (!mobileNavigation) return
 
     // functions
     const openMenu = (toggle: Element) => {
       const text = toggle.querySelector('span')
-      const icon = toggle.querySelector('svg')
-      if (!text || !icon) return
+      if (!text) return
 
       text.textContent = 'Close'
       toggle.setAttribute('aria-expanded', 'true')
       toggle.setAttribute('aria-label', 'Close menu navigation')
-      icon.innerHTML = `<path d="M10 10 2 2m8 8 8 8m-8-8 8-8m-8 8-8 8" stroke="var(--foreground-color)" stroke-width="2.667" stroke-linecap="round" stroke-linejoin="round"/>`
     }
 
     const closeMenu = (toggle: Element) => {
       const text = toggle.querySelector('span')
-      const icon = toggle.querySelector('svg')
-      if (!text || !icon) return
+      if (!text) return
 
       text.textContent = 'Menu'
       toggle.setAttribute('aria-expanded', 'false')
       toggle.setAttribute('aria-label', 'Open menu navigation')
-      icon.innerHTML = `<path d="M2 1.667h24m-24 8h24m-24 8h24" stroke="var(--foreground-color)" stroke-width="2.667" stroke-linecap="round" stroke-linejoin="round"/>`
+    }
+
+    const closeMobileMenu = () => {
+      if (mobileNavigation.classList.contains('show')) {
+        mobileNavigation.classList.remove('show')
+        closeMenu(responsiveToggle)
+      }
     }
 
     // execution
     responsiveToggle.addEventListener('click', () => {
-      const mobileNavigation = document.querySelector('.mobile-menu')
-      if (!mobileNavigation) return
-
       mobileNavigation.classList.toggle('show')
       mobileNavigation.classList.contains('show') ? openMenu(responsiveToggle) : closeMenu(responsiveToggle)
     })
+
+    // Close menu when window resizes to desktop width (matches nav breakpoint: 1050px)
+    const mediaQuery = window.matchMedia('(min-width: 1050px)')
+    const handleResize = () => {
+      if (mediaQuery.matches) {
+        closeMobileMenu()
+      }
+    }
+    mediaQuery.addEventListener('change', handleResize)
   })
 </script>
 
@@ -74,16 +82,45 @@ const { class: className } = Astro.props
     border: none;
     background: transparent;
     padding: 0;
+    cursor: pointer;
 
     span {
       margin-inline-end: var(--space-3xs);
     }
 
-    svg {
+    .hamburger-box {
+      position: relative;
       width: 30px;
+      height: 21px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-      path {
-        transition: fill var(--animation-speed-fast) var(--cubic-bezier);
+    .hamburger-line {
+      display: block;
+      width: 100%;
+      height: 2.667px;
+      background-color: var(--foreground-color);
+      border-radius: 2px;
+      transition: all var(--animation-speed-fast) var(--cubic-bezier);
+      transform-origin: center;
+    }
+
+    // Animate to X when expanded
+    &[aria-expanded='true'] {
+      .hamburger-line--top {
+        translate: 0 9.166px;
+        rotate: 45deg;
+      }
+
+      .hamburger-line--middle {
+        opacity: 0;
+      }
+
+      .hamburger-line--bottom {
+        translate: 0 -9.166px;
+        rotate: -45deg;
       }
     }
 
