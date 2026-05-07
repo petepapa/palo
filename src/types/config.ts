@@ -80,6 +80,7 @@ export interface BrandingFontConfig {
   name: string
   path: string
   weights: BrandingFontWeights
+  capHeightOffset?: string
 }
 
 export interface BrandingConfig {

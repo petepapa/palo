@@ -1,0 +1,60 @@
+// ============================================================
+// Form alignment overrides for accessible-astro-components
+//
+// Fixes vertical alignment of checkbox/radio indicators and
+// text inputs when using fonts with unusual cap-height ratios.
+//
+// The translate offset is configurable via config.yaml →
+// branding.font.capHeightOffset (default: -0.05em)
+// ============================================================
+
+// --- Checkbox / Radio: font-independent vertical alignment ---
+// Override the default grid layout with flex so the input
+// and its label text are always vertically centered.
+// NOTE: Direct class selectors (without :where) are used to
+// override Astro-scoped styles from the component library.
+.checkbox-group,
+.radio-group {
+  display: flex !important;
+  align-items: center;
+  gap: var(--space-3xs);
+  line-height: 1;
+}
+
+.checkbox-group input,
+.radio-group input {
+  flex-shrink: 0;
+  margin: 0 !important;                     // override margin-block-start: 0.125em from library
+  inline-size: 1em;
+  block-size: 1em;
+  translate: 0 var(--font-cap-height-offset, -0.05em);
+}
+
+.checkbox-group input {
+  border-radius: 0.25em;
+}
+
+.radio-group input {
+  border-radius: 50%;
+}
+
+.checkbox-group label,
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3xs);
+  cursor: pointer;
+}
+
+// --- Text Inputs: prevent height distortion from line-height ---
+// The library uses padding: var(--space-2xs) which creates unequal
+// block space with certain fonts. Use fixed height + equal padding.
+.input-group input {
+  border: 2px solid var(--color-default-border);     // preserve library border
+  border-radius: var(--radius-s);                    // preserve library radius
+  height: 2.75em;
+  padding-block: 0;                                  // remove variable block padding
+  padding-inline: var(--space-2xs);                  // keep horizontal padding
+  line-height: 1;
+  box-sizing: border-box;
+}

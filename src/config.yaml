@@ -61,6 +61,10 @@ branding:
       accent: 400                       # 导航、按钮、标签等强调文字 / Navigation, buttons, labels
       heading: 500                      # 所有标题 / All headings
 
+    # checkbox/radio 与 label 的垂直对齐微调（根据实际使用的字体调整）
+    # Vertical alignment offset for checkbox/radio vs label. Adjust per font.
+    capHeightOffset: '-0.05em'
+
 
 # ============================================================
 # 布局 / Layout
