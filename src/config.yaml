@@ -18,6 +18,10 @@ site:
   # Show the dark mode toggle in the header.
   showDarkModeToggle: true
 
+  # Show the launcher button in the header.
+  # The launcher provides keyboard shortcuts (Cmd+K / Ctrl+K) for quick navigation.
+  showLauncher: true
+
 metadata:
   # Production site URL, including https://
   # Used for canonical URLs, social sharing metadata, and sitemap generation.

@@ -47,6 +47,7 @@ export interface SiteConfig {
   titleSeparator: string
   trailingSlash: boolean
   showDarkModeToggle: boolean
+  showLauncher: boolean
 }
 
 export interface MetadataConfig {

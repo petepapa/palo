@@ -60,7 +60,11 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       </li>
     )
   }
-  <li class="menu-item desktop-launcher">
-    <LauncherTrigger launcherId="site-launcher" compact={true} gradientBorder={true} />
-  </li>
+  {
+    themeConfig.site.showLauncher && (
+      <li class="menu-item desktop-launcher">
+        <LauncherTrigger launcherId="site-launcher" compact={true} gradientBorder={true} />
+      </li>
+    )
+  }
 </ul>

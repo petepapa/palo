@@ -9,7 +9,7 @@ import themeConfig from '@config'
  *
  * @description A component that displays the header of the website
  */
-const { layout } = themeConfig
+const { layout, site } = themeConfig
 
 // Convert opacity (0–1) to a CSS alpha value for the fixed header background
 const headerBgOpacity = layout.headerBackgroundOpacity ?? 0.75
@@ -29,8 +29,9 @@ const headerBgBlur = layout.headerBackgroundBlur ?? '12px'
   </div>
 
   <Navigation />
-  {/* To remove the launcher, delete this component and remove the LauncherTrigger from `Navigation.astro`. */}
-  <LauncherConfig />
+  {
+    site.showLauncher && <LauncherConfig />
+  }
 </header>
 
 {
