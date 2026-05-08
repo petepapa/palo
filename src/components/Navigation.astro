@@ -312,6 +312,10 @@ const navAlignment =
 
     // Desktop: switch to desktop menu at nav breakpoint
     @include breakpoint('nav') {
+      > .container {
+        column-gap: var(--space-l);
+      }
+
       .mobile-menu {
         display: none;
       }
@@ -436,19 +440,26 @@ const navAlignment =
     }
 
     .desktop-menu {
-      a,
-      button {
+      .menu--primary a,
+      .menu--primary button,
+      .menu--utility > .type-icon > a,
+      .menu--utility > .type-icon > button {
         font-size: var(--navigation-desktop-font-size, 1rem);
       }
 
-      .dropdown-menu a,
-      .dropdown-menu button {
+      .menu--primary .dropdown-menu a,
+      .menu--primary .dropdown-menu button {
         font-size: var(--navigation-dropdown-desktop-font-size, var(--navigation-desktop-font-size, 1rem));
       }
 
       svg {
         width: 1em;
         height: 1em;
+      }
+
+      .desktop-launcher .launcher-trigger .trigger,
+      .desktop-launcher .launcher-trigger .key {
+        font-size: initial;
       }
     }
 

@@ -25,7 +25,7 @@ navigation:
   headerBackgroundBlur: 10px              # 背景模糊强度（设为 0 可关闭）/ Background blur strength (0 = disabled)
 
   # --- 菜单布局 / Menu Layout ---
-  desktopMenuAlignment: 'right'           # 桌面端文字主菜单位置：'left' | 'center' | 'right'；不影响右侧功能图标与移动端 / Desktop text menu alignment: 'left' | 'center' | 'right'; does not affect right-side utility icons or mobile layout
+  desktopMenuAlignment: 'center'           # 桌面端文字主菜单位置：'left' | 'center' | 'right'；不影响右侧功能图标与移动端 / Desktop text menu alignment: 'left' | 'center' | 'right'; does not affect right-side utility icons or mobile layout
 
   # --- 导航字号 / Navigation Font Sizes ---
   desktopFontSize: '21px'                 # 桌面端主导航 / Desktop main nav
