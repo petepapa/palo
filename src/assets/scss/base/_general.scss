@@ -60,7 +60,18 @@ footer a {
   box-shadow: none;
 }
 
-.card,
+.card {
+  border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)));
+}
+
+.card.card-thin {
+  --border-width-card: 1px;
+}
+
+.card.card-thick {
+  --border-width-card: 4px;
+}
+
 .dropdown-menu,
 article {
   border-width: var(--border-width-surface, var(--border-width-global, 3px));
