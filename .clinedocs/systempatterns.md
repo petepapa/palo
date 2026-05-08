@@ -59,6 +59,15 @@ The value is passed to the `#main-navigation` element as a `data-nav-active-styl
 - Filesystem access to parent directories
 - Symlink preservation in Vite
 
+### 8. Form Alignment Pattern (Font-Independent)
+Checkbox/radio indicators and their label text must be vertically centered regardless of font choice.
+A dedicated `_form.scss` partial handles this with:
+- `display: flex; align-items: center` on the group container
+- `translate: 0 var(--font-cap-height-offset)` on the input for per-font micro-adjustment
+- `text-transform: none` on labels to exclude them from global `uppercaseDisplayText`
+- `line-height: var(--text-base--line-height)` on label `<span>` to respect config-driven line-height scale
+The translate offset is configurable via `config.yaml → branding.font.capHeightOffset` (default: `-0.05em`).
+
 ## Code Organization
 
 ### File Naming
