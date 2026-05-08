@@ -11,13 +11,28 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  *
  * @description A component that displays the navigation items for the website
  */
+interface Props {
+  variant?: 'all' | 'primary' | 'utility'
+  includeLauncher?: boolean
+}
+
+const { variant = 'all', includeLauncher = true } = Astro.props
+
+const primaryItems = navigationItems.filter((item) => !item.icon)
+const utilityItems = navigationItems.filter((item) => Boolean(item.icon))
+const itemsToRender = variant === 'primary' ? primaryItems : variant === 'utility' ? utilityItems : navigationItems
 ---
 
-<ul class="menu">
+<ul class:list={['menu', variant !== 'all' && `menu--${variant}`]}>
   {
-    navigationItems.map((item: any) => (
+    itemsToRender.map((item: any) => (
       <li
-        class={`menu-item ${item.type === 'dropdown' ? 'has-dropdown' : ''} ${item.icon ? 'type-icon animate-rotate' : ''}`}
+        class:list={[
+          'menu-item',
+          item.type === 'dropdown' && 'has-dropdown',
+          item.icon && 'type-icon animate-rotate menu-item--utility',
+          !item.icon && 'menu-item--primary',
+        ]}
       >
         {item.type === 'dropdown' ? (
           <button aria-haspopup="true" aria-expanded="false">
@@ -51,8 +66,8 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     ))
   }
   {
-    themeConfig.site.showDarkModeToggle && (
-      <li class="menu-item type-icon animate-rotate">
+    variant !== 'primary' && themeConfig.site.showDarkModeToggle && (
+      <li class="menu-item type-icon animate-rotate menu-item--utility">
         <DarkMode>
           <Icon aria-hidden="true" name="lucide:moon" slot="light" />
           <Icon aria-hidden="true" name="lucide:sun" slot="dark" />
@@ -61,8 +76,8 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     )
   }
   {
-    themeConfig.site.showLauncher && (
-      <li class="menu-item desktop-launcher">
+    variant !== 'primary' && includeLauncher && themeConfig.site.showLauncher && (
+      <li class="menu-item menu-item--utility desktop-launcher">
         <LauncherTrigger launcherId="site-launcher" compact={true} gradientBorder={true} />
       </li>
     )

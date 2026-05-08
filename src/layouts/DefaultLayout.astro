@@ -206,14 +206,20 @@ const containerMaxWidth = (() => {
   return resolved
 })()
 
-const navigationDesktopFontSize = resolveCssLength(typography.navigationDesktopFontSize, typography.baseFontSize)
-const navigationMobileFontSize = resolveCssLength(typography.navigationMobileFontSize, typography.baseFontSize)
+const navigationDesktopFontSize = resolveCssLength(
+  themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
+  typography.baseFontSize,
+)
+const navigationMobileFontSize = resolveCssLength(
+  themeConfig.navigation?.mobileFontSize ?? typography.navigationMobileFontSize,
+  typography.baseFontSize,
+)
 const navigationDropdownDesktopFontSize = resolveCssLength(
-  typography.navigationDropdownDesktopFontSize,
+  themeConfig.navigation?.dropdownDesktopFontSize ?? typography.navigationDropdownDesktopFontSize,
   navigationDesktopFontSize,
 )
 const navigationDropdownMobileFontSize = resolveCssLength(
-  typography.navigationDropdownMobileFontSize,
+  themeConfig.navigation?.dropdownMobileFontSize ?? typography.navigationDropdownMobileFontSize,
   navigationMobileFontSize,
 )
 const logoTextFontSize = resolveCssLength(typography.logoTextFontSize, navigationDesktopFontSize)

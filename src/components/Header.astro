@@ -12,13 +12,14 @@ import themeConfig from '@config'
 const { layout, site } = themeConfig
 
 // Convert opacity (0–1) to a CSS alpha value for the fixed header background
-const headerBgOpacity = layout.headerBackgroundOpacity ?? 0.75
+const headerBgOpacity = themeConfig.navigation?.headerBackgroundOpacity ?? layout.headerBackgroundOpacity ?? 0.75
 // Blur strength for the fixed header background
-const headerBgBlur = layout.headerBackgroundBlur ?? '12px'
+const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.headerBackgroundBlur ?? '12px'
+const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 ---
 
 <header
-  class:list={[layout.fixedHeader && 'is-fixed']}
+  class:list={[fixedHeader && 'is-fixed']}
   style={`--header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
 >
   <SkipLink />
@@ -35,7 +36,7 @@ const headerBgBlur = layout.headerBackgroundBlur ?? '12px'
 </header>
 
 {
-  layout.fixedHeader && (
+  fixedHeader && (
     <style lang="scss" is:global>
       body {
         overflow-x: visible;

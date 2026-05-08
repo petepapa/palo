@@ -11,15 +11,18 @@ import themeConfig from '@config'
  * @description A component that displays the navigation menu for the website
  */
 const { site, typography } = themeConfig
-const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
+const navActiveStyle = themeConfig.navigation?.activeStyle ?? typography.navigationActiveStyle ?? 'wavy'
+const navAlignment =
+  themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
 ---
 
 <div id="main-navigation" class="py-8" data-nav-active-style={navActiveStyle}>
   <div class="container">
     <Logo />
     <div class="wrapper">
-      <nav class="desktop-menu" aria-label="Main navigation desktop">
-        <NavigationItems />
+      <nav class={`desktop-menu desktop-menu--${navAlignment}`} aria-label="Main navigation desktop">
+        <NavigationItems variant="primary" includeLauncher={false} />
+        <NavigationItems variant="utility" />
       </nav>
       <ResponsiveToggle />
       {
@@ -31,7 +34,7 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       }
     </div>
     <nav class="mobile-menu" aria-label="Main navigation mobile">
-      <NavigationItems />
+      <NavigationItems includeLauncher={false} />
     </nav>
   </div>
 </div>
@@ -43,12 +46,14 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     if (!mainNav) return
 
     const mainContainer = mainNav.querySelector(':scope > .container') as HTMLElement | null
-    const mainMenu = mainNav.querySelector('ul') as HTMLUListElement | null
+    const keyboardMenus = [
+      ...mainNav.querySelectorAll('.desktop-menu .menu--primary, .mobile-menu .menu'),
+    ] as HTMLUListElement[]
     const dropdownMenus = [...document.querySelectorAll('.has-dropdown button')] as HTMLButtonElement[]
 
     // functions
     const setActiveMenuItem = (): void => {
-      const mobileDesktopMenus = mainNav.querySelectorAll('nav > ul')
+      const mobileDesktopMenus = mainNav.querySelectorAll('.desktop-menu .menu, .mobile-menu .menu')
       const currentPathname = window.location.pathname
 
       // Normalize a path by stripping trailing slash (for comparison purposes)
@@ -129,11 +134,11 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     // execution
-    mainMenu &&
-      mainMenu.addEventListener('keydown', (event: KeyboardEvent) => {
+    keyboardMenus.forEach((menu) => {
+      menu.addEventListener('keydown', (event: KeyboardEvent) => {
         const element = event.target as Element
         const currentMenuItem = element.closest('li')
-        const menuItems = [...mainMenu.querySelectorAll('.menu-item')] as HTMLLIElement[]
+        const menuItems = [...menu.querySelectorAll('.menu-item')] as HTMLLIElement[]
         const currentDropdownMenu = element.closest('.has-dropdown button') as HTMLButtonElement | null
         const currentDropdownMenuItem = element.closest('.has-dropdown li') as HTMLLIElement | null
         const currentIndex = currentMenuItem ? menuItems.findIndex((item) => item === currentMenuItem) : -1
@@ -230,6 +235,7 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
           }
         }
       })
+    })
 
     dropdownMenus &&
       dropdownMenus.forEach((dropdownMenu) => {
@@ -319,7 +325,45 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
       }
 
       .desktop-menu {
-        display: block;
+        display: grid;
+        flex: 1 1 auto;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: var(--space-m);
+        min-inline-size: 0;
+      }
+
+      .desktop-menu > ul {
+        display: flex;
+        align-items: center;
+        gap: var(--space-m);
+        list-style-type: none;
+      }
+
+      .desktop-menu > .menu--primary {
+        min-inline-size: 0;
+      }
+
+      .desktop-menu > .menu--utility {
+        justify-self: end;
+      }
+
+      .desktop-menu--left > .menu--primary {
+        justify-self: start;
+      }
+
+      .desktop-menu--center > .menu--primary {
+        justify-self: center;
+      }
+
+      .desktop-menu--right > .menu--primary {
+        justify-self: end;
+      }
+
+      .wrapper {
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-inline-size: 0;
       }
     }
 
@@ -438,6 +482,10 @@ const navActiveStyle = typography.navigationActiveStyle ?? 'wavy'
     }
 
     .mobile-menu {
+      .desktop-launcher {
+        display: none;
+      }
+
       > ul {
         flex-direction: row;
         flex-wrap: wrap;

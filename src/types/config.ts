@@ -32,8 +32,15 @@ export interface NavigationItemDropdown {
 export type NavigationItem = NavigationItemLink | NavigationItemDropdown
 
 export interface NavigationConfig {
-  darkmode: boolean
-  items: NavigationItem[]
+  fixedHeader?: boolean
+  headerBackgroundOpacity?: number
+  headerBackgroundBlur?: string
+  desktopMenuAlignment?: 'left' | 'center' | 'right'
+  desktopFontSize?: string
+  mobileFontSize?: string
+  dropdownDesktopFontSize?: string
+  dropdownMobileFontSize?: string
+  activeStyle?: 'wavy' | 'underline' | 'bold'
 }
 
 export interface SocialItem {
@@ -48,6 +55,8 @@ export interface SiteConfig {
   trailingSlash: boolean
   showDarkModeToggle: boolean
   showLauncher: boolean
+  navigationAlignment?: 'left' | 'center' | 'right'
+  desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }
 
 export interface MetadataConfig {
@@ -113,6 +122,7 @@ export interface TypographyConfig {
 
 export interface PaloConfig {
   site: SiteConfig
+  navigation?: NavigationConfig
   metadata: MetadataConfig
   branding: BrandingConfig
   layout: LayoutConfig
