@@ -72,6 +72,12 @@ footer a {
   --border-width-card: 4px;
 }
 
+// Accordion item border width
+.accordion details.wrapper,
+.accordion-stable .wrapper {
+  border-block-start-width: var(--border-width-accordion, var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)))) !important;
+}
+
 .dropdown-menu,
 article {
   border-width: var(--border-width-surface, var(--border-width-global, 3px));

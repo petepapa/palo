@@ -236,7 +236,7 @@ const panelId = `${uid}-panel`
     --transition-duration: 0.3s;
     --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
 
-    border-block-start: 2px solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
+    border-block-start: var(--border-width-accordion, 2px) solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
     padding-block: 0;
   }
 

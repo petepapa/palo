@@ -46,6 +46,7 @@ export interface NavigationConfig {
 export interface BorderConfig {
   globalWidth?: string
   buttonWidth?: string
+  accordionWidth?: string
   formWidth?: string
   surfaceWidth?: string
   dividerWidth?: string
