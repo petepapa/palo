@@ -527,8 +527,11 @@ const navAlignment =
       }
     }
 
+    // Dropdown offset = container padding + border width
+    // This ensures the dropdown aligns with the container's inner edge
     .has-dropdown {
       position: relative;
+      --dropdown-offset-inline: calc(var(--grid-gutter) / 2 + var(--border-width-global));
 
       > button {
         display: flex;
@@ -554,7 +557,7 @@ const navAlignment =
         gap: var(--space-2xs);
         visibility: hidden;
         pointer-events: none;
-        transform: translate(calc(var(--space-m) * -1), 1rem);
+        transform: translate(calc(var(--dropdown-offset-inline) * -1), 1rem);
         opacity: 0;
         z-index: 100;
         inset-block-start: 125%;
@@ -579,7 +582,7 @@ const navAlignment =
       > button.show ~ ul {
         visibility: visible;
         pointer-events: auto;
-        transform: translate(calc(var(--space-m) * -1), 0);
+        transform: translate(calc(var(--dropdown-offset-inline) * -1), 0);
         opacity: 1;
         transition-delay: 0s;
       }
