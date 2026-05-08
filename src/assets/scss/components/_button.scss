@@ -20,6 +20,7 @@
 a.button,
 button.button {
   font-weight: var(--font-weight-accent, 400);
+  border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
 }
 
 :where(.button) {

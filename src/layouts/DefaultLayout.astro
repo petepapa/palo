@@ -206,6 +206,12 @@ const containerMaxWidth = (() => {
   return resolved
 })()
 
+const defaultBorderWidth = resolveCssLength(themeConfig.border?.globalWidth, '3px')
+const buttonBorderWidth = resolveCssLength(themeConfig.border?.buttonWidth, defaultBorderWidth)
+const formBorderWidth = resolveCssLength(themeConfig.border?.formWidth, defaultBorderWidth)
+const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
+const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
+
 const navigationDesktopFontSize = resolveCssLength(
   themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
   typography.baseFontSize,
@@ -429,6 +435,11 @@ const themeVariablesCss = `
   --font-weight-heading: ${font.weights.heading};
   --font-cap-height-offset: ${font.capHeightOffset || '-0.05em'};
   --line-height-scale: ${typography.lineHeightScale};
+  --border-width-global: ${defaultBorderWidth};
+  --border-width-button: ${buttonBorderWidth};
+  --border-width-form: ${formBorderWidth};
+  --border-width-surface: ${surfaceBorderWidth};
+  --border-width-divider: ${dividerBorderWidth};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};
@@ -717,7 +728,7 @@ const themeVariablesCss = `
       }
 
       pre {
-        border: 2px solid var(--link-color);
+        border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--link-color);
         border-radius: 0.35rem;
         padding: 1rem;
       }

@@ -779,7 +779,7 @@ const components = [
 
     .components-showcase {
       @include breakpoint(m) {
-        border-inline-end: 1px solid var(--border-color-subtle);
+        border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
         padding-inline-end: var(--space-l);
       }
     }

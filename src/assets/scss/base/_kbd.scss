@@ -2,7 +2,7 @@
   position: relative;
   inset-block-start: -1px;
   box-shadow: 0 2px 0 1px light-dark(var(--color-neutral-400), var(--color-neutral-700));
-  border: 1px solid light-dark(var(--color-neutral-400), var(--color-neutral-600));
+  border: var(--border-width-global, 3px) solid light-dark(var(--color-neutral-400), var(--color-neutral-600));
   border-radius: var(--radius-s);
   background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
   padding: var(--space-4xs) var(--space-3xs);

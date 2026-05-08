@@ -43,6 +43,14 @@ export interface NavigationConfig {
   activeStyle?: 'wavy' | 'underline' | 'bold'
 }
 
+export interface BorderConfig {
+  globalWidth?: string
+  buttonWidth?: string
+  formWidth?: string
+  surfaceWidth?: string
+  dividerWidth?: string
+}
+
 export interface SocialItem {
   label: string
   href: string
@@ -123,6 +131,7 @@ export interface TypographyConfig {
 export interface PaloConfig {
   site: SiteConfig
   navigation?: NavigationConfig
+  border?: BorderConfig
   metadata: MetadataConfig
   branding: BrandingConfig
   layout: LayoutConfig

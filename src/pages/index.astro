@@ -167,7 +167,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 <style>
   .avatar {
-    border: 1px solid var(--border-color-subtle);
+    border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     border-radius: var(--radius-md);
     padding: var(--space-s);
   }

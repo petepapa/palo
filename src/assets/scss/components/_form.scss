@@ -26,6 +26,7 @@
   margin: 0 !important;                     // override margin-block-start: 0.125em from library
   inline-size: 1em;
   block-size: 1em;
+  border-width: var(--border-width-form, var(--border-width-global, 3px));
   translate: 0 var(--font-cap-height-offset, -0.05em);
 }
 
@@ -57,12 +58,45 @@
 // --- Text Inputs: prevent height distortion from line-height ---
 // The library uses padding: var(--space-2xs) which creates unequal
 // block space with certain fonts. Use fixed height + equal padding.
-.input-group input {
-  border: 2px solid var(--color-default-border);     // preserve library border
+.input-group input,
+.input-group textarea,
+.input-group select,
+.textarea-group textarea {
+  border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);     // preserve library border
   border-radius: var(--radius-s);                    // preserve library radius
-  height: 2.75em;
   padding-block: 0;                                  // remove variable block padding
   padding-inline: var(--space-2xs);                  // keep horizontal padding
   line-height: 1;
   box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group input:focus-visible,
+.input-group select:focus,
+.input-group select:focus-visible,
+.textarea-group textarea:focus,
+.textarea-group textarea:focus-visible {
+  outline: none;
+  border-color: var(--link-color);
+  box-shadow: 0 0 0 1px var(--link-color);
+}
+
+.input-group input,
+.input-group select {
+  height: calc(2.75em + (var(--border-width-form, var(--border-width-global, 3px)) * 2));
+}
+
+.textarea-group textarea {
+  min-block-size: 10em;
+  padding-block: var(--space-2xs);
+  line-height: inherit;
+  resize: none;
+}
+
+fieldset.fieldset {
+  border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);
+}
+
+fieldset.fieldset[aria-invalid='true'] {
+  border-color: var(--color-error-border);
 }

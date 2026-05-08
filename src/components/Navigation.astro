@@ -479,7 +479,7 @@ const navAlignment =
           gap: var(--space-2xs);
           transition: all var(--animation-speed-fast) var(--cubic-bezier);
           margin-block-start: calc(var(--space-4xs) * -1);
-          border: 1px solid var(--foreground-color);
+          border: var(--border-width-button, var(--border-width-global, 3px)) solid var(--foreground-color);
           border-radius: var(--radius-large);
           padding: var(--space-4xs) var(--space-2xs);
           text-decoration: none;
@@ -562,7 +562,7 @@ const navAlignment =
         inline-size: max-content;
         max-inline-size: var(--dropdown-max-inline-size, none);
         box-shadow: var(--elevation-4);
-        border: 2px solid var(--border-color-subtle);
+        border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
         border-radius: var(--radius-l);
         background-color: var(--background-color);
         padding: var(--space-m);

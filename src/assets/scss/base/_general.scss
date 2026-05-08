@@ -59,3 +59,9 @@ footer a {
   outline: none;
   box-shadow: none;
 }
+
+.card,
+.dropdown-menu,
+article {
+  border-width: var(--border-width-surface, var(--border-width-global, 3px));
+}
