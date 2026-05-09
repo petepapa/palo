@@ -283,7 +283,7 @@ index c1f389f..c6d0cdd 100644
    }
  </style>
 diff --git a/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro b/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
-index 75c1527..7bf1700 100644
+index 75c1527..674db47 100644
 --- a/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
 +++ b/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
 @@ -201,7 +201,7 @@ const sizeValue = getSizeValue(size)
@@ -295,6 +295,18 @@ index 75c1527..7bf1700 100644
      border-color: var(--color-default-border);
      background-color: var(--color-default-bg);
      color: var(--color-default-text);
+@@ -246,6 +246,11 @@ const sizeValue = getSizeValue(size)
+   }
+ 
+   :where(.avatar .initials) {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    inline-size: 100%;
++    block-size: 100%;
+     font-weight: bold;
+     font-size: clamp(1rem, calc(var(--size) * 0.4), calc(var(--size) * 0.6));
+     line-height: 1;
 diff --git a/node_modules/accessible-astro-components/src/components/badge/Badge.astro b/node_modules/accessible-astro-components/src/components/badge/Badge.astro
 index 2594c63..a75149b 100644
 --- a/node_modules/accessible-astro-components/src/components/badge/Badge.astro
