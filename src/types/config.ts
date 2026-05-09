@@ -48,6 +48,7 @@ export interface BorderConfig {
   buttonWidth?: string
   cardWidth?: string
   accordionWidth?: string
+  tabsWidth?: string
   avatarWidth?: string
   badgeWidth?: string
   formWidth?: string

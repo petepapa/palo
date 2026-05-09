@@ -50,7 +50,8 @@ border:
   globalWidth: '24px'                    # 全站默认描边粗细 / Default border width site-wide
   buttonWidth: ''                       # 按钮与按钮型链接；留空继承全局 / Buttons and button-like links; leave blank to inherit global
   cardWidth: ''                      # Card 卡片描边；留空继承全局 / Card borders; leave blank to inherit global
-  accordionWidth: '2px'                    # Accordion 可折叠面板边框；留空继承全局 / Accordion item borders; leave blank to inherit global
+  accordionWidth: '1px'                    # Accordion 可折叠面板边框；留空继承全局 / Accordion item borders; leave blank to inherit global
+  tabsWidth: '1px'                       # Tabs 切换标签与面板边框；留空继承全局 / Tabs tab and panel borders; leave blank to inherit global
   avatarWidth: '0'                      # Avatar 头像边框；留空继承全局 / Avatar borders; leave blank to inherit global
   badgeWidth: '1px'                        # Badge 徽章边框；留空继承全局 / Badge borders; leave blank to inherit global
   formWidth: ''                         # 输入框、选择框、勾选框等表单元素；留空继承全局 / Inputs, selects, checkboxes, and other form controls; leave blank to inherit global

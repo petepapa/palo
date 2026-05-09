@@ -210,6 +210,7 @@ const defaultBorderWidth = resolveCssLength(themeConfig.border?.globalWidth, '3p
 const buttonBorderWidth = resolveCssLength(themeConfig.border?.buttonWidth, defaultBorderWidth)
 const cardBorderWidth = resolveCssLength(themeConfig.border?.cardWidth, defaultBorderWidth)
 const accordionBorderWidth = resolveCssLength(themeConfig.border?.accordionWidth, cardBorderWidth)
+const tabsBorderWidth = resolveCssLength(themeConfig.border?.tabsWidth, defaultBorderWidth)
 const avatarBorderWidth = resolveCssLength(themeConfig.border?.avatarWidth, defaultBorderWidth)
 const badgeBorderWidth = resolveCssLength(themeConfig.border?.badgeWidth, defaultBorderWidth)
 const notificationBorderWidth = resolveCssLength(themeConfig.border?.notificationWidth, defaultBorderWidth)
@@ -444,6 +445,7 @@ const themeVariablesCss = `
   --border-width-button: ${buttonBorderWidth};
   --border-width-card: ${cardBorderWidth};
   --border-width-accordion: ${accordionBorderWidth};
+  --border-width-tabs: ${tabsBorderWidth};
   --border-width-avatar: ${avatarBorderWidth};
   --border-width-badge: ${badgeBorderWidth};
   --border-width-notification: ${notificationBorderWidth};

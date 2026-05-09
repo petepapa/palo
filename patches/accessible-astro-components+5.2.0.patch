@@ -390,6 +390,32 @@ index fd55453..350803d 100644
      border-radius: 0.5rem;
      padding: 1rem;
    }
+diff --git a/node_modules/accessible-astro-components/src/components/tabs/TabsPanel.astro b/node_modules/accessible-astro-components/src/components/tabs/TabsPanel.astro
+index efca20a..eacbf9f 100644
+--- a/node_modules/accessible-astro-components/src/components/tabs/TabsPanel.astro
++++ b/node_modules/accessible-astro-components/src/components/tabs/TabsPanel.astro
+@@ -50,7 +50,7 @@ const { class: className, id, labelledby, selected = false, ...rest } = Astro.pr
+     justify-content: center;
+     align-items: flex-start;
+     gap: 1rem;
+-    border: 2px solid;
++    border: var(--border-width-tabs, 2px) solid;
+     border-color: light-dark(hsl(0 0% 10%), hsl(0 0% 90%));
+     border-end-start-radius: 0.5rem;
+     border-end-end-radius: 0.5rem;
+diff --git a/node_modules/accessible-astro-components/src/components/tabs/TabsTab.astro b/node_modules/accessible-astro-components/src/components/tabs/TabsTab.astro
+index d14e5c1..c980dc7 100644
+--- a/node_modules/accessible-astro-components/src/components/tabs/TabsTab.astro
++++ b/node_modules/accessible-astro-components/src/components/tabs/TabsTab.astro
+@@ -51,7 +51,7 @@ const { class: className, id, controls, selected = false, ...rest } = Astro.prop
+ 
+     flex-grow: 1;
+     cursor: pointer;
+-    border: 2px solid;
++    border: var(--border-width-tabs, 2px) solid;
+     border-color: light-dark(hsl(0 0% 10%), hsl(0 0% 90%));
+     border-radius: 0.5rem;
+     background-color: transparent;
 diff --git a/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro b/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro
 index 9ac20de..994562a 100644
 --- a/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro

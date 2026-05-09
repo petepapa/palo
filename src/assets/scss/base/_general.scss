@@ -124,3 +124,19 @@ article {
 .notification.notification-thick:where(.variant-default) {
   --border-width-notification: 4px;
 }
+
+// Tabs border width
+.tab,
+.tab-panel {
+  border-width: var(--border-width-tabs, var(--border-width-global, 3px)) !important;
+}
+
+.tab.tab-thin,
+.tab-panel.tab-panel-thin {
+  --border-width-tabs: 1px;
+}
+
+.tab.tab-thick,
+.tab-panel.tab-panel-thick {
+  --border-width-tabs: 4px;
+}
