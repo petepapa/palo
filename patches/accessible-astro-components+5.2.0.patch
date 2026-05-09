@@ -377,6 +377,19 @@ index a0fdf9d..4ea9c06 100644
      }
    }
  
+diff --git a/node_modules/accessible-astro-components/src/components/notification/Notification.astro b/node_modules/accessible-astro-components/src/components/notification/Notification.astro
+index fd55453..350803d 100644
+--- a/node_modules/accessible-astro-components/src/components/notification/Notification.astro
++++ b/node_modules/accessible-astro-components/src/components/notification/Notification.astro
+@@ -196,7 +196,7 @@ const Element = element as any
+     display: flex;
+     align-items: center;
+     gap: 0.75rem;
+-    border: 2px solid;
++    border: var(--border-width-notification, var(--border-width-global, 2px)) solid;
+     border-radius: 0.5rem;
+     padding: 1rem;
+   }
 diff --git a/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro b/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro
 index 9ac20de..994562a 100644
 --- a/node_modules/accessible-astro-components/src/components/tooltip/Tooltip.astro

@@ -51,6 +51,7 @@ export interface BorderConfig {
   avatarWidth?: string
   badgeWidth?: string
   formWidth?: string
+  notificationWidth?: string
   surfaceWidth?: string
   dividerWidth?: string
 }

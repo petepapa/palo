@@ -111,3 +111,16 @@ article {
 .badge.badge-thick {
   --border-width-badge: 4px;
 }
+
+// Notification border width
+.notification:where(.variant-default) {
+  border-width: var(--border-width-notification, var(--border-width-global, 2px)) !important;
+}
+
+.notification.notification-thin:where(.variant-default) {
+  --border-width-notification: 1px;
+}
+
+.notification.notification-thick:where(.variant-default) {
+  --border-width-notification: 4px;
+}
