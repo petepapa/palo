@@ -527,11 +527,11 @@ const navAlignment =
       }
     }
 
-    // Dropdown offset = container padding + border width
+    // Dropdown offset = space-m + surface border width
     // This ensures the dropdown aligns with the container's inner edge
     .has-dropdown {
       position: relative;
-      --dropdown-offset-inline: calc(var(--grid-gutter) / 2 + var(--border-width-global));
+      --dropdown-offset-inline: calc(var(--space-m) + var(--border-width-surface, var(--border-width-global)));
 
       > button {
         display: flex;
