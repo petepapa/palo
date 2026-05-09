@@ -82,3 +82,19 @@ footer a {
 article {
   border-width: var(--border-width-surface, var(--border-width-global, 3px));
 }
+
+// Avatar border width
+.avatar .initials-container,
+.avatar .icon-container {
+  border-width: var(--border-width-avatar, var(--border-width-global, 3px)) !important;
+}
+
+.avatar.avatar-thin .initials-container,
+.avatar.avatar-thin .icon-container {
+  --border-width-avatar: 1px;
+}
+
+.avatar.avatar-thick .initials-container,
+.avatar.avatar-thick .icon-container {
+  --border-width-avatar: 4px;
+}

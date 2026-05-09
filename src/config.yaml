@@ -47,10 +47,11 @@ navigation:
 # ============================================================
 
 border:
-  globalWidth: '22px'                    # 全站默认描边粗细 / Default border width site-wide
+  globalWidth: '13px'                    # 全站默认描边粗细 / Default border width site-wide
   buttonWidth: ''                       # 按钮与按钮型链接；留空继承全局 / Buttons and button-like links; leave blank to inherit global
   cardWidth: ''                      # Card 卡片描边；留空继承全局 / Card borders; leave blank to inherit global
   accordionWidth: '2px'                    # Accordion 可折叠面板边框；留空继承全局 / Accordion item borders; leave blank to inherit global
+  avatarWidth: '0'                      # Avatar 头像边框；留空继承全局 / Avatar borders; leave blank to inherit global
   formWidth: ''                         # 输入框、选择框、勾选框等表单元素；留空继承全局 / Inputs, selects, checkboxes, and other form controls; leave blank to inherit global
   surfaceWidth: '0'                     # 卡片、面板、下拉菜单、信息块等容器类元素；留空继承全局 / Cards, panels, dropdowns, and other surface containers; leave blank to inherit global
   dividerWidth: ''                   # 分隔线、区块分隔边框；留空继承全局 / Dividers and section-separating borders; leave blank to inherit global

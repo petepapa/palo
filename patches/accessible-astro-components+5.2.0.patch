@@ -282,6 +282,19 @@ index c1f389f..c6d0cdd 100644
      transform: scaleY(-1);
    }
  </style>
+diff --git a/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro b/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
+index 75c1527..7bf1700 100644
+--- a/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
++++ b/node_modules/accessible-astro-components/src/components/avatar/Avatar.astro
+@@ -201,7 +201,7 @@ const sizeValue = getSizeValue(size)
+   /* Default type */
+   :where(.initials-container),
+   :where(.icon-container) {
+-    border: 2px solid;
++    border: var(--border-width-avatar, 2px) solid;
+     border-color: var(--color-default-border);
+     background-color: var(--color-default-bg);
+     color: var(--color-default-text);
 diff --git a/node_modules/accessible-astro-components/src/components/card/Card.astro b/node_modules/accessible-astro-components/src/components/card/Card.astro
 index 54bf207..79ec263 100644
 --- a/node_modules/accessible-astro-components/src/components/card/Card.astro
