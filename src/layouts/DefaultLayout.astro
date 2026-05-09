@@ -211,6 +211,7 @@ const buttonBorderWidth = resolveCssLength(themeConfig.border?.buttonWidth, defa
 const cardBorderWidth = resolveCssLength(themeConfig.border?.cardWidth, defaultBorderWidth)
 const accordionBorderWidth = resolveCssLength(themeConfig.border?.accordionWidth, cardBorderWidth)
 const avatarBorderWidth = resolveCssLength(themeConfig.border?.avatarWidth, defaultBorderWidth)
+const badgeBorderWidth = resolveCssLength(themeConfig.border?.badgeWidth, defaultBorderWidth)
 const formBorderWidth = resolveCssLength(themeConfig.border?.formWidth, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
@@ -443,6 +444,7 @@ const themeVariablesCss = `
   --border-width-card: ${cardBorderWidth};
   --border-width-accordion: ${accordionBorderWidth};
   --border-width-avatar: ${avatarBorderWidth};
+  --border-width-badge: ${badgeBorderWidth};
   --border-width-form: ${formBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
   --border-width-divider: ${dividerBorderWidth};

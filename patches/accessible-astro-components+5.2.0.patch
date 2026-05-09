@@ -295,6 +295,19 @@ index 75c1527..7bf1700 100644
      border-color: var(--color-default-border);
      background-color: var(--color-default-bg);
      color: var(--color-default-text);
+diff --git a/node_modules/accessible-astro-components/src/components/badge/Badge.astro b/node_modules/accessible-astro-components/src/components/badge/Badge.astro
+index 2594c63..a75149b 100644
+--- a/node_modules/accessible-astro-components/src/components/badge/Badge.astro
++++ b/node_modules/accessible-astro-components/src/components/badge/Badge.astro
+@@ -155,7 +155,7 @@ const sizeClass = `size-${size}`
+     position: relative;
+     justify-content: center;
+     align-items: center;
+-    border: 2px solid;
++    border: var(--border-width-badge, 2px) solid;
+     border-radius: 0.5rem;
+   }
+ 
 diff --git a/node_modules/accessible-astro-components/src/components/card/Card.astro b/node_modules/accessible-astro-components/src/components/card/Card.astro
 index 54bf207..79ec263 100644
 --- a/node_modules/accessible-astro-components/src/components/card/Card.astro

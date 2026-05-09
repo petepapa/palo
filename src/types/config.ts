@@ -46,8 +46,10 @@ export interface NavigationConfig {
 export interface BorderConfig {
   globalWidth?: string
   buttonWidth?: string
+  cardWidth?: string
   accordionWidth?: string
   avatarWidth?: string
+  badgeWidth?: string
   formWidth?: string
   surfaceWidth?: string
   dividerWidth?: string
@@ -97,9 +99,9 @@ export interface BrandingFontWeights {
 
 export interface BrandingFontConfig {
   name: string
-  path: string
   weights: BrandingFontWeights
   capHeightOffset?: string
+  path?: string
 }
 
 export interface BrandingConfig {

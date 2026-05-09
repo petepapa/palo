@@ -98,3 +98,16 @@ article {
 .avatar.avatar-thick .icon-container {
   --border-width-avatar: 4px;
 }
+
+// Badge border width
+.badge {
+  border-width: var(--border-width-badge, 2px) !important;
+}
+
+.badge.badge-thin {
+  --border-width-badge: 1px;
+}
+
+.badge.badge-thick {
+  --border-width-badge: 4px;
+}
