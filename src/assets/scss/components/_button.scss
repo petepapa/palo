@@ -23,6 +23,13 @@ button.button {
   border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
 }
 
+.button .button-content,
+a.button .button-content,
+button.button .button-content {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1.5);
+}
+
 :where(.button) {
   box-shadow: none !important;
   text-decoration: none !important;

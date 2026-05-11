@@ -89,6 +89,13 @@ article {
   border-width: var(--border-width-avatar, var(--border-width-global, 3px)) !important;
 }
 
+.avatar .initials,
+.avatar .title,
+.avatar .subtitle {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1);
+}
+
 .avatar.avatar-thin .initials-container,
 .avatar.avatar-thin .icon-container {
   --border-width-avatar: 1px;
@@ -106,6 +113,17 @@ article {
 
 .badge .badge-content {
   transform: translateY(calc(var(--font-cap-height-offset, -0.05em) * -1));
+}
+
+.badge .badge-content > svg,
+.badge .badge-content > svg[data-icon] {
+  position: relative;
+  top: var(--font-cap-height-offset, -0.05em);
+}
+
+.notification .notification-content > * {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1.5);
 }
 
 .badge.circular {
