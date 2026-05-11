@@ -112,13 +112,24 @@ article {
 }
 
 .badge .badge-content {
-  transform: translateY(calc(var(--font-cap-height-offset, -0.05em) * -1));
+  translate: 0 calc(var(--font-cap-height-offset, -0.05em) * -1);
 }
 
 .badge .badge-content > svg,
 .badge .badge-content > svg[data-icon] {
-  position: relative;
-  top: var(--font-cap-height-offset, -0.05em);
+  translate: 0 var(--font-cap-height-offset, -0.05em);
+}
+
+.badge.size-sm:not(.circular) {
+  padding-block: 0.2rem;
+}
+
+.badge.size-md:not(.circular) {
+  padding-block: 0.2rem;
+}
+
+.badge.size-lg:not(.circular) {
+  padding-block: 0.22rem;
 }
 
 .notification .notification-content > * {
