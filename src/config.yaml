@@ -135,7 +135,7 @@ typography:
   # --- 全局 / Global ---
   baseFontSize: '16px'                   # 根字号，全站 1rem = 此值 / Root font size, 1rem equals this value site-wide
   lineHeightScale: 1.0                   # 行高倍数（影响正文与标题）/ Line height multiplier (affects body and headings)
-  uppercaseDisplayText: true             # 标题和强调文字是否强制大写 / Force headings and UI text to uppercase
+  uppercaseDisplayText: false             # 标题和强调文字是否强制大写 / Force headings and UI text to uppercase
 
   # --- 标题大小阶梯 / Heading Scale ---
   # 公式：h1 = 1rem × scale^5，h2 = scale^4 … 以此类推

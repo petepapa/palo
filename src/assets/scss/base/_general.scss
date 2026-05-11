@@ -104,6 +104,10 @@ article {
   border-width: var(--border-width-badge, 2px) !important;
 }
 
+.badge .badge-content {
+  transform: translateY(calc(var(--font-cap-height-offset, -0.05em) * -1));
+}
+
 .badge.circular {
   box-sizing: border-box;
   display: inline-grid;
@@ -112,10 +116,6 @@ article {
   border-radius: 9999px;
   line-height: 1;
   font-variant-numeric: lining-nums tabular-nums;
-}
-
-.badge.circular .badge-content {
-  transform: translateY(0.06em);
 }
 
 .badge.size-sm.circular {
