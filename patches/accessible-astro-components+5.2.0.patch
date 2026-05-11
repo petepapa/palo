@@ -308,7 +308,7 @@ index 75c1527..674db47 100644
      font-size: clamp(1rem, calc(var(--size) * 0.4), calc(var(--size) * 0.6));
      line-height: 1;
 diff --git a/node_modules/accessible-astro-components/src/components/badge/Badge.astro b/node_modules/accessible-astro-components/src/components/badge/Badge.astro
-index 2594c63..a75149b 100644
+index 2594c63..396b604 100644
 --- a/node_modules/accessible-astro-components/src/components/badge/Badge.astro
 +++ b/node_modules/accessible-astro-components/src/components/badge/Badge.astro
 @@ -155,7 +155,7 @@ const sizeClass = `size-${size}`
@@ -320,6 +320,48 @@ index 2594c63..a75149b 100644
      border-radius: 0.5rem;
    }
  
+@@ -238,25 +238,32 @@ const sizeClass = `size-${size}`
+   :where(.badge.circular) {
+     border-radius: 50%;
+     padding: 0;
+-    aspect-ratio: 1 / 1;
+-    min-inline-size: 1.5em;
+-    min-block-size: 1.5em;
++    inline-size: 1.5em;
++    block-size: 1.5em;
+     text-align: center;
+   }
+ 
++  :where(.badge.circular) > :where(:global(*), slot) {
++    display: flex;
++    align-items: center;
++    justify-content: center;
++    inline-size: 100%;
++    block-size: 100%;
++  }
++
+   :where(.badge.size-sm.circular) {
+-    min-inline-size: 1.5em;
+-    min-block-size: 1.5em;
++    inline-size: 1.5em;
++    block-size: 1.5em;
+   }
+ 
+   :where(.badge.size-md.circular) {
+-    min-inline-size: 1.75em;
+-    min-block-size: 1.75em;
++    inline-size: 1.75em;
++    block-size: 1.75em;
+   }
+ 
+   :where(.badge.size-lg.circular) {
+-    min-inline-size: 2em;
+-    min-block-size: 2em;
++    inline-size: 2em;
++    block-size: 2em;
+   }
+ 
+   :where(.badge) :global(svg) {
 diff --git a/node_modules/accessible-astro-components/src/components/card/Card.astro b/node_modules/accessible-astro-components/src/components/card/Card.astro
 index 54bf207..79ec263 100644
 --- a/node_modules/accessible-astro-components/src/components/card/Card.astro

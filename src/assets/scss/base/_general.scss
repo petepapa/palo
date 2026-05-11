@@ -104,6 +104,35 @@ article {
   border-width: var(--border-width-badge, 2px) !important;
 }
 
+.badge.circular {
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  padding: 0 !important;
+  border-radius: 9999px;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.badge.circular .badge-content {
+  transform: translateY(0.06em);
+}
+
+.badge.size-sm.circular {
+  inline-size: calc(1.5em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(1.5em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
+.badge.size-md.circular {
+  inline-size: calc(1.75em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(1.75em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
+.badge.size-lg.circular {
+  inline-size: calc(2em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(2em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
 .badge.badge-thin {
   --border-width-badge: 1px;
 }
