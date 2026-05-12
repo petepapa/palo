@@ -65,6 +65,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "accessible-astro-components": "5.2.0",
     "accessible-astro-launcher": "^2.0.0",
+    "astro-icon": "^1.1.5",
     "astro-seo": "^1.1.0",
     "js-yaml": "^4.1.1"
   },
