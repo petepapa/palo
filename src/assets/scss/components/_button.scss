@@ -148,6 +148,7 @@ button.button .button-content {
 /* Base: all outlined buttons have transparent background */
 :where(.button--outlined) {
   background-color: transparent !important;
+  border-width: max(1px, var(--border-width-button, var(--border-width-global, 3px))) !important;
 }
 
 /* Default state text: theme-driven --- */

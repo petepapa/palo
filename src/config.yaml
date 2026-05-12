@@ -48,14 +48,14 @@ navigation:
 
 border:
   globalWidth: '3px'                    # 全站默认描边粗细 / Default border width site-wide
-  buttonWidth: ''                       # 按钮与按钮型链接；留空继承全局 / Buttons and button-like links; leave blank to inherit global
-  cardWidth: ''                      # Card 卡片描边；留空继承全局 / Card borders; leave blank to inherit global
+  buttonWidth: '0'                       # 按钮与按钮型链接；留空继承全局 / Buttons and button-like links; leave blank to inherit global
+  cardWidth: '3px'                      # Card 卡片描边；留空继承全局 / Card borders; leave blank to inherit global
   accordionWidth: '3px'                    # Accordion 可折叠面板边框；留空继承全局 / Accordion item borders; leave blank to inherit global
   tabsWidth: '3px'                       # Tabs 切换标签与面板边框；留空继承全局 / Tabs tab and panel borders; leave blank to inherit global
   avatarWidth: '0'                      # Avatar 头像边框；留空继承全局 / Avatar borders; leave blank to inherit global
   badgeWidth: '1px'                        # Badge 徽章边框；留空继承全局 / Badge borders; leave blank to inherit global
   formWidth: '1px'                         # 输入框、选择框、勾选框等表单元素；留空继承全局 / Inputs, selects, checkboxes, and other form controls; leave blank to inherit global
-  notificationWidth: '0'                 # Notification 通知组件描边；留空继承全局 / Notification borders; leave blank to inherit global
+  notificationWidth: '2px'                 # Notification 通知组件描边；留空继承全局 / Notification borders; leave blank to inherit global
   surfaceWidth: '0'                     # 卡片、面板、下拉菜单、信息块等容器类元素；留空继承全局 / Cards, panels, dropdowns, and other surface containers; leave blank to inherit global
   dividerWidth: '1px'                   # 分隔线、区块分隔边框；留空继承全局 / Dividers and section-separating borders; leave blank to inherit global
 
@@ -68,15 +68,15 @@ border:
 
 radius:
   globalSize: '5rem'                    # 全站默认圆角，同时驱动基础圆角比例 token / Default radius site-wide; also drives the base radius scale tokens
-  buttonSize: ''                        # Button、按钮型 Link、分页按钮等 / Buttons, button-like Links, pagination buttons
-  formSize: ''                          # Input、Textarea、Select、Fieldset、Checkbox 等 / Inputs, textareas, selects, fieldsets, checkboxes, etc.
-  cardSize: ''                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
+  buttonSize: '0'                        # Button、按钮型 Link、分页按钮等 / Buttons, button-like Links, pagination buttons
+  formSize: '0'                          # Input、Textarea、Select、Fieldset、Checkbox 等 / Inputs, textareas, selects, fieldsets, checkboxes, etc.
+  cardSize: '0'                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
   mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
-  tabsSize: ''                          # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
-  badgeSize: ''                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
-  notificationSize: ''                  # Notification 通知组件 / Notifications
-  avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
-  surfaceSize: ''                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
+  tabsSize: '0'                          # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
+  badgeSize: '0'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
+  notificationSize: '0'                  # Notification 通知组件 / Notifications
+  avatarSize: '0'                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
+  surfaceSize: '0'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
 
 
 # ============================================================

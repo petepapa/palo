@@ -62,7 +62,7 @@ footer a {
 
 .card {
   border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)));
-  border-radius: var(--radius-card, var(--radius-surface, var(--radius-global, var(--radius-m))));
+  border-radius: var(--radius-card, var(--radius-surface, var(--radius-global, var(--radius-m)))) !important;
 }
 
 .card.card-thin {
@@ -83,20 +83,39 @@ footer a {
 article,
 .media-wrapper {
   border-width: var(--border-width-surface, var(--border-width-global, 3px));
-  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
+}
+
+pre,
+code:not(pre code),
+kbd,
+.tooltip,
+.modal,
+.darkmode-toggle,
+.highcontrast-toggle,
+.reducedmotion-toggle,
+.skip-link a {
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
 }
 
 .feature::before,
-.feature::after,
+.feature::after {
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
+}
+
 .call-to-action,
 .pagination a,
 .pagination .disabled {
-  border-radius: var(--radius-card, var(--radius-global, var(--radius-m))) !important;
+  border-radius: var(--radius-global, var(--radius-m)) !important;
+}
+
+.pagination a,
+.pagination .disabled {
+  border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-button, var(--radius-global, var(--radius-s))) !important;
 }
 
 img.rounded-lg,
-.media-wrapper,
-.media-wrapper.rounded-lg,
 .breakout-image img.rounded-lg,
 .breakout-image .rounded-lg,
 .content-media .rounded-lg {
