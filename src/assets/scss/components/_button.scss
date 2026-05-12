@@ -146,7 +146,9 @@ button.button .button-content {
    ============================================================ */
 
 /* Base: all outlined buttons have transparent background */
-:where(.button--outlined) {
+:where(.button.button--outlined),
+:where(a.button.button--outlined),
+:where(button.button.button--outlined) {
   background-color: transparent !important;
   border-width: max(1px, var(--border-width-button, var(--border-width-global, 3px))) !important;
 }
