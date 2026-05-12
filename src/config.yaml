@@ -80,7 +80,7 @@ radius:
   avatarSize: '30px'                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
   paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global
   toggleSize: '0.5rem'                       # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）圆角；留空继承全局 / Toggle button corners (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
-  surfaceSize: '0'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
+  surfaceSize: '2rem'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
 
 
 # ============================================================
