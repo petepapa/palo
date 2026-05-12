@@ -11,8 +11,7 @@
     "dev:astro": "astro dev",
     "start": "node scripts/dev-with-config-watch.mjs",
     "build": "astro build",
-    "preview": "astro preview",
-    "postinstall": "patch-package"
+    "preview": "astro preview"
   },
   "keywords": [
     "astro",
@@ -52,7 +51,6 @@
     "eslint-plugin-astro": "^1.6.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "globals": "^17.4.0",
-    "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-css-order": "^2.2.0",
