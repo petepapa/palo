@@ -75,7 +75,7 @@ radius:
   cardSize: '1.5rem'                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
   mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
   tabsSize: ''                          # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
-  badgeSize: ''                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
+  badgeSize: '0.3rem'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
   notificationSize: ''                  # Notification 通知组件 / Notifications
   avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
   paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global

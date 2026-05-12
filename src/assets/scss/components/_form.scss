@@ -83,12 +83,14 @@
 
 .input-group input,
 .input-group select {
-  height: calc(2.75em + (var(--border-width-form, var(--border-width-global, 3px)) * 2));
+  height: calc(2.75em + (var(--border-width-form, var(--border-width-global, 3px)) * 2) + var(--radius-form, var(--radius-global, var(--radius-s))));
+  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
 }
 
 .textarea-group textarea {
   min-block-size: 10em;
-  padding-block: var(--space-2xs);
+  padding-block: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
+  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
   line-height: inherit;
   resize: none;
 }
@@ -96,6 +98,8 @@
 fieldset.fieldset {
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);
   border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
+  padding-block: calc(var(--space-2xs) + var(--radius-form, var(--radius-global, var(--radius-s))));
+  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
 }
 
 fieldset.fieldset[aria-invalid='true'] {
