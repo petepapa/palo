@@ -103,16 +103,14 @@ kbd,
   border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
 }
 
-.call-to-action,
-.pagination a,
-.pagination .disabled {
+.call-to-action {
   border-radius: var(--radius-global, var(--radius-m)) !important;
 }
 
 .pagination a,
 .pagination .disabled {
-  border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
-  border-radius: var(--radius-button, var(--radius-global, var(--radius-s))) !important;
+  border-width: var(--border-width-pagination, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-pagination, var(--radius-global, var(--radius-s))) !important;
 }
 
 img.rounded-lg,

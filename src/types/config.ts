@@ -53,6 +53,7 @@ export interface BorderConfig {
   badgeWidth?: string
   formWidth?: string
   notificationWidth?: string
+  paginationWidth?: string
   surfaceWidth?: string
   dividerWidth?: string
 }
@@ -67,6 +68,7 @@ export interface RadiusConfig {
   badgeSize?: string
   formSize?: string
   notificationSize?: string
+  paginationSize?: string
   surfaceSize?: string
 }
 
