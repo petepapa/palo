@@ -590,6 +590,7 @@ const navAlignment =
 
     .mobile-menu .has-dropdown ul {
       display: flex;
+      inline-size: 100%;
       position: relative;
       visibility: visible;
       pointer-events: auto;
@@ -604,8 +605,6 @@ const navAlignment =
       padding-inline-start: 0;
       margin-inline-start: 0;
       min-inline-size: auto;
-
-      // Animate dropdown open/close
       max-block-size: 0;
       overflow: hidden;
       transition:
@@ -618,6 +617,10 @@ const navAlignment =
       margin-inline-start: 0;
       padding-block-start: 0;
       padding-block-end: 0;
+
+      a {
+        inline-size: 100%;
+      }
     }
 
     .mobile-menu .has-dropdown > button.show ~ ul {

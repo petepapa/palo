@@ -74,13 +74,13 @@ radius:
   formSize: ''                          # Input、Textarea、Select、Fieldset、Checkbox 等 / Inputs, textareas, selects, fieldsets, checkboxes, etc.
   cardSize: '1.5rem'                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
   mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
-  tabsSize: '1.5rem'                         # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
+  tabsSize: '1rem'                         # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
   badgeSize: '0.3rem'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
   notificationSize: ''                  # Notification 通知组件 / Notifications
   avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
   paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global
   toggleSize: '0.5rem'                       # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）圆角；留空继承全局 / Toggle button corners (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
-  surfaceSize: '1.5rem'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
+  surfaceSize: '1rem'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
 
 
 # ============================================================
@@ -116,10 +116,10 @@ branding:
     outline: '#ffffff'                   # 无障碍焦点轮廓色 / Accessibility focus outline color
 
     # 状态色，用于按钮、徽章、通知等 / Semantic state colors for buttons, badges, notifications
-    info: '#75878a'
-    success: 'green'
-    warning: 'orange'
-    error: 'red'
+    info: '#177cb0'
+    success: '#00bc12'
+    warning: '#ffa400'
+    error: '#f00056'
 
   # --- 字体 / Font ---
   font:
