@@ -217,6 +217,16 @@ const notificationBorderWidth = resolveCssLength(themeConfig.border?.notificatio
 const formBorderWidth = resolveCssLength(themeConfig.border?.formWidth, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
+const defaultRadiusSize = resolveCssLength(themeConfig.radius?.globalSize, '0.5rem')
+const buttonRadiusSize = resolveCssLength(themeConfig.radius?.buttonSize, defaultRadiusSize)
+const cardRadiusSize = resolveCssLength(themeConfig.radius?.cardSize, defaultRadiusSize)
+const mediaRadiusSize = resolveCssLength(themeConfig.radius?.mediaSize, defaultRadiusSize)
+const tabsRadiusSize = resolveCssLength(themeConfig.radius?.tabsSize, defaultRadiusSize)
+const avatarRadiusSize = resolveCssLength(themeConfig.radius?.avatarSize, defaultRadiusSize)
+const badgeRadiusSize = resolveCssLength(themeConfig.radius?.badgeSize, defaultRadiusSize)
+const formRadiusSize = resolveCssLength(themeConfig.radius?.formSize, defaultRadiusSize)
+const notificationRadiusSize = resolveCssLength(themeConfig.radius?.notificationSize, defaultRadiusSize)
+const surfaceRadiusSize = resolveCssLength(themeConfig.radius?.surfaceSize, defaultRadiusSize)
 
 const navigationDesktopFontSize = resolveCssLength(
   themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
@@ -452,6 +462,24 @@ const themeVariablesCss = `
   --border-width-form: ${formBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
   --border-width-divider: ${dividerBorderWidth};
+  --radius-global: ${defaultRadiusSize};
+  --radius-xs: calc(${defaultRadiusSize} * 0.25);
+  --radius-s: calc(${defaultRadiusSize} * 0.5);
+  --radius-m: ${defaultRadiusSize};
+  --radius-l: calc(${defaultRadiusSize} * 1.5);
+  --radius-h: calc(${defaultRadiusSize} * 2);
+  --radius-md: var(--radius-m);
+  --radius-small: var(--radius-s);
+  --radius-large: var(--radius-m);
+  --radius-button: ${buttonRadiusSize};
+  --radius-card: ${cardRadiusSize};
+  --radius-media: ${mediaRadiusSize};
+  --radius-tabs: ${tabsRadiusSize};
+  --radius-avatar: ${avatarRadiusSize};
+  --radius-badge: ${badgeRadiusSize};
+  --radius-form: ${formRadiusSize};
+  --radius-notification: ${notificationRadiusSize};
+  --radius-surface: ${surfaceRadiusSize};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};

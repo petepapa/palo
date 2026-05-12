@@ -62,6 +62,7 @@ footer a {
 
 .card {
   border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)));
+  border-radius: var(--radius-card, var(--radius-surface, var(--radius-global, var(--radius-m))));
 }
 
 .card.card-thin {
@@ -79,14 +80,39 @@ footer a {
 }
 
 .dropdown-menu,
-article {
+article,
+.media-wrapper {
   border-width: var(--border-width-surface, var(--border-width-global, 3px));
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+}
+
+.feature::before,
+.feature::after,
+.call-to-action,
+.pagination a,
+.pagination .disabled {
+  border-radius: var(--radius-card, var(--radius-global, var(--radius-m))) !important;
+}
+
+img.rounded-lg,
+.media-wrapper,
+.media-wrapper.rounded-lg,
+.breakout-image img.rounded-lg,
+.breakout-image .rounded-lg,
+.content-media .rounded-lg {
+  border-radius: var(--radius-media, var(--radius-global, var(--radius-l))) !important;
 }
 
 // Avatar border width
 .avatar .initials-container,
 .avatar .icon-container {
   border-width: var(--border-width-avatar, var(--border-width-global, 3px)) !important;
+}
+
+.avatar.shape-square .initials-container,
+.avatar.shape-square .icon-container,
+.avatar.shape-square .image {
+  border-radius: var(--radius-avatar, var(--radius-global, var(--radius-s))) !important;
 }
 
 .avatar .initials,
@@ -109,6 +135,7 @@ article {
 // Badge border width
 .badge {
   border-width: var(--border-width-badge, 2px) !important;
+  border-radius: var(--radius-badge, var(--radius-global, var(--radius-m))) !important;
 }
 
 .badge .badge-content {
@@ -173,6 +200,7 @@ article {
 // Notification border width
 .notification:where(.variant-default) {
   border-width: var(--border-width-notification, var(--border-width-global, 2px)) !important;
+  border-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
 }
 
 .notification.notification-thin:where(.variant-default) {
@@ -187,6 +215,67 @@ article {
 .tab,
 .tab-panel {
   border-width: var(--border-width-tabs, var(--border-width-global, 3px)) !important;
+}
+
+.tabs-list {
+  position: relative;
+}
+
+.tab {
+  border-radius: var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
+}
+
+.tab-panel {
+  border-radius: 0 0 var(--radius-tabs, var(--radius-global, var(--radius-m)))
+    var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
+}
+
+@media (min-width: 31.25rem) {
+  .tabs-list {
+    z-index: 1;
+    align-items: flex-end;
+    margin-block-end: calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) !important;
+  }
+
+  .tab {
+    position: relative;
+    z-index: 1;
+    border-radius: var(--radius-tabs, var(--radius-global, var(--radius-m)))
+      var(--radius-tabs, var(--radius-global, var(--radius-m))) 0 0 !important;
+  }
+
+  .tab[aria-selected='true'],
+  .tab:hover,
+  .tab:focus-visible {
+    box-shadow:
+      0 calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)),
+      calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) 0 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)),
+      var(--border-width-tabs, var(--border-width-global, 3px)) 0 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)) !important;
+  }
+
+  .tab[aria-selected='true'] {
+    z-index: 2;
+  }
+}
+
+pre,
+code:not(pre code),
+kbd,
+.tooltip,
+.modal,
+.darkmode-toggle,
+.highcontrast-toggle,
+.reducedmotion-toggle,
+.skip-link a {
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
+}
+
+.notification.variant-accent::before {
+  border-top-left-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
+  border-bottom-left-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
 }
 
 .tab.tab-thin,

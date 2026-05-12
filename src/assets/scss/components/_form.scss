@@ -31,7 +31,7 @@
 }
 
 .checkbox-group input {
-  border-radius: 0.25em;
+  border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
 }
 
 .radio-group input {
@@ -63,7 +63,7 @@
 .input-group select,
 .textarea-group textarea {
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);     // preserve library border
-  border-radius: var(--radius-s);                    // preserve library radius
+  border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
   padding-block: 0;                                  // remove variable block padding
   padding-inline: var(--space-2xs);                  // keep horizontal padding
   line-height: 1;
@@ -95,6 +95,7 @@
 
 fieldset.fieldset {
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);
+  border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
 }
 
 fieldset.fieldset[aria-invalid='true'] {

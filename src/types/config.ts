@@ -57,6 +57,19 @@ export interface BorderConfig {
   dividerWidth?: string
 }
 
+export interface RadiusConfig {
+  globalSize?: string
+  buttonSize?: string
+  cardSize?: string
+  mediaSize?: string
+  tabsSize?: string
+  avatarSize?: string
+  badgeSize?: string
+  formSize?: string
+  notificationSize?: string
+  surfaceSize?: string
+}
+
 export interface SocialItem {
   label: string
   href: string
@@ -138,6 +151,7 @@ export interface PaloConfig {
   site: SiteConfig
   navigation?: NavigationConfig
   border?: BorderConfig
+  radius?: RadiusConfig
   metadata: MetadataConfig
   branding: BrandingConfig
   layout: LayoutConfig

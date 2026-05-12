@@ -61,6 +61,25 @@ border:
 
 
 # ============================================================
+# 圆角 / Radius
+# 全局圆角大小与主要元素分类圆角设置
+# Global corner radius and major element radius categories
+# ============================================================
+
+radius:
+  globalSize: '5rem'                    # 全站默认圆角，同时驱动基础圆角比例 token / Default radius site-wide; also drives the base radius scale tokens
+  buttonSize: ''                        # Button、按钮型 Link、分页按钮等 / Buttons, button-like Links, pagination buttons
+  formSize: ''                          # Input、Textarea、Select、Fieldset、Checkbox 等 / Inputs, textareas, selects, fieldsets, checkboxes, etc.
+  cardSize: ''                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
+  mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
+  tabsSize: ''                          # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
+  badgeSize: ''                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
+  notificationSize: ''                  # Notification 通知组件 / Notifications
+  avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
+  surfaceSize: ''                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
+
+
+# ============================================================
 # SEO & 元数据 / SEO & Metadata
 # 站点 URL、默认标题、描述、作者、社交分享图、网站图标
 # Site URL, default title, description, author, social image, favicon
