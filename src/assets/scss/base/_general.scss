@@ -250,6 +250,7 @@ img.rounded-lg,
 .tab-panel {
   border-radius: 0 0 var(--radius-tabs, var(--radius-global, var(--radius-m)))
     var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
+  padding-block-end: calc(2rem + (var(--radius-tabs, var(--radius-global, var(--radius-m))) * 0.5)) !important;
 }
 
 @media (min-width: 31.25rem) {
