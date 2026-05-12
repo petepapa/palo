@@ -54,6 +54,7 @@ export interface BorderConfig {
   formWidth?: string
   notificationWidth?: string
   paginationWidth?: string
+  toggleWidth?: string
   surfaceWidth?: string
   dividerWidth?: string
 }
@@ -69,6 +70,7 @@ export interface RadiusConfig {
   formSize?: string
   notificationSize?: string
   paginationSize?: string
+  toggleSize?: string
   surfaceSize?: string
 }
 

@@ -216,6 +216,7 @@ const badgeBorderWidth = resolveCssLength(themeConfig.border?.badgeWidth, defaul
 const notificationBorderWidth = resolveCssLength(themeConfig.border?.notificationWidth, defaultBorderWidth)
 const formBorderWidth = resolveCssLength(themeConfig.border?.formWidth, defaultBorderWidth)
 const paginationBorderWidth = resolveCssLength(themeConfig.border?.paginationWidth, defaultBorderWidth)
+const toggleBorderWidth = resolveCssLength(themeConfig.border?.toggleWidth, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
 const defaultRadiusSize = resolveCssLength(themeConfig.radius?.globalSize, '0.5rem')
@@ -228,6 +229,7 @@ const badgeRadiusSize = resolveCssLength(themeConfig.radius?.badgeSize, defaultR
 const formRadiusSize = resolveCssLength(themeConfig.radius?.formSize, defaultRadiusSize)
 const notificationRadiusSize = resolveCssLength(themeConfig.radius?.notificationSize, defaultRadiusSize)
 const paginationRadiusSize = resolveCssLength(themeConfig.radius?.paginationSize, defaultRadiusSize)
+const toggleRadiusSize = resolveCssLength(themeConfig.radius?.toggleSize, defaultRadiusSize)
 const surfaceRadiusSize = resolveCssLength(themeConfig.radius?.surfaceSize, defaultRadiusSize)
 
 const navigationDesktopFontSize = resolveCssLength(
@@ -463,6 +465,7 @@ const themeVariablesCss = `
   --border-width-notification: ${notificationBorderWidth};
   --border-width-form: ${formBorderWidth};
   --border-width-pagination: ${paginationBorderWidth};
+  --border-width-toggle: ${toggleBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
   --border-width-divider: ${dividerBorderWidth};
   --radius-global: ${defaultRadiusSize};
@@ -483,6 +486,7 @@ const themeVariablesCss = `
   --radius-form: ${formRadiusSize};
   --radius-notification: ${notificationRadiusSize};
   --radius-pagination: ${paginationRadiusSize};
+  --radius-toggle: ${toggleRadiusSize};
   --radius-surface: ${surfaceRadiusSize};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};

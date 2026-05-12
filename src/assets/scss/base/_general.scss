@@ -91,11 +91,15 @@ code:not(pre code),
 kbd,
 .tooltip,
 .modal,
-.darkmode-toggle,
-.highcontrast-toggle,
-.reducedmotion-toggle,
 .skip-link a {
   border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
+}
+
+.darkmode-toggle,
+.highcontrast-toggle,
+.reducedmotion-toggle {
+  border-width: var(--border-width-toggle, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s))) !important;
 }
 
 .feature::before,
@@ -283,9 +287,6 @@ code:not(pre code),
 kbd,
 .tooltip,
 .modal,
-.darkmode-toggle,
-.highcontrast-toggle,
-.reducedmotion-toggle,
 .skip-link a {
   border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
 }

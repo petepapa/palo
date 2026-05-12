@@ -56,8 +56,9 @@ border:
   badgeWidth: '1px'                        # Badge 徽章边框；留空继承全局 / Badge borders; leave empty to inherit global
   formWidth: '1px'                         # 输入框、选择框、勾选框等表单元素；留空继承全局 / Inputs, selects, checkboxes, and other form controls; leave empty to inherit global
   notificationWidth: '2px'                 # Notification 通知组件描边；留空继承全局 / Notification borders; leave empty to inherit global
-  paginationWidth: '0.1rem'                 # Pagination 分页按钮描边；留空继承按钮描边 / Pagination button borders; leave empty to inherit button borders
-  surfaceWidth: '0'                     # 卡片、面板、下拉菜单、信息块等容器类元素；留空继承全局 / Cards, panels, dropdowns, and other surface containers; leave empty to inherit global
+  paginationWidth: '0.1rem'                 # Pagination 分页按钮描边；留空继承全局 / Pagination button borders; leave empty to inherit global
+  toggleWidth: '0.1rem'                     # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）描边；留空继承全局 / Toggle button borders (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
+  surfaceWidth: '10px'                     # 卡片、面板、下拉菜单、信息块等容器类元素；留空继承全局 / Cards, panels, dropdowns, and other surface containers; leave empty to inherit global
   dividerWidth: '1px'                   # 分隔线、区块分隔边框；留空继承全局 / Dividers and section-separating borders; leave empty to inherit global
 
 
@@ -77,7 +78,8 @@ radius:
   badgeSize: '0'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
   notificationSize: '0'                  # Notification 通知组件 / Notifications
   avatarSize: '30px'                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
-  paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承按钮圆角 / Pagination button corners; leave empty to inherit button corners
+  paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global
+  toggleSize: '0.5rem'                       # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）圆角；留空继承全局 / Toggle button corners (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
   surfaceSize: '0'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
 
 
