@@ -293,8 +293,8 @@ kbd,
 }
 
 .notification.variant-accent::before {
-  border-top-left-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
-  border-bottom-left-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 .tab.tab-thin,
