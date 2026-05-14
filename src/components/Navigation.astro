@@ -52,8 +52,10 @@ const navAlignment =
     // variables
     const mainNav = document.querySelector('#main-navigation') as HTMLElement | null
     if (!mainNav) return
+    const navBreakpoint = window.matchMedia('(min-width: 1050px)')
 
     const mainContainer = mainNav.querySelector(':scope > .container') as HTMLElement | null
+    const mobileMenu = mainNav.querySelector('.mobile-menu') as HTMLElement | null
     const keyboardMenus = [
       ...mainNav.querySelectorAll('.desktop-menu .menu--primary, .mobile-menu .menu'),
     ] as HTMLUListElement[]
@@ -103,6 +105,20 @@ const navAlignment =
       const dropdownList = dropdownMenu.parentNode?.querySelector('ul') as HTMLUListElement | null
       if (!dropdownList) return
 
+      if (!navBreakpoint.matches && dropdownMenu.closest('.mobile-menu')) {
+        dropdownList.hidden = false
+        dropdownList.style.height = 'auto'
+        const targetHeight = dropdownList.scrollHeight
+        dropdownList.style.height = '0px'
+
+        requestAnimationFrame(() => {
+          dropdownMenu.classList.add('show')
+          dropdownMenu.setAttribute('aria-expanded', 'true')
+          dropdownList.style.height = `${targetHeight}px`
+        })
+        return
+      }
+
       dropdownList.style.removeProperty('--dropdown-max-inline-size')
       dropdownMenu.classList.add('show')
       dropdownMenu.setAttribute('aria-expanded', 'true')
@@ -120,6 +136,20 @@ const navAlignment =
 
     const closeDropdownMenu = (dropdownMenu: HTMLButtonElement): void => {
       const dropdownList = dropdownMenu.parentNode?.querySelector('ul') as HTMLUListElement | null
+      if (!dropdownList) return
+
+      if (!navBreakpoint.matches && dropdownMenu.closest('.mobile-menu')) {
+        const currentHeight = dropdownList.scrollHeight
+        dropdownList.style.height = `${currentHeight}px`
+
+        requestAnimationFrame(() => {
+          dropdownMenu.classList.remove('show')
+          dropdownMenu.setAttribute('aria-expanded', 'false')
+          dropdownList.style.height = '0px'
+        })
+        return
+      }
+
       dropdownList?.style.removeProperty('--dropdown-max-inline-size')
       dropdownMenu.classList.remove('show')
       dropdownMenu.setAttribute('aria-expanded', 'false')
@@ -142,6 +172,47 @@ const navAlignment =
     }
 
     // execution
+    mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
+      const list = dropdownList as HTMLUListElement
+      list.hidden = true
+      list.style.height = '0px'
+    })
+
+    mainNav.addEventListener('transitionend', (event: TransitionEvent) => {
+      const target = event.target as HTMLElement | null
+      if (!target || event.propertyName !== 'height') return
+
+      if (target.matches('.mobile-menu')) {
+        if (target.classList.contains('show')) {
+          mobileMenu?.dispatchEvent(new CustomEvent('palo:content-resize'))
+        } else {
+          target.style.overflowY = 'hidden'
+        }
+      }
+
+      if (target.matches('.mobile-menu .has-dropdown > ul')) {
+        const trigger = target.parentElement?.querySelector(':scope > button') as HTMLButtonElement | null
+        if (trigger?.classList.contains('show')) {
+          target.style.height = 'auto'
+          target.hidden = false
+        } else {
+          target.hidden = true
+        }
+
+        mobileMenu?.dispatchEvent(new CustomEvent('palo:content-resize'))
+      }
+    })
+
+    navBreakpoint.addEventListener('change', (event) => {
+      if (event.matches) {
+        mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
+          const list = dropdownList as HTMLUListElement
+          list.hidden = true
+          list.style.height = '0px'
+        })
+      }
+    })
+
     keyboardMenus.forEach((menu) => {
       menu.addEventListener('keydown', (event: KeyboardEvent) => {
         const element = event.target as Element
@@ -265,6 +336,10 @@ const navAlignment =
   @use 'scss/base/breakpoint' as *;
 
   #main-navigation {
+    --mobile-menu-duration: 0.24s;
+    --mobile-menu-fade-duration: 0.18s;
+    --mobile-menu-easing: cubic-bezier(0.22, 1, 0.36, 1);
+
     display: flex;
     flex-direction: column;
 
@@ -287,25 +362,26 @@ const navAlignment =
     // Mobile-first: show mobile menu by default
     .mobile-menu {
       flex: 1 1 100%;
-      max-block-size: 0;
+      height: 0;
       opacity: 0;
       overflow: hidden;
-      will-change: max-block-size, opacity;
-      // 仅动画 opacity + max-block-size，去掉 layout-heavy 的 margin/padding 过渡
+      will-change: height, opacity;
       transition:
-        max-block-size var(--animation-speed-medium) var(--cubic-bezier),
-        opacity var(--animation-speed-medium) var(--cubic-bezier);
-      margin-block-start: 0;
+        height var(--mobile-menu-duration) var(--mobile-menu-easing),
+        opacity var(--mobile-menu-fade-duration) ease-out;
       padding-block-start: 0;
       padding-block-end: 0;
 
       &.show {
-        max-block-size: calc(100vh - 8rem);
         opacity: 1;
-        overflow-y: auto;
-        margin-block-start: var(--space-m);
-        padding-block-start: var(--space-2xs);
+        overflow-y: hidden;
+        padding-block-start: var(--space-m);
         padding-block-end: var(--space-2xs);
+      }
+
+      &:not(.show) {
+        padding-block-start: 0;
+        padding-block-end: 0;
       }
     }
 
@@ -628,11 +704,11 @@ const navAlignment =
       padding-inline-start: 0;
       margin-inline-start: 0;
       min-inline-size: auto;
-      max-block-size: 0;
+      height: 0;
       overflow: hidden;
-      will-change: max-block-size;
+      will-change: height;
       transition:
-        max-block-size var(--animation-speed-medium) var(--cubic-bezier);
+        height var(--mobile-menu-duration) var(--mobile-menu-easing);
       margin-block-start: 0;
       margin-inline-start: 0;
       padding-block-start: 0;
@@ -644,7 +720,6 @@ const navAlignment =
     }
 
     .mobile-menu .has-dropdown > button.show ~ ul {
-      max-block-size: 500px;
       margin-block-start: var(--space-m);
       padding-block-start: var(--space-2xs);
       padding-block-end: var(--space-2xs);

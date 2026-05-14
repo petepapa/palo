@@ -26,10 +26,11 @@ const { class: className } = Astro.props
 <script>
   document.addEventListener('astro:page-load', () => {
     // variables
-    const responsiveToggle = document.querySelector('.responsive-toggle')
+    const responsiveToggle = document.querySelector('.responsive-toggle') as HTMLButtonElement | null
     if (!responsiveToggle) return
-    const mobileNavigation = document.querySelector('.mobile-menu')
+    const mobileNavigation = document.querySelector('.mobile-menu') as HTMLElement | null
     if (!mobileNavigation) return
+    const navBar = document.querySelector('#main-navigation .nav-bar') as HTMLElement | null
 
     // functions
     const openMenu = (toggle: Element) => {
@@ -50,17 +51,61 @@ const { class: className } = Astro.props
       toggle.setAttribute('aria-label', 'Open menu navigation')
     }
 
+    const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight
+
+    const getOpenMetrics = () => {
+      const navBarHeight = navBar?.getBoundingClientRect().height ?? 0
+      const availableHeight = Math.max(getViewportHeight() - navBarHeight, 0)
+
+      mobileNavigation.style.maxHeight = 'none'
+      const contentHeight = mobileNavigation.scrollHeight
+      const targetHeight = Math.min(contentHeight, availableHeight)
+
+      return { availableHeight, contentHeight, targetHeight }
+    }
+
+    const syncExpandedMenuSize = () => {
+      if (!mobileNavigation.classList.contains('show')) return
+
+      const { availableHeight, contentHeight, targetHeight } = getOpenMetrics()
+      mobileNavigation.style.maxHeight = `${availableHeight}px`
+      mobileNavigation.style.height = contentHeight > availableHeight ? `${targetHeight}px` : 'auto'
+      mobileNavigation.style.overflowY = contentHeight > availableHeight ? 'auto' : 'hidden'
+    }
+
     const closeMobileMenu = () => {
       if (mobileNavigation.classList.contains('show')) {
-        mobileNavigation.classList.remove('show')
+        const currentHeight = mobileNavigation.scrollHeight
+        mobileNavigation.style.height = `${currentHeight}px`
+        mobileNavigation.style.overflowY = 'hidden'
+
+        requestAnimationFrame(() => {
+          mobileNavigation.classList.remove('show')
+          mobileNavigation.style.height = '0px'
+        })
+
         closeMenu(responsiveToggle)
       }
     }
 
     // execution
     responsiveToggle.addEventListener('click', () => {
-      mobileNavigation.classList.toggle('show')
-      mobileNavigation.classList.contains('show') ? openMenu(responsiveToggle) : closeMenu(responsiveToggle)
+      if (mobileNavigation.classList.contains('show')) {
+        closeMobileMenu()
+        return
+      }
+
+      mobileNavigation.classList.add('show')
+      mobileNavigation.style.height = 'auto'
+      const { availableHeight, targetHeight } = getOpenMetrics()
+      mobileNavigation.style.maxHeight = `${availableHeight}px`
+      mobileNavigation.style.height = '0px'
+
+      requestAnimationFrame(() => {
+        mobileNavigation.style.height = `${targetHeight}px`
+      })
+
+      openMenu(responsiveToggle)
     })
 
     // Close menu when window resizes to desktop width (matches nav breakpoint: 1050px)
@@ -68,9 +113,25 @@ const { class: className } = Astro.props
     const handleResize = () => {
       if (mediaQuery.matches) {
         closeMobileMenu()
+        return
       }
+
+      syncExpandedMenuSize()
     }
     mediaQuery.addEventListener('change', handleResize)
+
+    mobileNavigation.addEventListener('transitionend', (event: TransitionEvent) => {
+      if (event.propertyName === 'height' && mobileNavigation.classList.contains('show')) {
+        syncExpandedMenuSize()
+      }
+    })
+
+    mobileNavigation.addEventListener('palo:content-resize', () => {
+      syncExpandedMenuSize()
+    })
+
+    window.addEventListener('resize', handleResize)
+    window.visualViewport?.addEventListener('resize', handleResize)
   })
 </script>
 
@@ -103,7 +164,10 @@ const { class: className } = Astro.props
       height: 2.667px;
       background-color: var(--foreground-color);
       border-radius: 2px;
-      transition: all var(--animation-speed-fast) var(--cubic-bezier);
+      transition:
+        translate 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        rotate 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+        opacity 0.16s ease-out;
       transform-origin: center;
     }
 
