@@ -1,174 +1,190 @@
-# ============================================================
-# 基本信息 / Site Info
-# 网站名称、标题分隔符、URL 格式、Header 功能开关
-# Site name, title separator, URL format, header toggles
-# ============================================================
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  基本信息 / Site Info                                        ║
+# ║  网站名称、标题格式、URL、Header 功能开关                      ║
+# ║  Site name, title format, URL, header feature toggles        ║
+# ╚══════════════════════════════════════════════════════════════╝
 
 site:
   name: Palo
-  titleSeparator: '|'                    # 标签页标题分隔符，例如 "About | Palo" / Browser tab title separator, e.g. "About | Palo"
-  trailingSlash: false                   # URL 尾部斜杠：false → /about，true → /about/ / Trailing slash: false → /about, true → /about/
-  showDarkModeToggle: true               # 显示深色模式切换按钮 / Show dark mode toggle button
-  showLauncher: true                     # 显示快捷启动器按钮（Cmd+K / Ctrl+K）/ Show launcher button (Cmd+K / Ctrl+K)
+  titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo" / Tab title separator, e.g. "About | Palo"
+  trailingSlash: false        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
+  showDarkModeToggle: true    # 显示深色模式切换 / Show dark mode toggle
+  showLauncher: true          # 显示快捷启动器（Cmd+K / Ctrl+K）/ Show launcher button
 
 
-# ============================================================
-# 导航 / Navigation
-# 导航布局、固定顶部、字号与交互相关设置
-# Navigation layout, sticky header, sizing, and interaction settings
-# ============================================================
-
-navigation:
-  # --- 固定顶部 / Sticky Header ---
-  fixedHeader: true                        # 固定顶部导航，滚动时始终可见 / Sticky header — stays visible while scrolling
-  headerBackgroundOpacity: 0.45           # 背景透明度（0 全透明 → 1 不透明）/ Background opacity (0 = transparent, 1 = opaque)
-  headerBackgroundBlur: 10px              # 背景模糊强度（设为 0 可关闭）/ Background blur strength (0 = disabled)
-
-  # --- 菜单布局 / Menu Layout ---
-  desktopMenuAlignment: 'center'           # 桌面端文字主菜单位置：'left' | 'center' | 'right'；不影响右侧功能图标与移动端 / Desktop text menu alignment: 'left' | 'center' | 'right'; does not affect right-side utility icons or mobile layout
-
-  # --- 导航字号 / Navigation Font Sizes ---
-  desktopFontSize: '21px'                 # 桌面端主导航 / Desktop main nav
-  dropdownDesktopFontSize: '16px'         # 桌面端下拉子菜单 / Desktop dropdown
-  mobileFontSize: '24px'                  # 手机端展开菜单 / Mobile expanded menu
-  dropdownMobileFontSize: '21px'          # 手机端下拉子菜单 / Mobile dropdown
-
-  # --- 主导航最小高度 / Main Nav Min Height ---
-  # 仅当设值大于内容高度时生效（= CSS min-height）/ Only takes effect when set value > content height (= CSS min-height)
-  minHeight: '6rem'
-
-  # --- 导航高亮样式 / Navigation Active Style ---
-  # 'wavy'      → 波浪下划线（默认）/ Wavy underline (default)
-  # 'underline' → 直线下划线 / Solid underline
-  # 'bold'      → 加粗，悬停时显示下划线 / Bold weight, underline on hover
-  activeStyle: 'bold'
-
-
-# ============================================================
-# 描边 / Borders
-# 全局描边粗细与主要元素分类描边设置
-# Global border thickness and major element border categories
-# ============================================================
-
-border:
-  globalWidth: '0.1rem'                    # 全站默认描边粗细 / Default border width site-wide
-  buttonWidth: ''                       # 按钮与按钮型链接；留空继承全局 / Buttons and button-like links; leave empty to inherit global
-  cardWidth: ''                      # Card 卡片描边；留空继承全局 / Card borders; leave empty to inherit global
-  accordionWidth: ''                    # Accordion 可折叠面板边框；留空继承全局 / Accordion item borders; leave empty to inherit global
-  tabsWidth: ''                       # Tabs 切换标签与面板边框；留空继承全局 / Tabs tab and panel borders; leave empty to inherit global
-  avatarWidth: '0'                      # Avatar 头像边框；留空继承全局 / Avatar borders; leave empty to inherit global
-  badgeWidth: '0.05rem'                        # Badge 徽章边框；留空继承全局 / Badge borders; leave empty to inherit global
-  formWidth: '0.075rem'                         # 输入框、选择框、勾选框等表单元素；留空继承全局 / Inputs, selects, checkboxes, and other form controls; leave empty to inherit global
-  notificationWidth: '0'                 # Notification 通知组件描边；留空继承全局 / Notification borders; leave empty to inherit global
-  paginationWidth: '0.1rem'                 # Pagination 分页按钮描边；留空继承全局 / Pagination button borders; leave empty to inherit global
-  toggleWidth: '0.1rem'                     # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）描边；留空继承全局 / Toggle button borders (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
-  surfaceWidth: '0'                     # 卡片、面板、下拉菜单、信息块等容器类元素；留空继承全局 / Cards, panels, dropdowns, and other surface containers; leave empty to inherit global
-  dividerWidth: '0.05rem'                   # 分隔线、区块分隔边框；留空继承全局 / Dividers and section-separating borders; leave empty to inherit global
-
-
-# ============================================================
-# 圆角 / Radius
-# 全局圆角大小与主要元素分类圆角设置
-# Global corner radius and major element radius categories
-# ============================================================
-
-radius:
-  globalSize: '0.75rem'                    # 全站默认圆角，同时驱动基础圆角比例 token / Default radius site-wide; also drives the base radius scale tokens
-  buttonSize: ''                        # Button、按钮型 Link 等 / Buttons, button-like Links
-  formSize: ''                          # Input、Textarea、Select、Fieldset、Checkbox 等 / Inputs, textareas, selects, fieldsets, checkboxes, etc.
-  cardSize: '1.5rem'                          # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA-style sections
-  mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
-  tabsSize: '1rem'                         # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
-  badgeSize: '0.3rem'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
-  notificationSize: ''                  # Notification 通知组件 / Notifications
-  avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
-  paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global
-  toggleSize: '0.5rem'                       # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）圆角；留空继承全局 / Toggle button corners (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global
-  surfaceSize: '1rem'                       # 下拉菜单、文章容器、代码块、工具面板等其余容器 / Dropdowns, article containers, code blocks, utility panels, and other surfaces
-
-
-# ============================================================
-# SEO & 元数据 / SEO & Metadata
-# 站点 URL、默认标题、描述、作者、社交分享图、网站图标
-# Site URL, default title, description, author, social image, favicon
-# ============================================================
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  SEO & 元数据 / SEO & Metadata                               ║
+# ║  站点地址、标题、描述、作者、分享图、图标                       ║
+# ║  Site URL, title, description, author, social image, favicon  ║
+# ╚══════════════════════════════════════════════════════════════╝
 
 metadata:
   siteUrl: 'https://palo.petepa.com/'
   title: 'Palo - A minimalist Astro theme for artists, musicians, and designers'
   description: 'Break free from generic business templates. Palo is a minimalist Astro theme by PetePa, crafted for artists, musicians, and designers. Deeply customize your colors, radius, and typography within a logic-driven framework. Build your unique digital identity at palo.petepa.com.'
   author: PetePa
-  image: '/social-preview-image.png'    # 社交分享预览图，放在 /public 下 / Social sharing image, place in /public
-  favicon: '/favicon.svg'               # 浏览器标签页图标，放在 /public 下 / Favicon, place in /public
+  image: '/social-preview-image.png'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
+  favicon: '/favicon.svg'             # 标签页图标，放 /public 下 / Favicon, place in /public
 
 
-# ============================================================
-# 品牌：Logo · 颜色 · 字体 / Branding: Logo · Colors · Font
-# ============================================================
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  品牌 / Branding                                             ║
+# ║  Logo · 主题色 · 状态色 · 字体                                ║
+# ║  Logo · Theme colors · State colors · Font                   ║
+# ╚══════════════════════════════════════════════════════════════╝
 
 branding:
 
-  # Logo：留空显示文字 Logo，填写路径显示图片（放在 /public 下）
-  # Logo: leave empty to show text logo, or provide an image path (place file in /public)
+  # Logo：留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
+  # Logo: empty = show text logo, path = show image (place in /public)
   logo: ''
+  logoTextFontSize: '36px'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
 
-  # --- 颜色 / Colors ---
+  # ── 颜色 / Colors ────────────────────────────────────────────
+
   colors:
-    primary: '#ff4b00'                   # 主品牌色 / Primary brand color
-    secondary: '#632a1b'                 # 副品牌色 / Secondary brand color
-    neutral: '#75878a'                   # 中性色，用于文字、边框、背景 / Neutral color for text, borders, surfaces
-    outline: '#ffffff'                   # 无障碍焦点轮廓色 / Accessibility focus outline color
+    # 品牌色 / Brand colors
+    primary: '#ff4b00'    # 主品牌色 / Primary brand color
+    secondary: '#632a1b'  # 副品牌色 / Secondary brand color
+    neutral: '#75878a'    # 中性色（文字、边框、背景）/ Neutral (text, borders, surfaces)
+    outline: '#ffffff'    # 无障碍焦点轮廓色 / Accessibility focus outline
 
-    # 状态色，用于按钮、徽章、通知等 / Semantic state colors for buttons, badges, notifications
+    # 状态色（按钮、徽章、通知等）/ Semantic state colors (buttons, badges, notifications)
     info: '#177cb0'
     success: '#00bc12'
     warning: '#ffa400'
     error: '#f00056'
 
-  # --- 字体 / Font ---
+  # ── 字体 / Font ──────────────────────────────────────────────
+
   font:
-    name: 'League Spartan'              # 字体族名称 / Font family name
-    path: '/fonts/League_Spartan/'      # 字体文件目录，放在 /public 下 / Font files folder, place in /public
+    name: 'League Spartan'         # 字体族名称 / Font family name
+    path: '/fonts/League_Spartan/' # 字体目录，放 /public 下 / Font folder, place in /public
 
     # 各场景字重 / Font weights per context
     weights:
-      body: 300                         # 正文段落 / Body paragraphs
-      accent: 400                       # 导航、按钮、标签等强调文字 / Navigation, buttons, labels
-      heading: 500                      # 所有标题 / All headings
+      body: 400     # 正文 / Body paragraphs
+      accent: 500   # 导航、按钮、标签等 / Navigation, buttons, labels
+      heading: 600  # 所有标题 / All headings
 
-    # checkbox/radio 与 label 的垂直对齐微调（根据实际使用的字体调整）
-    # Vertical alignment offset for checkbox/radio vs label. Adjust per font.
+    # checkbox / radio 与 label 的垂直对齐微调，根据实际字体调整
+    # Vertical alignment offset for checkbox/radio vs label — adjust per font
     capHeightOffset: '-0.05em'
 
 
-# ============================================================
-# 布局 / Layout
-# 内容区宽度等页面结构设置
-# Content width and page structure settings
-# ============================================================
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  导航 / Navigation                                           ║
+# ║  固定顶栏、菜单布局、字号、高亮样式                            ║
+# ║  Sticky header, menu layout, font sizes, active style        ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+navigation:
+
+  # ── 固定顶栏 / Sticky Header ─────────────────────────────────
+
+  fixedHeader: true               # 固定顶部，滚动时始终可见 / Stays visible while scrolling
+  minHeight: '6rem'               # 导航栏最小高度（值需大于内容高度才生效）/ Min height — only applies when > content height
+  headerBackgroundOpacity: 0.45   # 背景透明度（0 全透明 → 1 不透明）/ Opacity (0 = clear, 1 = solid)
+  headerBackgroundBlur: 10px      # 背景模糊（0 = 关闭）/ Blur strength (0 = disabled)
+
+  # ── 菜单布局 / Menu Layout ────────────────────────────────────
+
+  # 桌面端文字主菜单位置，不影响右侧功能图标和移动端
+  # Desktop text menu position — does not affect utility icons or mobile
+  desktopMenuAlignment: 'right'  # 'left' | 'center' | 'right'
+
+  # ── 字号 / Font Sizes ─────────────────────────────────────────
+
+  desktopFontSize: '21px'           # 桌面端主导航 / Desktop main nav
+  dropdownDesktopFontSize: '16px'   # 桌面端下拉子菜单 / Desktop dropdown
+  mobileFontSize: '24px'            # 手机端展开菜单 / Mobile expanded menu
+  dropdownMobileFontSize: '21px'    # 手机端下拉子菜单 / Mobile dropdown
+
+  # ── 高亮样式 / Active Style ───────────────────────────────────
+
+  # 'wavy'      → 波浪下划线（默认）/ Wavy underline (default)
+  # 'underline' → 直线下划线 / Solid underline
+  # 'bold'      → 加粗，悬停显示下划线 / Bold weight, underline on hover
+  activeStyle: 'bold'
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  布局 / Layout                                               ║
+# ║  内容区宽度等页面结构设置                                      ║
+# ║  Content width and page structure                            ║
+# ╚══════════════════════════════════════════════════════════════╝
 
 layout:
-  containerMaxWidth: '1536px'           # 内容区最大宽度，支持 px / rem / % 等 / Max content width, accepts px, rem, %, etc.
+  containerMaxWidth: '1536px'  # 内容区最大宽度，支持 px / rem / % / Max content width, accepts px, rem, %
 
 
-# ============================================================
-# 版式 & 文字大小 / Typography & Font Sizes
-# 根字号、行高、标题缩放等全局文字设置
-# Base size, line height, heading scale, and global typography
-# ============================================================
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  版式 / Typography                                           ║
+# ║  根字号、行高、大写、标题缩放                                   ║
+# ║  Base size, line height, uppercase, heading scale            ║
+# ╚══════════════════════════════════════════════════════════════╝
 
 typography:
 
-  # --- 全局 / Global ---
-  baseFontSize: '16px'                   # 根字号，全站 1rem = 此值 / Root font size, 1rem equals this value site-wide
-  lineHeightScale: 1.0                   # 行高倍数（影响正文与标题）/ Line height multiplier (affects body and headings)
-  uppercaseDisplayText: true             # 标题和强调文字是否强制大写 / Force headings and UI text to uppercase
+  # ── 全局 / Global ─────────────────────────────────────────────
 
-  # --- 标题大小阶梯 / Heading Scale ---
+  baseFontSize: '16px'          # 根字号，全站 1rem = 此值 / Root size, 1rem = this value site-wide
+  lineHeightScale: 1.0          # 行高倍数（影响正文与标题）/ Line height multiplier
+  uppercaseDisplayText: true    # 标题和强调文字强制大写 / Force headings and UI text to uppercase
+
+  # ── 标题缩放 / Heading Scale ──────────────────────────────────
+
   # 公式：h1 = 1rem × scale^5，h2 = scale^4 … 以此类推
   # Formula: h1 = 1rem × scale^5, h2 = scale^4 … and so on
-  mobileHeadingScale: 1.25             # 小屏标题缩放比 / Heading scale on small screens
-  desktopHeadingScale: 1.65            # 大屏标题缩放比 / Heading scale on large screens
-  headingLineHeightScale: 0.85         # 标题行高微调（< 1 更紧凑，> 1 更宽松）/ Heading line height (< 1 tighter, > 1 looser)
+  mobileHeadingScale: 1.25      # 小屏标题缩放比 / Heading scale on small screens
+  desktopHeadingScale: 1.65     # 大屏标题缩放比 / Heading scale on large screens
+  headingLineHeightScale: 0.85  # 标题行高微调（< 1 更紧凑，> 1 更宽松）/ Heading line height (< 1 tighter, > 1 looser)
 
-  logoTextFontSize: '36px'                  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (leave empty to inherit desktop nav size)
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  描边 / Borders                                              ║
+# ║  全局粗细 + 各组件独立描边，留空则继承全局                      ║
+# ║  Global width + per-component overrides, empty = inherit     ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+border:
+  globalWidth: '0.1rem'       # 全站默认描边 / Default border width site-wide
+
+  # ── 组件独立描边（留空 = 继承全局）/ Per-component (empty = inherit global) ──
+
+  buttonWidth: ''             # 按钮与按钮型链接 / Buttons and button-like links
+  formWidth: '0.075rem'       # 输入框、选择框、勾选框等 / Inputs, selects, checkboxes
+  cardWidth: ''               # Card 卡片 / Cards
+  accordionWidth: ''          # Accordion 折叠面板 / Accordion items
+  tabsWidth: ''               # Tabs 标签与面板 / Tab and panel borders
+  badgeWidth: '0.05rem'       # Badge 徽章 / Badges
+  avatarWidth: '0'            # Avatar 头像 / Avatars
+  notificationWidth: '0'      # Notification 通知 / Notifications
+  paginationWidth: '0.1rem'   # Pagination 分页按钮 / Pagination buttons
+  toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
+  surfaceWidth: '0'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
+  dividerWidth: '0.05rem'     # 分隔线 / Dividers
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  圆角 / Radius                                               ║
+# ║  全局大小 + 各组件独立圆角，留空则继承全局                      ║
+# ║  Global size + per-component overrides, empty = inherit      ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+radius:
+  globalSize: '0.75rem'   # 全站默认圆角，同时驱动基础圆角比例 token / Default radius; also drives base radius scale tokens
+
+  # ── 组件独立圆角（留空 = 继承全局）/ Per-component (empty = inherit global) ──
+
+  buttonSize: ''          # Button、按钮型 Link / Buttons, button-like links
+  formSize: ''            # Input、Textarea、Select、Checkbox 等 / Inputs, textareas, selects, checkboxes
+  cardSize: '1.5rem'      # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA sections
+  mediaSize: ''           # 文章图、BreakoutImage 等媒体 / Post images, breakout images, media components
+  tabsSize: '1rem'        # Tabs 标签与面板（连接处保留直角）/ Tabs and panel (straight join edges preserved)
+  badgeSize: '0.3rem'     # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes intact)
+  notificationSize: ''    # Notification 通知 / Notifications
+  avatarSize: ''          # Avatar 方形圆角（圆形保持 50%）/ Square avatar corners (round = always 50%)
+  paginationSize: '0.5rem'  # Pagination 分页按钮 / Pagination buttons
+  toggleSize: '0.5rem'      # Toggle 切换按钮 / Toggle buttons
+  surfaceSize: '1rem'       # 下拉菜单、代码块、工具面板等容器 / Dropdowns, code blocks, utility panels

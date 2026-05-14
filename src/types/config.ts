@@ -126,6 +126,7 @@ export interface BrandingFontConfig {
 
 export interface BrandingConfig {
   logo: string
+  logoTextFontSize?: string
   font: BrandingFontConfig
   colors: BrandingColors
 }
@@ -144,7 +145,6 @@ export interface TypographyConfig {
   navigationMobileFontSize: string
   navigationDropdownDesktopFontSize: string
   navigationDropdownMobileFontSize: string
-  logoTextFontSize: string
   mobileHeadingScale: number
   desktopHeadingScale: number
   headingLineHeightScale: number

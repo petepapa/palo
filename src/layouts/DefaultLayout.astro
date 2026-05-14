@@ -248,7 +248,7 @@ const navigationDropdownMobileFontSize = resolveCssLength(
   themeConfig.navigation?.dropdownMobileFontSize ?? typography.navigationDropdownMobileFontSize,
   navigationMobileFontSize,
 )
-const logoTextFontSize = resolveCssLength(typography.logoTextFontSize, navigationDesktopFontSize)
+const logoTextFontSize = resolveCssLength(themeConfig.branding?.logoTextFontSize, navigationDesktopFontSize)
 
 const publicRoot = resolve(process.cwd(), 'public')
 const fontDirectory = resolve(publicRoot, font.path.replace(/^\//, ''))
