@@ -156,17 +156,24 @@ img.rounded-lg,
 
 // Badge border width
 .badge {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
+
   border-width: var(--border-width-badge, 2px) !important;
   border-radius: var(--radius-badge, var(--radius-global, var(--radius-m))) !important;
 }
 
-.badge .badge-content {
-  translate: 0 calc(var(--font-cap-height-offset, -0.05em) * -1);
-}
-
-.badge .badge-content > svg,
-.badge .badge-content > svg[data-icon] {
-  translate: 0 var(--font-cap-height-offset, -0.05em);
+.badge > svg,
+.badge > svg[data-icon] {
+  display: block;
+  flex-shrink: 0;
+  margin-block-start: var(--font-cap-height-offset, -0.05em);
+  transform-origin: center center;
+  transform-box: fill-box;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .badge.size-sm:not(.circular) {
