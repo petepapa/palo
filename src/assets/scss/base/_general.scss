@@ -248,9 +248,13 @@ img.rounded-lg,
 }
 
 .tab-panel {
+  --tabs-panel-radius: var(--radius-tabs, var(--radius-global, var(--radius-m)));
+  --tabs-panel-corner-safe-inset: min(calc(var(--tabs-panel-radius) * 0.5), var(--space-s));
+  --tabs-panel-padding-block-end: calc(2rem + var(--tabs-panel-corner-safe-inset));
+
   border-radius: 0 0 var(--radius-tabs, var(--radius-global, var(--radius-m)))
     var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
-  padding-block-end: calc(2rem + (var(--radius-tabs, var(--radius-global, var(--radius-m))) * 0.5)) !important;
+  padding-block-end: var(--tabs-panel-padding-block-end) !important;
 }
 
 @media (min-width: 31.25rem) {

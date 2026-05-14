@@ -62,8 +62,13 @@
 .input-group textarea,
 .input-group select,
 .textarea-group textarea {
+  --form-control-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
+  --form-control-corner-safe-inset: min(calc(var(--form-control-radius) * 0.5), var(--space-s));
+  --form-control-padding-inline: calc(var(--space-2xs) + (var(--form-control-radius) * 0.5));
+  --form-control-padding-block: calc(var(--space-2xs) + (var(--form-control-corner-safe-inset) * 0.5));
+
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);     // preserve library border
-  border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
+  border-radius: var(--form-control-radius);
   padding-block: 0;                                  // remove variable block padding
   padding-inline: var(--space-2xs);                  // keep horizontal padding
   line-height: 1;
@@ -83,22 +88,22 @@
 
 .input-group input,
 .input-group select {
-  height: calc(2.75em + (var(--border-width-form, var(--border-width-global, 3px)) * 2) + var(--radius-form, var(--radius-global, var(--radius-s))));
-  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
+  height: calc(2.75em + (var(--border-width-form, var(--border-width-global, 3px)) * 2) + var(--form-control-radius));
+  padding-inline: var(--form-control-padding-inline);
 }
 
 .textarea-group textarea {
   min-block-size: 10em;
-  padding-block: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
-  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
+  padding-block: var(--form-control-padding-block);
+  padding-inline: var(--form-control-padding-inline);
   line-height: inherit;
   resize: none;
 }
 
 fieldset.fieldset {
-  --fieldset-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
-  --fieldset-corner-safe-inset: min(calc(var(--fieldset-radius) * 0.5), var(--space-s));
-  --fieldset-padding-inline: calc(var(--space-2xs) + (var(--fieldset-radius) * 0.5));
+  --fieldset-radius: var(--form-control-radius, var(--radius-form, var(--radius-global, var(--radius-s))));
+  --fieldset-corner-safe-inset: var(--form-control-corner-safe-inset, min(calc(var(--fieldset-radius) * 0.5), var(--space-s)));
+  --fieldset-padding-inline: var(--form-control-padding-inline, calc(var(--space-2xs) + (var(--fieldset-radius) * 0.5)));
   --fieldset-padding-block-start: calc(var(--space-3xs) + (var(--fieldset-corner-safe-inset) * 0.35));
   --fieldset-padding-block-end: calc(var(--space-2xs) + var(--fieldset-corner-safe-inset));
 
