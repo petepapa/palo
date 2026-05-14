@@ -96,10 +96,26 @@
 }
 
 fieldset.fieldset {
+  --fieldset-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
+  --fieldset-corner-safe-inset: min(calc(var(--fieldset-radius) * 0.5), var(--space-s));
+  --fieldset-padding-inline: calc(var(--space-2xs) + (var(--fieldset-radius) * 0.5));
+  --fieldset-padding-block-start: calc(var(--space-3xs) + (var(--fieldset-corner-safe-inset) * 0.35));
+  --fieldset-padding-block-end: calc(var(--space-2xs) + var(--fieldset-corner-safe-inset));
+
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);
-  border-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
-  padding-block: calc(var(--space-2xs) + var(--radius-form, var(--radius-global, var(--radius-s))));
-  padding-inline: calc(var(--space-2xs) + (var(--radius-form, var(--radius-global, var(--radius-s))) * 0.5));
+  border-radius: var(--fieldset-radius);
+  row-gap: calc(var(--space-4xs) * 0.75);
+  padding-block-start: var(--fieldset-padding-block-start);
+  padding-block-end: var(--fieldset-padding-block-end);
+  padding-inline: var(--fieldset-padding-inline);
+}
+
+fieldset.fieldset > legend {
+  margin-block-end: 0;
+}
+
+fieldset.fieldset > .fieldset-group {
+  row-gap: var(--space-4xs);
 }
 
 fieldset.fieldset[aria-invalid='true'] {
