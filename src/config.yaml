@@ -80,7 +80,7 @@ radius:
   mediaSize: ''                         # Media 组件、文章/项目图、BreakoutImage 等媒体圆角 / Media components, post/project images, breakout images
   tabsSize: '1rem'                         # Tabs 标签与面板圆角；顶部与面板连接处保留直角 / Tabs and tab panel radius; keep straight join edges between tabs and panel
   badgeSize: '0.3rem'                         # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes stay intact)
-  notificationSize: ''                  # Notification 通知组件 / Notifications
+  notificationSize: '10rem'                  # Notification 通知组件 / Notifications
   avatarSize: ''                        # Avatar 方形样式圆角（圆形头像保持 50%）/ Square avatar corners (round avatars stay 50%)
   paginationSize: '0.5rem'                 # Pagination 分页按钮圆角；留空继承全局 / Pagination button corners; leave empty to inherit global
   toggleSize: '0.5rem'                       # Toggle 切换按钮（DarkMode、HighContrast、ReducedMotion）圆角；留空继承全局 / Toggle button corners (DarkMode, HighContrast, ReducedMotion); leave empty to inherit global

@@ -221,8 +221,15 @@ img.rounded-lg,
 
 // Notification border width
 .notification:where(.variant-default) {
+  --notification-radius: var(--radius-notification, var(--radius-global, var(--radius-m)));
+  --notification-corner-safe-inset: min(calc(var(--notification-radius) * 0.5), var(--space-s));
+  --notification-padding-inline: calc(1rem + (var(--notification-corner-safe-inset) * 0.5));
+  --notification-padding-block: calc(1rem + (var(--notification-corner-safe-inset) * 0.25));
+
   border-width: var(--border-width-notification, var(--border-width-global, 2px)) !important;
-  border-radius: var(--radius-notification, var(--radius-global, var(--radius-m))) !important;
+  border-radius: var(--notification-radius) !important;
+  padding-inline: var(--notification-padding-inline) !important;
+  padding-block: var(--notification-padding-block) !important;
 }
 
 .notification.notification-thin:where(.variant-default) {
@@ -231,6 +238,17 @@ img.rounded-lg,
 
 .notification.notification-thick:where(.variant-default) {
   --border-width-notification: 4px;
+}
+
+.notification:where(.variant-accent) {
+  border-radius: 0 !important;
+}
+
+.notification.variant-accent::before {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
 
 // Tabs border width
