@@ -191,23 +191,23 @@ const components = [
         </div>
 
         <Heading level="h3">Notification</Heading>
-        <div class="flex flex-wrap gap-4">
-          <div style="position: relative; display: inline-flex;">
-            <button style="background: none; border: none; cursor: pointer;">
+        <div class="badge-notification-demo">
+          <div class="badge-notification-demo__item">
+            <button class="badge-notification-demo__trigger">
               <Icon aria-hidden="true" name="lucide:mail" size="1.5rem" />
               <span class="sr-only">3 unread messages</span>
             </button>
             <Badge type="error" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">3</Badge>
           </div>
-          <div style="position: relative; display: inline-flex;">
-            <button style="background: none; border: none; cursor: pointer;">
+          <div class="badge-notification-demo__item">
+            <button class="badge-notification-demo__trigger">
               <Icon aria-hidden="true" name="lucide:bell" size="1.5rem" />
               <span class="sr-only">5 new notifications</span>
             </button>
             <Badge type="info" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">5</Badge>
           </div>
-          <div style="position: relative; display: inline-flex;">
-            <button style="background: none; border: none; cursor: pointer;">
+          <div class="badge-notification-demo__item">
+            <button class="badge-notification-demo__trigger">
               <Icon aria-hidden="true" name="lucide:message-circle" size="1.5rem" />
               <span class="sr-only">2 new comments</span>
             </button>
@@ -817,6 +817,37 @@ const components = [
 
     ul:not([class]) li {
       margin-block-end: 0.35rem;
+    }
+
+    .badge-notification-demo {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .badge-notification-demo__item {
+      position: relative;
+      display: grid;
+      place-items: center;
+      inline-size: max-content;
+      block-size: max-content;
+      line-height: 0;
+    }
+
+    .badge-notification-demo__trigger {
+      display: grid;
+      place-items: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      line-height: 0;
+      vertical-align: top;
+    }
+
+    .badge-notification-demo__trigger :global(svg) {
+      display: block;
     }
 
     :global(.heading) {

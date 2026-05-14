@@ -195,12 +195,20 @@ img.rounded-lg,
 
 .badge.circular {
   box-sizing: border-box;
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 !important;
   border-radius: 9999px !important;
   line-height: 1;
   font-variant-numeric: lining-nums tabular-nums;
+}
+
+// Safari 圆型 badge 文字偏上补偿：padding-block-start 将内容区下移，
+// flex align-items: center 随之将文字推下，效果等效于 badge-content 的 translate 偏移
+.badge.circular:not(:has(svg)) {
+  padding-block-start: 0.1em !important;
+  padding-block-end: 0 !important;
 }
 
 .badge.size-sm.circular {
