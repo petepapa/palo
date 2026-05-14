@@ -307,3 +307,102 @@ kbd,
 .tab-panel.tab-panel-thick {
   --border-width-tabs: 4px;
 }
+
+// ──────────────────────────────────────────────
+//  Modal & Launcher 淡入淡出动画
+//  使用 @keyframes animation 替代 @starting-style + transition，
+//  解决 Safari 下 @starting-style 动画卡顿问题。
+//  打开/关闭均为 fade + slide，方向一致。
+//  will-change 提示 GPU 合成，减少 Safari 重绘。
+// ──────────────────────────────────────────────
+
+// backdrop 闭态（媒体查询外，reduced-motion 时也能正确显示）
+dialog.launcher::backdrop,
+dialog.modal::backdrop {
+  opacity: 0;
+}
+
+dialog.launcher[open]::backdrop,
+dialog.modal[open]::backdrop {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  // ════════════════════ Modal ════════════════════
+
+  // Modal 打开（覆盖组件内建 @starting-style + transition）
+  dialog.modal[open] {
+    animation: modal-fade-in 0.25s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    will-change: opacity, translate;
+  }
+
+  // Modal 关闭
+  dialog.modal.closing {
+    animation: modal-fade-out 0.25s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    pointer-events: none;
+  }
+
+  // Modal backdrop 打开
+  dialog.modal[open]::backdrop {
+    animation: backdrop-fade-in 0.3s ease-out forwards;
+  }
+
+  // Modal backdrop 关闭
+  dialog.modal.closing::backdrop {
+    animation: backdrop-fade-out 0.15s ease-out forwards;
+  }
+
+  // ════════════════════ Launcher ════════════════════
+
+  // Launcher 打开（从上往下移出）
+  dialog.launcher[open] {
+    animation: launcher-fade-in 0.25s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    will-change: opacity, translate;
+  }
+
+  // Launcher 关闭（向下移出）
+  dialog.launcher.closing {
+    animation: launcher-fade-out 0.25s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    pointer-events: none;
+  }
+
+  // Launcher backdrop 打开
+  dialog.launcher[open]::backdrop {
+    animation: backdrop-fade-in 0.3s ease-out forwards;
+  }
+
+  // Launcher backdrop 关闭
+  dialog.launcher.closing::backdrop {
+    animation: backdrop-fade-out 0.15s ease-out forwards;
+  }
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; translate: 0 calc(var(--translate-offset-y, 7.5vh) * -1); }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes modal-fade-out {
+  from { opacity: 1; translate: 0 0; }
+  to   { opacity: 0; translate: 0 var(--translate-offset-y, 7.5vh); }
+}
+
+@keyframes launcher-fade-in {
+  from { opacity: 0; translate: 0 -40px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes launcher-fade-out {
+  from { opacity: 1; translate: 0 0; }
+  to   { opacity: 0; translate: 0 40px; }
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes backdrop-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}

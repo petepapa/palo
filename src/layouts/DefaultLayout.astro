@@ -732,6 +732,158 @@ const themeVariablesCss = `
       document.addEventListener('astro:after-swap', paloInitAccordionFallback)
       paloInitAccordionFallback()
     </script>
+    <script is:inline>
+      /**
+       * Modal 淡出动画
+       * 拦截组件原生 closeModal，先播放 .closing 动画再真正关闭
+       * Escape 由 capture 阶段 keydown 统一处理（见下方）
+       */
+      let __origCloseModal = null
+
+      function paloInitModalAnimation() {
+        const dialogs = document.querySelectorAll('.modal')
+        if (!dialogs.length) return
+
+        // 保存原始 closeModal（Escape 和后续使用）
+        if (typeof window.closeModal === 'function' && !__origCloseModal) {
+          __origCloseModal = window.closeModal
+        }
+
+        // 包装全局 closeModal（关闭按钮 + 遮罩点击）
+        if (typeof window.closeModal === 'function') {
+          const origClose = window.closeModal
+          window.closeModal = () =>
+            closeWithAnimation(document.querySelector('.modal[open]'), origClose)
+        }
+      }
+
+      function closeWithAnimation(dialog, fallbackClose) {
+        if (!dialog || dialog.classList.contains('closing')) return
+
+        dialog.classList.add('closing')
+
+        const finish = () => {
+          dialog.classList.remove('closing')
+          if (fallbackClose) fallbackClose()
+          else dialog.close()
+        }
+
+        // 只监听 dialog 自身 fade-out，忽略 ::backdrop 冒泡上来的 animationend
+        dialog.addEventListener('animationend', (e) => {
+          if (e.target === dialog) finish()
+        }, { once: true })
+        // fallback：确保动画异常时也能关闭
+        setTimeout(finish, 300)
+      }
+
+      document.addEventListener('astro:page-load', paloInitModalAnimation)
+      document.addEventListener('astro:after-swap', paloInitModalAnimation)
+      paloInitModalAnimation()
+    </script>
+    <script is:inline>
+      /**
+       * Launcher 淡入淡出动画
+       * 使用 capture 阶段拦截全部关闭路径（关闭按钮、遮罩、Cmd+K），
+       * 先播放 .closing 动画再真正 close。
+       * Escape 由 capture 阶段 keydown 统一处理（见下方）。
+       * Safari 兼容：capture 事件、keydown、keyframes—均广泛支持。
+       */
+      function paloInitLauncherAnimation() {
+        const dialogs = document.querySelectorAll('.launcher')
+        if (!dialogs.length) return
+
+        dialogs.forEach((dialog) => {
+          // 1) 关闭按钮 — capture 阶段拦截，阻止组件 bubbling handler
+          const closeBtn = dialog.querySelector('.close')
+          if (closeBtn) {
+            closeBtn.addEventListener(
+              'click',
+              (e) => {
+                e.stopPropagation()
+                closeLauncher(dialog)
+              },
+              { capture: true },
+            )
+          }
+
+          // 2) 遮罩点击 — capture 阶段拦截位置在 dialog 自身上的 click
+          dialog.addEventListener(
+            'click',
+            (e) => {
+              if (e.target === dialog) {
+                e.stopPropagation()
+                closeLauncher(dialog)
+              }
+            },
+            { capture: true },
+          )
+        })
+
+        // 3) Cmd+K / Ctrl+K 快捷键 — capture 阶段提前拦截
+        document.addEventListener(
+          'keydown',
+          (e) => {
+            const isMac = navigator.userAgent.toLowerCase().includes('mac')
+            const mod = isMac ? e.metaKey : e.ctrlKey
+            if (mod && e.key.toLowerCase() === 'k') {
+              const launcher = document.querySelector('.launcher[open]')
+              if (launcher) {
+                e.stopPropagation()
+                closeLauncher(launcher)
+              }
+            }
+          },
+          { capture: true },
+        )
+      }
+
+      function closeLauncher(dialog) {
+        if (!dialog || dialog.classList.contains('closing')) return
+        dialog.classList.add('closing')
+
+        const finish = () => {
+          dialog.classList.remove('closing')
+          dialog.close()
+        }
+        // 只监听 dialog 自身 fade-out，忽略 ::backdrop 冒泡上来的 animationend
+        dialog.addEventListener('animationend', (e) => {
+          if (e.target === dialog) finish()
+        }, { once: true })
+        setTimeout(finish, 300)
+      }
+
+      document.addEventListener('astro:page-load', paloInitLauncherAnimation)
+      document.addEventListener('astro:after-swap', paloInitLauncherAnimation)
+      paloInitLauncherAnimation()
+
+      // ═══════════════════════════════════════════
+      //  Escape 统一处理（Modal + Launcher）
+      //  使用 capture 阶段 keydown 在 dialog 原生处理之前拦截，
+      //  解决 Safari 下 cancel 事件 preventDefault() 不可靠的问题。
+      // ═══════════════════════════════════════════
+      document.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.key !== 'Escape') return
+
+          // 优先检查 Launcher（Launcher 打开时 modal 不显示）
+          const launcher = document.querySelector('.launcher[open]')
+          if (launcher && !launcher.classList.contains('closing')) {
+            e.stopPropagation()
+            closeLauncher(launcher)
+            return
+          }
+
+          // 检查 Modal
+          const modal = document.querySelector('.modal[open]')
+          if (modal && !modal.classList.contains('closing')) {
+            e.stopPropagation()
+            closeWithAnimation(modal, __origCloseModal)
+          }
+        },
+        { capture: true },
+      )
+    </script>
     <style lang="scss" is:global>
       @use 'scss/base/mixins' as *;
 
