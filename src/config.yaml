@@ -33,6 +33,10 @@ navigation:
   mobileFontSize: '24px'                  # 手机端展开菜单 / Mobile expanded menu
   dropdownMobileFontSize: '21px'          # 手机端下拉子菜单 / Mobile dropdown
 
+  # --- 主导航最小高度 / Main Nav Min Height ---
+  # 仅当设值大于内容高度时生效（= CSS min-height）/ Only takes effect when set value > content height (= CSS min-height)
+  minHeight: '6rem'
+
   # --- 导航高亮样式 / Navigation Active Style ---
   # 'wavy'      → 波浪下划线（默认）/ Wavy underline (default)
   # 'underline' → 直线下划线 / Solid underline

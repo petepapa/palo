@@ -11,27 +11,35 @@ import themeConfig from '@config'
  * @description A component that displays the navigation menu for the website
  */
 const { site, typography } = themeConfig
+const navMinHeight = themeConfig.navigation?.minHeight ?? ''
 const navActiveStyle = themeConfig.navigation?.activeStyle ?? typography.navigationActiveStyle ?? 'wavy'
 const navAlignment =
   themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
 ---
 
-<div id="main-navigation" class="py-8" data-nav-active-style={navActiveStyle}>
+<div
+  id="main-navigation"
+  class=""
+  data-nav-active-style={navActiveStyle}
+  style={navMinHeight ? `--nav-min-height: ${navMinHeight}` : ''}
+>
   <div class="container">
-    <Logo />
-    <div class="wrapper">
-      <nav class={`desktop-menu desktop-menu--${navAlignment}`} aria-label="Main navigation desktop">
-        <NavigationItems variant="primary" includeLauncher={false} />
-        <NavigationItems variant="utility" />
-      </nav>
-      <ResponsiveToggle />
-      {
-        site.showLauncher && (
-          <div class="mobile-launcher">
-            <LauncherTrigger launcherId="site-launcher" iconOnly={true} gradientBorder={true} />
-          </div>
-        )
-      }
+    <div class="nav-bar">
+      <Logo />
+      <div class="wrapper">
+        <nav class={`desktop-menu desktop-menu--${navAlignment}`} aria-label="Main navigation desktop">
+          <NavigationItems variant="primary" includeLauncher={false} />
+          <NavigationItems variant="utility" />
+        </nav>
+        <ResponsiveToggle />
+        {
+          site.showLauncher && (
+            <div class="mobile-launcher">
+              <LauncherTrigger launcherId="site-launcher" iconOnly={true} gradientBorder={true} />
+            </div>
+          )
+        }
+      </div>
     </div>
     <nav class="mobile-menu" aria-label="Main navigation mobile">
       <NavigationItems includeLauncher={false} />
@@ -257,24 +265,36 @@ const navAlignment =
   @use 'scss/base/breakpoint' as *;
 
   #main-navigation {
+    display: flex;
+    flex-direction: column;
+
     > .container {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .nav-bar {
+      display: flex;
+      flex: 1 1 100%;
+      justify-content: space-between;
       align-items: center;
+      gap: var(--space-m);
+      min-block-size: var(--nav-min-height, auto);
     }
 
     // Mobile-first: show mobile menu by default
     .mobile-menu {
+      flex: 1 1 100%;
       max-block-size: 0;
       opacity: 0;
       overflow: hidden;
+      will-change: max-block-size, opacity;
+      // 仅动画 opacity + max-block-size，去掉 layout-heavy 的 margin/padding 过渡
       transition:
         max-block-size var(--animation-speed-medium) var(--cubic-bezier),
-        opacity var(--animation-speed-medium) var(--cubic-bezier),
-        margin-block-start var(--animation-speed-medium) var(--cubic-bezier),
-        padding-block-start var(--animation-speed-medium) var(--cubic-bezier),
-        padding-block-end var(--animation-speed-medium) var(--cubic-bezier);
+        opacity var(--animation-speed-medium) var(--cubic-bezier);
       margin-block-start: 0;
       padding-block-start: 0;
       padding-block-end: 0;
@@ -283,7 +303,6 @@ const navAlignment =
         max-block-size: calc(100vh - 8rem);
         opacity: 1;
         overflow-y: auto;
-        // Restore margin-block-start that was set further down
         margin-block-start: var(--space-m);
         padding-block-start: var(--space-2xs);
         padding-block-end: var(--space-2xs);
@@ -314,6 +333,10 @@ const navAlignment =
     @include breakpoint('nav') {
       > .container {
         column-gap: var(--space-l);
+      }
+
+      .nav-bar {
+        flex: 1 1 auto;
       }
 
       .mobile-menu {
@@ -607,12 +630,9 @@ const navAlignment =
       min-inline-size: auto;
       max-block-size: 0;
       overflow: hidden;
+      will-change: max-block-size;
       transition:
-        max-block-size var(--animation-speed-medium) var(--cubic-bezier),
-        margin-block-start var(--animation-speed-medium) var(--cubic-bezier),
-        margin-inline-start var(--animation-speed-medium) var(--cubic-bezier),
-        padding-block-start var(--animation-speed-medium) var(--cubic-bezier),
-        padding-block-end var(--animation-speed-medium) var(--cubic-bezier);
+        max-block-size var(--animation-speed-medium) var(--cubic-bezier);
       margin-block-start: 0;
       margin-inline-start: 0;
       padding-block-start: 0;
