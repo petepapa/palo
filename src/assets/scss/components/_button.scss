@@ -19,9 +19,14 @@
 .button,
 a.button,
 button.button {
+  --button-radius: var(--radius-button, var(--radius-global, var(--radius-s)));
+  --button-corner-safe-inset: min(calc(var(--button-radius) * 0.5), var(--space-s));
+  --button-padding-inline: calc(1rem + (var(--button-corner-safe-inset) * 0.5));
+
   font-weight: var(--font-weight-accent, 400);
   border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
-  border-radius: var(--radius-button, var(--radius-global, var(--radius-s))) !important;
+  border-radius: var(--button-radius) !important;
+  padding-inline: var(--button-padding-inline) !important;
 }
 
 .button .button-content,
