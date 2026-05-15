@@ -52,7 +52,7 @@ branding:
     # 状态色（按钮、徽章、通知等）/ Semantic state colors (buttons, badges, notifications)
     info: '#177cb0'
     success: '#00bc12'
-    warning: '#ffa400'
+    warning: '#ffa631'
     error: '#f00056'
 
   # ── 字体 / Font ──────────────────────────────────────────────
@@ -91,7 +91,7 @@ navigation:
 
   # 桌面端文字主菜单位置，不影响右侧功能图标和移动端
   # Desktop text menu position — does not affect utility icons or mobile
-  desktopMenuAlignment: 'right'  # 'left' | 'center' | 'right'
+  desktopMenuAlignment: 'center'  # 'left' | 'center' | 'right'
 
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 
