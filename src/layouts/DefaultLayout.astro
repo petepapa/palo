@@ -733,6 +733,38 @@ const themeVariablesCss = `
       paloInitAccordionFallback()
     </script>
     <script is:inline>
+      function paloInitFloatingFormLabels() {
+        const groups = document.querySelectorAll('.input-group, .textarea-group')
+        if (!groups.length) return
+
+        groups.forEach((group) => {
+          const control = group.querySelector('input, textarea')
+          if (!(control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement)) return
+
+          const syncState = () => {
+            const hasValue = control.value.trim().length > 0
+            group.setAttribute('data-floating-active', hasValue ? 'true' : 'false')
+          }
+
+          if (group.getAttribute('data-palo-floating-bound') !== 'true') {
+            control.addEventListener('input', syncState)
+            control.addEventListener('change', syncState)
+            control.addEventListener('blur', syncState)
+            control.addEventListener('animationstart', syncState)
+            group.setAttribute('data-palo-floating-bound', 'true')
+          }
+
+          syncState()
+          requestAnimationFrame(syncState)
+          setTimeout(syncState, 0)
+        })
+      }
+
+      document.addEventListener('astro:page-load', paloInitFloatingFormLabels)
+      document.addEventListener('astro:after-swap', paloInitFloatingFormLabels)
+      paloInitFloatingFormLabels()
+    </script>
+    <script is:inline>
       /**
        * Modal 淡出动画
        * 拦截组件原生 closeModal，先播放 .closing 动画再真正关闭

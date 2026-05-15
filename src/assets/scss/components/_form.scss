@@ -58,14 +58,24 @@
 // --- Text Inputs: prevent height distortion from line-height ---
 // The library uses padding: var(--space-2xs) which creates unequal
 // block space with certain fonts. Use fixed height + equal padding.
-.input-group input,
-.input-group textarea,
-.input-group select,
-.textarea-group textarea {
+.input-group,
+.textarea-group,
+fieldset.fieldset {
+  --form-control-border-width: var(--border-width-form, var(--border-width-global, 3px));
   --form-control-radius: var(--radius-form, var(--radius-global, var(--radius-s)));
   --form-control-corner-safe-inset: min(calc(var(--form-control-radius) * 0.5), var(--space-s));
   --form-control-padding-inline: calc(var(--space-2xs) + (var(--form-control-radius) * 0.5));
   --form-control-padding-block: calc(var(--space-2xs) + (var(--form-control-corner-safe-inset) * 0.5));
+  --floating-label-chip-padding-inline: var(--space-4xs);
+  --floating-label-float-scale: 0.78;
+  --floating-label-inline: calc(var(--form-control-border-width) + var(--form-control-padding-inline));
+  --floating-label-bg: var(--background-color);
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select,
+.textarea-group textarea {
 
   border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);     // preserve library border
   border-radius: var(--form-control-radius);
@@ -73,6 +83,52 @@
   padding-inline: var(--space-2xs);                  // keep horizontal padding
   line-height: 1;
   box-sizing: border-box;
+}
+
+.input-group,
+.textarea-group {
+  position: relative;
+}
+
+.input-group label,
+.textarea-group label {
+  position: absolute;
+  z-index: 1;
+  inset-inline-start: var(--floating-label-inline);
+  margin: 0;
+  max-inline-size: calc(100% - (var(--floating-label-inline) * 2));
+  color: color-mix(in oklab, var(--foreground-color) 74%, transparent);
+  line-height: 1;
+  pointer-events: auto;
+  transform-origin: left center;
+  transition:
+    inset-block-start 0.2s var(--cubic-bezier),
+    transform 0.2s var(--cubic-bezier),
+    color 0.2s var(--cubic-bezier),
+    background-color 0.2s var(--cubic-bezier),
+    padding-inline 0.2s var(--cubic-bezier);
+}
+
+.input-group label {
+  inset-block-start: 50%;
+  transform: translateY(calc(-50% + (var(--font-cap-height-offset, -0.05em) * -0.2)));
+}
+
+.textarea-group label {
+  inset-block-start: calc(
+    var(--form-control-border-width) +
+    var(--form-control-padding-block) +
+    (0.5lh - 0.5em) -
+    0.06em -
+    var(--font-cap-height-offset, -0.05em)
+  );
+  line-height: inherit;
+  transform: translateY(0);
+}
+
+.input-group label > span:last-child,
+.textarea-group label > span:last-child {
+  white-space: nowrap;
 }
 
 .input-group input:focus,
@@ -101,9 +157,9 @@
 }
 
 fieldset.fieldset {
-  --fieldset-radius: var(--form-control-radius, var(--radius-form, var(--radius-global, var(--radius-s))));
-  --fieldset-corner-safe-inset: var(--form-control-corner-safe-inset, min(calc(var(--fieldset-radius) * 0.5), var(--space-s)));
-  --fieldset-padding-inline: var(--form-control-padding-inline, calc(var(--space-2xs) + (var(--fieldset-radius) * 0.5)));
+  --fieldset-radius: var(--form-control-radius);
+  --fieldset-corner-safe-inset: var(--form-control-corner-safe-inset);
+  --fieldset-padding-inline: calc(var(--form-control-border-width) + var(--form-control-padding-inline));
   --fieldset-padding-block-start: calc(var(--space-3xs) + (var(--fieldset-corner-safe-inset) * 0.35));
   --fieldset-padding-block-end: calc(var(--space-2xs) + var(--fieldset-corner-safe-inset));
 
@@ -112,17 +168,45 @@ fieldset.fieldset {
   row-gap: calc(var(--space-4xs) * 0.75);
   padding-block-start: var(--fieldset-padding-block-start);
   padding-block-end: var(--fieldset-padding-block-end);
-  padding-inline: var(--fieldset-padding-inline);
+  padding-inline: calc(var(--fieldset-padding-inline) - var(--form-control-border-width));
 }
 
 fieldset.fieldset > legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3xs);
   margin-block-end: 0;
+  padding-inline: var(--space-2xs);
+  line-height: 1;
+  color: var(--foreground-color);
 }
 
 fieldset.fieldset > .fieldset-group {
   row-gap: var(--space-4xs);
 }
 
+.input-group[data-floating-active='true'] label,
+.textarea-group[data-floating-active='true'] label,
+.input-group:has(input:focus) label,
+.textarea-group:has(textarea:focus) label {
+  inset-block-start: 0;
+  padding-inline: var(--floating-label-chip-padding-inline);
+  background-color: var(--floating-label-bg);
+  color: var(--foreground-color);
+  transform: translateY(-50%) scale(var(--floating-label-float-scale));
+}
+
+.input-group:has(input:focus) label,
+.textarea-group:has(textarea:focus) label {
+  color: var(--link-color);
+}
+
 fieldset.fieldset[aria-invalid='true'] {
   border-color: var(--color-error-border);
+}
+
+.input-group:has([aria-invalid='true']) label,
+.textarea-group:has([aria-invalid='true']) label {
+  color: var(--color-error-border);
 }
