@@ -136,6 +136,32 @@
 
 ---
 
+### 5. 页面导航 active 状态效果不明显
+
+**问题**：页面内容导航的 active 变大效果变得不明显了，原因是我们之前给 font-size 变量加了 `!important`，而 `.active` 样式没有足够的优先级。
+
+**修改文件**：
+- [accessible-components.astro](file:///Users/petelee/工作/palo/src/pages/accessible-components.astro#L813-L817) - 给 active 样式加上 !important
+
+**修改内容**：
+```scss
+// 修改前
+.active {
+  transform: scale(1.08);
+  font-weight: var(--font-weight-heading, 500);
+  font-size: 1.25rem;
+}
+
+// 修改后
+.active {
+  transform: scale(1.08) !important;
+  font-weight: var(--font-weight-heading, 500) !important;
+  font-size: 1.25rem !important;
+}
+```
+
+---
+
 ## 配置参数说明
 
 **config.yaml 相关配置**：
