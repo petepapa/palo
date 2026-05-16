@@ -5,7 +5,7 @@
 # ╚══════════════════════════════════════════════════════════════╝
 
 site:
-  name: Palo Theme
+  name: Palo
   titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo" / Tab title separator, e.g. "About | Palo"
   trailingSlash: false        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
   showDarkModeToggle: true    # 显示深色模式切换 / Show dark mode toggle
@@ -158,11 +158,11 @@ border:
   accordionWidth: ''          # Accordion 折叠面板 / Accordion items
   tabsWidth: ''               # Tabs 标签与面板 / Tab and panel borders
   badgeWidth: '0.05rem'       # Badge 徽章 / Badges
-  avatarWidth: '0'            # Avatar 头像 / Avatars
-  notificationWidth: '0'      # Notification 通知 / Notifications
+  avatarWidth: ''            # Avatar 头像 / Avatars
+  notificationWidth: ''      # Notification 通知 / Notifications
   paginationWidth: '0.1rem'   # Pagination 分页按钮 / Pagination buttons
   toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
-  surfaceWidth: '0'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
+  surfaceWidth: '0.05rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
   dividerWidth: '0.05rem'     # 分隔线 / Dividers
 
 

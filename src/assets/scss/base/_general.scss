@@ -62,7 +62,7 @@ footer a {
 }
 
 .card {
-  border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)));
+  border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px))) !important;
   border-radius: var(--radius-card, var(--radius-surface, var(--radius-global, var(--radius-m)))) !important;
 }
 
