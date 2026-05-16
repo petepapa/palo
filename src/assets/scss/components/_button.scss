@@ -19,7 +19,7 @@
 .button,
 a.button,
 button.button {
-  --button-radius: 0.25rem;
+  --button-radius: var(--radius-button, 0.25rem);
   --button-corner-safe-inset: min(calc(var(--button-radius) * 0.5), var(--space-s));
   --button-padding-inline: calc(1rem + (var(--button-corner-safe-inset) * 0.5));
 
