@@ -250,6 +250,38 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
 </style>
 ```
 
+### 字体加载策略
+
+#### font-display: swap（覆盖所有字重）
+
+`buildFontFaceCss()` 生成的每条 `@font-face` 声明均包含 `font-display: swap;`：
+
+- **变量字体路径**：当检测到 `variablefont` 文件时，生成单条 `@font-face`，`font-weight: 100 900`，`font-display: swap`
+- **静态字体路径**：遍历 `uniqueConfiguredWeights`（body / accent / heading），逐条生成带各自 `font-weight` 的 `@font-face`，每条均带 `font-display: swap`
+
+效果：字体加载期间浏览器先以系统字体渲染文字（FOUT），字体就绪后无缝替换。文字始终可见，彻底消除 FOIT。
+
+#### body 字重 preload
+
+`DefaultLayout.astro` 在 `<head>` 的 favicon 之后、`@font-face` 样式之前，动态输出 `<link rel="preload">`：
+
+```html
+<link rel="preload" as="font" type="font/woff2" crossorigin
+      href="[拼接路径]" />
+```
+
+**拼接逻辑**（构建时 frontmatter 计算）：
+
+1. 若存在变量字体文件 → 以变量字体文件为目标
+2. 否则 → 调用 `selectStaticFontFile(font.weights.body)` 定位正文字重文件
+3. 通过 `getPublicUrl()` 将文件系统绝对路径转换为 `/public` 下的站点相对路径
+4. 仅当目标文件为 `.woff2` 格式时才输出 `<link>`（`type="font/woff2"`）
+
+**只 preload body 字重**，accent 和 heading 字重仅依赖 `font-display: swap` 降级显示，避免首屏并行下载过多字体文件。
+
+**数据来源**：`config.yaml` → `branding.font.path`（字体目录） + `branding.font.weights.body`（body 字重值，如 `400`）
+
+
 ---
 
 ## 四、功能组件范式

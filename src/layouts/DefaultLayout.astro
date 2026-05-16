@@ -371,6 +371,11 @@ const buildFontFaceCss = (): string => {
 
 const fontFaceCss = buildFontFaceCss()
 
+// Preload body weight font for reduced CLS
+const bodyFontFile = variableFontFile ?? selectStaticFontFile(font.weights.body)
+const bodyFontPreloadUrl = bodyFontFile ? getPublicUrl(bodyFontFile) : null
+const bodyFontIsWoff2 = bodyFontPreloadUrl?.endsWith('.woff2') ?? false
+
 const mobileScale = typography.mobileHeadingScale
 const desktopScale = typography.desktopHeadingScale
 const viewportMin = 375
@@ -532,6 +537,10 @@ const themeVariablesCss = `
 
     <!-- favicon -->
     <link rel="icon" type="image/svg+xml" href={themeConfig.metadata.favicon || '/favicon.svg'} />
+    <!-- Preload body weight font to reduce CLS -->
+    {bodyFontPreloadUrl && bodyFontIsWoff2 && (
+      <link rel="preload" as="font" type="font/woff2" crossorigin href={bodyFontPreloadUrl} />
+    )}
 
     {fontFaceCss && <style is:global set:html={fontFaceCss} />}
 
