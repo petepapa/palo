@@ -22,6 +22,55 @@ config.yaml
         └── SCSS / @layer 消费
 ```
 
+### Zod 构建时校验门（v5.1.0+）
+
+在 `js-yaml.load()` 之后、配置消费之前，插入 Zod schema 校验：
+
+```
+src/config.yaml
+    │
+    ├── fs.readFileSync() ──► yaml.load() ──► raw config object
+    │                                              │
+    │                          ┌───────────────────┘
+    │                          ▼
+    │               validateConfig(rawConfig)  ← src/utils/validateConfig.ts
+    │                    │            │
+    │              ✅ pass          ❌ fail
+    │              silent           throw Error(msg)
+    │                    │            │
+    │                    ▼            ▼
+    │              继续构建      构建终止，打印字段路径 + 期望格式
+    │
+    └── 消费方：astro.config.mjs / DefaultLayout.astro / 组件
+```
+
+**校验覆盖范围：**
+
+| 类别 | 示例 | 校验规则 |
+|------|------|----------|
+| CSS 长度值 | `'0.1rem'`, `'16px'`, `'-0.05em'` | 正则 `/^-?\d*\.?\d+(px\|rem\|em\|%\|vw\|…)?$/`，允许空字符串 `''` 表示继承 |
+| 布尔值 | `trailingSlash`, `showLauncher` | `z.boolean()` — 拒绝字符串 `'true'`、数字 `1` |
+| 枚举 | `activeStyle`, `desktopMenuAlignment` | `z.enum(['wavy','underline','bold'])` / `z.enum(['left','center','right'])` |
+| 数值范围 | `headerBackgroundOpacity`, 字重 | `z.number().min(0).max(1)` / `.min(100).max(900)` |
+| 必填字符串 | `site.name`, `metadata.title` 等 | `z.string().min(1)` |
+
+**错误信息格式示例：**
+```
+❌ config.yaml validation failed with 3 errors:
+
+  • site.trailingSlash: Expected boolean, received string
+  • navigation.activeStyle: Invalid enum value. Expected 'wavy' | 'underline' | 'bold', received 'boldd'
+  • border.globalWidth: Expected a CSS length like "0.1rem" / "16px" / "-0.05em", or "" to inherit
+
+  Fix the errors above in src/config.yaml and rebuild.
+```
+
+**架构决策：**
+- Zod schema 反映 `config.yaml` 实际结构（非 `src/types/config.ts` 的 TypeScript 接口），两者独立演进
+- 使用 `.strip()` 忽略未知字段，避免阻塞未来配置扩展
+- `validateConfig()` 返回 `void`（非 `PaloConfig`），仅做副作用校验；保持现有消费代码零修改
+- 校验文件路径：`src/utils/validateConfig.ts`，在 `astro.config.mjs` 中 `yaml.load()` 后立即调用
+
 ### 关键计算链路
 
 **border + radius：**

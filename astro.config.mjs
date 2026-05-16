@@ -9,11 +9,16 @@ import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { enhanceConfigForWorkspace } from './scripts/workspace-config.js'
+import { validateConfig } from './src/utils/validateConfig.ts'
 
 // Read config.yaml for site settings (used at build-time for Astro config)
 const configPath = path.resolve(fileURLToPath(new URL('./src/config.yaml', import.meta.url)))
 const rawYaml = fs.readFileSync(configPath, 'utf-8')
 const yamlConfig = yaml.load(rawYaml)
+
+// Build-time config validation: catches invalid values before they corrupt CSS
+validateConfig(yamlConfig)
+
 const siteUrl = String(yamlConfig.metadata?.siteUrl ?? '').trim()
 
 /**
