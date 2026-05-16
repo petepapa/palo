@@ -1,6 +1,6 @@
-# PALO 全景扫描报告 — v5.1.0
+# PALO 全景扫描报告 — v5.2.0
 
-> 生成日期：2026-05-15 | 框架：Astro 6.x | 构建模式：SSG
+> 生成日期：2026-05-17 | 框架：Astro 6.x | 构建模式：SSG
 
 ---
 
@@ -21,6 +21,89 @@ config.yaml
         ├── 组件 scoped CSS 消费
         └── SCSS / @layer 消费
 ```
+
+---
+
+### Zod 构建时校验门（v5.1.0+）
+
+在 `js-yaml.load()` 之后、配置消费之前，插入 Zod schema 校验：
+
+```
+config.yaml  →  js-yaml.load()  →  validateConfig()  →  Astro / Vite
+                    │                      │
+                    │              ┌───────┴────────┐
+                    │              │ ✅ pass → silent │
+                    │              │ ❌ fail → throw  │
+                    │              └────────────────┘
+                    │
+           No validation = silent CSS corruption
+```
+
+**实现位置：**
+
+1. **`src/utils/validateConfig.ts`** — 完整的 Zod schemas 和验证逻辑
+2. **`astro.config.mjs:21`** — 在配置加载后立即调用验证
+
+**关键代码（`validateConfig.ts`）：
+
+```ts
+import { z } from 'zod'
+
+// 自定义 CSS length 正则验证
+const CSS_LENGTH_RE = /^(?:$|-?\d*\.?\d+(?:px|rem|em|%|vh|vw|vmin|vmax|ch|ex|cm|mm|in|pt|pc|s|ms)?)$/
+
+function cssLength(fieldLabel: string) {
+  return z.string().regex(CSS_LENGTH_RE, `${fieldLabel}: Expected a CSS length like "0.1rem" / "16px" / "-0.05em", or "" to inherit`)
+}
+
+// 完整的配置 schema
+export const paloConfigSchema = z.object({
+  site: siteConfigSchema,
+  metadata: metadataConfigSchema,
+  branding: brandingConfigSchema,
+  layout: layoutConfigSchema,
+  typography: typographyConfigSchema,
+  navigation: navigationConfigSchema.optional(),
+  border: borderConfigSchema.optional(),
+  radius: radiusConfigSchema.optional(),
+}).strip()
+
+export function validateConfig(config: unknown): void {
+  const result = paloConfigSchema.safeParse(config)
+  if (!result.success) {
+    // 输出详细的错误信息
+    const issues = result.error.issues
+    const lines = [`❌ config.yaml validation failed with ${issues.length} error(s):`]
+    for (const issue of issues) {
+      const path = issue.path.length > 0 ? issue.path.join('.') : '(root)'
+      lines.push(`  • ${path}: ${issue.message}`)
+    }
+    throw new Error(lines.join('\n'))
+  }
+}
+```
+
+**astro.config.mjs 中的集成：
+
+```js
+import { validateConfig } from './src/utils/validateConfig.ts'
+
+const rawYaml = fs.readFileSync(configPath, 'utf-8')
+const yamlConfig = yaml.load(rawYaml)
+validateConfig(yamlConfig) // 构建时校验！
+```
+
+**验证范围：
+
+| 类型 | 示例 |
+|------|------|
+| CSS length | `"0.1rem"` / `"16px"` / `"-0.05em"` / `""` |
+| Font weights | 整数 100-900 |
+| Numbers (scale) | 0.1-5.0 范围 |
+| Booleans | `true` / `false` |
+| Enums | `'left'` / `'center'` / `'right'` |
+
+---
 
 ### 关键计算链路
 
@@ -133,7 +216,17 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
 
 ### dev 增强
 
-`scripts/dev-with-config-watch.mjs` 监听 `config.yaml` → 自动重启 Astro dev server（`fs.watch` → `SIGTERM` → `spawn`）。
+**主方案：Vite HMR 插件** `scripts/vite-plugin-palo-config.ts`
+- 在 `astro dev` 时启用（`apply: 'serve'`），`astro build` 时自动跳过
+- 通过 Vite 的 `server.watcher` 监听 `src/config.yaml`
+- 文件变化时调用 `validateConfig()` 进行 Zod 校验
+- 校验通过 → `server.ws.send({ type: 'full-reload' })` 触发浏览器全量刷新
+- 校验失败 → `server.ws.send({ type: 'error' })` 显示错误遮罩，不刷新页面
+- 相比旧方案（进程重启），反馈延迟从数秒降至毫秒级
+
+**备用方案：** `scripts/dev-legacy-watch.mjs`（`npm run dev:legacy`）
+- 使用 `fs.watch` 监听 + `SIGTERM` → `spawn` 全量重启 dev server
+- 保留供调试或环境兼容性使用
 
 ---
 
@@ -157,10 +250,32 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
 
 ### @layer 分布
 
-当前已使用 CSS `@layer` 建立优先级体系：
+已实施 CSS `@layer` 体系，覆盖全部四种样式来源：
+
 ```css
-@layer base, tokens, overrides;
+/* src/styles/tailwind.css */
+@layer reset, tokens, base, components, overrides, utilities, scoped;
 ```
+
+| Layer | 用途 | 文件位置 |
+|-------|------|----------|
+| `reset` | 基础样式重置 | `src/assets/scss/base/_reset.scss` |
+| `tokens` | CSS 自定义属性（颜色、间距、字体等） | `DefaultLayout.astro` / `src/assets/scss/base/_root.scss` |
+| `base` | 全局基础样式 | `_font.scss` / `_list.scss` / `_general.scss` / `_kbd.scss` |
+| `components` | 组件样式 | `.astro` 组件中的样式块 / `_button.scss` / `_form.scss` |
+| `overrides` | 第三方库样式覆盖（高优先级） | `_font.scss` / `Header.astro` / `Navigation.astro` / `Logo.astro` |
+| `utilities` | 工具类 | `src/assets/scss/base/_utility.scss` / `tailwind.css` |
+| `scoped` | 页面局部样式（最优先级） | 页面 `.astro` 中未标记层的样式块 |
+
+**优先级顺序（从低到高）：**
+`reset` → `tokens` → `base` → `components` → `overrides` → `utilities` → `scoped`
+
+**unlayered 例外（最高优先级）：**
+| **unlayered** | **最高** | `_button.scss`, `_form.scss`（覆盖第三方组件库）|
+
+**关键约束：**
+- `_button.scss`、`_form.scss` 必须保持 unlayered
+- Avatar / Badge / Notification / Tabs 组件覆盖样式位于 `_general.scss` 的 `@layer base` 块内，配合 `!important` 实现对第三方库的覆盖，功能等效于 unlayered
 
 ### Tailwind @theme 映射（src/styles/tailwind.css）
 
@@ -189,6 +304,33 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
   ${fontScaleVars}         <!-- --font-size-* (clamp 公式) -->
   ${fontFaceCss}           <!-- @font-face 声明 -->
 </style>
+```
+
+### 字体加载策略
+
+`DefaultLayout.astro` 中的 `buildFontFaceCss()` 实现了完整的字体加载策略：
+
+| 特性 | 实现 |
+|------|------|
+| `font-display: swap` | 所有 `@font-face` 声明使用 `swap`，优先使用系统字体，自定义字体加载后自动切换 |
+| 可变字体优先 | 优先检测 `public/fonts/` 中的可变字体（如 `VariableFont.ttf`），支持字重范围 `100 900` |
+| 静态字体回退 | 如果没有可变字体，回退到静态字体，为每个字重（`body`、`accent`、`heading`）生成单独的 `@font-face` |
+| 字体预加载 | 预加载 `body` 字重的 woff2 字体到 `<link rel="preload">`，减少 CLS |
+
+**关键代码**：
+
+```astro
+// buildFontFaceCss() 自动选择可变字体或静态字体
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-VariableFont.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+// 预加载标签
+<link rel="preload" as="font" type="font/woff2" crossorigin href="/fonts/AtkinsonHyperlegible-Bold.woff2" />
 ```
 
 ---
@@ -312,8 +454,8 @@ src/assets/scss/
 │   ├── _mixins.scss        # SCSS 工具
 │   └── _utility.scss       # 工具类
 └── components/
-    ├── _button.scss        # 按钮覆盖
-    └── _form.scss          # 表单覆盖
+    ├── _button.scss        # 按钮覆盖（unlayered，覆盖第三方组件库）
+    └── _form.scss          # 表单覆盖（unlayered，覆盖第三方组件库）
 ```
 
 ---
@@ -331,9 +473,9 @@ src/assets/scss/
 
 ### 原则二：优先级治理 (Specificity Governance)
 
-- 当前状态：通过 CSS `@layer` 规则和 `!important` 明确优先级层次
-- Layer 层次：`@layer base, tokens, overrides;`
-- 目标：通过 `@layer` 避免特异性战争，必要时使用 `!important`
+- **已实施 @layer 体系**：覆盖全部四种样式来源（SCSS / Astro scoped / is:global / Tailwind）
+- **层顺序**：`@layer reset, tokens, base, components, overrides, utilities, scoped;`
+- **unlayered 例外**：`_button.scss`、`_form.scss` 保持 unlayered；Avatar / Badge / Notification / Tabs 覆盖写在 `_general.scss` 的 `@layer base` 块内，配合 `!important` 实现等效覆盖能力
 
 **库样式覆盖记录（2026-05-17）**
 
@@ -520,16 +662,4 @@ accessible-astro-components 存在以下已知覆盖行为，
 }
 ```
 
----
 
-## 配置参数说明
-
-**config.yaml 相关配置**：
-- [config.yaml](file:///Users/petelee/工作/palo/src/config.yaml) 中的 `typography.mobileHeadingScale: 1.25` (移动端字体缩放比例)
-- [config.yaml](file:///Users/petelee/工作/palo/src/config.yaml) 中的 `typography.desktopHeadingScale: 1.65` (桌面端字体缩放比例)
-- [config.yaml](file:///Users/petelee/工作/palo/src/config.yaml) 中的 `typography.lineHeightScale: 1.0` (全局行高倍数)
-- [config.yaml](file:///Users/petelee/工作/palo/src/config.yaml) 中的 `typography.headingLineHeightScale: 0.85` (标题行高微调)
-
-**字体大小计算公式**：
-- 标题层级与指数的对应关系：h1 → scale^5, h2 → scale^4 … 以此类推
-- 使用 CSS clamp() 实现流体字体

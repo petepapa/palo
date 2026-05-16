@@ -7,7 +7,7 @@
 site:
   name: Palo
   titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo" / Tab title separator, e.g. "About | Palo"
-  trailingSlash: false        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
+  trailingSlash: true        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
   showDarkModeToggle: true    # 显示深色模式切换 / Show dark mode toggle
   showLauncher: true          # 显示快捷启动器（Cmd+K / Ctrl+K）/ Show launcher button
 
