@@ -260,87 +260,89 @@ const themes: Theme[] = [
 <style lang="scss">
   @use 'scss/base/breakpoint' as *;
 
-  .color-contrast {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xl);
-  }
-
-  .theme-section {
-    inline-size: 100%;
-  }
-
-  .theme-header {
-    margin-bottom: var(--space-m);
-  }
-
-  .theme-header h2,
-  .theme-header h3 {
-    margin-bottom: var(--space-xs);
-  }
-
-  .theme-header p {
-    font-size: var(--font-size-2);
-  }
-
-  .color-categories {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-l);
-
-    @include breakpoint(l) {
-      grid-template-columns: repeat(3, 1fr);
+  @layer components {
+    .color-contrast {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
     }
-  }
 
-  .color-category h3 {
-    margin-bottom: var(--space-xs);
-    font-size: var(--font-size-1);
-  }
+    .theme-section {
+      inline-size: 100%;
+    }
 
-  .colors {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-  }
+    .theme-header {
+      margin-bottom: var(--space-m);
+    }
 
-  .color-item {
-    display: flex;
-    position: relative;
-    justify-content: space-between;
-    align-items: center;
-    border-radius: var(--radius-s);
-    padding: var(--space-m);
-    block-size: 3rem;
-    font-weight: var(--font-weight-accent, 400);
-  }
+    .theme-header h2,
+    .theme-header h3 {
+      margin-bottom: var(--space-xs);
+    }
 
-  .contrast-score {
-    backdrop-filter: blur(4px);
-    border-radius: var(--radius-xs);
-    background-color: rgba(255, 255, 255, 0.25);
-    padding: var(--space-2xs) var(--space-3xs);
-    font-weight: var(--font-weight-heading, 500);
-    font-size: var(--font-size--1);
-  }
+    .theme-header p {
+      font-size: var(--font-size-2);
+    }
 
-  .excellent {
-    background-color: rgb(9, 126, 87);
-    color: white;
-  }
+    .color-categories {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
 
-  .good {
-    background-color: rgb(41, 168, 126);
-    color: black;
-  }
+      @include breakpoint(l) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
 
-  .fair {
-    background-color: rgb(219, 141, 31);
-    color: black;
-  }
+    .color-category h3 {
+      margin-bottom: var(--space-xs);
+      font-size: var(--font-size-1);
+    }
 
-  .poor {
-    background-color: rgb(221, 39, 54);
-    color: white;
+    .colors {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .color-item {
+      display: flex;
+      position: relative;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: var(--radius-s);
+      padding: var(--space-m);
+      block-size: 3rem;
+      font-weight: var(--font-weight-accent, 400);
+    }
+
+    .contrast-score {
+      backdrop-filter: blur(4px);
+      border-radius: var(--radius-xs);
+      background-color: rgba(255, 255, 255, 0.25);
+      padding: var(--space-2xs) var(--space-3xs);
+      font-weight: var(--font-weight-heading, 500);
+      font-size: var(--font-size--1);
+    }
+
+    .excellent {
+      background-color: rgb(9, 126, 87);
+      color: white;
+    }
+
+    .good {
+      background-color: rgb(41, 168, 126);
+      color: black;
+    }
+
+    .fair {
+      background-color: rgb(219, 141, 31);
+      color: black;
+    }
+
+    .poor {
+      background-color: rgb(221, 39, 54);
+      color: white;
+    }
   }
 </style>

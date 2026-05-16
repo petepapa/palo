@@ -99,8 +99,10 @@ const currentYear = new Date().getFullYear()
   </section>
 </footer>
 
-<style>
-  section {
-    border-top: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+<style lang="scss">
+  @layer components {
+    section {
+      border-top: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
   }
 </style>

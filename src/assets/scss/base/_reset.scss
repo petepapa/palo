@@ -1,4 +1,4 @@
-@layer base {
+@layer reset {
   html {
     box-sizing: border-box;
     scroll-behavior: smooth;
@@ -107,7 +107,7 @@
   }
 
   [hidden] {
-    display: none !important;
+    display: none;
   }
 
   noscript {
@@ -117,8 +117,8 @@
   }
 
   [tabindex='-1'] {
-    outline: none !important;
-    box-shadow: none !important;
+    outline: none;
+    box-shadow: none;
   }
 
   [popover] {

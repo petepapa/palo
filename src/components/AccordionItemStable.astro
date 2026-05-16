@@ -232,108 +232,110 @@ const panelId = `${uid}-panel`
 </script>
 
 <style>
-  :where(.wrapper) {
-    --transition-duration: 0.3s;
-    --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  @layer components {
+    :where(.wrapper) {
+      --transition-duration: 0.3s;
+      --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
 
-    border-block-start: var(--border-width-accordion, 2px) solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
-    padding-block: 0;
-  }
+      border-block-start: var(--border-width-accordion, 2px) solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
+      padding-block: 0;
+    }
 
-  .title-heading {
-    margin: 0;
-  }
+    .title-heading {
+      margin: 0;
+    }
 
-  .title-heading :global(.heading) {
-    font-weight: normal;
-    font-size: 1.25rem;
-  }
+    .title-heading :global(.heading) {
+      font-weight: normal;
+      font-size: 1.25rem;
+    }
 
-  :where(.title) {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    padding-block: 0.75rem;
-    padding-inline: 0;
-    min-inline-size: 100%;
-    color: inherit;
-    text-align: start;
-    font: inherit;
-  }
+    :where(.title) {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding-block: 0.75rem;
+      padding-inline: 0;
+      min-inline-size: 100%;
+      color: inherit;
+      text-align: start;
+      font: inherit;
+    }
 
-  :where(.content) {
-    overflow: hidden;
-    opacity: 0;
-  }
+    :where(.content) {
+      overflow: hidden;
+      opacity: 0;
+    }
 
-  .wrapper.variant-default .content-inner {
-    padding: 0 0 1.5rem 2.2rem;
-  }
+    .wrapper.variant-default .content-inner {
+      padding: 0 0 1.5rem 2.2rem;
+    }
 
-  .wrapper.variant-chevron .title {
-    justify-content: space-between;
-  }
+    .wrapper.variant-chevron .title {
+      justify-content: space-between;
+    }
 
-  .wrapper.variant-chevron .content-inner {
-    padding-block-end: 2.2rem;
-  }
+    .wrapper.variant-chevron .content-inner {
+      padding-block-end: 2.2rem;
+    }
 
-  :where(.title:hover),
-  :where(.title:focus-visible) {
-    color: light-dark(hsl(215 25% 27%), hsl(215 25% 89%));
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
+    :where(.title:hover),
+    :where(.title:focus-visible) {
+      color: light-dark(hsl(215 25% 27%), hsl(215 25% 89%));
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
 
-  :where(.icon-plus) {
-    display: inline-block;
-    position: relative;
-    aspect-ratio: 1;
-    block-size: 20px;
-  }
+    :where(.icon-plus) {
+      display: inline-block;
+      position: relative;
+      aspect-ratio: 1;
+      block-size: 20px;
+    }
 
-  :where(.icon-plus svg) {
-    position: absolute;
-  }
+    :where(.icon-plus svg) {
+      position: absolute;
+    }
 
-  :where(.icon-plus svg:first-of-type) {
-    transform: translateY(-50%);
-    inset-block-start: 50%;
-    inset-inline-start: 0;
-  }
+    :where(.icon-plus svg:first-of-type) {
+      transform: translateY(-50%);
+      inset-block-start: 50%;
+      inset-inline-start: 0;
+    }
 
-  :where(.icon-plus svg:last-of-type) {
-    transform: translateY(-50%);
-    inset-block-start: 50%;
-    inset-inline-start: 50%;
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
+    :where(.icon-plus svg:last-of-type) {
+      transform: translateY(-50%);
+      inset-block-start: 50%;
+      inset-inline-start: 50%;
+      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
 
-  :where(.icon-chevron) {
-    flex-shrink: 0;
-  }
+    :where(.icon-chevron) {
+      flex-shrink: 0;
+    }
 
-  :where(.icon-chevron svg) {
-    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-  }
+    :where(.icon-chevron svg) {
+      transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
 
-  :where(.content a) {
-    display: inline-block;
-  }
+    :where(.content a) {
+      display: inline-block;
+    }
 
-  :where(.content > *:not(:first-child)) {
-    margin-block-start: 0.75rem;
-  }
+    :where(.content > *:not(:first-child)) {
+      margin-block-start: 0.75rem;
+    }
 
-  :where(.wrapper[data-open='true'] .icon-plus svg:last-of-type) {
-    transform: rotate(90deg);
-    inset-block-start: 0;
-  }
+    :where(.wrapper[data-open='true'] .icon-plus svg:last-of-type) {
+      transform: rotate(90deg);
+      inset-block-start: 0;
+    }
 
-  :where(.wrapper[data-open='true'] .icon-chevron svg) {
-    transform: scaleY(-1);
+    :where(.wrapper[data-open='true'] .icon-chevron svg) {
+      transform: scaleY(-1);
+    }
   }
 </style>

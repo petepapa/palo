@@ -69,8 +69,10 @@ const author = {
 </DefaultLayout>
 
 <style lang="scss" is:global>
-  .narrow {
-    margin-inline: auto;
-    max-width: 65ch;
+  @layer components {
+    .narrow {
+      margin-inline: auto;
+      max-width: 65ch;
+    }
   }
 </style>

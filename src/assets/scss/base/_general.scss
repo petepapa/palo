@@ -4,6 +4,7 @@
   navigation: auto;
 }
 
+@layer base {
 body {
   font-weight: var(--font-weight-body, 300);
   font-size: var(--font-size-0, 1rem);
@@ -442,4 +443,5 @@ dialog.modal[open]::backdrop {
 @keyframes backdrop-fade-out {
   from { opacity: 1; }
   to   { opacity: 0; }
+}
 }

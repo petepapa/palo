@@ -101,38 +101,40 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 <style lang="scss" is:global>
   @use 'scss/base/breakpoint' as *;
 
-  header {
-    li.type-icon {
-      display: block;
-
-      @include breakpoint('nav') {
-        translate: 0 4px;
-      }
-
-      button {
-        border: none;
-        border-radius: 0;
-      }
-
-      svg {
-        inline-size: 30px;
-        block-size: 30px;
-      }
-    }
-
-    li.type-icon ~ li.type-icon {
-      @include breakpoint('nav') {
-        margin-inline-start: calc(var(--space-2xs) * -1);
-      }
-    }
-
-    li.desktop-launcher {
-      display: none;
-    }
-
-    @include breakpoint('nav') {
-      li.desktop-launcher {
+  @layer overrides {
+    header {
+      li.type-icon {
         display: block;
+
+        @include breakpoint('nav') {
+          translate: 0 4px;
+        }
+
+        button {
+          border: none !important;
+          border-radius: 0;
+        }
+
+        svg {
+          inline-size: 30px;
+          block-size: 30px;
+        }
+      }
+
+      li.type-icon ~ li.type-icon {
+        @include breakpoint('nav') {
+          margin-inline-start: calc(var(--space-2xs) * -1);
+        }
+      }
+
+      li.desktop-launcher {
+        display: none;
+      }
+
+      @include breakpoint('nav') {
+        li.desktop-launcher {
+          display: block;
+        }
       }
     }
   }

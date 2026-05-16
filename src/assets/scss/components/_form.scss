@@ -23,7 +23,7 @@
 .checkbox-group input,
 .radio-group input {
   flex-shrink: 0;
-  margin: 0 !important;                     // override margin-block-start: 0.125em from library
+  margin: 0 !important;
   inline-size: 1em;
   block-size: 1em;
   border-width: var(--border-width-form, var(--border-width-global, 3px));
@@ -44,12 +44,9 @@
   align-items: center;
   gap: var(--space-3xs);
   cursor: pointer;
-  // Exclude form labels from the global uppercaseDisplayText
   text-transform: none;
 }
 
-// Apply the body line-height scale from config to checkbox/radio label text,
-// so they respect typography.lineHeightScale instead of being collapsed.
 .checkbox-group label span,
 .radio-group label span {
   line-height: var(--text-base--line-height);
@@ -76,11 +73,10 @@ fieldset.fieldset {
 .input-group textarea,
 .input-group select,
 .textarea-group textarea {
-
-  border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);     // preserve library border
+  border: var(--border-width-form, var(--border-width-global, 3px)) solid var(--color-default-border);
   border-radius: var(--form-control-radius);
-  padding-block: 0;                                  // remove variable block padding
-  padding-inline: var(--space-2xs);                  // keep horizontal padding
+  padding-block: 0;
+  padding-inline: var(--space-2xs);
   line-height: 1;
   box-sizing: border-box;
 }

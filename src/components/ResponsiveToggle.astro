@@ -138,61 +138,62 @@ const { class: className } = Astro.props
 <style lang="scss">
   @use 'scss/base/breakpoint' as *;
 
-  .responsive-toggle {
-    display: none;
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-
-    span {
-      margin-inline-end: var(--space-3xs);
-    }
-
-    .hamburger-box {
-      position: relative;
-      width: 30px;
-      height: 21px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .hamburger-line {
-      display: block;
-      width: 100%;
-      height: 2.667px;
-      background-color: var(--foreground-color);
-      border-radius: 2px;
-      transition:
-        translate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
-        rotate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
-        opacity 0.2s ease-out;
-      transform-origin: center;
-    }
-
-    // Animate to X when expanded
-    &[aria-expanded='true'] {
-      .hamburger-line--top {
-        translate: 0 9.166px;
-        rotate: 45deg;
-      }
-
-      .hamburger-line--middle {
-        opacity: 0;
-      }
-
-      .hamburger-line--bottom {
-        translate: 0 -9.166px;
-        rotate: -45deg;
-      }
-    }
-
-    &:where(:hover, :focus-visible, [aria-expanded='true']) {
-      text-decoration: none;
+  @layer components {
+    .responsive-toggle {
+      display: none;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
 
       span {
+        margin-inline-end: var(--space-3xs);
+      }
+
+      .hamburger-box {
+        position: relative;
+        width: 30px;
+        height: 21px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .hamburger-line {
+        display: block;
+        width: 100%;
+        height: 2.667px;
+        background-color: var(--foreground-color);
+        border-radius: 2px;
+        transition:
+          translate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
+          rotate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
+          opacity 0.2s ease-out;
+        transform-origin: center;
+      }
+
+      &[aria-expanded='true'] {
+        .hamburger-line--top {
+          translate: 0 9.166px;
+          rotate: 45deg;
+        }
+
+        .hamburger-line--middle {
+          opacity: 0;
+        }
+
+        .hamburger-line--bottom {
+          translate: 0 -9.166px;
+          rotate: -45deg;
+        }
+      }
+
+      &:where(:hover, :focus-visible, [aria-expanded='true']) {
         text-decoration: none;
+
+        span {
+          text-decoration: none;
+        }
       }
     }
   }

@@ -25,25 +25,27 @@ const { author } = Astro.props
 </blockquote>
 
 <style lang="scss" is:global>
-  blockquote {
-    font-size: var(--font-size-2);
+  @layer components {
+    blockquote {
+      font-size: var(--font-size-2);
 
-    p {
-      display: inline;
-    }
-
-    svg {
-      display: inline;
-      margin-block-start: calc(var(--space-s) * -1);
-
-      &:first-child {
-        scale: -1 1;
+      p {
+        display: inline;
       }
-    }
 
-    cite {
-      margin-block-start: var(--space-s);
-      font-size: var(--font-size-1);
+      svg {
+        display: inline;
+        margin-block-start: calc(var(--space-s) * -1);
+
+        &:first-child {
+          scale: -1 1;
+        }
+      }
+
+      cite {
+        margin-block-start: var(--space-s);
+        font-size: var(--font-size-1);
+      }
     }
   }
 </style>

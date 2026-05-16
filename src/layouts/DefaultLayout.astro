@@ -542,9 +542,9 @@ const themeVariablesCss = `
       <link rel="preload" as="font" type="font/woff2" crossorigin href={bodyFontPreloadUrl} />
     )}
 
-    {fontFaceCss && <style is:global set:html={fontFaceCss} />}
+    {fontFaceCss && <style is:global set:html={`@layer base { ${fontFaceCss} }`} />}
 
-    <style is:global set:html={themeVariablesCss}></style>
+    <style is:global set:html={`@layer tokens { ${themeVariablesCss} }`}></style>
 
     <SEO
       title={seoTitle}
@@ -928,55 +928,56 @@ const themeVariablesCss = `
     <style lang="scss" is:global>
       @use 'scss/base/mixins' as *;
 
-      .accordion details.wrapper > .content {
-        display: block;
-      }
-
-      .accordion details.wrapper.variant-default > .content {
-        padding: 0;
-      }
-
-      .accordion details.wrapper.variant-default > .content > * {
-        padding: 0 0 1.5rem 2.2rem;
-      }
-
-      .accordion details.wrapper.variant-chevron > .content {
-        padding-block-end: 0;
-      }
-
-      .accordion details.wrapper.variant-chevron > .content > * {
-        padding-block-end: 2.2rem;
-      }
-
-      // sticky footer on low content pages
-      html,
-      body {
-        height: 100%;
-      }
-
-      body {
-        display: flex;
-        flex-direction: column;
-        overflow-x: clip;
-
-        main {
-          flex: 1 0 auto;
+      @layer components {
+        .accordion details.wrapper > .content {
+          display: block;
         }
 
-        footer {
-          flex-shrink: 0;
+        .accordion details.wrapper.variant-default > .content {
+          padding: 0;
         }
-      }
 
-      pre {
-        border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--link-color);
-        border-radius: var(--radius-surface, var(--radius-global, var(--radius-s)));
-        padding: 1rem;
-      }
+        .accordion details.wrapper.variant-default > .content > * {
+          padding: 0 0 1.5rem 2.2rem;
+        }
 
-      .card {
-        a {
-          @include text-decoration(transparent, var(--foreground-color), 4px, 2px);
+        .accordion details.wrapper.variant-chevron > .content {
+          padding-block-end: 0;
+        }
+
+        .accordion details.wrapper.variant-chevron > .content > * {
+          padding-block-end: 2.2rem;
+        }
+
+        html,
+        body {
+          height: 100%;
+        }
+
+        body {
+          display: flex;
+          flex-direction: column;
+          overflow-x: clip;
+
+          main {
+            flex: 1 0 auto;
+          }
+
+          footer {
+            flex-shrink: 0;
+          }
+        }
+
+        pre {
+          border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--link-color);
+          border-radius: var(--radius-s);
+          padding: 1rem;
+        }
+
+        .card {
+          a {
+            @include text-decoration(transparent, var(--foreground-color), 4px, 2px);
+          }
         }
       }
     </style>

@@ -443,23 +443,27 @@ const navAlignment =
         list-style-type: none;
       }
 
-      .desktop-menu > .menu--primary {
+      .desktop-menu > ul > li {
+        align-content: center;
+      }
+
+      .menu--primary {
         min-inline-size: 0;
       }
 
-      .desktop-menu > .menu--utility {
+      .menu--utility {
         justify-self: end;
       }
 
-      .desktop-menu--left > .menu--primary {
+      .desktop-menu--left .menu--primary {
         justify-self: start;
       }
 
-      .desktop-menu--center > .menu--primary {
+      .desktop-menu--center .menu--primary {
         justify-self: center;
       }
 
-      .desktop-menu--right > .menu--primary {
+      .desktop-menu--right .menu--primary {
         justify-self: end;
       }
 
@@ -778,9 +782,11 @@ const navAlignment =
 </style>
 
 <style is:global>
+@layer overrides {
   #main-navigation .mobile-launcher .launcher-trigger svg,
   #main-navigation .desktop-launcher .launcher-trigger svg {
     width: 20px !important;
     height: 20px !important;
   }
+}
 </style>

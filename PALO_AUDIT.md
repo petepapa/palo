@@ -219,7 +219,44 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
 
 ### @layer 分布
 
-当前未使用 CSS `@layer`。SCSS `@use` 决定加载顺序。Tailwind v4 `@theme` 在单独层。全局覆盖通过**特异性 + `:where()` 归零**与组件 scoped CSS（`[data-astro-cid-xxx]`）协作。
+已实施 CSS `@layer` 体系，覆盖全部四种样式来源：
+
+```css
+@layer reset, tokens, base, components, overrides, utilities, scoped;
+```
+
+**层顺序（优先级由低到高）：**
+
+| 层名 | 优先级 | 来源 |
+|------|--------|------|
+| `reset` | 最低 | SCSS: `_reset.scss` |
+| `tokens` | ↓ | SCSS: `_root.scss` + DefaultLayout.astro: `:root { CSS vars }` |
+| `base` | ↓ | SCSS: `_font.scss`, `_list.scss`, `_general.scss`, `_kbd.scss` + DefaultLayout.astro: `@font-face` |
+| `components` | ↓ | 所有 Astro 组件的 scoped CSS |
+| `overrides` | ↓ | Logo 链接去下划线等 |
+| `utilities` | ↓ | SCSS: `_utility.scss` + Tailwind v4 utilities |
+| `scoped` | ↓ | 极少数需要压倒所有其他层的组件样式 |
+| **unlayered** | **最高** | `_button.scss`, `_form.scss`, `_overrides.scss`（依赖 `!important` 覆盖第三方组件库） |
+
+**样式来源映射：**
+
+| 来源 | 文件 | 层归属 |
+|------|------|--------|
+| A: SCSS 文件 | `src/assets/scss/base/*.scss` | 各层内部 `@layer { }` |
+| A: SCSS 文件 | `src/assets/scss/components/*.scss` | `_button.scss`, `_form.scss`, `_overrides.scss` 为 **unlayered**；其他各层内部 `@layer { }` |
+| B: Astro scoped CSS | 所有 `.astro` 组件的 `<style>` 块 | `@layer components { }` |
+| C: is:global 注入 | `DefaultLayout.astro` | `@layer tokens { }` (CSS vars) + `@layer base { }` (@font-face) |
+| D: Tailwind utilities | `src/styles/tailwind.css` | Tailwind v4 内部层 → `@layer utilities` |
+
+**关键约束：**
+- `src/styles/tailwind.css` 顶部声明全局层顺序，确保浏览器按预期处理优先级
+- SCSS 文件内部包裹各自的 `@layer`，避免 `@use` 在层声明之后的问题
+- **组件覆盖样式**（`_button.scss`, `_form.scss`, `_overrides.scss`）必须保持为 **unlayered**，原因：
+  - `node_modules/accessible-astro-components/` 的样式是 unlayered
+  - 根据 CSS `@layer` 规范：**unlayered `!important` > layered `!important`**
+  - 放入 `@layer` 后会导致无法覆盖第三方组件库样式
+- `_overrides.scss` 职责：Avatar、Badge、Notification、Tabs 组件的 `border-width`、`border-radius` 和布局对齐
+- Astro scoped CSS 通过 `<style lang="scss">` 和 `is:global` 指令使用，样式选择器编译后带 `[data-astro-cid-xxx]` 属性选择器
 
 ### Tailwind @theme 映射（src/styles/tailwind.css）
 
@@ -410,8 +447,32 @@ src/assets/scss/
 
 ### 原则二：优先级治理 (Specificity Governance)
 
-- 当前状态：通过特异性选择器覆盖组件库 scoped CSS，必要时使用 `!important`
-- @layer 方案因与 Astro scoped CSS 及 `is:global` 注入样式的优先级冲突，暂缓实施。待评估完整迁移方案（需同时处理组件库 CSS 的 @layer 包裹、`is:global` 注入样式的层次归属、以及 unlayered scoped CSS 的优先级反转问题）后再执行。
+- **已实施 @layer 体系**：通过 CSS `@layer` 控制优先级，覆盖全部四种样式来源
+- **层顺序**：`@layer reset, tokens, base, components, overrides, utilities, scoped;`
+- **层归属记录**：
+  - `reset`: `_reset.scss`
+  - `tokens`: `_root.scss` + DefaultLayout.astro CSS vars
+  - `base`: `_font.scss`, `_list.scss`, `_general.scss`, `_kbd.scss` + DefaultLayout.astro @font-face
+  - `components`: 所有 Astro scoped CSS
+  - `overrides`: Logo 链接去下划线等
+  - `utilities`: `_utility.scss` + Tailwind v4 utilities
+  - `scoped`: 极少数需要最高优先级的组件样式
+- **第三方组件库优先级处理**（2026-05-16 修复）：
+  - **问题**：`node_modules/accessible-astro-components/` 的样式是 **unlayered**
+  - **CSS @layer 规范**：unlayered `!important` > layered `!important`
+  - **解决方案**：以下样式必须保持为 **unlayered**（不使用 `@layer` 包裹），因为它们依赖 `!important` 来覆盖第三方组件库的样式：
+    - `_button.scss` - 按钮样式覆盖
+    - `_form.scss` - 表单样式覆盖
+    - `_overrides.scss` - Avatar、Badge、Notification、Tabs 组件样式覆盖
+  - **关键约束**：
+    - 组件覆盖样式必须放在 `index.scss` 最后加载
+    - 使用 `!important` 确保覆盖第三方组件库的默认样式
+    - 禁止将这些样式放入任何 `@layer`，否则会失去对 unlayered 样式的覆盖能力
+  - **_overrides.scss 职责范围**：
+    - Avatar 组件：`border-width`、`border-radius`、`initials/title/subtitle` 垂直对齐
+    - Badge 组件：`border-width`、`border-radius`、circular 尺寸、svg 对齐
+    - Notification 组件：`border-width`、`border-radius`、padding 计算
+    - Tabs 组件：`border-width`
 
 ### 原则三：路由闭环 (Route Closure)
 

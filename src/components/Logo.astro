@@ -27,6 +27,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 </Link>
 
 <style is:global>
+@layer overrides {
   .logo-link,
   .logo-link:hover,
   .logo-link:focus-visible {
@@ -37,4 +38,5 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
   .logo-link .logo-text:focus-visible {
     text-decoration: none !important;
   }
+}
 </style>

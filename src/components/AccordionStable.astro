@@ -11,15 +11,17 @@ const { class: className } = Astro.props
 </ul>
 
 <style>
-  :where(.accordion-stable) {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    padding: 0;
-    list-style: none;
-  }
+  @layer components {
+    :where(.accordion-stable) {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      list-style: none;
+    }
 
-  :global(:where(.accordion-stable > .item:first-child .wrapper)) {
-    border-block-start: none !important;
+    :global(:where(.accordion-stable > .item:first-child .wrapper)) {
+      border-block-start: none;
+    }
   }
 </style>

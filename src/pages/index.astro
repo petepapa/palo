@@ -166,9 +166,11 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 </DefaultLayout>
 
 <style>
-  .avatar {
-    border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
-    border-radius: var(--radius-surface, var(--radius-global, var(--radius-md)));
-    padding: var(--space-s);
+  @layer components {
+    .avatar {
+      border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+      border-radius: var(--radius-surface, var(--radius-global, var(--radius-md)));
+      padding: var(--space-s);
+    }
   }
 </style>

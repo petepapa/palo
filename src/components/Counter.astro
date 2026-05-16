@@ -29,7 +29,9 @@ const { count, title, sub } = Astro.props
 </div>
 
 <style lang="scss">
-  div > p:first-child {
-    color: var(--link-color);
+  @layer components {
+    div > p:first-child {
+      color: var(--link-color);
+    }
   }
 </style>

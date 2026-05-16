@@ -73,6 +73,8 @@ const viteConfig = {
     preprocessorOptions: {
       scss: {
         loadPaths: [fileURLToPath(new URL('./src/assets', import.meta.url))],
+        api: 'modern',
+        silenceDeprecations: ['import', 'color-module', 'global-builtin'],
         logger: {
           warn: () => {},
         },
