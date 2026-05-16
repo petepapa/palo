@@ -7,9 +7,9 @@
   "type": "module",
   "homepage": "https://accessible-astro-starter.incluud.dev/",
   "scripts": {
-    "dev": "node scripts/dev-with-config-watch.mjs",
-    "dev:astro": "astro dev",
-    "start": "node scripts/dev-with-config-watch.mjs",
+    "dev": "astro dev",
+    "dev:legacy": "node scripts/dev-legacy-watch.mjs",
+    "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
   },

@@ -183,7 +183,19 @@ config.yaml → astro.config.mjs → __PALO_TRAILING_SLASH__ (Vite define)
 
 ### dev 增强
 
-`scripts/dev-with-config-watch.mjs` 监听 `config.yaml` → 自动重启 Astro dev server（`fs.watch` → `SIGTERM` → `spawn`）。
+**主方案：Vite HMR 插件** `scripts/vite-plugin-palo-config.ts`
+
+- 在 `astro dev` 时启用（`apply: 'serve'`），`astro build` 时自动跳过
+- 通过 Vite 的 `server.watcher` 监听 `src/config.yaml`
+- 文件变化时调用 `validateConfig()` 进行 Zod 校验
+- 校验通过 → `server.ws.send({ type: 'full-reload' })` 触发浏览器全量刷新
+- 校验失败 → `server.ws.send({ type: 'error' })` 显示错误遮罩，不刷新页面
+- 相比旧方案（进程重启），反馈延迟从数秒降至毫秒级
+
+**备用方案：** `scripts/dev-legacy-watch.mjs`（`npm run dev:legacy`）
+
+- 使用 `fs.watch` 监听 + `SIGTERM` → `spawn` 全量重启 dev server
+- 保留供调试或环境兼容性使用
 
 ---
 
@@ -367,11 +379,7 @@ src/assets/scss/
 ### 原则二：优先级治理 (Specificity Governance)
 
 - 当前状态：通过特异性选择器覆盖组件库 scoped CSS，必要时使用 `!important`
-- 未来：引入 CSS `@layer` 规则，建立明确的优先级层次：
-  ```css
-  @layer reset, tokens, components-library, overrides, utilities;
-  ```
-  目标：所有 `!important` 替换为 `@layer overrides` 内的声明，根除特异性战争
+- @layer 方案因与 Astro scoped CSS 及 `is:global` 注入样式的优先级冲突，暂缓实施。待评估完整迁移方案（需同时处理组件库 CSS 的 @layer 包裹、`is:global` 注入样式的层次归属、以及 unlayered scoped CSS 的优先级反转问题）后再执行。
 
 ### 原则三：路由闭环 (Route Closure)
 

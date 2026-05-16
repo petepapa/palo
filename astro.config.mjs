@@ -9,6 +9,7 @@ import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { enhanceConfigForWorkspace } from './scripts/workspace-config.js'
+import { paloConfigHmr } from './scripts/vite-plugin-palo-config.ts'
 import { validateConfig } from './src/utils/validateConfig.ts'
 
 // Read config.yaml for site settings (used at build-time for Astro config)
@@ -38,6 +39,10 @@ function yamlPlugin() {
       }
     },
     handleHotUpdate(ctx) {
+      // config.yaml is handled by palo-config-hmr plugin with validation
+      if (ctx.file.endsWith('config.yaml') || ctx.file.endsWith('config.yml')) {
+        return
+      }
       if (!ctx.file.endsWith('.yaml') && !ctx.file.endsWith('.yml')) {
         return
       }
@@ -74,7 +79,7 @@ const viteConfig = {
       },
     },
   },
-  plugins: [tailwindcss(), yamlPlugin()],
+  plugins: [tailwindcss(), paloConfigHmr(), yamlPlugin()],
   resolve: {
     alias: {
       '@config': fileURLToPath(new URL('./src/config.yaml', import.meta.url)),
