@@ -797,6 +797,21 @@ const themeVariablesCss = `
           window.closeModal = () =>
             closeWithAnimation(document.querySelector('.modal[open]'), origClose)
         }
+
+        // 处理每个 Modal
+        dialogs.forEach((dialog) => {
+          // 监听 cancel 事件防止原生关闭行为
+          dialog.addEventListener('cancel', (e) => {
+            e.preventDefault()
+          }, { capture: true })
+
+          // 监听原生 open 方法，在打开前清理 closing 类
+          const originalShowModal = dialog.showModal.bind(dialog)
+          dialog.showModal = function() {
+            dialog.classList.remove('closing')
+            originalShowModal()
+          }
+        })
       }
 
       function closeWithAnimation(dialog, fallbackClose) {
@@ -835,6 +850,18 @@ const themeVariablesCss = `
         if (!dialogs.length) return
 
         dialogs.forEach((dialog) => {
+          // 监听 cancel 事件防止原生关闭行为
+          dialog.addEventListener('cancel', (e) => {
+            e.preventDefault()
+          }, { capture: true })
+
+          // 监听原生 open 方法，在打开前清理 closing 类
+          const originalShowModal = dialog.showModal.bind(dialog)
+          dialog.showModal = function() {
+            dialog.classList.remove('closing')
+            originalShowModal()
+          }
+
           // 1) 关闭按钮 — capture 阶段拦截，阻止组件 bubbling handler
           const closeBtn = dialog.querySelector('.close')
           if (closeBtn) {
@@ -870,6 +897,7 @@ const themeVariablesCss = `
             if (mod && e.key.toLowerCase() === 'k') {
               const launcher = document.querySelector('.launcher[open]')
               if (launcher) {
+                e.preventDefault()
                 e.stopPropagation()
                 closeLauncher(launcher)
               }
@@ -911,6 +939,7 @@ const themeVariablesCss = `
           // 优先检查 Launcher（Launcher 打开时 modal 不显示）
           const launcher = document.querySelector('.launcher[open]')
           if (launcher && !launcher.classList.contains('closing')) {
+            e.preventDefault()
             e.stopPropagation()
             closeLauncher(launcher)
             return
@@ -919,6 +948,7 @@ const themeVariablesCss = `
           // 检查 Modal
           const modal = document.querySelector('.modal[open]')
           if (modal && !modal.classList.contains('closing')) {
+            e.preventDefault()
             e.stopPropagation()
             closeWithAnimation(modal, __origCloseModal)
           }

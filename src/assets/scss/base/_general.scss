@@ -354,6 +354,31 @@ kbd,
 //  will-change 提示 GPU 合成，减少 Safari 重绘。
 // ──────────────────────────────────────────────
 
+// 重置 Modal 样式，与 Launcher 保持一致
+dialog.modal {
+  background-color: transparent !important;
+}
+
+dialog.modal .modal-content {
+  backdrop-filter: blur(40px) !important;
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
+// 允许背景页面滚动，不要禁用（与 Launcher 保持一致）
+// 强制覆盖所有可能的禁用滚动设置
+html:has(dialog.modal[open]),
+body:has(dialog.modal[open]),
+body:has(dialog[open]) {
+  overflow: visible !important;
+  overflow-y: visible !important;
+  overflow-x: visible !important;
+}
+
+dialog.modal::backdrop {
+  backdrop-filter: blur(4px) !important;
+  background-color: rgba(0 0 0 / 0.3) !important;
+}
+
 // backdrop 闭态（媒体查询外，reduced-motion 时也能正确显示）
 dialog.launcher::backdrop,
 dialog.modal::backdrop {
@@ -416,13 +441,13 @@ dialog.modal[open]::backdrop {
 }
 
 @keyframes modal-fade-in {
-  from { opacity: 0; translate: 0 calc(var(--translate-offset-y, 7.5vh) * -1); }
+  from { opacity: 0; translate: 0 -40px; }
   to   { opacity: 1; translate: 0 0; }
 }
 
 @keyframes modal-fade-out {
   from { opacity: 1; translate: 0 0; }
-  to   { opacity: 0; translate: 0 var(--translate-offset-y, 7.5vh); }
+  to   { opacity: 0; translate: 0 40px; }
 }
 
 @keyframes launcher-fade-in {
