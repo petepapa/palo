@@ -217,6 +217,7 @@ const notificationBorderWidth = resolveCssLength(themeConfig.border?.notificatio
 const formBorderWidth = resolveCssLength(themeConfig.border?.formWidth, defaultBorderWidth)
 const paginationBorderWidth = resolveCssLength(themeConfig.border?.paginationWidth, defaultBorderWidth)
 const toggleBorderWidth = resolveCssLength(themeConfig.border?.toggleWidth, defaultBorderWidth)
+const mediaBorderWidth = resolveCssLength(themeConfig.border?.mediaWidth, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
 const defaultRadiusSize = resolveCssLength(themeConfig.radius?.globalSize, '0.5rem')
@@ -472,6 +473,7 @@ const themeVariablesCss = `
   --border-width-form: ${formBorderWidth};
   --border-width-pagination: ${paginationBorderWidth};
   --border-width-toggle: ${toggleBorderWidth};
+  --border-width-media: ${mediaBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
   --border-width-divider: ${dividerBorderWidth};
   --radius-global: ${defaultRadiusSize};

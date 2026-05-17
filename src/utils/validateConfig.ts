@@ -190,6 +190,7 @@ const borderConfigSchema = z
     notificationWidth: cssLengthOptional('border.notificationWidth'),
     paginationWidth: cssLengthOptional('border.paginationWidth'),
     toggleWidth: cssLengthOptional('border.toggleWidth'),
+    mediaWidth: cssLengthOptional('border.mediaWidth'),
     surfaceWidth: cssLengthOptional('border.surfaceWidth'),
     dividerWidth: cssLengthOptional('border.dividerWidth'),
   })

@@ -38,7 +38,7 @@ branding:
   # Logo：留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
   # Logo: empty = show text logo, path = show image (place in /public)
   logo: ''
-  logoTextFontSize: '2rem'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
+  logoTextFontSize: '32px'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
 
   # ── 颜色 / Colors ────────────────────────────────────────────
 
@@ -95,10 +95,10 @@ navigation:
 
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 
-  desktopFontSize: '21px'           # 桌面端主导航 / Desktop main nav
-  dropdownDesktopFontSize: '16px'   # 桌面端下拉子菜单 / Desktop dropdown
-  mobileFontSize: '24px'            # 手机端展开菜单 / Mobile expanded menu
-  dropdownMobileFontSize: '21px'    # 手机端下拉子菜单 / Mobile dropdown
+  desktopFontSize: '24px'           # 桌面端主导航 / Desktop main nav
+  dropdownDesktopFontSize: '21px'   # 桌面端下拉子菜单 / Desktop dropdown
+  mobileFontSize: '32px'            # 手机端展开菜单 / Mobile expanded menu
+  dropdownMobileFontSize: '24px'    # 手机端下拉子菜单 / Mobile dropdown
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
 
@@ -162,6 +162,7 @@ border:
   notificationWidth: ''      # Notification 通知 / Notifications
   paginationWidth: '0.1rem'   # Pagination 分页按钮 / Pagination buttons
   toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
+  mediaWidth: '0'              # 图片 / Images
   surfaceWidth: '0.05rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
   dividerWidth: '0.05rem'     # 分隔线 / Dividers
 
@@ -180,7 +181,7 @@ radius:
   buttonSize: ''          # Button、按钮型 Link / Buttons, button-like links
   formSize: ''            # Input、Textarea、Select、Checkbox 等 / Inputs, textareas, selects, checkboxes
   cardSize: '1.5rem'      # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA sections
-  mediaSize: ''           # 文章图、BreakoutImage 等媒体 / Post images, breakout images, media components
+  mediaSize: ''           # 图片 / Images
   tabsSize: '1rem'        # Tabs 标签与面板（连接处保留直角）/ Tabs and panel (straight join edges preserved)
   badgeSize: '0.3rem'     # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes intact)
   notificationSize: ''    # Notification 通知 / Notifications
