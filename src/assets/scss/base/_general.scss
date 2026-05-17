@@ -93,7 +93,7 @@ article {
 
 pre,
 code:not(pre code),
-kbd,
+kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
 .modal,
 .skip-link a {
@@ -329,7 +329,7 @@ img.rounded-lg,
 
 pre,
 code:not(pre code),
-kbd,
+kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
 .modal,
 .skip-link a {

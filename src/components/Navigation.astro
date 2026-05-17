@@ -561,7 +561,9 @@ const navAlignment =
       }
 
       .desktop-launcher .launcher-trigger .trigger,
-      .desktop-launcher .launcher-trigger .key {
+      .desktop-launcher .launcher-trigger kbd.key,
+      .mobile-launcher .launcher-trigger .trigger,
+      .mobile-launcher .launcher-trigger kbd.key {
         font-size: initial;
       }
     }
@@ -783,8 +785,8 @@ const navAlignment =
 
 <style is:global>
 @layer overrides {
-  #main-navigation .mobile-launcher .launcher-trigger svg,
-  #main-navigation .desktop-launcher .launcher-trigger svg {
+  #main-navigation .mobile-launcher .launcher-trigger .wrapper > svg,
+  #main-navigation .desktop-launcher .launcher-trigger .wrapper > svg {
     width: 20px !important;
     height: 20px !important;
   }

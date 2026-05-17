@@ -95,7 +95,7 @@ navigation:
 
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 
-  desktopFontSize: '24px'           # 桌面端主导航 / Desktop main nav
+  desktopFontSize: '36px'           # 桌面端主导航 / Desktop main nav
   dropdownDesktopFontSize: '21px'   # 桌面端下拉子菜单 / Desktop dropdown
   mobileFontSize: '32px'            # 手机端展开菜单 / Mobile expanded menu
   dropdownMobileFontSize: '24px'    # 手机端下拉子菜单 / Mobile dropdown
