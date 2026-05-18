@@ -150,6 +150,10 @@ img.rounded-lg,
   top: calc(var(--font-cap-height-offset, -0.05em) * -1);
 }
 
+.avatar-group.display-condensed .avatar {
+  isolation: isolate;
+}
+
 .avatar.avatar-thin .initials-container,
 .avatar.avatar-thin .icon-container {
   --border-width-avatar: 1px;
