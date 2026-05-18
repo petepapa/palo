@@ -162,6 +162,11 @@ img.rounded-lg,
 
 // Badge border width
 .badge {
+  --badge-padding-block: 0.05rem;
+  --badge-text-shift: calc(var(--font-cap-height-offset, -0.05em) * -1);
+  --badge-icon-size: 1rem;
+
+  box-sizing: border-box;
   display: inline-grid;
   grid-auto-flow: column;
   align-items: center;
@@ -175,23 +180,47 @@ img.rounded-lg,
 .badge > svg[data-icon] {
   display: block;
   flex-shrink: 0;
-  margin-block-start: var(--font-cap-height-offset, -0.05em);
+  margin-block-start: 0;
   transform-origin: center center;
   transform-box: fill-box;
   backface-visibility: hidden;
   will-change: transform;
 }
 
-.badge.size-sm:not(.circular) {
-  padding-block: 0.16rem;
+.badge:not(.circular) {
+  block-size: calc(1.5em + (var(--badge-padding-block) * 2) + (var(--border-width-badge, 2px) * 2));
+  padding-block-start: calc(var(--badge-padding-block) + var(--badge-text-shift)) !important;
+  padding-block-end: var(--badge-padding-block) !important;
 }
 
-.badge.size-md:not(.circular) {
-  padding-block: 0.16rem;
+.badge:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.35rem + var(--badge-icon-size) + 0.3rem) !important;
 }
 
-.badge.size-lg:not(.circular) {
-  padding-block: 0.18rem;
+.badge.size-sm:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.2rem + var(--badge-icon-size) + 0.15rem) !important;
+}
+
+.badge.size-lg:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.45rem + var(--badge-icon-size) + 0.4rem) !important;
+}
+
+.badge:not(.circular) > svg,
+.badge:not(.circular) > svg[data-icon] {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0.35rem;
+  translate: 0 -50%;
+}
+
+.badge.size-sm:not(.circular) > svg,
+.badge.size-sm:not(.circular) > svg[data-icon] {
+  inset-inline-start: 0.2rem;
+}
+
+.badge.size-lg:not(.circular) > svg,
+.badge.size-lg:not(.circular) > svg[data-icon] {
+  inset-inline-start: 0.45rem;
 }
 
 .notification .notification-content > * {
@@ -210,10 +239,10 @@ img.rounded-lg,
   font-variant-numeric: lining-nums tabular-nums;
 }
 
-// Safari 圆型 badge 文字偏上补偿：padding-block-start 将内容区下移，
-// flex align-items: center 随之将文字推下，效果等效于 badge-content 的 translate 偏移
+// Safari text metrics render badges slightly high on iOS; use the same
+// cap-height compensation token as Avatar without changing component markup.
 .badge.circular:not(:has(svg)) {
-  padding-block-start: 0.1em !important;
+  padding-block-start: calc(var(--font-cap-height-offset, -0.05em) * -1) !important;
   padding-block-end: 0 !important;
 }
 
