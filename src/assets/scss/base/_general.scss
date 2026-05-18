@@ -193,6 +193,14 @@ img.rounded-lg,
   padding-block-end: var(--badge-padding-block) !important;
 }
 
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .badge:not(.circular) {
+      --badge-text-shift: calc((var(--font-cap-height-offset, -0.05em) * -1) + 0.055em);
+    }
+  }
+}
+
 .badge:not(.circular):has(> svg) {
   padding-inline-start: calc(0.35rem + var(--badge-icon-size) + 0.3rem) !important;
 }
