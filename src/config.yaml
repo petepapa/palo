@@ -69,7 +69,7 @@ branding:
 
     # checkbox / radio 与 label 的垂直对齐微调，根据实际字体调整
     # Vertical alignment offset for checkbox/radio vs label — adjust per font
-    capHeightOffset: '-0.13em'
+    capHeightOffset: '-0.12em'
 
 
 # ╔══════════════════════════════════════════════════════════════╗
