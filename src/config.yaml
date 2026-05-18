@@ -38,7 +38,7 @@ branding:
   # Logo：留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
   # Logo: empty = show text logo, path = show image (place in /public)
   logo: ''
-  logoTextFontSize: '32px'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
+  logoTextFontSize: '36px'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
 
   # ── 颜色 / Colors ────────────────────────────────────────────
 
@@ -183,9 +183,9 @@ radius:
   cardSize: '1.5rem'      # Card、Feature、CTA 等卡片型区块 / Cards, feature blocks, CTA sections
   mediaSize: ''           # 图片 / Images
   tabsSize: '1rem'        # Tabs 标签与面板（连接处保留直角）/ Tabs and panel (straight join edges preserved)
-  badgeSize: '0.3rem'     # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes intact)
+  badgeSize: '0.25rem'     # Badge 徽章（圆形与 pill 特例保留）/ Badges (circular and pill shapes intact)
   notificationSize: ''    # Notification 通知 / Notifications
   avatarSize: ''          # Avatar 方形圆角（圆形保持 50%）/ Square avatar corners (round = always 50%)
   paginationSize: '0.5rem'  # Pagination 分页按钮 / Pagination buttons
   toggleSize: '0.5rem'      # Toggle 切换按钮 / Toggle buttons
-  surfaceSize: '1rem'       # 下拉菜单、代码块、工具面板等容器 / Dropdowns, code blocks, utility panels
+  surfaceSize: ''       # 下拉菜单、代码块、工具面板等容器 / Dropdowns, code blocks, utility panels
