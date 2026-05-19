@@ -13,13 +13,13 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 <Link href="/" class="flex items-center gap-2 logo-link">
   {
     themeConfig.branding.logo && (
-      <img src={themeConfig.branding.logo} alt={themeConfig.site.name} width="47" height="37" loading="eager" />
+      <img class="logo-image" src={themeConfig.branding.logo} alt={themeConfig.site.name} width="47" height="37" loading="eager" />
     )
   }
   {!themeConfig.branding.logo && (
     <span
       class="logo-text"
-      style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading}); font-size: var(--logo-text-font-size, var(--navigation-desktop-font-size, 1rem)); text-transform: none;`}
+      style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading}); font-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem)); text-transform: none;`}
     >
       {themeConfig.site.name}
     </span>
@@ -37,6 +37,14 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
   .logo-link .logo-text:hover,
   .logo-link .logo-text:focus-visible {
     text-decoration: none !important;
+  }
+  .logo-link .logo-image {
+    display: block;
+    width: auto !important;
+    height: var(--logo-size, var(--navigation-desktop-font-size, 1rem)) !important;
+    block-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem)) !important;
+    inline-size: auto !important;
+    max-inline-size: 100%;
   }
 }
 </style>

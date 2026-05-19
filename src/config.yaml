@@ -37,8 +37,8 @@ branding:
 
   # Logo：留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
   # Logo: empty = show text logo, path = show image (place in /public)
-  logo: ''
-  logoTextFontSize: '36px'  # 文字 Logo 大小（留空跟随桌面导航字号）/ Text logo size (empty = inherit desktop nav size)
+  logo: 'branding/logo.svg'
+  logoSize: '36px'  # Logo 大小：文字为字号，图片为高度（留空跟随桌面导航字号）/ Logo size: text font-size, image height
 
   # ── 颜色 / Colors ────────────────────────────────────────────
 

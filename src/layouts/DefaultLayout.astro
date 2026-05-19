@@ -249,7 +249,7 @@ const navigationDropdownMobileFontSize = resolveCssLength(
   themeConfig.navigation?.dropdownMobileFontSize ?? typography.navigationDropdownMobileFontSize,
   navigationMobileFontSize,
 )
-const logoTextFontSize = resolveCssLength(themeConfig.branding?.logoTextFontSize, navigationDesktopFontSize)
+const logoSize = resolveCssLength(themeConfig.branding?.logoSize, navigationDesktopFontSize)
 
 const publicRoot = resolve(process.cwd(), 'public')
 const fontDirectory = resolve(publicRoot, font.path.replace(/^\//, ''))
@@ -500,7 +500,7 @@ const themeVariablesCss = `
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};
   --navigation-dropdown-mobile-font-size: ${navigationDropdownMobileFontSize};
-  --logo-text-font-size: ${logoTextFontSize};
+  --logo-size: ${logoSize};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
   --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem) !important;
   --font-size--1: clamp(${fontScaleMap[-1].min}rem, calc(${fontScaleMap[-1].intercept}rem + ${fontScaleMap[-1].slope}vw), ${fontScaleMap[-1].max}rem) !important;
