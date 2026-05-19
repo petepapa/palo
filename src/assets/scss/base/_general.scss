@@ -200,7 +200,7 @@ img.rounded-lg,
 @supports (-webkit-touch-callout: none) {
   @media (hover: none) and (pointer: coarse) {
     .badge:not(.circular) {
-      --badge-text-shift: calc((var(--font-cap-height-offset, -0.05em) * -1) + 0.055em);
+      --badge-text-shift: calc((var(--font-cap-height-offset, -0.05em) * -1) + 0.1000em);
     }
   }
 }
