@@ -35,30 +35,12 @@ const showMobileMenuLabel = themeConfig.navigation?.showMobileMenuLabel ?? false
     if (!mobileNavigation) return
     const navBar = document.querySelector('#main-navigation .nav-bar') as HTMLElement | null
     const header = responsiveToggle.closest('header')
-    let lockedScrollY = 0
 
     // functions
-    const lockPageScroll = () => {
-      if (header?.classList.contains('is-fixed')) return
-      lockedScrollY = window.scrollY
-      document.body.style.position = 'fixed'
-      document.body.style.insetBlockStart = `-${lockedScrollY}px`
-      document.body.style.inlineSize = '100%'
-    }
-
-    const unlockPageScroll = () => {
-      if (header?.classList.contains('is-fixed')) return
-      document.body.style.position = ''
-      document.body.style.insetBlockStart = ''
-      document.body.style.inlineSize = ''
-      window.scrollTo(0, lockedScrollY)
-    }
-
     const openMenu = (toggle: Element) => {
       const text = toggle.querySelector('span')
       if (!text) return
 
-      lockPageScroll()
       text.textContent = 'Close'
       toggle.setAttribute('aria-expanded', 'true')
       toggle.setAttribute('aria-label', 'Close menu navigation')
@@ -73,7 +55,6 @@ const showMobileMenuLabel = themeConfig.navigation?.showMobileMenuLabel ?? false
       toggle.setAttribute('aria-expanded', 'false')
       toggle.setAttribute('aria-label', 'Open menu navigation')
       header?.classList.remove('is-menu-open')
-      unlockPageScroll()
     }
 
     const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight
