@@ -15,10 +15,12 @@ const navMinHeight = themeConfig.navigation?.minHeight ?? ''
 const navActiveStyle = themeConfig.navigation?.activeStyle ?? typography.navigationActiveStyle ?? 'wavy'
 const navAlignment =
   themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
-const navMenuLineHeightScale = themeConfig.navigation?.menuLineHeightScale ?? 1
+const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightScale ?? 1
+const navDropdownMenuLineHeightScale = themeConfig.navigation?.dropdownMenuLineHeightScale ?? 1
 const navStyle = [
   navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
-  `--navigation-menu-line-height-scale: ${navMenuLineHeightScale}`,
+  `--navigation-main-menu-line-height-scale: ${navMainMenuLineHeightScale}`,
+  `--navigation-dropdown-menu-line-height-scale: ${navDropdownMenuLineHeightScale}`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -572,9 +574,16 @@ const navStyle = [
 
       .menu--primary .dropdown-menu a,
       .menu--primary .dropdown-menu button {
+        display: block;
         font-size: var(--navigation-dropdown-desktop-font-size, var(--navigation-desktop-font-size, 1rem));
-        line-height: calc(1.5 * var(--navigation-menu-line-height-scale, 1));
-        padding-block: calc(0.25em * var(--navigation-menu-line-height-scale, 1));
+        inline-size: 100%;
+        line-height: calc(1.5 * var(--navigation-dropdown-menu-line-height-scale, 1));
+        padding-block: calc(0.25em * var(--navigation-dropdown-menu-line-height-scale, 1));
+        text-align: start;
+      }
+
+      .menu--primary .dropdown-menu li {
+        inline-size: 100%;
       }
 
       svg {
@@ -621,15 +630,21 @@ const navStyle = [
 
     .mobile-menu {
       --mobile-menu-item-line-height: calc(
-        1.5 * var(--navigation-menu-line-height-scale, 1)
+        1.5 * var(--navigation-main-menu-line-height-scale, 1)
       );
       --mobile-menu-item-padding-block: calc(
-        0.25em * var(--navigation-menu-line-height-scale, 1)
+        0.25em * var(--navigation-main-menu-line-height-scale, 1)
+      );
+      --mobile-menu-dropdown-item-line-height: calc(
+        1.5 * var(--navigation-dropdown-menu-line-height-scale, 1)
+      );
+      --mobile-menu-dropdown-item-padding-block: calc(
+        0.25em * var(--navigation-dropdown-menu-line-height-scale, 1)
       );
       --mobile-menu-dropdown-offset: calc(
-        0.5em * var(--navigation-menu-line-height-scale, 1)
+        0.5em * var(--navigation-dropdown-menu-line-height-scale, 1)
       );
-      --mobile-menu-icon-group-gap: calc(1em * var(--navigation-menu-line-height-scale, 1));
+      --mobile-menu-icon-group-gap: calc(1em * var(--navigation-main-menu-line-height-scale, 1));
 
       .desktop-launcher {
         display: none;
@@ -661,8 +676,8 @@ const navStyle = [
       .dropdown-menu a,
       .dropdown-menu button {
         font-size: var(--navigation-dropdown-mobile-font-size, var(--navigation-mobile-font-size, 1rem));
-        line-height: var(--mobile-menu-item-line-height);
-        padding-block: var(--mobile-menu-item-padding-block);
+        line-height: var(--mobile-menu-dropdown-item-line-height);
+        padding-block: var(--mobile-menu-dropdown-item-padding-block);
       }
 
       svg {

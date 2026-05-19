@@ -175,10 +175,15 @@ const navigationConfigSchema = z
     dropdownMobileFontSize: cssLengthOptional(
       'navigation.dropdownMobileFontSize',
     ),
-    menuLineHeightScale: z
+    mainMenuLineHeightScale: z
       .number()
-      .min(0.5, 'navigation.menuLineHeightScale must be ≥ 0.5')
-      .max(3, 'navigation.menuLineHeightScale must be ≤ 3')
+      .min(0.5, 'navigation.mainMenuLineHeightScale must be ≥ 0.5')
+      .max(3, 'navigation.mainMenuLineHeightScale must be ≤ 3')
+      .optional(),
+    dropdownMenuLineHeightScale: z
+      .number()
+      .min(0.5, 'navigation.dropdownMenuLineHeightScale must be ≥ 0.5')
+      .max(3, 'navigation.dropdownMenuLineHeightScale must be ≤ 3')
       .optional(),
     minHeight: cssLengthOptional('navigation.minHeight'),
     activeStyle: activeStyleEnum.optional(),
