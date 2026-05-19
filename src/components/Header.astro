@@ -35,74 +35,73 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
   }
 </header>
 
-{
-  fixedHeader && (
-    <style lang="scss" is:global>
-      body {
-        overflow-x: visible;
-      }
+<style lang="scss" is:global>
+  body {
+    overflow-x: visible;
+  }
 
-      header.is-fixed {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        z-index: 50;
-        background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
-        backdrop-filter: blur(var(--header-bg-blur, 12px));
-        -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
-        transition:
-          background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
-          backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
-      }
+  header.is-fixed,
+  header.is-menu-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 50;
+    background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+    transition:
+      background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+      backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+  }
 
-      header.is-fixed.is-menu-open {
-        background-color: var(--background-color);
-      }
+  header.is-menu-open {
+    background-color: var(--background-color);
+  }
 
-      main {
-        padding-top: var(--header-height);
-      }
+  body.has-fixed-header main {
+    padding-top: var(--header-height);
+  }
 
-      #main-content {
-        scroll-margin-top: var(--header-height);
-      }
-    </style>
+  body.has-fixed-header #main-content {
+    scroll-margin-top: var(--header-height);
+  }
+</style>
 
-    <script>
-      /**
-       * Dynamically measures the fixed header height and sets
-       * --header-height on :root so content padding follows suit.
-       */
-      function observeHeaderHeight() {
-        const header = /** @type {HTMLElement} */ (document.querySelector('header.is-fixed'))
-        if (!header) return
+<script define:vars={{ fixedHeader }}>
+  /**
+   * Dynamically measures the fixed header height and sets
+   * --header-height on :root so content padding follows suit.
+   */
+  function observeHeaderHeight() {
+    const header = /** @type {HTMLElement} */ (document.querySelector('header'))
+    if (!header) return
 
-        const setHeight = () => {
-          document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px')
-        }
+    document.body.classList.toggle('has-fixed-header', Boolean(fixedHeader))
 
-        setHeight()
-
-        const ro = new ResizeObserver(setHeight)
-        ro.observe(header)
-      }
-
-    const initHeaderHeight = () => {
-      if (document.readyState === 'loading') {
-        window.addEventListener('DOMContentLoaded', observeHeaderHeight, { once: true })
-      } else {
-        observeHeaderHeight()
-      }
+    const setHeight = () => {
+      document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px')
     }
 
-    document.addEventListener('astro:page-load', initHeaderHeight)
-    document.addEventListener('astro:after-swap', initHeaderHeight)
-    initHeaderHeight()
-  </script>
-  )
-}
+    setHeight()
+
+    const ro = new ResizeObserver(setHeight)
+    ro.observe(header)
+  }
+
+  const initHeaderHeight = () => {
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', observeHeaderHeight, { once: true })
+    } else {
+      observeHeaderHeight()
+    }
+  }
+
+  document.addEventListener('astro:page-load', initHeaderHeight)
+  document.addEventListener('astro:after-swap', initHeaderHeight)
+  initHeaderHeight()
+</script>
 
 <style lang="scss" is:global>
   @use 'scss/base/breakpoint' as *;

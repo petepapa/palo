@@ -163,6 +163,9 @@ const navigationConfigSchema = z
       .max(1, 'navigation.headerBackgroundOpacity must be ≤ 1')
       .optional(),
     headerBackgroundBlur: cssLengthOptional('navigation.headerBackgroundBlur'),
+    showMobileMenuLabel: z
+      .boolean({ error: 'navigation.showMobileMenuLabel must be true or false' })
+      .optional(),
     desktopMenuAlignment: alignmentEnum.optional(),
     desktopFontSize: cssLengthOptional('navigation.desktopFontSize'),
     mobileFontSize: cssLengthOptional('navigation.mobileFontSize'),

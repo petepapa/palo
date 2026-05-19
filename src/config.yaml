@@ -82,10 +82,11 @@ navigation:
 
   # ── 固定顶栏 / Sticky Header ─────────────────────────────────
 
-  fixedHeader: false               # 固定顶部，滚动时始终可见 / Stays visible while scrolling
+  fixedHeader: false              # 固定顶部，滚动时始终可见 / Stays visible while scrolling
   minHeight: '6rem'               # 导航栏最小高度（值需大于内容高度才生效）/ Min height — only applies when > content height
   headerBackgroundOpacity: 0.45   # 背景透明度（0 全透明 → 1 不透明）/ Opacity (0 = clear, 1 = solid)
   headerBackgroundBlur: 10px      # 背景模糊（0 = 关闭）/ Blur strength (0 = disabled)
+  showMobileMenuLabel: true      # 是否显示汉堡按钮旁的 Menu/Close 文字 / Show Menu/Close text next to hamburger
 
   # ── 菜单布局 / Menu Layout ────────────────────────────────────
 

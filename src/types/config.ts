@@ -35,6 +35,7 @@ export interface NavigationConfig {
   fixedHeader?: boolean
   headerBackgroundOpacity?: number
   headerBackgroundBlur?: string
+  showMobileMenuLabel?: boolean
   desktopMenuAlignment?: 'left' | 'center' | 'right'
   desktopFontSize?: string
   mobileFontSize?: string
