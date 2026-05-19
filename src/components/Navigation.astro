@@ -336,14 +336,15 @@ const navAlignment =
   @use 'scss/base/breakpoint' as *;
 
   #main-navigation {
-    --mobile-menu-duration: 0.25s;
-    --mobile-menu-fade-duration: 0.25s;
-    --mobile-menu-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
+    --mobile-menu-duration: 0.18s;
+    --mobile-menu-fade-duration: 0.14s;
+    --mobile-menu-easing: cubic-bezier(0.2, 0, 0, 1);
 
     display: flex;
     flex-direction: column;
 
     > .container {
+      position: relative;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -361,16 +362,28 @@ const navAlignment =
 
     // Mobile-first: show mobile menu by default
     .mobile-menu {
+      position: absolute;
+      z-index: 10;
+      inset-block-start: 100%;
+      inset-inline: 0;
       flex: 1 1 100%;
       height: 0;
       opacity: 0;
       overflow: hidden;
+      contain: layout paint;
       will-change: height, opacity;
+      border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+      background-color: var(--background-color);
       transition:
         height var(--mobile-menu-duration) var(--mobile-menu-easing),
         opacity var(--mobile-menu-fade-duration) ease-out;
+      padding-inline: var(--grid-gutter);
       padding-block-start: 0;
       padding-block-end: 0;
+
+      @include breakpoint(m) {
+        padding-inline: 2rem;
+      }
 
       &.show {
         opacity: 1;

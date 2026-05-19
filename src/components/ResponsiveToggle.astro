@@ -31,6 +31,7 @@ const { class: className } = Astro.props
     const mobileNavigation = document.querySelector('.mobile-menu') as HTMLElement | null
     if (!mobileNavigation) return
     const navBar = document.querySelector('#main-navigation .nav-bar') as HTMLElement | null
+    const header = responsiveToggle.closest('header')
 
     // functions
     const openMenu = (toggle: Element) => {
@@ -40,6 +41,7 @@ const { class: className } = Astro.props
       text.textContent = 'Close'
       toggle.setAttribute('aria-expanded', 'true')
       toggle.setAttribute('aria-label', 'Close menu navigation')
+      header?.classList.add('is-menu-open')
     }
 
     const closeMenu = (toggle: Element) => {
@@ -49,17 +51,19 @@ const { class: className } = Astro.props
       text.textContent = 'Menu'
       toggle.setAttribute('aria-expanded', 'false')
       toggle.setAttribute('aria-label', 'Open menu navigation')
+      header?.classList.remove('is-menu-open')
     }
 
     const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight
 
     const getOpenMetrics = () => {
       const navBarHeight = navBar?.getBoundingClientRect().height ?? 0
-      const availableHeight = Math.max(getViewportHeight() - navBarHeight, 0)
+      const menuTop = mobileNavigation.getBoundingClientRect().top || navBarHeight
+      const availableHeight = Math.max(getViewportHeight() - menuTop, 0)
 
       mobileNavigation.style.maxHeight = 'none'
       const contentHeight = mobileNavigation.scrollHeight
-      const targetHeight = Math.min(contentHeight, availableHeight)
+      const targetHeight = availableHeight
 
       return { availableHeight, contentHeight, targetHeight }
     }
@@ -69,13 +73,13 @@ const { class: className } = Astro.props
 
       const { availableHeight, contentHeight, targetHeight } = getOpenMetrics()
       mobileNavigation.style.maxHeight = `${availableHeight}px`
-      mobileNavigation.style.height = contentHeight > availableHeight ? `${targetHeight}px` : 'auto'
+      mobileNavigation.style.height = `${targetHeight}px`
       mobileNavigation.style.overflowY = contentHeight > availableHeight ? 'auto' : 'hidden'
     }
 
     const closeMobileMenu = () => {
       if (mobileNavigation.classList.contains('show')) {
-        const currentHeight = mobileNavigation.scrollHeight
+        const currentHeight = mobileNavigation.getBoundingClientRect().height
         mobileNavigation.style.height = `${currentHeight}px`
         mobileNavigation.style.overflowY = 'hidden'
 

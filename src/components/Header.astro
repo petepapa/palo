@@ -52,7 +52,13 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
         background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
         backdrop-filter: blur(var(--header-bg-blur, 12px));
         -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
-        transition: all 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition:
+          background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+          backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+      }
+
+      header.is-fixed.is-menu-open {
+        background-color: var(--background-color);
       }
 
       main {
