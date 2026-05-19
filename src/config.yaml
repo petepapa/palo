@@ -93,6 +93,7 @@ navigation:
   # 桌面端文字主菜单位置，不影响右侧功能图标和移动端
   # Desktop text menu position — does not affect utility icons or mobile
   desktopMenuAlignment: 'center'  # 'left' | 'center' | 'right'
+  dropdownDesktopColorMode: 'inverse' # PC 下拉菜单配色：'theme' 跟随主题，'inverse' 反相 / Desktop dropdown color mode
 
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 

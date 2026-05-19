@@ -37,6 +37,7 @@ export interface NavigationConfig {
   headerBackgroundBlur?: string
   showMobileMenuLabel?: boolean
   desktopMenuAlignment?: 'left' | 'center' | 'right'
+  dropdownDesktopColorMode?: 'theme' | 'inverse'
   desktopFontSize?: string
   mobileFontSize?: string
   dropdownDesktopFontSize?: string

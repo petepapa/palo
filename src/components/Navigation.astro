@@ -15,6 +15,7 @@ const navMinHeight = themeConfig.navigation?.minHeight ?? ''
 const navActiveStyle = themeConfig.navigation?.activeStyle ?? typography.navigationActiveStyle ?? 'wavy'
 const navAlignment =
   themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
+const navDropdownDesktopColorMode = themeConfig.navigation?.dropdownDesktopColorMode ?? 'theme'
 const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightScale ?? 1
 const navDropdownMenuLineHeightScale = themeConfig.navigation?.dropdownMenuLineHeightScale ?? 1
 const navStyle = [
@@ -30,6 +31,7 @@ const navStyle = [
   id="main-navigation"
   class=""
   data-nav-active-style={navActiveStyle}
+  data-dropdown-desktop-color-mode={navDropdownDesktopColorMode}
   style={navStyle}
 >
   <div class="container">
@@ -487,6 +489,18 @@ const navStyle = [
 
       .desktop-menu--right .menu--primary {
         justify-self: end;
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          color-scheme: dark;
+        }
+      }
+
+      .darkmode &[data-dropdown-desktop-color-mode='inverse'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          color-scheme: light;
+        }
       }
 
       .wrapper {

@@ -64,6 +64,10 @@ function cssLengthOptional(fieldLabel: string) {
 
 const alignmentEnum = z.enum(['left', 'center', 'right']).describe('alignment')
 
+const dropdownDesktopColorModeEnum = z
+  .enum(['theme', 'inverse'])
+  .describe('desktop dropdown color mode')
+
 const activeStyleEnum = z
   .enum(['wavy', 'underline', 'bold'])
   .describe('active link style')
@@ -167,6 +171,7 @@ const navigationConfigSchema = z
       .boolean({ error: 'navigation.showMobileMenuLabel must be true or false' })
       .optional(),
     desktopMenuAlignment: alignmentEnum.optional(),
+    dropdownDesktopColorMode: dropdownDesktopColorModeEnum.optional(),
     desktopFontSize: cssLengthOptional('navigation.desktopFontSize'),
     mobileFontSize: cssLengthOptional('navigation.mobileFontSize'),
     dropdownDesktopFontSize: cssLengthOptional(
