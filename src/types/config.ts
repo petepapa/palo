@@ -41,6 +41,7 @@ export interface NavigationConfig {
   mobileFontSize?: string
   dropdownDesktopFontSize?: string
   dropdownMobileFontSize?: string
+  menuLineHeightScale?: number
   minHeight?: string
   activeStyle?: 'wavy' | 'underline' | 'bold'
 }

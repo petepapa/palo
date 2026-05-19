@@ -97,9 +97,10 @@ navigation:
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 
   desktopFontSize: '24px'           # 桌面端主导航 / Desktop main nav
-  dropdownDesktopFontSize: '24px'   # 桌面端下拉子菜单 / Desktop dropdown
-  mobileFontSize: '24px'            # 手机端展开菜单 / Mobile expanded menu
+  dropdownDesktopFontSize: '21px'   # 桌面端下拉子菜单 / Desktop dropdown
+  mobileFontSize: '30px'            # 手机端展开菜单 / Mobile expanded menu
   dropdownMobileFontSize: '24px'    # 手机端下拉子菜单 / Mobile dropdown
+  menuLineHeightScale: 1.0            # 竖排菜单行高倍数，数值越大越宽松 / Vertical menu line-height scale
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
 
