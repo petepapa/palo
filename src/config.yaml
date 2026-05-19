@@ -20,9 +20,9 @@ site:
 
 metadata:
   siteUrl: 'https://palo.petepa.com/'
-  title: 'Palo - A minimalist Astro theme for artists, musicians, and designers'
-  description: 'Break free from generic business templates. Palo is a minimalist Astro theme by PetePa, crafted for artists, musicians, and designers. Deeply customize your colors, radius, and typography within a logic-driven framework. Build your unique digital identity at palo.petepa.com.'
-  author: PetePa
+  title: 'Palo — The Astro Theme for Creative Portfolios'
+  description: 'Palo is a minimalist Astro theme for artists, musicians, and designers. Control colors, typography, and layouts from one config file. Build your creative portfolio your way.a'
+  author: Pete Lee
   image: '/social-preview-image.png'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
   favicon: '/favicon.svg'             # 标签页图标，放 /public 下 / Favicon, place in /public
 
