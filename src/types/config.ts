@@ -129,7 +129,8 @@ export interface BrandingFontConfig {
 }
 
 export interface BrandingConfig {
-  logo: string
+  logoLight?: string
+  logoDark?: string
   logoSize?: string
   font: BrandingFontConfig
   colors: BrandingColors

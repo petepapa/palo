@@ -8,15 +8,39 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  *
  * @description Logo description
  */
+const logoLight = themeConfig.branding.logoLight || themeConfig.branding.logoDark || ''
+const logoDark = themeConfig.branding.logoDark || themeConfig.branding.logoLight || ''
+const hasImageLogo = Boolean(logoLight || logoDark)
 ---
 
 <Link href="/" class="flex items-center gap-2 logo-link">
   {
-    themeConfig.branding.logo && (
-      <img class="logo-image" src={themeConfig.branding.logo} alt={themeConfig.site.name} width="47" height="37" loading="eager" />
+    hasImageLogo && logoLight && (
+      <img
+        class="logo-image logo-image--light"
+        src={logoLight}
+        alt={themeConfig.site.name}
+        width="47"
+        height="37"
+        loading="eager"
+        style="width: auto; height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));"
+      />
     )
   }
-  {!themeConfig.branding.logo && (
+  {
+    hasImageLogo && logoDark && (
+      <img
+        class="logo-image logo-image--dark"
+        src={logoDark}
+        alt={themeConfig.site.name}
+        width="47"
+        height="37"
+        loading="eager"
+        style="width: auto; height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));"
+      />
+    )
+  }
+  {!hasImageLogo && (
     <span
       class="logo-text"
       style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading}); font-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem)); text-transform: none;`}
@@ -40,11 +64,20 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
   }
   .logo-link .logo-image {
     display: block;
-    width: auto !important;
-    height: var(--logo-size, var(--navigation-desktop-font-size, 1rem)) !important;
-    block-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem)) !important;
-    inline-size: auto !important;
+    width: auto;
+    height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));
+    block-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem));
+    inline-size: auto;
     max-inline-size: 100%;
+  }
+  .logo-link .logo-image--dark {
+    display: none;
+  }
+  .darkmode .logo-link .logo-image--light {
+    display: none;
+  }
+  .darkmode .logo-link .logo-image--dark {
+    display: block;
   }
 }
 </style>

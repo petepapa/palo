@@ -149,7 +149,8 @@ const fontConfigSchema = z
 
 const brandingConfigSchema = z
   .object({
-    logo: z.string(),
+    logoLight: z.string().optional(),
+    logoDark: z.string().optional(),
     logoSize: cssLengthOptional('branding.logoSize'),
     font: fontConfigSchema,
     colors: brandingColorsSchema,
