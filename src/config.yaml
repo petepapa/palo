@@ -39,7 +39,7 @@ branding:
   # Logo: leave both empty = show text logo, path = show image (place in /public)
   logoLight: 'branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
   logoDark: 'branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
-  logoSize: '36px'  # Logo 大小：文字为字号，图片为高度（留空跟随桌面导航字号）/ Logo size: text font-size, image height
+  logoSize: '40px'  # Logo 大小：文字为字号，图片为高度（留空跟随桌面导航字号）/ Logo size: text font-size, image height
 
   # ── 颜色 / Colors ────────────────────────────────────────────
 
