@@ -14,12 +14,12 @@ import { Icon } from 'astro-icon/components'
 // ║  Fullscreen, background, colors, navigation theme            ║
 // ╚══════════════════════════════════════════════════════════════╝
 
-const fullscreen = false                    // 全屏显示 / Fill viewport
+const fullscreen = true                    // 全屏显示 / Fill viewport
 const backgroundImage = 'bg.png'           // 背景图，放 /public 下 / Background image, place in /public
 const backgroundVideo = ''                 // 背景视频，放 /public 下 / Background video, place in /public
 const backgroundColor = ''                 // 背景颜色，留空透明 / Background color, empty = transparent
 const contentColor = '#ffffff'             // 内容颜色 / Content color
-const topNavigationTheme = 'dark'          // 顶部导航配色，可选：'dark' | 'light' / Top nav theme, options: 'dark' | 'light'
+const topNavigationTheme: 'dark' | 'light' = 'dark'  // 顶部导航配色 / Top nav theme
 
 // ════════════════════════════════════════════════════════════════
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
@@ -51,7 +51,7 @@ const heroStyle = [
         <br />
         Neither should your website
       </h3>
-      <div class="">
+      <div class="w-full">
         <p class="text-lg">
           Palo is a minimalist Astro theme crafted
           <br class="hidden sm:inline" />
@@ -65,7 +65,7 @@ const heroStyle = [
         Star on GitHub
       </Link>
     </div>
-
+    
     {/* 可编辑区域结束 / Editable Content End */}
   </div>
 </section>
