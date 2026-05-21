@@ -7,16 +7,25 @@ import { Icon } from 'astro-icon/components'
  *
  * @description Homepage hero section.
  */
-interface Props {
-  fullscreen?: boolean
-  backgroundImage?: string
-  backgroundVideo?: string
-  backgroundColor?: string
-  contentColor?: string
-}
+// 首页 Hero 是否全屏显示：true = 撑满首屏，false = 使用普通页面间距
+// Homepage hero fullscreen: true = fill the first viewport, false = use normal page spacing
+const fullscreen = true
 
-const { fullscreen = true, backgroundImage = '', backgroundVideo = '', backgroundColor = '', contentColor = '' }: Props =
-  Astro.props
+// 首页 Hero 背景图：留空 = 不使用背景图；可填 /public 下的路径，例如 '/hero.jpg'
+// Homepage hero background image: empty = none; use a /public path, e.g. '/hero.jpg'
+const backgroundImage = 'bg.png'
+
+// 首页 Hero 背景视频：留空 = 不使用背景视频；可填 /public 下的路径，例如 '/hero.mp4'
+// Homepage hero background video: empty = none; use a /public path, e.g. '/hero.mp4'
+const backgroundVideo = ''
+
+// 首页 Hero 背景颜色：留空 = 透明；支持任意 CSS 颜色，例如 '#111111' / 'oklch(20% 0 0)'
+// Homepage hero background color: empty = transparent; accepts any CSS color, e.g. '#111111' / 'oklch(20% 0 0)'
+const backgroundColor = ''
+
+// 首页 Hero 内容颜色：留空 = 跟随主题；支持任意 CSS 颜色，例如 '#ffffff' / 'var(--foreground-color)'
+// Homepage hero content color: empty = inherit theme; accepts any CSS color, e.g. '#ffffff' / 'var(--foreground-color)'
+const contentColor = '#ffffff'
 
 const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
 const heroStyle = [
@@ -28,7 +37,7 @@ const heroStyle = [
   .join('; ')
 ---
 
-<section class:list={['hero', fullscreen ? 'hero--fullscreen' : 'py-24']} style={heroStyle || undefined}>
+<section class:list={['hero', fullscreen ? 'section-fullscreen' : 'py-24']} style={heroStyle || undefined}>
   {
     backgroundVideo && (
       <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />
@@ -93,11 +102,5 @@ const heroStyle = [
       color: var(--hero-content-color, inherit);
     }
 
-    .hero--fullscreen {
-      display: grid;
-      place-items: center;
-      min-block-size: calc(100svh - var(--header-height, 0px));
-      padding-block: var(--space-xl);
-    }
   }
 </style>

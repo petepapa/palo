@@ -29,6 +29,21 @@
     place-items: center;
   }
 
+  .section-fullscreen {
+    display: grid;
+    place-items: center;
+    min-block-size: 100svh;
+    padding-block: var(--space-xl);
+  }
+
+  body.has-fixed-header main > .section-fullscreen:first-child {
+    margin-block-start: calc(var(--header-height, 0px) * -1);
+  }
+
+  body:not(.has-fixed-header) main > .section-fullscreen:first-child {
+    min-block-size: calc(100svh - var(--header-height, 0px));
+  }
+
   .flex-center {
     display: flex;
     justify-content: center;

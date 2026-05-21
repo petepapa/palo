@@ -19,7 +19,7 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 ---
 
 <header
-  class:list={[fixedHeader && 'is-fixed']}
+  class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
   style={`--header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
 >
   <SkipLink />
@@ -40,12 +40,7 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     overflow-x: visible;
   }
 
-  header.is-fixed,
-  header.is-menu-open {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+  header {
     width: 100%;
     z-index: 50;
     background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
@@ -56,8 +51,24 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
       backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
   }
 
+  header.is-fixed,
+  header.is-menu-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  header.is-at-top:not(.is-menu-open) {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+
   header.is-menu-open {
     background-color: var(--background-color);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
   }
 
   body.has-fixed-header main {
@@ -86,8 +97,10 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 
     setHeight()
 
+    window.__paloHeaderResizeObserver?.disconnect()
     const ro = new ResizeObserver(setHeight)
     ro.observe(header)
+    window.__paloHeaderResizeObserver = ro
   }
 
   const initHeaderHeight = () => {
@@ -98,9 +111,31 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     }
   }
 
-  document.addEventListener('astro:page-load', initHeaderHeight)
-  document.addEventListener('astro:after-swap', initHeaderHeight)
-  initHeaderHeight()
+  function initHeaderScrollState() {
+    const header = /** @type {HTMLElement} */ (document.querySelector('header'))
+    if (!header) return
+
+    const syncHeaderScrollState = () => {
+      header.classList.toggle('is-at-top', window.scrollY <= 1)
+    }
+
+    window.__paloHeaderScrollController?.abort()
+    const controller = new AbortController()
+    window.__paloHeaderScrollController = controller
+
+    syncHeaderScrollState()
+    window.addEventListener('scroll', syncHeaderScrollState, { passive: true, signal: controller.signal })
+    window.addEventListener('resize', syncHeaderScrollState, { passive: true, signal: controller.signal })
+  }
+
+  const initHeader = () => {
+    initHeaderHeight()
+    initHeaderScrollState()
+  }
+
+  document.addEventListener('astro:page-load', initHeader)
+  document.addEventListener('astro:after-swap', initHeader)
+  initHeader()
 </script>
 
 <style lang="scss" is:global>
