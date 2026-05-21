@@ -79,5 +79,25 @@ const hasImageLogo = Boolean(logoLight || logoDark)
   .darkmode .logo-link .logo-image--dark {
     display: block;
   }
+  header.is-at-top[data-top-navigation-theme='light'] .logo-link .logo-image--light {
+    display: block;
+  }
+  header.is-at-top[data-top-navigation-theme='light'] .logo-link .logo-image--dark {
+    display: none;
+  }
+  header.is-at-top[data-top-navigation-theme='dark'] .logo-link .logo-image--light {
+    display: none;
+  }
+  header.is-at-top[data-top-navigation-theme='dark'] .logo-link .logo-image--dark {
+    display: block;
+  }
+  header.is-at-top[data-top-navigation-theme='light'] .darkmode-toggle .icon-light,
+  header.is-at-top[data-top-navigation-theme='dark'] .darkmode-toggle .icon-dark {
+    display: none;
+  }
+  header.is-at-top[data-top-navigation-theme='light'] .darkmode-toggle .icon-dark,
+  header.is-at-top[data-top-navigation-theme='dark'] .darkmode-toggle .icon-light {
+    display: flex;
+  }
 }
 </style>

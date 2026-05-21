@@ -27,6 +27,10 @@ const backgroundColor = ''
 // Homepage hero content color: empty = inherit theme; accepts any CSS color, e.g. '#ffffff' / 'var(--foreground-color)'
 const contentColor = '#ffffff'
 
+// 页面在顶部时的透明导航配色：'dark' = 深色主题导航，'light' = 浅色主题导航
+// Transparent navigation theme at page top: 'dark' = dark navigation, 'light' = light navigation
+const topNavigationTheme: 'dark' | 'light' = 'dark'
+
 const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
 const heroStyle = [
   backgroundColor ? `--hero-background-color: ${backgroundColor}` : '',
@@ -37,7 +41,11 @@ const heroStyle = [
   .join('; ')
 ---
 
-<section class:list={['hero', fullscreen ? 'section-fullscreen' : 'py-24']} style={heroStyle || undefined}>
+<section
+  class:list={['hero', fullscreen ? 'section-fullscreen' : 'py-24']}
+  data-top-navigation-theme={topNavigationTheme}
+  style={heroStyle || undefined}
+>
   {
     backgroundVideo && (
       <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />

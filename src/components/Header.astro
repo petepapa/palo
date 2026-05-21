@@ -65,6 +65,40 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     -webkit-backdrop-filter: blur(0);
   }
 
+  header.is-at-top[data-top-navigation-theme='light'] {
+    --foreground-color: var(--color-neutral-800);
+    --background-color: var(--color-neutral-100);
+    --icon-color: var(--color-neutral-800);
+    --link-color: var(--color-neutral-800);
+    --link-hover-color: var(--color-neutral-700);
+    --border-color: var(--color-neutral-900);
+    --text-decoration-color: var(--color-neutral-700);
+    --text-decoration-color-hover: var(--color-neutral-900);
+    --outline-color: var(--color-outline-200);
+    color-scheme: light;
+  }
+
+  header.is-at-top[data-top-navigation-theme='dark'] {
+    --foreground-color: var(--color-neutral-100);
+    --background-color: var(--color-neutral-900);
+    --icon-color: var(--color-neutral-100);
+    --link-color: var(--color-neutral-100);
+    --link-hover-color: var(--color-neutral-200);
+    --border-color: var(--color-neutral-100);
+    --text-decoration-color: var(--color-neutral-100);
+    --text-decoration-color-hover: var(--color-neutral-200);
+    --outline-color: var(--color-outline-100);
+    color-scheme: dark;
+  }
+
+  header.is-at-top[data-top-navigation-theme] {
+    color: var(--foreground-color);
+  }
+
+  header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+    color: var(--foreground-color);
+  }
+
   header.is-menu-open {
     background-color: var(--background-color);
     backdrop-filter: blur(var(--header-bg-blur, 12px));
@@ -116,7 +150,17 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     if (!header) return
 
     const syncHeaderScrollState = () => {
-      header.classList.toggle('is-at-top', window.scrollY <= 1)
+      const isAtTop = window.scrollY <= 1
+      const topNavigationSource = /** @type {HTMLElement | null} */ (document.querySelector('main [data-top-navigation-theme]'))
+      const topNavigationTheme = topNavigationSource?.dataset.topNavigationTheme
+
+      header.classList.toggle('is-at-top', isAtTop)
+
+      if (isAtTop && (topNavigationTheme === 'light' || topNavigationTheme === 'dark')) {
+        header.dataset.topNavigationTheme = topNavigationTheme
+      } else {
+        delete header.dataset.topNavigationTheme
+      }
     }
 
     window.__paloHeaderScrollController?.abort()
