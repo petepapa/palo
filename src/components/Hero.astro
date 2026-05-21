@@ -46,11 +46,10 @@ const heroStyle = [
 
     <div class="flex flex-col items-center justify-center text-center gap-6">
       <img src="/favicon.svg" alt="Hero Artwork" class="w-24 h-24 object-contain mb-2" />
-      <h3>
-        Your art doesn't fit in a box
-        <br />
-        Neither should your website
-      </h3>
+      <h2>
+        Your art doesn't fit in a box.
+        Neither should your website.
+      </h2>
       <div class="w-full">
         <p class="text-lg">
           Palo is a minimalist Astro theme crafted
@@ -60,10 +59,12 @@ const heroStyle = [
           who refuse to look like everyone else.
         </p>
       </div>
-      <Link href="https://github.com/petepapa/palo" isButton type="primary" animateOnHover animationType="boop">
-        <Icon aria-hidden="true" name="lucide:star" size="1.5rem" />
-        Star on GitHub
+      
+      <Link href="https://github.com/petepapa/palo" size="lg" isButton type="error" variant="outlined">
+        <Icon aria-hidden="true" name="lucide:github" size="24" /> 
+        Get on Github
       </Link>
+
     </div>
     
     {/* 可编辑区域结束 / Editable Content End */}

@@ -64,7 +64,7 @@ branding:
 
     # 各场景字重 / Font weights per context
     weights:
-      body: 400     # 正文 / Body paragraphs
+      body: 300     # 正文 / Body paragraphs
       accent: 500   # 导航、按钮、标签等 / Navigation, buttons, labels
       heading: 600  # 所有标题 / All headings
 
