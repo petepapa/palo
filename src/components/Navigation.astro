@@ -491,14 +491,62 @@ const navStyle = [
         justify-self: end;
       }
 
+      &[data-dropdown-desktop-color-mode='theme'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
+          color-scheme: light;
+        }
+      }
+
+      .darkmode &[data-dropdown-desktop-color-mode='theme'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
+          color-scheme: dark;
+        }
+      }
+
       &[data-dropdown-desktop-color-mode='inverse'] {
         .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
           color-scheme: dark;
         }
       }
 
       .darkmode &[data-dropdown-desktop-color-mode='inverse'] {
         .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
           color-scheme: light;
         }
       }
