@@ -36,7 +36,11 @@
     padding-block: var(--space-xl);
   }
 
-  body.has-fixed-header main > .section-fullscreen:first-child {
+  .section-fullscreen.hero {
+    padding-block-start: calc(var(--space-xl) + var(--header-height, 0px));
+  }
+
+  body.has-fixed-header main > .hero:first-child {
     margin-block-start: calc(var(--header-height, 0px) * -1);
   }
 

@@ -5,8 +5,11 @@ import { Icon } from 'astro-icon/components'
 /**
  * Hero Component
  *
- * @description Homepage hero section.
+ * @description Homepage hero section with customizable content.
  */
+
+// ==================== 用户可自定义区域开始：Hero 外观配置 ====================
+// User-customizable section start: Hero appearance configuration
 // 首页 Hero 是否全屏显示：true = 撑满首屏，false = 使用普通页面间距
 // Homepage hero fullscreen: true = fill the first viewport, false = use normal page spacing
 const fullscreen = true
@@ -30,7 +33,11 @@ const contentColor = '#ffffff'
 // 页面在顶部时的透明导航配色：'dark' = 深色主题导航，'light' = 浅色主题导航
 // Transparent navigation theme at page top: 'dark' = dark navigation, 'light' = light navigation
 const topNavigationTheme: 'dark' | 'light' = 'dark'
+// ==================== 用户可自定义区域结束：Hero 外观配置 ====================
+// User-customizable section end: Hero appearance configuration
 
+// 组件内部逻辑，一般不需要修改
+// Component internal logic, generally no need to modify
 const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
 const heroStyle = [
   backgroundColor ? `--hero-background-color: ${backgroundColor}` : '',
@@ -42,7 +49,7 @@ const heroStyle = [
 ---
 
 <section
-  class:list={['hero', fullscreen ? 'section-fullscreen' : 'py-24']}
+  class:list={['hero', fullscreen ? 'section-fullscreen' : 'hero--standard']}
   data-top-navigation-theme={topNavigationTheme}
   style={heroStyle || undefined}
 >
@@ -52,15 +59,23 @@ const heroStyle = [
     )
   }
   <div class="container">
+    {/* ==================== 用户可自定义区域开始：Hero 内容 ==================== */}
+    {/* User-customizable section start: Hero content */}
     <div class="hero__content flex flex-col items-center justify-center text-center gap-6">
+      {/* Logo/图片区域：可替换为你的标志或特色图片 */}
+      {/* Logo/image area: replace with your logo or featured image */}
       <img src="/favicon.svg" alt="Hero Artwork" class="w-24 h-24 object-contain mb-2" />
 
+      {/* 标题区域：修改这里的文字来展示你的品牌标语 */}
+      {/* Heading area: modify text here to show your brand tagline */}
       <h3>
         Your art doesn't fit in a box
         <br />
         Neither should your website
       </h3>
 
+      {/* 描述区域：修改这里的文字来介绍你的项目或业务 */}
+      {/* Description area: modify text here to introduce your project or business */}
       <div class="w-full">
         <p class="text-lg">
           Palo is a minimalist Astro theme crafted
@@ -70,11 +85,16 @@ const heroStyle = [
           who refuse to look like everyone else.
         </p>
       </div>
+
+      {/* 按钮区域：修改按钮文字和链接，也可以添加更多按钮 */}
+      {/* Button area: modify button text and link, or add more buttons */}
       <Link href="https://github.com/petepapa/palo" isButton type="primary" animateOnHover animationType="boop">
         <Icon aria-hidden="true" name="lucide:star" size="1.5rem" />
         Star on GitHub
       </Link>
     </div>
+    {/* ==================== 用户可自定义区域结束：Hero 内容 ==================== */}
+    {/* User-customizable section end: Hero content */}
   </div>
 </section>
 
@@ -89,6 +109,11 @@ const heroStyle = [
       background-position: center;
       background-size: cover;
       background-repeat: no-repeat;
+    }
+
+    .hero--standard {
+      padding-block-start: calc(6rem + var(--header-height, 0px));
+      padding-block-end: 6rem;
     }
 
     .hero > .container {
