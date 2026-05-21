@@ -19,7 +19,7 @@ const backgroundImage = 'bg.png'           // 背景图，放 /public 下 / Back
 const backgroundVideo = ''                 // 背景视频，放 /public 下 / Background video, place in /public
 const backgroundColor = ''                 // 背景颜色，留空透明 / Background color, empty = transparent
 const contentColor = '#ffffff'             // 内容颜色 / Content color
-const topNavigationTheme: 'dark' | 'light' = 'dark'  // 顶部导航配色 / Top nav theme
+const topNavigationTheme = 'dark'          // 顶部导航配色，可选：'dark' | 'light' / Top nav theme, options: 'dark' | 'light'
 
 // ════════════════════════════════════════════════════════════════
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
@@ -43,6 +43,7 @@ const heroStyle = [
   {backgroundVideo && <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />}
   <div class="container">
     {/* 可编辑区域开始 / Editable Content Start */}
+
     <div class="hero__content flex flex-col items-center justify-center text-center gap-6">
       <img src="/favicon.svg" alt="Hero Artwork" class="w-24 h-24 object-contain mb-2" />
       <h3>
@@ -50,7 +51,7 @@ const heroStyle = [
         <br />
         Neither should your website
       </h3>
-      <div class="w-full">
+      <div class="">
         <p class="text-lg">
           Palo is a minimalist Astro theme crafted
           <br class="hidden sm:inline" />
@@ -64,6 +65,7 @@ const heroStyle = [
         Star on GitHub
       </Link>
     </div>
+
     {/* 可编辑区域结束 / Editable Content End */}
   </div>
 </section>
