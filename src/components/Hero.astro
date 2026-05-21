@@ -1,73 +1,103 @@
 ---
 import { Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
-import { Image } from 'astro:assets'
 
 /**
  * Hero Component
  *
- * @description A component that displays a hero section with a title, description, and image
+ * @description Homepage hero section.
  */
 interface Props {
-  /**
-   * The source URL for the image
-   */
-  src?: string
+  fullscreen?: boolean
+  backgroundImage?: string
+  backgroundVideo?: string
+  backgroundColor?: string
+  contentColor?: string
 }
 
-const { src = '/astronaut-hero-img.webp' }: Props = Astro.props
+const { fullscreen = true, backgroundImage = '', backgroundVideo = '', backgroundColor = '', contentColor = '' }: Props =
+  Astro.props
+
+const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
+const heroStyle = [
+  backgroundColor ? `--hero-background-color: ${backgroundColor}` : '',
+  backgroundImage ? `--hero-background-image: ${cssUrl(backgroundImage)}` : '',
+  contentColor ? `--hero-content-color: ${contentColor}` : '',
+]
+  .filter(Boolean)
+  .join('; ')
 ---
 
-<section class="hero my-24">
+<section class:list={['hero', fullscreen ? 'hero--fullscreen' : 'py-24']} style={heroStyle || undefined}>
+  {
+    backgroundVideo && (
+      <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />
+    )
+  }
   <div class="container">
-    <div class="grid grid-cols-1 items-center gap-24 lg:grid-cols-2">
-      <div class="flex flex-col items-center gap-8 md:items-start">
-        <h1 class="text-center md:text-left">
-          <slot><span class="text-gradient">Accessible</span> Starter for Astro</slot>
-        </h1>
-        <div class="flex flex-col gap-3 min-[500px]:flex-row">
-          <Link
-            href="https://github.com/incluud/accessible-astro-starter"
-            isButton
-            type="primary"
-            animateOnHover
-            animationType="boop"
-          >
-            <Icon aria-hidden="true" name="lucide:star" size="1.5rem" />
-            Star on GitHub
-          </Link>
-          <Link
-            href="https://accessible-astro.incluud.dev/"
-            isButton
-            type="secondary"
-            animateOnHover
-            animationType="boop"
-          >
-            <Icon aria-hidden="true" name="lucide:bookmark" size="1.5rem" />
-            Read the docs
-          </Link>
-        </div>
+    <div class="hero__content flex flex-col items-center justify-center text-center gap-6">
+      <img src="/favicon.svg" alt="Hero Artwork" class="w-24 h-24 object-contain mb-2" />
+
+      <h3>
+        Your art doesn't fit in a box
+        <br />
+        Neither should your website
+      </h3>
+
+      <div class="w-full">
+        <p class="text-lg">
+          Palo is a minimalist Astro theme crafted
+          <br class="hidden sm:inline" />
+          for artists, musicians, and designers
+          <br class="hidden sm:inline" />
+          who refuse to look like everyone else.
+        </p>
       </div>
-      <Image class="hidden lg:block" src={src} alt="" decoding="async" width={800} height={600} loading="eager" />
+      <Link href="https://github.com/petepapa/palo" isButton type="primary" animateOnHover animationType="boop">
+        <Icon aria-hidden="true" name="lucide:star" size="1.5rem" />
+        Star on GitHub
+      </Link>
     </div>
   </div>
 </section>
 
 <style lang="scss">
   @layer components {
-    h1 {
-      text-wrap: unset;
+    .hero {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background-color: var(--hero-background-color, transparent);
+      background-image: var(--hero-background-image, none);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
 
-    .text-gradient {
-      background: linear-gradient(
-        315deg,
-        light-dark(var(--color-primary-300), var(--color-secondary-100)) 25%,
-        light-dark(var(--color-secondary-300), var(--color-primary-200))
-      );
-      background-clip: border-box;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .hero > .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero__background-video {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .hero__content {
+      color: var(--hero-content-color, inherit);
+    }
+
+    .hero--fullscreen {
+      display: grid;
+      place-items: center;
+      min-block-size: calc(100svh - var(--header-height, 0px));
+      padding-block: var(--space-xl);
     }
   }
 </style>

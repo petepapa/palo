@@ -11,10 +11,36 @@ import AccordionItemStable from '@components/AccordionItemStable.astro'
 import { Avatar, AvatarGroup, Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+// 首页 Hero 是否全屏显示：true = 撑满首屏，false = 使用普通页面间距
+// Homepage hero fullscreen: true = fill the first viewport, false = use normal page spacing
+const heroFullscreen = false
+
+// 首页 Hero 背景图：留空 = 不使用背景图；可填 /public 下的路径，例如 '/hero.jpg'
+// Homepage hero background image: empty = none; use a /public path, e.g. '/hero.jpg'
+const heroBackgroundImage = 'bg.jpeg'
+
+// 首页 Hero 背景视频：留空 = 不使用背景视频；可填 /public 下的路径，例如 '/hero.mp4'
+// Homepage hero background video: empty = none; use a /public path, e.g. '/hero.mp4'
+const heroBackgroundVideo = ''
+
+// 首页 Hero 背景颜色：留空 = 透明；支持任意 CSS 颜色，例如 '#111111' / 'oklch(20% 0 0)'
+// Homepage hero background color: empty = transparent; accepts any CSS color, e.g. '#111111' / 'oklch(20% 0 0)'
+const heroBackgroundColor = 'red'
+
+// 首页 Hero 内容颜色：留空 = 跟随主题；支持任意 CSS 颜色，例如 '#ffffff' / 'var(--foreground-color)'
+// Homepage hero content color: empty = inherit theme; accepts any CSS color, e.g. '#ffffff' / 'var(--foreground-color)'
+const heroContentColor = ''
 ---
 
 <DefaultLayout>
-  <Hero />
+  <Hero
+    fullscreen={heroFullscreen}
+    backgroundImage={heroBackgroundImage}
+    backgroundVideo={heroBackgroundVideo}
+    backgroundColor={heroBackgroundColor}
+    contentColor={heroContentColor}
+  />
   <section class="my-64">
     <div class="container">
       <Heading level="h2" class="mb-8">Features</Heading>
