@@ -158,7 +158,7 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 
     const syncHeaderScrollState = () => {
       const headerHeight = header.offsetHeight || 1
-      const isAtTop = window.scrollY <= headerHeight
+      const isAtTop = !fixedHeader || window.scrollY <= headerHeight
       const topNavigationSource = /** @type {HTMLElement | null} */ (document.querySelector('main [data-top-navigation-theme]'))
       const topNavigationTheme = topNavigationSource?.dataset.topNavigationTheme
 
