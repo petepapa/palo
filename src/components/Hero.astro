@@ -41,10 +41,10 @@ const heroStyle = [
   style={heroStyle || undefined}
 >
   {backgroundVideo && <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />}
-  <div class="container">
+  <div class="container hero__content">
     {/* 可编辑区域开始 / Editable Content Start */}
 
-    <div class="hero__content flex flex-col items-center justify-center text-center gap-6">
+    <div class="flex flex-col items-center justify-center text-center gap-6">
       <img src="/favicon.svg" alt="Hero Artwork" class="w-24 h-24 object-contain mb-2" />
       <h3>
         Your art doesn't fit in a box
