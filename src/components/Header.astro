@@ -59,6 +59,13 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     right: 0;
   }
 
+  body:not(.has-fixed-header):has(main > .section-fullscreen:first-child) > header:not(.is-menu-open) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
   header.is-at-top:not(.is-menu-open) {
     background-color: transparent;
     backdrop-filter: blur(0);
@@ -150,7 +157,8 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     if (!header) return
 
     const syncHeaderScrollState = () => {
-      const isAtTop = window.scrollY <= 1
+      const headerHeight = header.offsetHeight || 1
+      const isAtTop = window.scrollY <= headerHeight
       const topNavigationSource = /** @type {HTMLElement | null} */ (document.querySelector('main [data-top-navigation-theme]'))
       const topNavigationTheme = topNavigationSource?.dataset.topNavigationTheme
 
