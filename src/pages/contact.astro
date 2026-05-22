@@ -1,13 +1,22 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Form, Input, Button, Textarea, Checkbox, Fieldset, Heading, Link, Radio } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout title="Contact">
-  <PageHeader title="Contact" subtitle="Have a question? Get in touch with us!" bgType="gradient" />
+  <PaloPageHeader title="Contact" subtitle="Have a question? Get in touch with us!" {...pageHeaderAppearance} />
   <section class="my-16">
     <div class="container">
       <Heading level="h2">Let's talk</Heading>

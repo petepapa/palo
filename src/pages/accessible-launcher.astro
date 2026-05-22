@@ -1,17 +1,24 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Notification } from 'accessible-astro-components'
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout title="Accessible launcher">
-  <section class="my-12">
-    <PageHeader
-      title="Accessible launcher"
-      subtitle="This theme includes the Accessible Astro Launcher component from the <a href='https://github.com/incluud/accessible-astro-launcher'>Accessible Astro Launcher</a> NPM package to accelerate accessible development. For detailed documentation and usage examples, visit our <a href='https://accessible-astro-launcher.incluud.dev/'>documentation website</a>."
-      bgType="bordered"
-    />
-  </section>
+  <PaloPageHeader
+    title="Accessible launcher"
+    subtitle="This theme includes the Accessible Astro Launcher component from the <a href='https://github.com/incluud/accessible-astro-launcher'>Accessible Astro Launcher</a> NPM package to accelerate accessible development. For detailed documentation and usage examples, visit our <a href='https://accessible-astro-launcher.incluud.dev/'>documentation website</a>."
+    {...pageHeaderAppearance}
+  />
   <section class="mt-32 mb-12">
     <div class="narrow container">
       <Notification type="info" variant="accent">

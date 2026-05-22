@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from './DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 
 const { frontmatter } = Astro.props
 const containerClass = frontmatter.narrow ? 'narrow container' : 'container'
@@ -15,7 +15,20 @@ const pageHeader = frontmatter.pageHeader
   type={frontmatter.type}
   useTitleTemplate={frontmatter.useTitleTemplate}
 >
-  {pageHeader && <PageHeader title={pageHeader.title} subtitle={pageHeader.subtitle} bgType={pageHeader.bgType} />}
+  {
+    pageHeader && (
+      <PaloPageHeader
+        title={pageHeader.title}
+        subtitle={pageHeader.subtitle}
+        fullscreen={pageHeader.fullscreen ?? false}
+        backgroundImage={pageHeader.backgroundImage ?? ''}
+        backgroundVideo={pageHeader.backgroundVideo ?? ''}
+        backgroundColor={pageHeader.backgroundColor ?? ''}
+        contentColor={pageHeader.contentColor ?? ''}
+        topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
+      />
+    )
+  }
   <div class={containerClass}>
     <div class="space-content my-12">
       <slot />

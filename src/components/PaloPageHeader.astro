@@ -1,0 +1,166 @@
+---
+import { Avatar, Heading } from 'accessible-astro-components'
+import { Image } from 'astro:assets'
+import sanitizeHtml from 'sanitize-html'
+import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
+
+interface Props {
+  class?: string
+  featuredImage?: string
+  title: string
+  subtitle?: string
+  author?: {
+    name: string
+    image: string
+    bio: string
+  }
+  fullscreen?: boolean
+  backgroundImage?: string
+  backgroundVideo?: string
+  backgroundColor?: string
+  contentColor?: string
+  topNavigationTheme?: string
+}
+
+const {
+  class: className,
+  title,
+  subtitle,
+  featuredImage,
+  author,
+  fullscreen = false,
+  backgroundImage = '',
+  backgroundVideo = '',
+  backgroundColor = '',
+  contentColor = '',
+  topNavigationTheme = '',
+} = Astro.props
+
+const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderVisuals({
+  backgroundColor,
+  backgroundImage,
+  contentColor,
+  topNavigationTheme,
+})
+
+const sanitizedSubtitle: string = subtitle
+  ? sanitizeHtml(subtitle, {
+      allowedTags: ['b', 'i', 'em', 'strong', 'a', 'span', 'br'],
+      allowedAttributes: {
+        a: ['href', 'title', 'target', 'rel'],
+        span: ['class'],
+      },
+    })
+  : ''
+---
+
+<section
+  class:list={[className, 'palo-page-header', fullscreen ? 'section-fullscreen' : 'palo-page-header--standard']}
+  data-top-navigation-theme={resolvedTopNavigationTheme}
+  style={pageHeaderStyle || undefined}
+>
+  {
+    backgroundVideo && (
+      <video
+        class="palo-page-header__background-video"
+        src={backgroundVideo}
+        autoplay
+        muted
+        loop
+        playsinline
+        aria-hidden="true"
+      />
+    )
+  }
+  <div class="container palo-page-header__content space-content">
+    {
+      featuredImage && (
+        <div class="palo-page-header__featured-image mb-8">
+          <Image src={featuredImage} alt="" width={1200} height={250} class="h-[250px] w-full rounded-lg object-cover" />
+        </div>
+      )
+    }
+    <Heading level="h1">{title}</Heading>
+    {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
+    {
+      author && (
+        <div class="mt-6 flex items-center">
+          <Avatar title={author.name} image={author.image} subtitle={author.bio} />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style lang="scss">
+  @layer components {
+    .palo-page-header {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background-color: var(--page-header-background-color, transparent);
+      background-image: var(--page-header-background-image, none);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .palo-page-header--standard {
+      padding-block-start: calc(6rem + var(--header-height, 0px));
+      padding-block-end: 6rem;
+    }
+
+    .palo-page-header > .container {
+      position: relative;
+      z-index: 1;
+    }
+
+    .palo-page-header__background-video {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+
+    .palo-page-header__content {
+      color: var(--page-header-content-color, inherit);
+    }
+
+    .palo-page-header__featured-image {
+      max-height: 500px;
+      overflow: hidden;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button,
+    .palo-page-header[data-top-navigation-theme='dark'] .button {
+      --btn-bg: var(--page-header-button-bg, var(--brand-primary)) !important;
+      --btn-text: var(--page-header-button-text, var(--color-neutral-100)) !important;
+      background-color: var(--btn-bg) !important;
+      border-color: var(--page-header-button-border, var(--btn-bg)) !important;
+      color: var(--btn-text) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button:hover,
+    .palo-page-header[data-top-navigation-theme='dark'] .button:hover {
+      background-color: var(--btn-text) !important;
+      border-color: var(--btn-text) !important;
+      color: var(--btn-bg) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button.button--outlined,
+    .palo-page-header[data-top-navigation-theme='dark'] .button.button--outlined {
+      background-color: transparent !important;
+      color: var(--page-header-button-text) !important;
+      border-color: var(--page-header-button-border) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button.button--outlined:hover,
+    .palo-page-header[data-top-navigation-theme='dark'] .button.button--outlined:hover {
+      background-color: var(--page-header-button-border) !important;
+      color: var(--page-header-button-bg) !important;
+    }
+  }
+</style>

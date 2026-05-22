@@ -59,7 +59,7 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     right: 0;
   }
 
-  body:not(.has-fixed-header):has(main > .hero:first-child) > header:not(.is-menu-open) {
+  body:not(.has-fixed-header):has(main > :where(.hero, .palo-page-header):first-child) > header:not(.is-menu-open) {
     position: absolute;
     top: 0;
     left: 0;

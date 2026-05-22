@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Card, Pagination } from 'accessible-astro-components'
 import type { PaginateFunction, Page } from 'astro'
 import { BLOG_API_URL } from 'astro:env/server'
@@ -73,16 +73,25 @@ interface Props {
 }
 
 const { page } = Astro.props as Props
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout
   title="Blog"
   description="An example of a blog with dynamic content fetched from JSONPlaceholder using the title, body and userId."
 >
-  <PageHeader
+  <PaloPageHeader
     title="Blog"
     subtitle='An example of a blog with dynamic content fetched from <a href="https://jsonplaceholder.typicode.com/posts">JSONPlaceholder</a> using the title, body and userId. The Accessible Astro Card Component is used here to display al the posts.'
-    bgType="bordered"
+    {...pageHeaderAppearance}
   />
 
   <section class="my-12">

@@ -1,13 +1,22 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Heading, Link, Notification } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout title="Thank You">
-  <PageHeader title="Splendid!" subtitle="The form was successfully validated." bgType="gradient" />
+  <PaloPageHeader title="Splendid!" subtitle="The form was successfully validated." {...pageHeaderAppearance} />
   <section class="container my-16">
     <div class="space-content">
       <Notification type="info">

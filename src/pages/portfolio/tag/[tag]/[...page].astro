@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Badge, Card, Heading, Link, Pagination } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
 import type { GetStaticPaths, Page } from 'astro'
@@ -64,20 +64,25 @@ interface Props {
 }
 
 const { page, currentTag, uniqueTags } = Astro.props
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout
   title={`Portfolio - ${currentTag.label}`}
   description={`Projects filtered by ${currentTag.label} tag. Discover our work in ${currentTag.label} and related technologies.`}
 >
-  <PageHeader
+  <PaloPageHeader
     title={`Portfolio: ${currentTag.label}`}
     subtitle={`Showing ${page.total} project${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/portfolio')}">View all projects</a> or filter by other tags below.`}
-    bgType="bordered"
-    customBreadcrumbLabels={{
-      [currentTag.slug]: currentTag.label,
-    }}
-    joinLastBreadcrumb={true}
+    {...pageHeaderAppearance}
   />
   <section class="my-12">
     <div class="container">

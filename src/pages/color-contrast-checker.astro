@@ -1,15 +1,24 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import ColorContrastComponent from '@components/ColorContrast.astro'
 import { Heading } from 'accessible-astro-components'
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout title="Color Contrast Checker">
-  <PageHeader
+  <PaloPageHeader
     title="Color Contrast Checker"
     subtitle="This tool helps you verify which colors in your theme's palette meet the WCAG contrast requirements for accessibility in both light and dark modes."
-    bgType="neutral"
+    {...pageHeaderAppearance}
   />
 
   <section class="container my-16">

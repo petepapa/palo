@@ -1,7 +1,7 @@
 ---
 import DefaultLayout from '../layouts/DefaultLayout.astro'
 import { Icon } from 'astro-icon/components'
-import PageHeader from '../components/PageHeader.astro'
+import PaloPageHeader from '../components/PaloPageHeader.astro'
 import AccordionStable from '../components/AccordionStable.astro'
 import AccordionItemStable from '../components/AccordionItemStable.astro'
 import {
@@ -58,13 +58,22 @@ const components = [
   { name: 'Tooltip', id: 'tooltip' },
   { name: 'Video', id: 'video' },
 ]
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout title="Accessible components">
-  <PageHeader
+  <PaloPageHeader
     title="Accessible components"
     subtitle="This theme includes comprehensive accessibility components from the <a href='https://github.com/incluud/accessible-astro-components'>Accessible Astro Components</a> NPM package to accelerate accessible development. For detailed documentation and usage examples, visit our <a href='https://accessible-astro.incluud.dev/'>documentation website</a>. Additional components are available in the theme's components directory. Note: accessibility tools like aXe may report issues due to the static demonstration of the components on this page."
-    bgType="bordered"
+    {...pageHeaderAppearance}
   />
   <section class="mt-32 mb-12">
     <div class="components container grid">

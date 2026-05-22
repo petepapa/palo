@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Heading, Notification } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
@@ -62,16 +62,25 @@ const staticPages = [
     description: 'Confirmation page for successful form submissions and user interactions.',
   },
 ]
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  backgroundImage: '',
+  backgroundVideo: '',
+  backgroundColor: '',
+  contentColor: '',
+  topNavigationTheme: '',
+}
 ---
 
 <DefaultLayout
   title="Sitemap"
   description="Complete site map showing all pages, portfolio projects, and sections available on our accessible website."
 >
-  <PageHeader
+  <PaloPageHeader
     title="Sitemap"
     subtitle="A comprehensive overview of all pages and content available on our website, organized for easy navigation."
-    bgType="gradient"
+    {...pageHeaderAppearance}
   />
 
   <section class="my-16">

@@ -1,6 +1,7 @@
 ---
 import { Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
 
 /**
  * Hero Component
@@ -25,36 +26,14 @@ const topNavigationTheme = ''              // 顶部导航配色：'' / 'dark' /
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
 // ════════════════════════════════════════════════════════════════
 
-const normalizedTopNavigationTheme = String(topNavigationTheme).trim()
-const resolvedTopNavigationTheme =
-  normalizedTopNavigationTheme === 'dark' || normalizedTopNavigationTheme === 'light'
-    ? normalizedTopNavigationTheme
-    : ''
-
-// Auto-apply theme colors if topNavigationTheme is set and individual colors are empty
-const effectiveBackgroundColor = 
-  backgroundColor || 
-  (resolvedTopNavigationTheme === 'dark' ? 'var(--color-neutral-900)' : 
-   resolvedTopNavigationTheme === 'light' ? 'var(--color-neutral-100)' : '')
-const effectiveContentColor = 
-  contentColor || 
-  (resolvedTopNavigationTheme === 'dark' ? 'var(--color-neutral-100)' : 
-   resolvedTopNavigationTheme === 'light' ? 'var(--color-neutral-900)' : '')
-
-const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
-const heroStyle = [
-  effectiveBackgroundColor ? `--hero-background-color: ${effectiveBackgroundColor}` : '',
-  backgroundImage ? `--hero-background-image: ${cssUrl(backgroundImage)}` : '',
-  effectiveContentColor ? `--hero-content-color: ${effectiveContentColor}` : '',
-  resolvedTopNavigationTheme === 'light' ? `--hero-button-bg: var(--color-neutral-100)` : '',
-  resolvedTopNavigationTheme === 'light' ? `--hero-button-text: var(--color-neutral-900)` : '',
-  resolvedTopNavigationTheme === 'light' ? `--hero-button-border: var(--color-neutral-900)` : '',
-  resolvedTopNavigationTheme === 'dark' ? `--hero-button-bg: var(--color-neutral-900)` : '',
-  resolvedTopNavigationTheme === 'dark' ? `--hero-button-text: var(--color-neutral-100)` : '',
-  resolvedTopNavigationTheme === 'dark' ? `--hero-button-border: var(--color-neutral-100)` : '',
-]
-  .filter(Boolean)
-  .join('; ')
+const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
+  backgroundColor,
+  backgroundImage,
+  contentColor,
+  topNavigationTheme,
+})
+const heroStyle = pageHeaderVisualStyle
+  .replaceAll('--page-header-', '--hero-')
 ---
 
 <section
