@@ -9,10 +9,10 @@ site:
   titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo" / Tab title separator, e.g. "About | Palo"
   trailingSlash: false        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
   showDarkModeToggle: true    # 显示深色模式切换 / Show dark mode toggle
-  showLauncher: true          # 显示快捷启动器（Cmd+K / Ctrl+K）/ Show launcher button
+  showLauncher: trues          # 启用快捷启动器（Cmd+K / Ctrl+K），可选：false / true（默认）/ default / gradientBorder
 
 
-# ╔══════════════════════════════════════════════════════════════╗
+# ╔══════════════════════════════════════════════════════╗
 # ║  SEO & 元数据 / SEO & Metadata                               ║
 # ║  站点地址、标题、描述、作者、分享图、图标                       ║
 # ║  Site URL, title, description, author, social image, favicon  ║

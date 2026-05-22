@@ -86,9 +86,10 @@ const siteConfigSchema = z
     showDarkModeToggle: z.boolean({
       error: 'site.showDarkModeToggle must be true or false',
     }),
-    showLauncher: z.boolean({
-      error: 'site.showLauncher must be true or false',
-    }),
+    showLauncher: z.union([
+      z.boolean({ error: 'site.showLauncher must be true or false' }),
+      z.enum(['default', 'gradientBorder']),
+    ]),
     navigationAlignment: alignmentEnum.optional(),
     desktopNavigationMenuAlignment: alignmentEnum.optional(),
   })

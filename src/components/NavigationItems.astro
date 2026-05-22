@@ -17,6 +17,7 @@ interface Props {
 }
 
 const { variant = 'all', includeLauncher = true } = Astro.props
+const launcherGradientBorder = themeConfig.site.showLauncher === 'gradientBorder'
 
 const primaryItems = navigationItems.filter((item) => !item.icon)
 const utilityItems = navigationItems.filter((item) => Boolean(item.icon))
@@ -78,7 +79,11 @@ const itemsToRender = variant === 'primary' ? primaryItems : variant === 'utilit
   {
     variant !== 'primary' && includeLauncher && themeConfig.site.showLauncher && (
       <li class="menu-item menu-item--utility desktop-launcher">
-        <LauncherTrigger launcherId="site-launcher" compact={true} gradientBorder={true} />
+        <LauncherTrigger
+          launcherId="site-launcher"
+          compact={true}
+          gradientBorder={launcherGradientBorder}
+        />
       </li>
     )
   }

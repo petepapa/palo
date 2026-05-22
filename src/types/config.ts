@@ -90,7 +90,7 @@ export interface SiteConfig {
   titleSeparator: string
   trailingSlash: boolean
   showDarkModeToggle: boolean
-  showLauncher: boolean
+  showLauncher: false | true | 'default' | 'gradientBorder'
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }
