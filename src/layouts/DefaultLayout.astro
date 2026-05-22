@@ -232,6 +232,7 @@ const notificationRadiusSize = resolveCssLength(themeConfig.radius?.notification
 const paginationRadiusSize = resolveCssLength(themeConfig.radius?.paginationSize, defaultRadiusSize)
 const toggleRadiusSize = resolveCssLength(themeConfig.radius?.toggleSize, defaultRadiusSize)
 const surfaceRadiusSize = resolveCssLength(themeConfig.radius?.surfaceSize, defaultRadiusSize)
+const codeBlockRadiusSize = resolveCssLength(themeConfig.radius?.codeBlockSize, surfaceRadiusSize)
 
 const navigationDesktopFontSize = resolveCssLength(
   themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
@@ -496,6 +497,7 @@ const themeVariablesCss = `
   --radius-pagination: ${paginationRadiusSize};
   --radius-toggle: ${toggleRadiusSize};
   --radius-surface: ${surfaceRadiusSize};
+  --radius-code-block: ${codeBlockRadiusSize};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};

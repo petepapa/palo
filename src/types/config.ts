@@ -77,6 +77,7 @@ export interface RadiusConfig {
   paginationSize?: string
   toggleSize?: string
   surfaceSize?: string
+  codeBlockSize?: string
 }
 
 export interface SocialItem {

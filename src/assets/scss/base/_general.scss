@@ -97,7 +97,7 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
 .modal,
 .skip-link a {
-  border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
 }
 
 .darkmode-toggle,
@@ -374,7 +374,7 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
 .modal,
 .skip-link a {
-  border-radius: var(--radius-surface, var(--radius-global, var(--radius-s))) !important;
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
 }
 
 .notification.variant-accent::before {

@@ -193,4 +193,5 @@ radius:
   avatarSize: ''          # Avatar 方形圆角（圆形保持 50%）/ Square avatar corners (round = always 50%)
   paginationSize: '0.5rem'  # Pagination 分页按钮 / Pagination buttons
   toggleSize: '0.5rem'      # Toggle 切换按钮 / Toggle buttons
-  surfaceSize: ''       # 下拉菜单、代码块、工具面板等容器 / Dropdowns, code blocks, utility panels
+  surfaceSize: ''       # 下拉菜单、工具面板、代码块等容器 / Dropdowns, panels, code blocks, utility panels
+  codeBlockSize: '0.25rem' # 代码块圆角 / Code block radius

@@ -230,6 +230,7 @@ const radiusConfigSchema = z
     paginationSize: cssLengthOptional('radius.paginationSize'),
     toggleSize: cssLengthOptional('radius.toggleSize'),
     surfaceSize: cssLengthOptional('radius.surfaceSize'),
+    codeBlockSize: cssLengthOptional('radius.codeBlockSize'),
   })
   .strip()
 
