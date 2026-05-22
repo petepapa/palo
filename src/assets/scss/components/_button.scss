@@ -21,12 +21,25 @@ a.button,
 button.button {
   --button-radius: var(--radius-button, 0.25rem);
   --button-corner-safe-inset: min(calc(var(--button-radius) * 0.5), var(--space-s));
-  --button-padding-inline: calc(1rem + (var(--button-corner-safe-inset) * 0.5));
+  --button-padding-inline-base: 1rem;
+  --button-padding-inline: calc(var(--button-padding-inline-base) + (var(--button-corner-safe-inset) * 0.5));
 
   font-weight: var(--font-weight-accent, 400);
   border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
   border-radius: var(--button-radius) !important;
   padding-inline: var(--button-padding-inline) !important;
+}
+
+.button.button--sm,
+a.button.button--sm,
+button.button.button--sm {
+  --button-padding-inline-base: 0.75rem;
+}
+
+.button.button--lg,
+a.button.button--lg,
+button.button.button--lg {
+  --button-padding-inline-base: 1.5rem;
 }
 
 .button .button-content,
