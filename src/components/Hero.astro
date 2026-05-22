@@ -19,33 +19,39 @@ const backgroundImage = 'hero-bg.png'           // 背景图，放 /public 下 /
 const backgroundVideo = ''                 // 背景视频，放 /public 下 / Background video, place in /public
 const backgroundColor = ''                 // 背景颜色，留空自动根据主题设定 / Background color, empty for auto-theme color
 const contentColor = ''             // 内容颜色，留空自动根据主题设定 / Content color, empty for auto-theme color
-const topNavigationTheme: '' | '' | '' = ''  // 顶部导航配色 / Top nav theme (''=follow current theme, 'dark'=force dark theme, 'light'=force light theme
+const topNavigationTheme = ''              // 顶部导航配色：'' / 'dark' / 'light' / Top nav theme
 
 // ════════════════════════════════════════════════════════════════
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
 // ════════════════════════════════════════════════════════════════
 
+const normalizedTopNavigationTheme = String(topNavigationTheme).trim()
+const resolvedTopNavigationTheme =
+  normalizedTopNavigationTheme === 'dark' || normalizedTopNavigationTheme === 'light'
+    ? normalizedTopNavigationTheme
+    : ''
+
 // Auto-apply theme colors if topNavigationTheme is set and individual colors are empty
 const effectiveBackgroundColor = 
   backgroundColor || 
-  (topNavigationTheme === 'dark' ? 'var(--color-neutral-900)' : 
-   topNavigationTheme === 'light' ? 'var(--color-neutral-100)' : '')
+  (resolvedTopNavigationTheme === 'dark' ? 'var(--color-neutral-900)' : 
+   resolvedTopNavigationTheme === 'light' ? 'var(--color-neutral-100)' : '')
 const effectiveContentColor = 
   contentColor || 
-  (topNavigationTheme === 'dark' ? 'var(--color-neutral-100)' : 
-   topNavigationTheme === 'light' ? 'var(--color-neutral-900)' : '')
+  (resolvedTopNavigationTheme === 'dark' ? 'var(--color-neutral-100)' : 
+   resolvedTopNavigationTheme === 'light' ? 'var(--color-neutral-900)' : '')
 
 const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
 const heroStyle = [
   effectiveBackgroundColor ? `--hero-background-color: ${effectiveBackgroundColor}` : '',
   backgroundImage ? `--hero-background-image: ${cssUrl(backgroundImage)}` : '',
   effectiveContentColor ? `--hero-content-color: ${effectiveContentColor}` : '',
-  topNavigationTheme === 'light' ? `--hero-button-bg: var(--color-neutral-100)` : '',
-  topNavigationTheme === 'light' ? `--hero-button-text: var(--color-neutral-900)` : '',
-  topNavigationTheme === 'light' ? `--hero-button-border: var(--color-neutral-900)` : '',
-  topNavigationTheme === 'dark' ? `--hero-button-bg: var(--color-neutral-900)` : '',
-  topNavigationTheme === 'dark' ? `--hero-button-text: var(--color-neutral-100)` : '',
-  topNavigationTheme === 'dark' ? `--hero-button-border: var(--color-neutral-100)` : '',
+  resolvedTopNavigationTheme === 'light' ? `--hero-button-bg: var(--color-neutral-100)` : '',
+  resolvedTopNavigationTheme === 'light' ? `--hero-button-text: var(--color-neutral-900)` : '',
+  resolvedTopNavigationTheme === 'light' ? `--hero-button-border: var(--color-neutral-900)` : '',
+  resolvedTopNavigationTheme === 'dark' ? `--hero-button-bg: var(--color-neutral-900)` : '',
+  resolvedTopNavigationTheme === 'dark' ? `--hero-button-text: var(--color-neutral-100)` : '',
+  resolvedTopNavigationTheme === 'dark' ? `--hero-button-border: var(--color-neutral-100)` : '',
 ]
   .filter(Boolean)
   .join('; ')
@@ -53,7 +59,7 @@ const heroStyle = [
 
 <section
   class:list={['hero', fullscreen ? 'section-fullscreen' : 'hero--standard']}
-  data-top-navigation-theme={topNavigationTheme}
+  data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
 >
   {backgroundVideo && <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />}
