@@ -15,21 +15,37 @@ import { Icon } from 'astro-icon/components'
 // ╚══════════════════════════════════════════════════════════════╝
 
 const fullscreen = true                    // 全屏显示 / Fill viewport
-const backgroundImage = ''           // 背景图，放 /public 下 / Background image, place in /public
+const backgroundImage = 'hero-bg.png'           // 背景图，放 /public 下 / Background image, place in /public
 const backgroundVideo = ''                 // 背景视频，放 /public 下 / Background video, place in /public
-const backgroundColor = ''                 // 背景颜色，留空透明 / Background color, empty = transparent
-const contentColor = ''             // 内容颜色 / Content color
-const topNavigationTheme: '' | '' = ''  // 顶部导航配色 / Top nav theme
+const backgroundColor = ''                 // 背景颜色，留空自动根据主题设定 / Background color, empty for auto-theme color
+const contentColor = ''             // 内容颜色，留空自动根据主题设定 / Content color, empty for auto-theme color
+const topNavigationTheme: '' | 'darkdark' | 'light' = ''  // 顶部导航配色 / Top nav theme (''=follow current theme, 'dark'=force dark theme, 'light'=force light theme
 
 // ════════════════════════════════════════════════════════════════
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
 // ════════════════════════════════════════════════════════════════
 
+// Auto-apply theme colors if topNavigationTheme is set and individual colors are empty
+const effectiveBackgroundColor = 
+  backgroundColor || 
+  (topNavigationTheme === 'dark' ? 'var(--color-neutral-900)' : 
+   topNavigationTheme === 'light' ? 'var(--color-neutral-100)' : '')
+const effectiveContentColor = 
+  contentColor || 
+  (topNavigationTheme === 'dark' ? 'var(--color-neutral-100)' : 
+   topNavigationTheme === 'light' ? 'var(--color-neutral-900)' : '')
+
 const cssUrl = (value: string) => `url("${value.replace(/"/g, '\\"')}")`
 const heroStyle = [
-  backgroundColor ? `--hero-background-color: ${backgroundColor}` : '',
+  effectiveBackgroundColor ? `--hero-background-color: ${effectiveBackgroundColor}` : '',
   backgroundImage ? `--hero-background-image: ${cssUrl(backgroundImage)}` : '',
-  contentColor ? `--hero-content-color: ${contentColor}` : '',
+  effectiveContentColor ? `--hero-content-color: ${effectiveContentColor}` : '',
+  topNavigationTheme === 'light' ? `--hero-button-bg: var(--color-neutral-100)` : '',
+  topNavigationTheme === 'light' ? `--hero-button-text: var(--color-neutral-900)` : '',
+  topNavigationTheme === 'light' ? `--hero-button-border: var(--color-neutral-900)` : '',
+  topNavigationTheme === 'dark' ? `--hero-button-bg: var(--color-neutral-900)` : '',
+  topNavigationTheme === 'dark' ? `--hero-button-text: var(--color-neutral-100)` : '',
+  topNavigationTheme === 'dark' ? `--hero-button-border: var(--color-neutral-100)` : '',
 ]
   .filter(Boolean)
   .join('; ')
@@ -108,5 +124,34 @@ const heroStyle = [
       color: var(--hero-content-color, inherit);
     }
 
+    /* Theme-adaptive buttons (only apply when topNavigationTheme is set) */
+    .hero[data-top-navigation-theme="light"] .button,
+    .hero[data-top-navigation-theme="dark"] .button {
+      --btn-bg: var(--hero-button-bg, var(--brand-primary)) !important;
+      --btn-text: var(--hero-button-text, var(--color-neutral-100)) !important;
+      background-color: var(--btn-bg) !important;
+      border-color: var(--hero-button-border, var(--btn-bg)) !important;
+      color: var(--btn-text) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button:hover,
+    .hero[data-top-navigation-theme="dark"] .button:hover {
+      background-color: var(--btn-text) !important;
+      border-color: var(--btn-text) !important;
+      color: var(--btn-bg) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button.button--outlined,
+    .hero[data-top-navigation-theme="dark"] .button.button--outlined {
+      background-color: transparent !important;
+      color: var(--hero-button-text) !important;
+      border-color: var(--hero-button-border) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button.button--outlined:hover,
+    .hero[data-top-navigation-theme="dark"] .button.button--outlined:hover {
+      background-color: var(--hero-button-border) !important;
+      color: var(--hero-button-bg) !important;
+    }
   }
 </style>
