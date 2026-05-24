@@ -108,10 +108,10 @@ console.log('[Build Config] Astro build.format mapping:', yamlConfig.site.traili
 console.log('[Build Config] URL policy is controlled by config.yaml -> Astro trailingSlash/build.format')
 console.log('[Build Config] ==========================================\n')
 
-const integrations = [compress(), icon(), mdx()]
+// https://astro.build/config
+const integrations = [compress(), icon({ include: { ph: ['*'] } }), mdx()]
 if (siteUrl) integrations.push(sitemap())
 
-// https://astro.build/config
 export default defineConfig({
   compressHTML: true,
   site: siteUrl || undefined,

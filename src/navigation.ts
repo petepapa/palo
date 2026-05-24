@@ -38,7 +38,7 @@ export const navigationItems: NavigationItem[] = [
   {
     label: 'Go to our GitHub page, opens in new tab',
     href: 'https://github.com/incluud/accessible-astro-starter',
-    icon: 'lucide:github',
+    icon: 'ph:github-logo',
     external: true,
     excludeFromLauncher: true,
   },
@@ -51,16 +51,16 @@ export const socialItems: SocialItem[] = [
   {
     label: 'GitHub',
     href: 'https://github.com/incluud/',
-    icon: 'lucide:github',
+    icon: 'ph:github-logo',
   },
   {
     label: 'Bluesky',
     href: 'https://bsky.app/profile/incluud.dev',
-    icon: 'lucide:bot-message-square',
+    icon: 'ph:chat-dots',
   },
   {
     label: 'Open Collective',
     href: 'https://opencollective.com/incluud',
-    icon: 'lucide:hand-heart',
+    icon: 'ph:hands-praying',
   },
 ]
