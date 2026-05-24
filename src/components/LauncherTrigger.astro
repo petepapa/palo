@@ -1,0 +1,224 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  launcherId: string
+  id?: string
+  placeholder?: string
+  shortcutKey?: string
+  compact?: boolean
+  iconOnly?: boolean
+  gradientBorder?: boolean
+  class?: string
+  [key: string]: string | boolean | undefined
+}
+
+const {
+  launcherId,
+  id,
+  placeholder = 'Search',
+  shortcutKey = 'K',
+  compact = false,
+  iconOnly = false,
+  gradientBorder = false,
+  class: className,
+  ...rest
+} = Astro.props
+---
+
+<div class:list={['launcher-trigger', gradientBorder && 'gradient-border', className]}>
+  <button
+    type="button"
+    class="trigger"
+    id={id}
+    class:list={[compact && 'compact', iconOnly && 'icon-only']}
+    aria-haspopup="dialog"
+    data-launcher-target={launcherId}
+    aria-label={placeholder}
+    {...rest}
+  >
+    <span class="wrapper">
+      <Icon name="ph:lightning" size="20" />
+      {compact || iconOnly ? null : <span class="placeholder">{placeholder}</span>}
+    </span>
+    {
+      !iconOnly ? (
+        <span class="shortcut">
+          <kbd class="key modifier" />
+          <kbd class="key">{shortcutKey}</kbd>
+        </span>
+      ) : null
+    }
+  </button>
+</div>
+
+<script>
+  const detectOS = () => {
+    const userAgent = navigator.userAgent.toLowerCase()
+
+    if (userAgent.includes('mac')) return 'mac'
+    if (userAgent.includes('win')) return 'windows'
+
+    return 'other'
+  }
+
+  const setModifierKeys = () => {
+    const os = detectOS()
+    const modifierElements = document.querySelectorAll('.launcher-trigger .modifier')
+
+    modifierElements.forEach((modifierElement) => {
+      if (os === 'mac') {
+        modifierElement.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg>
+          <span class="sr-only">Command</span>
+        `
+      } else {
+        modifierElement.textContent = 'Ctrl'
+      }
+    })
+  }
+
+  setModifierKeys()
+  document.addEventListener('astro:after-swap', setModifierKeys)
+</script>
+
+<style>
+  :where(.launcher-trigger) {
+    container-type: inline-size;
+    min-inline-size: var(--launcher-trigger-width-min);
+    min-block-size: var(--launcher-trigger-height);
+  }
+
+  :where(.launcher-trigger:has(.compact)) {
+    inline-size: var(--launcher-trigger-compact-width);
+  }
+
+  :where(.launcher-trigger:has(.icon-only)) {
+    inline-size: var(--launcher-trigger-icon-only-size);
+    block-size: var(--launcher-trigger-icon-only-size);
+  }
+
+  :where(.trigger) {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color var(--launcher-animation-duration) var(--launcher-animation-timing);
+    cursor: pointer;
+    border: 1px solid var(--launcher-inner-border-color);
+    border-radius: var(--launcher-radius-md);
+    background-color: var(--launcher-action-bar-color);
+    padding: var(--launcher-space-sm);
+    inline-size: clamp(var(--launcher-trigger-width-min), 100%, var(--launcher-trigger-width-max));
+    min-block-size: var(--launcher-trigger-height);
+    color: var(--launcher-text-color);
+    font-size: var(--launcher-font-size-md);
+    white-space: nowrap;
+  }
+
+  :where(.trigger:hover),
+  :where(.trigger:focus-visible) {
+    border-color: var(--launcher-border-interaction-color);
+  }
+
+  :where(.trigger.compact) {
+    inline-size: var(--launcher-trigger-compact-width);
+  }
+
+  :where(.trigger.icon-only) {
+    justify-content: center;
+    block-size: var(--launcher-trigger-icon-only-size);
+  }
+
+  :where(.wrapper) {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--launcher-space-sm);
+  }
+
+  :where(svg) {
+    flex-shrink: 0;
+  }
+
+  :where(.shortcut) {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  :where(.key) {
+    inline-size: fit-content;
+    block-size: 20px;
+  }
+
+  :where(.key:first-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-inline-end: 1px;
+  }
+
+  :where(.key:last-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-inline-start: 1px;
+    font-size: var(--launcher-font-size-sm);
+  }
+
+  :where(.launcher-trigger.gradient-border .trigger) {
+    --border-width: 2px;
+
+    border: none;
+    background: linear-gradient(115deg, #a767e5, #12bcfe, #44ce7b, #fad648, #a767e5);
+    background-position: 0 0;
+    background-size: 200% 100%;
+  }
+
+  .launcher-trigger.gradient-border .trigger::before {
+    position: absolute;
+    z-index: 1;
+    inset: var(--border-width);
+    border-radius: calc(var(--launcher-radius-md) - var(--border-width));
+    background-color: var(--launcher-action-bar-color);
+    content: '';
+  }
+
+  :where(.launcher-trigger.gradient-border .trigger > *) {
+    position: relative;
+    z-index: 2;
+  }
+
+  :where(.launcher-trigger.gradient-border .trigger:hover),
+  :where(.launcher-trigger.gradient-border .trigger:focus-visible) {
+    animation: rainbow-effect 1s linear infinite;
+  }
+
+  @keyframes rainbow-effect {
+    to {
+      background-position: 200% 0;
+    }
+  }
+
+  @container (max-width: 250px) {
+    :where(.launcher-trigger .trigger:not(.compact):not(.icon-only)) {
+      inline-size: var(--launcher-trigger-compact-width);
+      block-size: var(--launcher-trigger-compact-height);
+    }
+
+    :where(.launcher-trigger .trigger:not(.compact):not(.icon-only) .placeholder) {
+      display: none;
+    }
+  }
+
+  @container (max-width: 150px) {
+    :where(.launcher-trigger .trigger:not(.compact):not(.icon-only)) {
+      justify-content: center;
+      inline-size: var(--launcher-trigger-icon-only-size);
+    }
+
+    :where(.launcher-trigger .trigger:not(.compact):not(.icon-only) .placeholder),
+    :where(.launcher-trigger .trigger:not(.compact):not(.icon-only) .shortcut) {
+      display: none;
+    }
+  }
+</style>
