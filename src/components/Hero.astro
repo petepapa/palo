@@ -21,6 +21,7 @@ const backgroundVideo = ''                 // 背景视频，放 /public 下 / B
 const backgroundImage = 'hero-bg.png'           // 背景图，放 /public 下 / Background image, place in /public
 const backgroundColor = ''                 // 背景颜色，留空自动根据主题设定 / Background color, empty for auto-theme color
 const topNavigationTheme = ''              // 顶部导航配色：'' / 'dark' / 'light' / Top nav theme
+const showDivider = true                   // 显示底部分割线 / Show bottom divider
 
 // ════════════════════════════════════════════════════════════════
 //  内部逻辑，一般不需要修改 / Internal logic, no need to modify
@@ -37,7 +38,7 @@ const heroStyle = pageHeaderVisualStyle
 ---
 
 <section
-  class:list={['hero', fullscreen ? 'section-fullscreen' : 'hero--standard']}
+  class:list={['hero', fullscreen ? 'section-fullscreen' : 'hero--standard', showDivider && 'hero--with-divider']}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
 >
@@ -92,6 +93,10 @@ const heroStyle = pageHeaderVisualStyle
     .hero--standard {
       padding-block-start: calc(6rem + var(--header-height, 0px));
       padding-block-end: 6rem;
+    }
+
+    .hero--with-divider {
+      border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
 
     .hero > .container {
