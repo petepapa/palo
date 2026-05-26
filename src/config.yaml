@@ -162,7 +162,7 @@ border:
   cardWidth: ''               # Card 卡片 / Cards
   accordionWidth: ''          # Accordion 折叠面板 / Accordion items
   tabsWidth: ''               # Tabs 标签与面板 / Tab and panel borders
-  badgeWidth: '0.05rem'       # Badge 徽章 / Badges
+  badgeWidth: '0.075rem'       # Badge 徽章 / Badges
   avatarWidth: ''            # Avatar 头像 / Avatars
   notificationWidth: ''      # Notification 通知 / Notifications
   paginationWidth: '0.1rem'   # Pagination 分页按钮 / Pagination buttons
