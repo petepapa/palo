@@ -18,9 +18,13 @@ interface Props {
   backgroundImage?: string
   backgroundVideo?: string
   backgroundColor?: string
+  backgroundFixed?: boolean
+  backgroundOverlayOpacity?: number
   contentColor?: string
   topNavigationTheme?: string
   showDivider?: boolean
+  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+  contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
 }
 
 const {
@@ -33,10 +37,40 @@ const {
   backgroundImage = '',
   backgroundVideo = '',
   backgroundColor = '',
+  backgroundFixed = false,
+  backgroundOverlayOpacity = 0,
   contentColor = '',
   topNavigationTheme = '',
   showDivider = true,
+  paddingBlock,
+  contentVerticalAlign = '',
 } = Astro.props
+
+const hasPaddingBlockValue = paddingBlock !== undefined && paddingBlock !== ''
+const normalizedPaddingBlock = Number(paddingBlock)
+const hasCustomPaddingBlock =
+  hasPaddingBlockValue &&
+  Number.isFinite(normalizedPaddingBlock) &&
+  normalizedPaddingBlock >= 0 &&
+  normalizedPaddingBlock <= 8
+const pageHeaderPaddingBlock =
+  hasCustomPaddingBlock
+    ? normalizedPaddingBlock === 0
+      ? '0px'
+      : `var(--font-size-${normalizedPaddingBlock})`
+    : ''
+const resolvedContentVerticalAlign =
+  contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
+const pageHeaderContentAlignMap = {
+  top: 'start',
+  center: 'center',
+  bottom: 'end',
+} as const
+const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
+const resolvedBackgroundOverlayOpacity =
+  Number.isFinite(normalizedBackgroundOverlayOpacity)
+    ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
+    : 0
 
 const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderVisuals({
   backgroundColor,
@@ -44,6 +78,14 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
   contentColor,
   topNavigationTheme,
 })
+const resolvedPageHeaderStyle = [
+  pageHeaderStyle,
+  pageHeaderPaddingBlock ? `--page-header-padding-block: ${pageHeaderPaddingBlock}` : '',
+  `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedContentVerticalAlign]}`,
+  `--page-header-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
+]
+  .filter(Boolean)
+  .join('; ')
 
 const sanitizedSubtitle: string = subtitle
   ? sanitizeHtml(subtitle, {
@@ -61,24 +103,24 @@ const sanitizedSubtitle: string = subtitle
     className,
     'palo-page-header',
     fullscreen ? 'section-fullscreen' : 'palo-page-header--standard',
+    backgroundFixed && 'palo-page-header--background-fixed',
     showDivider && 'palo-page-header--with-divider',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
-  style={pageHeaderStyle || undefined}
+  style={resolvedPageHeaderStyle || undefined}
 >
-  {
-    backgroundVideo && (
-      <video
-        class="palo-page-header__background-video"
-        src={backgroundVideo}
-        autoplay
-        muted
-        loop
-        playsinline
-        aria-hidden="true"
-      />
-    )
-  }
+  {backgroundVideo && (
+    <div class="palo-page-header__background-media" aria-hidden="true">
+      <video class="palo-page-header__background-video" src={backgroundVideo} autoplay muted loop playsinline />
+    </div>
+  )}
+
+  {!backgroundVideo && backgroundImage && (
+    <div class="palo-page-header__background-media palo-page-header__background-image" aria-hidden="true"></div>
+  )}
+
+  {(backgroundVideo || backgroundImage) && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
+
   <div class="container palo-page-header__content space-content">
     {
       featuredImage && (
@@ -106,15 +148,24 @@ const sanitizedSubtitle: string = subtitle
       isolation: isolate;
       overflow: hidden;
       background-color: var(--page-header-background-color, transparent);
-      background-image: var(--page-header-background-image, none);
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
+    }
+
+    .palo-page-header--background-fixed {
+      overflow: hidden;
+      overflow: clip;
+      contain: paint;
+      clip-path: inset(0);
+      background-image: none;
     }
 
     .palo-page-header--standard {
-      padding-block-start: calc(var(--header-height, 6rem) + var(--space-xl));
-      padding-block-end: 6rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: var(--page-header-content-align, center);
+      justify-content: stretch;
+      justify-items: stretch;
+      padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, 6rem));
+      padding-block-end: var(--page-header-padding-block, 6rem);
     }
 
     .palo-page-header--with-divider {
@@ -123,17 +174,49 @@ const sanitizedSubtitle: string = subtitle
 
     .palo-page-header > .container {
       position: relative;
-      z-index: 1;
+      z-index: 2;
+      width: 100%;
+      inline-size: 100%;
+      max-width: none;
+      max-inline-size: none;
     }
 
-    .palo-page-header__background-video {
+    .palo-page-header__background-media {
       position: absolute;
       z-index: 0;
       inset: 0;
       inline-size: 100%;
       block-size: 100%;
-      object-fit: cover;
       pointer-events: none;
+    }
+
+    .palo-page-header--background-fixed .palo-page-header__background-media {
+      position: absolute;
+      inline-size: 100vw;
+      block-size: 100vh;
+      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
+    }
+
+    .palo-page-header__background-video {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .palo-page-header__background-image {
+      background-image: var(--page-header-background-image, none);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .palo-page-header__background-overlay {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      background-color: rgb(0 0 0 / var(--page-header-background-overlay-opacity, 0));
     }
 
     .palo-page-header__content {
@@ -175,3 +258,35 @@ const sanitizedSubtitle: string = subtitle
     }
   }
 </style>
+
+<script>
+  const win = window as Window & { __paloFixedBackgrounds?: boolean }
+
+  if (!win.__paloFixedBackgrounds) {
+    win.__paloFixedBackgrounds = true
+
+    const updateFixedBackgrounds = () => {
+      document
+        .querySelectorAll<HTMLElement>(
+          '.hero--background-fixed, .creative-section.has-fixed-background, .palo-page-header--background-fixed'
+        )
+        .forEach((section) => {
+          section.style.setProperty('--fixed-background-offset', `${section.getBoundingClientRect().top * -1}px`)
+        })
+    }
+
+    let frame = 0
+    const requestUpdate = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        updateFixedBackgrounds()
+      })
+    }
+
+    updateFixedBackgrounds()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+    document.addEventListener('astro:page-load', updateFixedBackgrounds)
+  }
+</script>

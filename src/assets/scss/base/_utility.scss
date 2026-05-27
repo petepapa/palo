@@ -43,7 +43,12 @@
   }
 
   .section-fullscreen:where(.palo-page-header) {
-    padding-block: var(--page-header-padding-block, var(--space-xl));
+    grid-template-columns: minmax(0, 1fr);
+    align-content: var(--page-header-content-align, center);
+    justify-content: stretch;
+    justify-items: stretch;
+    padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, var(--space-xl)));
+    padding-block-end: var(--page-header-padding-block, var(--space-xl));
   }
 
   body.has-fixed-header main > :where(.hero, .palo-page-header):first-child {

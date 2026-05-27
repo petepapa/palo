@@ -5,15 +5,19 @@ import { Form, Input, Button, Textarea, Checkbox, Fieldset, Heading, Link, Radio
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
-// Page header appearance settings: fullscreen, content color, background video/image, background color, top navigation theme, divider.
-// 页面头部外观设置：全屏、内容颜色、背景视频/图片、背景颜色、顶部导航主题、分割线
+// Page header appearance settings: fullscreen, content color, background video/image, background color, fixed background, overlay opacity, top navigation theme, padding, vertical alignment, divider.
+// 页面头部外观设置：全屏、内容颜色、背景视频/图片、背景颜色、固定背景、遮罩透明度、顶部导航主题、内边距、垂直对齐、分割线
 const pageHeaderAppearance = {
-  fullscreen: false,
-  contentColor: '',
-  backgroundVideo: '',
+  fullscreen: true,
+  contentColor: '#fff',
+  backgroundVideo: 'bg.mp4',
   backgroundImage: '',
-  backgroundColor: '',
-  topNavigationTheme: '',
+  backgroundColor: 'red',
+  backgroundFixed: true,
+  backgroundOverlayOpacity: '0.75',
+  topNavigationTheme: 'dark',
+  paddingBlock: '3',
+  contentVerticalAlign: 'bottom',
   showDivider: true,
 }
 ---

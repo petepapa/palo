@@ -255,7 +255,9 @@ const sectionStyle = {
 
     const updateFixedBackgrounds = () => {
       document
-        .querySelectorAll<HTMLElement>('.hero--background-fixed, .creative-section.has-fixed-background')
+        .querySelectorAll<HTMLElement>(
+          '.hero--background-fixed, .creative-section.has-fixed-background, .palo-page-header--background-fixed'
+        )
         .forEach((section) => {
           section.style.setProperty('--fixed-background-offset', `${section.getBoundingClientRect().top * -1}px`)
         })
