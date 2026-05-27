@@ -27,6 +27,11 @@ interface Props {
    */
   backgroundColor?: string
   /**
+   * 背景固定不随页面滚动 / Keep background fixed while content scrolls
+   * @default false
+   */
+  backgroundFixed?: boolean
+  /**
    * 顶部和底部内边距级别 / Top and bottom padding level
    * 默认 6，可选 0 到 8 / Default is 6, accepts 0 through 8
    */
@@ -48,6 +53,7 @@ const {
   backgroundVideo = '',
   backgroundImage = '',
   backgroundColor = '',
+  backgroundFixed = false,
   paddingBlock = 6,
   contentVerticalAlign = '',
   class: className = '',
@@ -81,6 +87,7 @@ const sectionStyle = {
   class:list={[
     'creative-section',
     { 'is-fullscreen': fullscreen },
+    { 'has-fixed-background': backgroundFixed },
     className
   ]}
   style={sectionStyle}
@@ -138,6 +145,14 @@ const sectionStyle = {
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
+    .creative-section.has-fixed-background {
+      overflow: hidden;
+      overflow: clip;
+      contain: paint;
+      clip-path: inset(0);
+      background-image: none;
+    }
+
     /* 全屏显示模式 / Fullscreen display mode */
     .creative-section.is-fullscreen {
       /* 全屏高度覆盖整个视口 / Fullscreen height covers the entire viewport */
@@ -155,6 +170,17 @@ const sectionStyle = {
       height: 100%;
       z-index: 1;
       pointer-events: none;
+    }
+
+    .creative-section.has-fixed-background .media-container {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
+    }
+
+    .creative-section.has-fixed-background .bg-image-layer {
+      display: block;
     }
 
     .background-media {
@@ -209,3 +235,33 @@ const sectionStyle = {
     }
   }
 </style>
+
+<script>
+  const win = window as Window & { __paloFixedBackgrounds?: boolean }
+
+  if (!win.__paloFixedBackgrounds) {
+    win.__paloFixedBackgrounds = true
+
+    const updateFixedBackgrounds = () => {
+      document
+        .querySelectorAll<HTMLElement>('.hero--background-fixed, .creative-section.has-fixed-background')
+        .forEach((section) => {
+          section.style.setProperty('--fixed-background-offset', `${section.getBoundingClientRect().top * -1}px`)
+        })
+    }
+
+    let frame = 0
+    const requestUpdate = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        updateFixedBackgrounds()
+      })
+    }
+
+    updateFixedBackgrounds()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+    document.addEventListener('astro:page-load', updateFixedBackgrounds)
+  }
+</script>

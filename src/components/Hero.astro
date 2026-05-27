@@ -13,6 +13,7 @@ interface Props {
   backgroundVideo?: string
   backgroundImage?: string
   backgroundColor?: string
+  backgroundFixed?: boolean
   topNavigationTheme?: string
   showDivider?: boolean
   paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
@@ -26,6 +27,7 @@ const {
   backgroundVideo = '',
   backgroundImage = '',
   backgroundColor = '',
+  backgroundFixed = false,
   topNavigationTheme = '',
   showDivider = true,
   paddingBlock,
@@ -74,6 +76,7 @@ const heroStyle = [
     className,
     'hero',
     fullscreen ? 'section-fullscreen' : 'hero--standard',
+    backgroundFixed && 'hero--background-fixed',
     showDivider && 'hero--with-divider',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
@@ -96,6 +99,30 @@ const heroStyle = [
       background-position: center;
       background-size: cover;
       background-repeat: no-repeat;
+    }
+
+    .hero--background-fixed {
+      overflow: hidden;
+      overflow: clip;
+      contain: paint;
+      clip-path: inset(0);
+      background-image: none;
+    }
+
+    .hero--background-fixed::before {
+      content: '';
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      inline-size: 100vw;
+      block-size: 100vh;
+      background-color: var(--hero-background-color, transparent);
+      background-image: var(--hero-background-image, none);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
+      pointer-events: none;
     }
 
     .hero--standard {
@@ -122,6 +149,13 @@ const heroStyle = [
       block-size: 100%;
       object-fit: cover;
       pointer-events: none;
+    }
+
+    .hero--background-fixed .hero__background-video {
+      position: absolute;
+      inline-size: 100vw;
+      block-size: 100vh;
+      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
     }
 
     .hero__content {
@@ -159,3 +193,33 @@ const heroStyle = [
     }
   }
 </style>
+
+<script>
+  const win = window as Window & { __paloFixedBackgrounds?: boolean }
+
+  if (!win.__paloFixedBackgrounds) {
+    win.__paloFixedBackgrounds = true
+
+    const updateFixedBackgrounds = () => {
+      document
+        .querySelectorAll<HTMLElement>('.hero--background-fixed, .creative-section.has-fixed-background')
+        .forEach((section) => {
+          section.style.setProperty('--fixed-background-offset', `${section.getBoundingClientRect().top * -1}px`)
+        })
+    }
+
+    let frame = 0
+    const requestUpdate = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(() => {
+        frame = 0
+        updateFixedBackgrounds()
+      })
+    }
+
+    updateFixedBackgrounds()
+    window.addEventListener('scroll', requestUpdate, { passive: true })
+    window.addEventListener('resize', requestUpdate)
+    document.addEventListener('astro:page-load', updateFixedBackgrounds)
+  }
+</script>
