@@ -1,19 +1,12 @@
 ---
-import { Avatar, Heading } from 'accessible-astro-components'
-import { Image } from 'astro:assets'
+import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
 
 interface Props {
   class?: string
-  featuredImage?: string
   title: string
   subtitle?: string
-  author?: {
-    name: string
-    image: string
-    bio: string
-  }
   fullscreen?: boolean
   backgroundImage?: string
   backgroundVideo?: string
@@ -31,8 +24,6 @@ const {
   class: className,
   title,
   subtitle,
-  featuredImage,
-  author,
   fullscreen = false,
   backgroundImage = '',
   backgroundVideo = '',
@@ -122,22 +113,8 @@ const sanitizedSubtitle: string = subtitle
   {(backgroundVideo || backgroundImage) && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
 
   <div class="container palo-page-header__content space-content">
-    {
-      featuredImage && (
-        <div class="palo-page-header__featured-image mb-8">
-          <Image src={featuredImage} alt="" width={1200} height={250} class="h-[250px] w-full rounded-lg object-cover" />
-        </div>
-      )
-    }
     <Heading level="h1">{title}</Heading>
     {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
-    {
-      author && (
-        <div class="mt-6 flex items-center">
-          <Avatar title={author.name} image={author.image} subtitle={author.bio} />
-        </div>
-      )
-    }
   </div>
 </section>
 
@@ -221,11 +198,6 @@ const sanitizedSubtitle: string = subtitle
 
     .palo-page-header__content {
       color: var(--page-header-content-color, inherit);
-    }
-
-    .palo-page-header__featured-image {
-      max-height: 500px;
-      overflow: hidden;
     }
 
     .palo-page-header[data-top-navigation-theme='light'] .button,
