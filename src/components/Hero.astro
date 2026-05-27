@@ -82,7 +82,14 @@ const heroStyle = [
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
 >
-  {backgroundVideo && <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />}
+  {backgroundVideo && (
+    <div class="hero__background-media" aria-hidden="true">
+      <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline />
+    </div>
+  )}
+
+  {!backgroundVideo && backgroundImage && <div class="hero__background-media hero__background-image" aria-hidden="true"></div>}
+
   <div class="container hero__content">
     <slot />
   </div>
@@ -95,10 +102,6 @@ const heroStyle = [
       isolation: isolate;
       overflow: hidden;
       background-color: var(--hero-background-color, transparent);
-      background-image: var(--hero-background-image, none);
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
     }
 
     .hero--background-fixed {
@@ -107,22 +110,6 @@ const heroStyle = [
       contain: paint;
       clip-path: inset(0);
       background-image: none;
-    }
-
-    .hero--background-fixed::before {
-      content: '';
-      position: absolute;
-      z-index: 0;
-      inset: 0;
-      inline-size: 100vw;
-      block-size: 100vh;
-      background-color: var(--hero-background-color, transparent);
-      background-image: var(--hero-background-image, none);
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
-      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
-      pointer-events: none;
     }
 
     .hero--standard {
@@ -141,21 +128,34 @@ const heroStyle = [
       z-index: 1;
     }
 
-    .hero__background-video {
+    .hero__background-media {
       position: absolute;
       z-index: 0;
       inset: 0;
       inline-size: 100%;
       block-size: 100%;
-      object-fit: cover;
       pointer-events: none;
     }
 
-    .hero--background-fixed .hero__background-video {
+    .hero--background-fixed .hero__background-media {
       position: absolute;
       inline-size: 100vw;
       block-size: 100vh;
       transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
+    }
+
+    .hero__background-video {
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero__background-image {
+      background-image: var(--hero-background-image, none);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
     }
 
     .hero__content {
