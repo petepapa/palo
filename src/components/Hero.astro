@@ -1,31 +1,49 @@
 ---
-import { Link } from 'accessible-astro-components'
-import { Icon } from 'astro-icon/components'
 import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
 
 /**
  * Hero Component
  *
- * @description Homepage hero section with customizable content.
+ * @description Reusable hero section with customizable visuals and slotted content.
  */
 
-// ╔══════════════════════════════════════════════════════════════╗
-// ║  外观配置 / Appearance                                       ║
-// ║  全屏、背景、颜色、导航主题                                    ║
-// ║  Fullscreen, background, colors, navigation theme            ║
-// ╚══════════════════════════════════════════════════════════════╝
+interface Props {
+  fullscreen?: boolean
+  contentColor?: string
+  backgroundVideo?: string
+  backgroundImage?: string
+  backgroundColor?: string
+  topNavigationTheme?: string
+  showDivider?: boolean
+  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  class?: string
+}
 
-const fullscreen = true                    // 全屏显示 / Fill viewport
-const contentColor = ''             // 内容颜色，留空自动根据主题设定 / Content color, empty for auto-theme color
-const backgroundVideo = ''                 // 背景视频，放 /public 下 / Background video, place in /public
-const backgroundImage = 'hero-bg.png'           // 背景图，放 /public 下 / Background image, place in /public
-const backgroundColor = ''                 // 背景颜色，留空自动根据主题设定 / Background color, empty for auto-theme color
-const topNavigationTheme = ''              // 顶部导航配色：'' / 'dark' / 'light' / Top nav theme
-const showDivider = true                   // 显示底部分割线 / Show bottom divider
+const {
+  fullscreen = true,
+  contentColor = '',
+  backgroundVideo = '',
+  backgroundImage = '',
+  backgroundColor = '',
+  topNavigationTheme = '',
+  showDivider = true,
+  paddingBlock,
+  class: className = '',
+} = Astro.props
 
-// ════════════════════════════════════════════════════════════════
-//  内部逻辑，一般不需要修改 / Internal logic, no need to modify
-// ════════════════════════════════════════════════════════════════
+const normalizedPaddingBlock = Number(paddingBlock)
+const hasCustomPaddingBlock =
+  paddingBlock !== undefined &&
+  Number.isFinite(normalizedPaddingBlock) &&
+  normalizedPaddingBlock >= 0 &&
+  normalizedPaddingBlock <= 8
+
+const heroPaddingBlock =
+  hasCustomPaddingBlock
+    ? normalizedPaddingBlock === 0
+      ? '0px'
+      : `var(--font-size-${normalizedPaddingBlock})`
+    : ''
 
 const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
   backgroundColor,
@@ -33,47 +51,27 @@ const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageH
   contentColor,
   topNavigationTheme,
 })
-const heroStyle = pageHeaderVisualStyle
-  .replaceAll('--page-header-', '--hero-')
+const heroStyle = [
+  pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
+  heroPaddingBlock ? `--hero-padding-block: ${heroPaddingBlock}` : '',
+]
+  .filter(Boolean)
+  .join('; ')
 ---
 
 <section
-  class:list={['hero', fullscreen ? 'section-fullscreen' : 'hero--standard', showDivider && 'hero--with-divider']}
+  class:list={[
+    className,
+    'hero',
+    fullscreen ? 'section-fullscreen' : 'hero--standard',
+    showDivider && 'hero--with-divider',
+  ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
 >
   {backgroundVideo && <video class="hero__background-video" src={backgroundVideo} autoplay muted loop playsinline aria-hidden="true" />}
   <div class="container hero__content">
-    {/* 可编辑区域开始 / Editable Content Start */}
-
-    <div class="flex flex-col items-center justify-center text-center gap-6">
-      <img 
-  src="/favicon.svg" 
-  alt="Hero Artwork" 
-  class="w-16 h-16 sm:w-24 sm:h-24 object-contain mb-2" 
-/>
-      <h2>
-        Your art doesn't fit in a box.
-        Neither should your website.
-      </h2>
-      <div class="w-full">
-        <p class="text-2xl">
-          Palo is a minimalist Astro theme crafted
-          <br class="hidden sm:inline" />
-          for artists, musicians, and designers
-          <br class="hidden sm:inline" />
-          who refuse to look like everyone else.
-        </p>
-      </div>
-      
-      <Link href="https://github.com/petepapa/palo" size="md" isButton type="primary">
-        Get on Github 
-        <Icon aria-hidden="true" name="ph:arrow-right" size="24" />
-      </Link>
-
-    </div>
-    
-    {/* 可编辑区域结束 / Editable Content End */}
+    <slot />
   </div>
 </section>
 
@@ -91,8 +89,8 @@ const heroStyle = pageHeaderVisualStyle
     }
 
     .hero--standard {
-      padding-block-start: calc(6rem + var(--header-height, 0px));
-      padding-block-end: 6rem;
+      padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, 6rem));
+      padding-block-end: var(--hero-padding-block, 6rem);
     }
 
     .hero--with-divider {

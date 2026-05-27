@@ -15,7 +15,44 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 ---
 
 <DefaultLayout>
-  <Hero />
+  <Hero
+    fullscreen={true}
+    contentColor=""
+    backgroundVideo=""
+    backgroundImage="hero-bg.png"
+    backgroundColor=""
+    topNavigationTheme=""
+    paddingBlock={1}
+    showDivider={true}
+  >
+    {/* 可编辑区域开始 / Editable Content Start */}
+    <div class="flex flex-col items-center  text-center gap-6">
+      <img
+        src="/favicon.svg"
+        alt="Hero Artwork"
+        class="w-16 h-16 sm:w-24 sm:h-24 object-contain mb-2"
+      />
+      <h2>
+        Your art doesn't fit in a box.
+        Neither should your website.
+      </h2>
+      <div class="w-full">
+        <p class="text-2xl">
+          Palo is a minimalist Astro theme crafted
+          <br class="hidden sm:inline" />
+          for artists, musicians, and designers
+          <br class="hidden sm:inline" />
+          who refuse to look like everyone else.
+        </p>
+      </div>
+
+      <Link href="https://github.com/petepapa/palo" size="md" isButton type="primary">
+        Get on Github
+        <Icon aria-hidden="true" name="ph:arrow-right" size="24" />
+      </Link>
+    </div>
+    {/* 可编辑区域结束 / Editable Content End */}
+  </Hero>
   <CreativeSection
     contentColor="#fff" 
     backgroundColor="#ff4b00"

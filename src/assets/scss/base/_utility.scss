@@ -36,8 +36,13 @@
     padding-block: var(--space-xl);
   }
 
-  .section-fullscreen:where(.hero, .palo-page-header) {
-    padding-block-start: calc(var(--space-xl) + var(--header-height, 0px));
+  .section-fullscreen:where(.hero) {
+    padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, var(--space-xl)));
+    padding-block-end: var(--hero-padding-block, var(--space-xl));
+  }
+
+  .section-fullscreen:where(.palo-page-header) {
+    padding-block: var(--page-header-padding-block, var(--space-xl));
   }
 
   body.has-fixed-header main > :where(.hero, .palo-page-header):first-child {
