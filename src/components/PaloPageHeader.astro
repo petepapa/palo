@@ -18,6 +18,8 @@ interface Props {
   showDivider?: boolean
   paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
+  contentHorizontalAlign?: '' | 'left' | 'center' | 'right'
+  textAlign?: '' | 'left' | 'center' | 'right'
 }
 
 const {
@@ -35,6 +37,8 @@ const {
   showDivider = true,
   paddingBlock,
   contentVerticalAlign = '',
+  contentHorizontalAlign = 'left',
+  textAlign = '',
 } = Astro.props
 
 const hasPaddingBlockValue = paddingBlock !== undefined && paddingBlock !== ''
@@ -57,6 +61,19 @@ const pageHeaderContentAlignMap = {
   center: 'center',
   bottom: 'end',
 } as const
+const contentHorizontalAlignValue = contentHorizontalAlign || textAlign
+const resolvedContentHorizontalAlign =
+  contentHorizontalAlignValue === 'center' || contentHorizontalAlignValue === 'right' ? contentHorizontalAlignValue : 'left'
+const pageHeaderTextAlignMap = {
+  left: 'start',
+  center: 'center',
+  right: 'end',
+} as const
+const pageHeaderItemsAlignMap = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+} as const
 const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
 const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)
@@ -73,6 +90,8 @@ const resolvedPageHeaderStyle = [
   pageHeaderStyle,
   pageHeaderPaddingBlock ? `--page-header-padding-block: ${pageHeaderPaddingBlock}` : '',
   `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedContentVerticalAlign]}`,
+  `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedContentHorizontalAlign]}`,
+  `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedContentHorizontalAlign]}`,
   `--page-header-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
 ]
   .filter(Boolean)
@@ -197,6 +216,10 @@ const sanitizedSubtitle: string = subtitle
     }
 
     .palo-page-header__content {
+      display: flex;
+      flex-direction: column;
+      align-items: var(--page-header-items-align, flex-start);
+      text-align: var(--page-header-text-align, start);
       color: var(--page-header-content-color, inherit);
     }
 
