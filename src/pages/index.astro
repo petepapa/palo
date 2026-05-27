@@ -1,6 +1,7 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
 import Hero from '@components/Hero.astro'
+import CreativeSection from '@components/CreativeSection.astro'
 import Feature from '@components/Feature.astro'
 import Counter from '@components/Counter.astro'
 import ContentMedia from '@components/ContentMedia.astro'
@@ -15,6 +16,18 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 <DefaultLayout>
   <Hero />
+  <CreativeSection
+    contentColor="#fff" 
+    backgroundColor="#ff4b00"
+    fullscreen={false}
+    paddingBlock={3}
+  >
+    <div class="text-center">
+      <p class="text-3xl font-semibold">
+        A portfolio framework that gets out of your way — and stays true to your aesthetic.
+      </p>
+    </div>
+  </CreativeSection>
   <section class="my-64">
     <div class="container">
       <Heading level="h2" class="mb-8">Features</Heading>

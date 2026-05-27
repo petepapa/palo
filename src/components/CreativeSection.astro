@@ -1,0 +1,196 @@
+---
+// src/components/CreativeSection.astro
+import themeConfig from '@config'
+
+interface Props {
+  /**
+   * 是否全屏显示 (占满视口高度) / Whether to display fullscreen (fill viewport height)
+   * @default false
+   */
+  fullscreen?: boolean
+  /**
+   * 前景内容颜色 (支持 Hex, OKLCH, CSS 变量) / Foreground text color (supports Hex, OKLCH, CSS variables)
+   * 留空自动跟随 Palo 当前的主题文字颜色 / Empty to automatically follow Palo's default text color
+   */
+  contentColor?: string
+  /**
+   * 背景视频路径 (放于 /public 目录下，如 'videos/hero.mp4') / Background video path (placed under /public, e.g. 'videos/hero.mp4')
+   */
+  backgroundVideo?: string
+  /**
+   * 背景图片路径 (放于 /public 目录下，如 'images/hero.jpg') / Background image path (placed under /public, e.g. 'images/hero.jpg')
+   */
+  backgroundImage?: string
+  /**
+   * 背景颜色 (支持 Hex, OKLCH, CSS 变量) / Background color (supports Hex, OKLCH, CSS variables)
+   * 留空默认透明 / Empty for transparent background by default
+   */
+  backgroundColor?: string
+  /**
+   * 顶部和底部内边距级别 / Top and bottom padding level
+   * 默认 6，可选 0 到 8 / Default is 6, accepts 0 through 8
+   */
+  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  /**
+   * 附加的类名 / Additional CSS classes
+   */
+  class?: string
+}
+
+const {
+  fullscreen = false, // 默认不全屏 / Default to non-fullscreen
+  contentColor = '',
+  backgroundVideo = '',
+  backgroundImage = '',
+  backgroundColor = '',
+  paddingBlock = 6,
+  class: className = '',
+} = Astro.props
+
+const normalizedPaddingBlock = Number(paddingBlock)
+const effectivePaddingBlock =
+  Number.isFinite(normalizedPaddingBlock) && normalizedPaddingBlock >= 0 && normalizedPaddingBlock <= 8
+    ? normalizedPaddingBlock
+    : 6
+
+// 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
+const sectionStyle = {
+  '--section-bg': backgroundColor || 'transparent',
+  '--section-padding-block':
+    effectivePaddingBlock === 0 ? '0px' : `var(--font-size-${effectivePaddingBlock})`,
+  ...(contentColor ? { '--section-color': contentColor } : {}),
+  ...(backgroundImage ? { '--section-bg-image': `url(${backgroundImage})` } : {}),
+}
+---
+
+<section
+  class:list={[
+    'creative-section',
+    { 'is-fullscreen': fullscreen },
+    className
+  ]}
+  style={sectionStyle}
+>
+  <!-- 层 1: 视频或图片媒体背景 / Layer 1: Video or image background media -->
+  {backgroundVideo && (
+    <div class="media-container" aria-hidden="true" tabindex="-1">
+      <video
+        autoplay
+        loop
+        muted
+        playsinline
+        class="background-media"
+      >
+        <source src={backgroundVideo} type="video/mp4" />
+      </video>
+    </div>
+  )}
+
+  {!backgroundVideo && backgroundImage && (
+    <div 
+      class="media-container bg-image-layer" 
+      aria-hidden="true" 
+      tabindex="-1"
+    ></div>
+  )}
+
+  <!-- 层 2: 智能对比度半透明遮罩 (当存在背景视频或图片时启用) / Layer 2: Contrast-enhancing semi-transparent backdrop overlay (enabled when video or image background is present) -->
+  {(backgroundVideo || backgroundImage) && (
+    <div class="section-overlay" aria-hidden="true" tabindex="-1"></div>
+  )}
+
+  <!-- 层 3: 前景内容 Slot (自动居中布局) / Layer 3: Foreground content Slot (auto-centering layout) -->
+  <div class="section-content container">
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* 运用 Palo 的 Cascade Layers 治理系统 / Integrate with Palo's CSS Cascade Layers specificity system */
+  @layer components {
+    .creative-section {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-block: var(--section-padding-block, var(--font-size-6)); /* 提供合理的默认上下呼吸间距 / Provides a reasonable default padding-block */
+      
+      /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */
+      background-color: var(--section-bg, transparent);
+      color: var(--section-color, var(--color-default-text));
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* 全屏显示模式 / Fullscreen display mode */
+    .creative-section.is-fullscreen {
+      /* 全屏高度覆盖整个视口 / Fullscreen height covers the entire viewport */
+      block-size: 100vh;
+      min-block-size: 100vh;
+      box-sizing: border-box;
+      padding-block: var(--section-padding-block, var(--font-size-2));
+    }
+
+    /* 媒体容器层 / Background media container layer */
+    .media-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .background-media {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* 背景图特殊处理：防止网络慢时背景出现空白抖动 / Background image styling: prevents white block flashing during slow network loads */
+    .bg-image-layer {
+      background-image: var(--section-bg-image);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* 智能半透明遮罩层：降低背景亮度，提高文字可读性，符合 WCAG AA 标准 / Semi-transparent overlay layer: darkens backdrop to optimize contrast and fulfill WCAG AA text readability standards */
+    .section-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      /* 使用 oklch 混合黑度，提供极其柔和高贵的暗度过渡 / Uses oklch logic to provide smooth, high-quality luminance blends */
+      background-color: light-dark(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.45));
+      backdrop-filter: blur(1px); /* 可选：给背景带来微微的毛玻璃深邃感 / Optional: adds a subtle depth of field blur */
+    }
+
+    /* 前景内容层 / Foreground content container layout */
+    .section-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      margin-inline: auto;
+      
+      /* 在全屏模式下，子元素自动垂直居中 / Enables automatic vertical alignment inside fullscreen frames */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* 无障碍减弱动态效果 / Accessibility: motion reduction adaptations */
+    @media (prefers-reduced-motion: reduce) {
+      .background-media {
+        display: none; /* 减弱动态偏好下，隐藏视频背景，退化为配置的背景色 / Hides video background when reduced motion is preferred, fallback to color */
+      }
+      .creative-section {
+        transition: none !important;
+      }
+    }
+  }
+</style>
