@@ -32,6 +32,11 @@ interface Props {
    */
   paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
   /**
+   * 内容垂直位置 / Vertical content position
+   * 留空等同 center，可选 top / center / bottom / Empty equals center; accepts top / center / bottom
+   */
+  contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
+  /**
    * 附加的类名 / Additional CSS classes
    */
   class?: string
@@ -44,6 +49,7 @@ const {
   backgroundImage = '',
   backgroundColor = '',
   paddingBlock = 6,
+  contentVerticalAlign = '',
   class: className = '',
 } = Astro.props
 
@@ -52,12 +58,20 @@ const effectivePaddingBlock =
   Number.isFinite(normalizedPaddingBlock) && normalizedPaddingBlock >= 0 && normalizedPaddingBlock <= 8
     ? normalizedPaddingBlock
     : 6
+const resolvedContentVerticalAlign =
+  contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
+const sectionContentAlignMap = {
+  top: 'flex-start',
+  center: 'center',
+  bottom: 'flex-end',
+} as const
 
 // 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
 const sectionStyle = {
   '--section-bg': backgroundColor || 'transparent',
   '--section-padding-block':
     effectivePaddingBlock === 0 ? '0px' : `var(--font-size-${effectivePaddingBlock})`,
+  '--section-content-align': sectionContentAlignMap[resolvedContentVerticalAlign],
   ...(contentColor ? { '--section-color': contentColor } : {}),
   ...(backgroundImage ? { '--section-bg-image': `url(${backgroundImage})` } : {}),
 }
@@ -114,7 +128,7 @@ const sectionStyle = {
       width: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: var(--section-content-align, center);
       padding-block: var(--section-padding-block, var(--font-size-6)); /* 提供合理的默认上下呼吸间距 / Provides a reasonable default padding-block */
       
       /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */

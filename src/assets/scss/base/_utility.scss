@@ -37,6 +37,7 @@
   }
 
   .section-fullscreen:where(.hero) {
+    place-content: var(--hero-content-align, center) center;
     padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, var(--space-xl)));
     padding-block-end: var(--hero-padding-block, var(--space-xl));
   }

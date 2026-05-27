@@ -16,6 +16,7 @@ interface Props {
   topNavigationTheme?: string
   showDivider?: boolean
   paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   class?: string
 }
 
@@ -28,6 +29,7 @@ const {
   topNavigationTheme = '',
   showDivider = true,
   paddingBlock,
+  contentVerticalAlign = '',
   class: className = '',
 } = Astro.props
 
@@ -44,6 +46,13 @@ const heroPaddingBlock =
       ? '0px'
       : `var(--font-size-${normalizedPaddingBlock})`
     : ''
+const resolvedContentVerticalAlign =
+  contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
+const heroContentAlignMap = {
+  top: 'start',
+  center: 'center',
+  bottom: 'end',
+} as const
 
 const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
   backgroundColor,
@@ -54,6 +63,7 @@ const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageH
 const heroStyle = [
   pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
   heroPaddingBlock ? `--hero-padding-block: ${heroPaddingBlock}` : '',
+  `--hero-content-align: ${heroContentAlignMap[resolvedContentVerticalAlign]}`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -89,6 +99,8 @@ const heroStyle = [
     }
 
     .hero--standard {
+      display: grid;
+      place-content: var(--hero-content-align, center) center;
       padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, 6rem));
       padding-block-end: var(--hero-padding-block, 6rem);
     }
