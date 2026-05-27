@@ -22,6 +22,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     backgroundImage="hero-bg.png"
     backgroundColor=""
     backgroundFixed={true}
+    backgroundOverlayOpacity={0}
     topNavigationTheme=""
     paddingBlock={3}
     contentVerticalAlign="center"
@@ -55,12 +56,14 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     </div>
     {/* 可编辑区域结束 / Editable Content End */}
   </Hero>
+
   <CreativeSection
     contentColor="#fff" 
     backgroundColor="#ff4b00"
-    backgroundVideo="bg.mp4"
-    backgroundFixed={true}
-    fullscreen={true}
+    backgroundVideo=""
+    backgroundFixed={false}
+    backgroundOverlayOpacity={0}
+    fullscreen={false}
     paddingBlock={3}
     contentVerticalAlign="center"
   >
@@ -70,6 +73,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       </p>
     </div>
   </CreativeSection>
+
   <section class="my-64">
     <div class="container">
       <Heading level="h2" class="mb-8">Features</Heading>

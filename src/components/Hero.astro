@@ -14,6 +14,7 @@ interface Props {
   backgroundImage?: string
   backgroundColor?: string
   backgroundFixed?: boolean
+  backgroundOverlayOpacity?: number
   topNavigationTheme?: string
   showDivider?: boolean
   paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
@@ -28,6 +29,7 @@ const {
   backgroundImage = '',
   backgroundColor = '',
   backgroundFixed = false,
+  backgroundOverlayOpacity = 0,
   topNavigationTheme = '',
   showDivider = true,
   paddingBlock,
@@ -55,6 +57,11 @@ const heroContentAlignMap = {
   center: 'center',
   bottom: 'end',
 } as const
+const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
+const resolvedBackgroundOverlayOpacity =
+  Number.isFinite(normalizedBackgroundOverlayOpacity)
+    ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
+    : 0
 
 const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
   backgroundColor,
@@ -66,6 +73,7 @@ const heroStyle = [
   pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
   heroPaddingBlock ? `--hero-padding-block: ${heroPaddingBlock}` : '',
   `--hero-content-align: ${heroContentAlignMap[resolvedContentVerticalAlign]}`,
+  `--hero-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -89,6 +97,8 @@ const heroStyle = [
   )}
 
   {!backgroundVideo && backgroundImage && <div class="hero__background-media hero__background-image" aria-hidden="true"></div>}
+
+  {(backgroundVideo || backgroundImage) && <div class="hero__background-overlay" aria-hidden="true"></div>}
 
   <div class="container hero__content">
     <slot />
@@ -125,7 +135,7 @@ const heroStyle = [
 
     .hero > .container {
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
 
     .hero__background-media {
@@ -156,6 +166,14 @@ const heroStyle = [
       background-position: center;
       background-size: cover;
       background-repeat: no-repeat;
+    }
+
+    .hero__background-overlay {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      background-color: rgb(0 0 0 / var(--hero-background-overlay-opacity, 0));
     }
 
     .hero__content {
