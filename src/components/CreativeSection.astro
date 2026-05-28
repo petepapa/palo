@@ -221,7 +221,6 @@ const sectionStyle = {
     .creative-section.has-fixed-background {
       overflow: hidden;
       overflow: clip;
-      contain: paint;
       clip-path: inset(0);
       background-image: none;
     }
@@ -254,10 +253,10 @@ const sectionStyle = {
     }
 
     .creative-section.has-fixed-background .media-container {
-      position: absolute;
+      position: fixed;
+      inset: 0;
       width: 100vw;
       height: 100vh;
-      transform: translate3d(0, var(--fixed-background-offset, 0px), 0);
     }
 
     .creative-section.has-fixed-background .bg-image-layer {
@@ -315,35 +314,3 @@ const sectionStyle = {
     }
   }
 </style>
-
-<script>
-  const win = window as Window & { __paloFixedBackgrounds?: boolean }
-
-  if (!win.__paloFixedBackgrounds) {
-    win.__paloFixedBackgrounds = true
-
-    const updateFixedBackgrounds = () => {
-      document
-        .querySelectorAll<HTMLElement>(
-          '.hero--background-fixed, .creative-section.has-fixed-background, .palo-page-header--background-fixed'
-        )
-        .forEach((section) => {
-          section.style.setProperty('--fixed-background-offset', `${section.getBoundingClientRect().top * -1}px`)
-        })
-    }
-
-    let frame = 0
-    const requestUpdate = () => {
-      if (frame) return
-      frame = window.requestAnimationFrame(() => {
-        frame = 0
-        updateFixedBackgrounds()
-      })
-    }
-
-    updateFixedBackgrounds()
-    window.addEventListener('scroll', requestUpdate, { passive: true })
-    window.addEventListener('resize', requestUpdate)
-    document.addEventListener('astro:page-load', updateFixedBackgrounds)
-  }
-</script>
