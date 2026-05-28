@@ -45,6 +45,12 @@ const CSS_LENGTH_RE =
 const CSS_LENGTH_HINT =
   'Expected a CSS length like "0.1rem" / "16px" / "-0.05em", or "" to inherit'
 
+const TEXT_SIZE_TOKEN_RE =
+  /^(?:$|(?:var\()?--?(?:text-(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size--?[0-9])\)?|(?:text-)?(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size--?[0-9])$/
+
+const TEXT_SIZE_TOKEN_HINT =
+  'Also accepts text size tokens like "base", "3xl", "text-3xl", or "--text-3xl"'
+
 /** Zod schema for a single CSS length field. */
 function cssLength(fieldLabel: string) {
   return z
@@ -56,6 +62,20 @@ function cssLength(fieldLabel: string) {
 /** Zod schema for an optional CSS length field (undefined → skipped, "" → inherit). */
 function cssLengthOptional(fieldLabel: string) {
   return cssLength(fieldLabel).optional()
+}
+
+function cssLengthOrTextSizeToken(fieldLabel: string) {
+  return z
+    .string()
+    .refine(
+      (value) => CSS_LENGTH_RE.test(value) || TEXT_SIZE_TOKEN_RE.test(value),
+      `${fieldLabel}: ${CSS_LENGTH_HINT}. ${TEXT_SIZE_TOKEN_HINT}.`,
+    )
+    .describe(fieldLabel)
+}
+
+function cssLengthOrTextSizeTokenOptional(fieldLabel: string) {
+  return cssLengthOrTextSizeToken(fieldLabel).optional()
 }
 
 // ---------------------------------------------------------------------------
@@ -152,7 +172,7 @@ const brandingConfigSchema = z
   .object({
     logoLight: z.string().optional(),
     logoDark: z.string().optional(),
-    logoSize: cssLengthOptional('branding.logoSize'),
+    logoSize: cssLengthOrTextSizeTokenOptional('branding.logoSize'),
     font: fontConfigSchema,
     colors: brandingColorsSchema,
   })
@@ -174,12 +194,12 @@ const navigationConfigSchema = z
       .optional(),
     desktopMenuAlignment: alignmentEnum.optional(),
     dropdownDesktopColorMode: dropdownDesktopColorModeEnum.optional(),
-    desktopFontSize: cssLengthOptional('navigation.desktopFontSize'),
-    mobileFontSize: cssLengthOptional('navigation.mobileFontSize'),
-    dropdownDesktopFontSize: cssLengthOptional(
+    desktopFontSize: cssLengthOrTextSizeTokenOptional('navigation.desktopFontSize'),
+    mobileFontSize: cssLengthOrTextSizeTokenOptional('navigation.mobileFontSize'),
+    dropdownDesktopFontSize: cssLengthOrTextSizeTokenOptional(
       'navigation.dropdownDesktopFontSize',
     ),
-    dropdownMobileFontSize: cssLengthOptional(
+    dropdownMobileFontSize: cssLengthOrTextSizeTokenOptional(
       'navigation.dropdownMobileFontSize',
     ),
     mainMenuLineHeightScale: z

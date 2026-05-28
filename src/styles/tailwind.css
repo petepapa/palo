@@ -15,5 +15,55 @@
 }
 
 @layer utilities {
-  /* Place custom utility overrides here if needed */
+  .text-xs {
+    font-size: var(--text-xs) !important;
+  }
+
+  .text-sm {
+    font-size: var(--text-sm) !important;
+  }
+
+  .text-base {
+    font-size: var(--text-base) !important;
+  }
+
+  .text-lg {
+    font-size: var(--text-lg) !important;
+  }
+
+  .text-xl {
+    font-size: var(--text-xl) !important;
+  }
+
+  .text-2xl {
+    font-size: var(--text-2xl) !important;
+  }
+
+  .text-3xl {
+    font-size: var(--text-3xl) !important;
+  }
+
+  .text-4xl {
+    font-size: var(--text-4xl) !important;
+  }
+
+  .text-5xl {
+    font-size: var(--text-5xl) !important;
+  }
+
+  .text-6xl {
+    font-size: var(--text-6xl) !important;
+  }
+
+  .text-7xl {
+    font-size: var(--text-7xl) !important;
+  }
+
+  .text-8xl {
+    font-size: var(--text-8xl) !important;
+  }
+
+  .text-9xl {
+    font-size: var(--text-9xl) !important;
+  }
 }

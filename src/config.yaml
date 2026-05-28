@@ -39,7 +39,7 @@ branding:
   # Logo: leave both empty = show text logo, path = show image (place in /public)
   logoLight: 'branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
   logoDark: 'branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
-  logoSize: '40px'  # Logo 大小：文字为字号，图片为高度（留空跟随桌面导航字号）/ Logo size: text font-size, image height
+  logoSize: '2xl'  # Logo 大小：支持 40px / 3xl / text-3xl / --text-3xl；文字为字号，图片为高度 / Logo size: accepts 40px / 3xl / text-3xl / --text-3xl
 
   # ── 颜色 / Colors ────────────────────────────────────────────
 
@@ -98,12 +98,12 @@ navigation:
 
   # ── 字号 / Font Sizes ─────────────────────────────────────────
 
-  desktopFontSize: '24px'           # 桌面端主导航 / Desktop main nav
-  dropdownDesktopFontSize: '21px'   # 桌面端下拉子菜单 / Desktop dropdown
-  mobileFontSize: '30px'            # 手机端展开菜单 / Mobile expanded menu
-  dropdownMobileFontSize: '24px'    # 手机端下拉子菜单 / Mobile dropdown
+  desktopFontSize: 'xl'           # 桌面端主导航，支持 24px / base / 3xl / --text-3xl / Desktop main nav
+  dropdownDesktopFontSize: 'lg'   # 桌面端下拉子菜单，支持字号 token / Desktop dropdown, accepts text size tokens
+  mobileFontSize: '3xl'            # 手机端展开菜单，支持字号 token / Mobile expanded menu, accepts text size tokens
+  dropdownMobileFontSize: '2xl'    # 手机端下拉子菜单，支持字号 token / Mobile dropdown, accepts text size tokens
   mainMenuLineHeightScale: 1.25      # 主菜单竖排行高倍数，数值越大越宽松 / Main menu vertical line-height scale
-  dropdownMenuLineHeightScale: 0.85  # 下拉菜单竖排行高倍数，数值越大越宽松 / Dropdown menu vertical line-height scale
+  dropdownMenuLineHeightScale: 1  # 下拉菜单竖排行高倍数，数值越大越宽松 / Dropdown menu vertical line-height scale
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
 
