@@ -2,7 +2,25 @@
 // src/components/CreativeSection.astro
 import themeConfig from '@config'
 
-type PaddingBlock = '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type PaddingBlock =
+  | ''
+  | '5xs'
+  | '4xs'
+  | '3xs'
+  | '2xs'
+  | 'xs'
+  | 's'
+  | 'sm'
+  | 'm'
+  | 'md'
+  | 'l'
+  | 'lg'
+  | 'xl'
+  | '2xl'
+  | '3xl'
+  | '4xl'
+  | '5xl'
+  | (string & {})
 
 interface Props {
   /**
@@ -40,7 +58,7 @@ interface Props {
   backgroundOverlayOpacity?: number
   /**
    * 顶部和底部内边距级别 / Top and bottom padding level
-   * 默认 xl，可选 xs / sm / md / lg / xl / Default is xl, accepts xs / sm / md / lg / xl
+   * 默认 xl，可选 5xs 到 5xl，也支持 sm/md/lg 别名 / Default is xl, accepts 5xs through 5xl and sm/md/lg aliases
    */
   paddingBlock?: PaddingBlock
   /**
@@ -68,13 +86,28 @@ const {
 } = Astro.props
 
 const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
+  '5xs': 'var(--space-5xs)',
+  '4xs': 'var(--space-4xs)',
+  '3xs': 'var(--space-3xs)',
+  '2xs': 'var(--space-2xs)',
   xs: 'var(--space-xs)',
+  s: 'var(--space-s)',
   sm: 'var(--space-s)',
+  m: 'var(--space-m)',
   md: 'var(--space-m)',
+  l: 'var(--space-l)',
   lg: 'var(--space-l)',
   xl: 'var(--space-xl)',
+  '2xl': 'var(--space-2xl)',
+  '3xl': 'var(--space-3xl)',
+  '4xl': 'var(--space-4xl)',
+  '5xl': 'var(--space-5xl)',
 }
-const resolvedPaddingBlock = paddingBlock ? (paddingBlockMap[paddingBlock] ?? 'var(--space-xl)') : 'var(--space-xl)'
+const resolvePaddingBlock = (value?: PaddingBlock): string => {
+  const normalizedValue = typeof value === 'string' ? value.trim() : ''
+  return normalizedValue ? (paddingBlockMap[normalizedValue] ?? normalizedValue) : 'var(--space-xl)'
+}
+const resolvedPaddingBlock = resolvePaddingBlock(paddingBlock)
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const sectionContentAlignMap = {

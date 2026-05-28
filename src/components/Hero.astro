@@ -7,7 +7,25 @@ import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
  * @description Reusable hero section with customizable visuals and slotted content.
  */
 
-type PaddingBlock = '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type PaddingBlock =
+  | ''
+  | '5xs'
+  | '4xs'
+  | '3xs'
+  | '2xs'
+  | 'xs'
+  | 's'
+  | 'sm'
+  | 'm'
+  | 'md'
+  | 'l'
+  | 'lg'
+  | 'xl'
+  | '2xl'
+  | '3xl'
+  | '4xl'
+  | '5xl'
+  | (string & {})
 
 interface Props {
   fullscreen?: boolean
@@ -40,13 +58,28 @@ const {
 } = Astro.props
 
 const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
+  '5xs': 'var(--space-5xs)',
+  '4xs': 'var(--space-4xs)',
+  '3xs': 'var(--space-3xs)',
+  '2xs': 'var(--space-2xs)',
   xs: 'var(--space-xs)',
+  s: 'var(--space-s)',
   sm: 'var(--space-s)',
+  m: 'var(--space-m)',
   md: 'var(--space-m)',
+  l: 'var(--space-l)',
   lg: 'var(--space-l)',
   xl: 'var(--space-xl)',
+  '2xl': 'var(--space-2xl)',
+  '3xl': 'var(--space-3xl)',
+  '4xl': 'var(--space-4xl)',
+  '5xl': 'var(--space-5xl)',
 }
-const heroPaddingBlock = paddingBlock ? (paddingBlockMap[paddingBlock] ?? 'var(--space-xl)') : 'var(--space-xl)'
+const resolvePaddingBlock = (value?: PaddingBlock): string => {
+  const normalizedValue = typeof value === 'string' ? value.trim() : ''
+  return normalizedValue ? (paddingBlockMap[normalizedValue] ?? normalizedValue) : 'var(--space-xl)'
+}
+const heroPaddingBlock = resolvePaddingBlock(paddingBlock)
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const heroContentAlignMap = {
