@@ -12,6 +12,21 @@
   --color-outline: var(--brand-outline);
   --font-family-body: var(--font-body);
   --font-family-heading: var(--font-heading);
+  
+  --text-xs: 0.64rem;
+  --text-sm: 0.8rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.953125rem;
+  --text-2xl: 2.44140625rem;
+  --text-3xl: 3.0517578125rem;
+  --text-4xl: 3.814697265625rem;
+  --text-5xl: 4.76837158203125rem;
+  --text-6xl: 5.9604644775390625rem;
+  --text-7xl: 7.450580596923828rem;
+  --text-8xl: 9.313225746154785rem;
+  --text-9xl: 11.641532182693481rem;
 }
 
 @layer utilities {

@@ -124,72 +124,40 @@ const {
   typography,
 } = themeConfig
 
+const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
+
 // ──────────────────────────────────────────────
-//  正文字体大小计算 - 基于 baseFontSize
+//  正文字号阶梯 / Body text size scale
+//  xs → -2, sm → -1, base → 0, md → 1 ... 9xl → 11
 // ──────────────────────────────────────────────
-const baseFontSizePx = Number.parseFloat(typography.baseFontSize)
+const textSizeStepMap = [
+  ['xs', -2],
+  ['sm', -1],
+  ['base', 0],
+  ['md', 1],
+  ['lg', 2],
+  ['xl', 3],
+  ['2xl', 4],
+  ['3xl', 5],
+  ['4xl', 6],
+  ['5xl', 7],
+  ['6xl', 8],
+  ['7xl', 9],
+  ['8xl', 10],
+  ['9xl', 11],
+] as const
 
-// 字体大小比例（相对于基准大小）
-const fontSizeRatios: Record<string, number> = {
-  xs: 0.75,
-  sm: 0.875,
-  base: 1,
-  md: 1,
-  lg: 1.125,
-  xl: 1.25,
-  '2xl': 1.5,
-  '3xl': 1.875,
-  '4xl': 2.25,
-  '5xl': 3,
-  '6xl': 3.75,
-  '7xl': 4.5,
-  '8xl': 6,
-  '9xl': 8,
+const bodyTextStepRatio = 1.25
+const calculateBodyTextSize = (step: number) => {
+  const ratio = step >= 0 ? Math.pow(bodyTextStepRatio, step) : 1 / Math.pow(bodyTextStepRatio, Math.abs(step))
+  return `${(ratio * rootFontSizePx) / 16}rem`
 }
 
-// 移动端缩放比例
-const mobileScaleFactors: Record<string, number> = {
-  xs: 1,
-  sm: 1,
-  base: 1,
-  md: 1,
-  lg: 1,
-  xl: 1,
-  '2xl': 0.8,
-  '3xl': 0.8,
-  '4xl': 0.7,
-  '5xl': 0.7,
-  '6xl': 0.65,
-  '7xl': 0.6,
-  '8xl': 0.6,
-  '9xl': 0.6,
-}
+const bodyTextSizes = textSizeStepMap
+  .map(([size, step]) => `  --text-${size}: ${calculateBodyTextSize(step)} !important;`)
+  .join('\n')
 
-// 计算字体大小
-function calculateFontSize(ratio: number, mobileScale: number, isResponsive: boolean) {
-  const desktopRem = ratio
-  const mobileRem = ratio * mobileScale
-
-  if (!isResponsive || mobileScale === 1) {
-    return `${desktopRem}rem`
-  }
-
-  // 计算 clamp() 的中间值
-  const slope = ((mobileRem - desktopRem) / (375 - 1440)) * 100
-  const intercept = (mobileRem - (slope * 375) / 100)
-
-  return `clamp(${mobileRem}rem, calc(${intercept}rem + ${Math.abs(slope)}vw), ${desktopRem}rem)`
-}
-
-// 生成正文字体大小 CSS 变量
-const bodyTextSizes = Object.entries(fontSizeRatios).map(([size, ratio]) => {
-  const mobileScale = mobileScaleFactors[size]
-  const isResponsive = mobileScale < 1
-  const fontSize = calculateFontSize(ratio, mobileScale, isResponsive)
-  return `  --text-${size}: ${fontSize} !important;`
-}).join('\n')
-
-// 生成行高 CSS 变量
+// 生成行高 CSS 变量 / Generate line-height variables
 const lineHeights: Record<string, number> = {
   xs: 1.4,
   sm: 1.5,
@@ -263,25 +231,8 @@ function hexToRgbTriplet(hex: string): string {
 const defaultContainerMaxWidth = '90rem'
 const cssLengthPattern = /^\d+(\.\d+)?(px|rem|em|vw|vh|vmin|vmax|ch|cm|mm|in|pc|%)$/i
 const textSizeTokenMap: Record<string, string> = {
-  ...Object.fromEntries(
-    Object.entries(fontSizeRatios).map(([size, ratio]) => [size, `calc(${ratio} * 1rem)`])
-  ),
-  '-2': '0.75rem',
-  '-1': '0.875rem',
-  '0': '1rem',
-  '1': '1.125rem',
-  '2': '1.25rem',
-  '3': '1.5rem',
-  '4': '1.875rem',
-  '5': '2.25rem',
-  '6': '3rem',
-  '7': '3.75rem',
-  '8': '4.5rem',
-  '9': '6rem',
-  '10': '8rem',
-  '11': '8rem',
-  '12': '8rem',
-  '13': '8rem',
+  ...Object.fromEntries(textSizeStepMap.map(([size]) => [size, `var(--text-${size})`])),
+  ...Object.fromEntries(textSizeStepMap.map(([size, step]) => [String(step), `var(--text-${size})`])),
 }
 
 const resolveTextSizeToken = (rawValue: string): string | null => {
@@ -510,8 +461,6 @@ const mobileScale = typography.mobileHeadingScale
 const desktopScale = typography.desktopHeadingScale
 const viewportMin = 375
 const viewportMax = 1440
-const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
-
 const buildScaleStep = (step: number) => {
   const mobileValueRem = step >= 0 ? Math.pow(mobileScale, step) : 1 / Math.pow(mobileScale, Math.abs(step))
   const desktopValueRem = step >= 0 ? Math.pow(desktopScale, step) : 1 / Math.pow(desktopScale, Math.abs(step))

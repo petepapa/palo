@@ -46,7 +46,7 @@ const CSS_LENGTH_HINT =
   'Expected a CSS length like "0.1rem" / "16px" / "-0.05em", or "" to inherit'
 
 const TEXT_SIZE_TOKEN_RE =
-  /^(?:$|(?:var\()?--?(?:text-(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size--?[0-9])\)?|(?:text-)?(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size--?[0-9])$/
+  /^(?:$|(?:var\()?--?(?:text-(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size-?-?(?:[0-9]|1[0-3]))\)?|(?:text-)?(?:xs|sm|base|md|lg|xl|[2-9]xl)|font-size-?-?(?:[0-9]|1[0-3]))$/
 
 const TEXT_SIZE_TOKEN_HINT =
   'Also accepts text size tokens like "base", "3xl", "text-3xl", or "--text-3xl"'
