@@ -103,7 +103,7 @@ navigation:
   mobileFontSize: '2xl'            # 手机端展开菜单，支持字号 token / Mobile expanded menu, accepts text size tokens
   dropdownMobileFontSize: 'xl'    # 手机端下拉子菜单，支持字号 token / Mobile dropdown, accepts text size tokens
   mainMenuLineHeightScale: 1.25      # 主菜单竖排行高倍数，数值越大越宽松 / Main menu vertical line-height scale
-  dropdownMenuLineHeightScale: 0.75  # 下拉菜单竖排行高倍数，数值越大越宽松 / Dropdown menu vertical line-height scale
+  dropdownMenuLineHeightScale: 0.85  # 下拉菜单竖排行高倍数，数值越大越宽松 / Dropdown menu vertical line-height scale
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
 
@@ -169,7 +169,7 @@ border:
   toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
   mediaWidth: '0'              # 图片 / Images
   surfaceWidth: '0.05rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
-  dividerWidth: '0.05rem'     # 分隔线 / Dividers
+  dividerWidth: '10.05rem'     # 分隔线 / Dividers
 
 
 # ╔══════════════════════════════════════════════════════════════╗
