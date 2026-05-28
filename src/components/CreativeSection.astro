@@ -1,6 +1,6 @@
 ---
 // src/components/CreativeSection.astro
-import themeConfig from '@config'
+import { normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 
 type PaddingBlock =
   | ''
@@ -140,6 +140,8 @@ const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)
     ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
     : 0
+const resolvedBackgroundImage = normalizePublicAssetUrl(backgroundImage)
+const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
 
 // 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
 const sectionStyle = {
@@ -148,7 +150,7 @@ const sectionStyle = {
   '--section-content-align': sectionContentAlignMap[resolvedContentVerticalAlign],
   '--section-overlay-opacity': resolvedBackgroundOverlayOpacity,
   ...(contentColor ? { '--section-color': contentColor } : {}),
-  ...(backgroundImage ? { '--section-bg-image': `url(${backgroundImage})` } : {}),
+  ...(resolvedBackgroundImage ? { '--section-bg-image': `url("${resolvedBackgroundImage.replace(/"/g, '\\"')}")` } : {}),
 }
 ---
 
@@ -173,7 +175,7 @@ const sectionStyle = {
         playsinline
         class="background-media"
       >
-        <source src={backgroundVideo} type="video/mp4" />
+        <source src={resolvedBackgroundVideo} type="video/mp4" />
       </video>
     </div>
   )}

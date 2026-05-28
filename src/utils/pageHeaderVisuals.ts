@@ -7,7 +7,23 @@ interface PageHeaderVisualOptions {
   topNavigationTheme?: string
 }
 
-const cssUrl = (value: string): string => `url("${value.replace(/"/g, '\\"')}")`
+export const normalizePublicAssetUrl = (value = ''): string => {
+  const trimmedValue = String(value).trim()
+  if (!trimmedValue) return ''
+
+  if (
+    trimmedValue.startsWith('/') ||
+    trimmedValue.startsWith('#') ||
+    /^(?:[a-z][a-z\d+.-]*:)?\/\//i.test(trimmedValue) ||
+    /^(?:data|blob):/i.test(trimmedValue)
+  ) {
+    return trimmedValue
+  }
+
+  return `/${trimmedValue.replace(/^\.?\//, '')}`
+}
+
+const cssUrl = (value: string): string => `url("${normalizePublicAssetUrl(value).replace(/"/g, '\\"')}")`
 
 export const resolveTopNavigationTheme = (value = ''): TopNavigationTheme => {
   const normalizedValue = String(value).trim()

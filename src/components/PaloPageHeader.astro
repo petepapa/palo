@@ -1,7 +1,7 @@
 ---
 import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
-import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
+import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 
 type PaddingBlock =
   | ''
@@ -131,6 +131,7 @@ const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)
     ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
     : 0
+const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
 
 const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderVisuals({
   backgroundColor,
@@ -174,7 +175,7 @@ const sanitizedSubtitle: string = subtitle
 >
   {backgroundVideo && (
     <div class="palo-page-header__background-media" aria-hidden="true">
-      <video class="palo-page-header__background-video" src={backgroundVideo} autoplay muted loop playsinline />
+      <video class="palo-page-header__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
     </div>
   )}
 
