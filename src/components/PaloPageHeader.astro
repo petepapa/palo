@@ -3,6 +3,8 @@ import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
 
+type PaddingBlock = '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
 interface Props {
   class?: string
   title: string
@@ -16,7 +18,7 @@ interface Props {
   contentColor?: string
   topNavigationTheme?: string
   showDivider?: boolean
-  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8'
+  paddingBlock?: PaddingBlock
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   contentHorizontalAlign?: '' | 'left' | 'center' | 'right'
   textAlign?: '' | 'left' | 'center' | 'right'
@@ -41,19 +43,16 @@ const {
   textAlign = '',
 } = Astro.props
 
-const hasPaddingBlockValue = paddingBlock !== undefined && paddingBlock !== ''
-const normalizedPaddingBlock = Number(paddingBlock)
-const hasCustomPaddingBlock =
-  hasPaddingBlockValue &&
-  Number.isFinite(normalizedPaddingBlock) &&
-  normalizedPaddingBlock >= 0 &&
-  normalizedPaddingBlock <= 8
-const pageHeaderPaddingBlock =
-  hasCustomPaddingBlock
-    ? normalizedPaddingBlock === 0
-      ? '0px'
-      : `var(--font-size-${normalizedPaddingBlock})`
-    : ''
+const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
+  xs: 'var(--space-xs)',
+  sm: 'var(--space-s)',
+  md: 'var(--space-m)',
+  lg: 'var(--space-l)',
+  xl: 'var(--space-xl)',
+}
+const pageHeaderPaddingBlock = paddingBlock
+  ? (paddingBlockMap[paddingBlock] ?? 'var(--space-xl)')
+  : 'var(--space-xl)'
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const pageHeaderContentAlignMap = {
@@ -88,7 +87,7 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
 })
 const resolvedPageHeaderStyle = [
   pageHeaderStyle,
-  pageHeaderPaddingBlock ? `--page-header-padding-block: ${pageHeaderPaddingBlock}` : '',
+  `--page-header-padding-block: ${pageHeaderPaddingBlock}`,
   `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedContentVerticalAlign]}`,
   `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedContentHorizontalAlign]}`,
   `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedContentHorizontalAlign]}`,
@@ -133,7 +132,7 @@ const sanitizedSubtitle: string = subtitle
 
   <div class="container palo-page-header__content space-content">
     <Heading level="h1">{title}</Heading>
-    {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
+    {sanitizedSubtitle && <p class="text-2xl" set:html={sanitizedSubtitle} />}
   </div>
 </section>
 
@@ -160,8 +159,8 @@ const sanitizedSubtitle: string = subtitle
       align-content: var(--page-header-content-align, center);
       justify-content: stretch;
       justify-items: stretch;
-      padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, 6rem));
-      padding-block-end: var(--page-header-padding-block, 6rem);
+      padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, var(--space-xl)));
+      padding-block-end: var(--page-header-padding-block, var(--space-xl));
     }
 
     .palo-page-header--with-divider {

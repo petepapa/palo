@@ -7,6 +7,8 @@ import { createPageHeaderVisuals } from '@utils/pageHeaderVisuals'
  * @description Reusable hero section with customizable visuals and slotted content.
  */
 
+type PaddingBlock = '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
 interface Props {
   fullscreen?: boolean
   contentColor?: string
@@ -17,7 +19,7 @@ interface Props {
   backgroundOverlayOpacity?: number
   topNavigationTheme?: string
   showDivider?: boolean
-  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  paddingBlock?: PaddingBlock
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   class?: string
 }
@@ -37,19 +39,14 @@ const {
   class: className = '',
 } = Astro.props
 
-const normalizedPaddingBlock = Number(paddingBlock)
-const hasCustomPaddingBlock =
-  paddingBlock !== undefined &&
-  Number.isFinite(normalizedPaddingBlock) &&
-  normalizedPaddingBlock >= 0 &&
-  normalizedPaddingBlock <= 8
-
-const heroPaddingBlock =
-  hasCustomPaddingBlock
-    ? normalizedPaddingBlock === 0
-      ? '0px'
-      : `var(--font-size-${normalizedPaddingBlock})`
-    : ''
+const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
+  xs: 'var(--space-xs)',
+  sm: 'var(--space-s)',
+  md: 'var(--space-m)',
+  lg: 'var(--space-l)',
+  xl: 'var(--space-xl)',
+}
+const heroPaddingBlock = paddingBlock ? (paddingBlockMap[paddingBlock] ?? 'var(--space-xl)') : 'var(--space-xl)'
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const heroContentAlignMap = {
@@ -71,7 +68,7 @@ const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageH
 })
 const heroStyle = [
   pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
-  heroPaddingBlock ? `--hero-padding-block: ${heroPaddingBlock}` : '',
+  `--hero-padding-block: ${heroPaddingBlock}`,
   `--hero-content-align: ${heroContentAlignMap[resolvedContentVerticalAlign]}`,
   `--hero-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
 ]
@@ -125,8 +122,8 @@ const heroStyle = [
     .hero--standard {
       display: grid;
       place-content: var(--hero-content-align, center) center;
-      padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, 6rem));
-      padding-block-end: var(--hero-padding-block, 6rem);
+      padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, var(--space-xl)));
+      padding-block-end: var(--hero-padding-block, var(--space-xl));
     }
 
     .hero--with-divider {

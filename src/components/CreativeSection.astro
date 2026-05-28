@@ -2,6 +2,8 @@
 // src/components/CreativeSection.astro
 import themeConfig from '@config'
 
+type PaddingBlock = '' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+
 interface Props {
   /**
    * 是否全屏显示 (占满视口高度) / Whether to display fullscreen (fill viewport height)
@@ -38,9 +40,9 @@ interface Props {
   backgroundOverlayOpacity?: number
   /**
    * 顶部和底部内边距级别 / Top and bottom padding level
-   * 默认 6，可选 0 到 8 / Default is 6, accepts 0 through 8
+   * 默认 xl，可选 xs / sm / md / lg / xl / Default is xl, accepts xs / sm / md / lg / xl
    */
-  paddingBlock?: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+  paddingBlock?: PaddingBlock
   /**
    * 内容垂直位置 / Vertical content position
    * 留空等同 center，可选 top / center / bottom / Empty equals center; accepts top / center / bottom
@@ -60,16 +62,19 @@ const {
   backgroundColor = '',
   backgroundFixed = false,
   backgroundOverlayOpacity = 0,
-  paddingBlock = 6,
+  paddingBlock = '',
   contentVerticalAlign = '',
   class: className = '',
 } = Astro.props
 
-const normalizedPaddingBlock = Number(paddingBlock)
-const effectivePaddingBlock =
-  Number.isFinite(normalizedPaddingBlock) && normalizedPaddingBlock >= 0 && normalizedPaddingBlock <= 8
-    ? normalizedPaddingBlock
-    : 6
+const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
+  xs: 'var(--space-xs)',
+  sm: 'var(--space-s)',
+  md: 'var(--space-m)',
+  lg: 'var(--space-l)',
+  xl: 'var(--space-xl)',
+}
+const resolvedPaddingBlock = paddingBlock ? (paddingBlockMap[paddingBlock] ?? 'var(--space-xl)') : 'var(--space-xl)'
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const sectionContentAlignMap = {
@@ -86,8 +91,7 @@ const resolvedBackgroundOverlayOpacity =
 // 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
 const sectionStyle = {
   '--section-bg': backgroundColor || 'transparent',
-  '--section-padding-block':
-    effectivePaddingBlock === 0 ? '0px' : `var(--font-size-${effectivePaddingBlock})`,
+  '--section-padding-block': resolvedPaddingBlock,
   '--section-content-align': sectionContentAlignMap[resolvedContentVerticalAlign],
   '--section-overlay-opacity': resolvedBackgroundOverlayOpacity,
   ...(contentColor ? { '--section-color': contentColor } : {}),
@@ -149,7 +153,7 @@ const sectionStyle = {
       flex-direction: column;
       align-items: center;
       justify-content: var(--section-content-align, center);
-      padding-block: var(--section-padding-block, var(--font-size-6)); /* 提供合理的默认上下呼吸间距 / Provides a reasonable default padding-block */
+      padding-block: var(--section-padding-block, var(--space-xl)); /* 提供合理的默认上下呼吸间距 / Provides a reasonable default padding-block */
       
       /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */
       background-color: var(--section-bg, transparent);
@@ -171,7 +175,7 @@ const sectionStyle = {
       block-size: 100vh;
       min-block-size: 100vh;
       box-sizing: border-box;
-      padding-block: var(--section-padding-block, var(--font-size-2));
+      padding-block: var(--section-padding-block, var(--space-xl));
     }
 
     /* 媒体容器层 / Background media container layer */
