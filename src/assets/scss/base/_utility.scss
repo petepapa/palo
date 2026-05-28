@@ -169,50 +169,58 @@
     }
   }
 
-  $font-map: (
-    -2: (
-        font-size: var(--font-size--2),
-        line-height: var(--font-size--2),
-      ),
-    -1: (
-        font-size: var(--font-size--1),
-        line-height: var(--font-size--1),
-      ),
-    0: (
-      font-size: var(--font-size-0),
-      line-height: var(--font-size-0),
-    ),
-    1: (
-      font-size: var(--font-size-1),
-      line-height: var(--font-size-1),
-    ),
-    2: (
-      font-size: var(--font-size-2),
-      line-height: var(--font-size-2),
-    ),
-    3: (
-      font-size: var(--font-size-3),
-      line-height: var(--font-size-3),
-    ),
-    4: (
-      font-size: var(--font-size-4),
-      line-height: var(--font-size-4),
-    ),
-    5: (
-      font-size: var(--font-size-5),
-      line-height: var(--font-size-5),
-    ),
-    6: (
-      font-size: var(--font-size-6),
-      line-height: var(--font-size-6),
-    )
-  );
-
-  @each $size, $value in $font-map {
-    .font-#{$size} {
-      font-size: map-get($value, font-size);
-      line-height: map-get($value, line-height);
-    }
+  /* 正文文本 - text-* 和 font-* 类 */
+  .text-xs, .font--2 {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+  }
+  .text-sm, .font--1 {
+    font-size: var(--text-sm);
+    line-height: var(--text-sm--line-height);
+  }
+  .text-base, .font-0 {
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+  .text-lg, .font-1 {
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+  }
+  .text-xl, .font-2 {
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+  }
+  .text-2xl, .font-3 {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+  }
+  .text-3xl, .font-4 {
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+  }
+  .text-4xl, .font-5 {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl--line-height);
+  }
+  .text-5xl, .font-6 {
+    font-size: var(--text-5xl);
+    line-height: var(--text-5xl--line-height);
+  }
+  .text-6xl, .font-7 {
+    font-size: var(--text-6xl);
+    line-height: var(--text-6xl--line-height);
+  }
+  .text-7xl, .font-8 {
+    font-size: var(--text-7xl);
+    line-height: var(--text-7xl--line-height);
+  }
+  .text-8xl, .font-9 {
+    font-size: var(--text-8xl);
+    line-height: var(--text-8xl--line-height);
+  }
+  .text-9xl, .font-10 {
+    font-size: var(--text-9xl);
+    line-height: var(--text-9xl--line-height);
   }
 
   .space-content {
