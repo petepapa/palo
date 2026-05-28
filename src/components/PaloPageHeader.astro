@@ -36,6 +36,13 @@ interface Props {
   contentColor?: string
   topNavigationTheme?: string
   showDivider?: boolean
+  /**
+   * 上下内边距 / Vertical padding.
+   * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
+   * 支持 space token: 5xs, 4xs, 3xs, 2xs, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl.
+   * 也支持别名 sm/md/lg，以及具体 CSS 值，如 "4rem"、"48px"、"clamp(2rem, 5vw, 6rem)".
+   * Supports space tokens, sm/md/lg aliases, and custom CSS values such as "4rem", "48px", or "clamp(2rem, 5vw, 6rem)".
+   */
   paddingBlock?: PaddingBlock
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   contentHorizontalAlign?: '' | 'left' | 'center' | 'right'

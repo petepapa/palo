@@ -4,27 +4,25 @@ import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Form, Input, Button, Textarea, Checkbox, Fieldset, Heading, Link, Radio } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-
-// Page header appearance settings: fullscreen, content color, background video/image, background color, fixed background, overlay opacity, top navigation theme, padding, vertical alignment, horizontal alignment, divider.
-// 页面头部外观设置：全屏、内容颜色、背景视频/图片、背景颜色、固定背景、遮罩透明度、顶部导航主题、内边距、垂直对齐、水平对齐、分割线
-const pageHeaderAppearance = {
-  fullscreen: false,
-  contentColor: '',
-  backgroundVideo: '',
-  backgroundImage: '',
-  backgroundColor: '',
-  backgroundFixed: false,
-  backgroundOverlayOpacity: '',
-  topNavigationTheme: '',
-  paddingBlock: '',
-  contentVerticalAlign: '',
-  contentHorizontalAlign: '',
-  showDivider: true,
-}
 ---
 
 <DefaultLayout title="Contact">
-  <PaloPageHeader title="Contact" subtitle="Have a question? Get in touch with us!" {...pageHeaderAppearance} />
+  <PaloPageHeader
+    title="Contact"
+    subtitle="Have a question? Get in touch with us!"
+    fullscreen={}
+    contentColor=""
+    backgroundVideo=""
+    backgroundImage=""
+    backgroundColor=""
+    backgroundFixed={}
+    backgroundOverlayOpacity={}
+    topNavigationTheme=""
+    paddingBlock=""
+    contentVerticalAlign=""
+    contentHorizontalAlign=""
+    showDivider={true}
+  />
   <section class="my-16">
     <div class="container">
       <Heading level="h2">Let's talk</Heading>
