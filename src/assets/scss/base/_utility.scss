@@ -182,6 +182,10 @@
     font-size: var(--text-base);
     line-height: var(--text-base--line-height);
   }
+  .text-md {
+    font-size: var(--text-md);
+    line-height: var(--text-md--line-height);
+  }
   .text-lg, .font-1 {
     font-size: var(--text-lg);
     line-height: var(--text-lg--line-height);

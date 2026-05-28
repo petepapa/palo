@@ -17,53 +17,71 @@
 @layer utilities {
   .text-xs {
     font-size: var(--text-xs) !important;
+    line-height: var(--text-xs--line-height) !important;
   }
 
   .text-sm {
     font-size: var(--text-sm) !important;
+    line-height: var(--text-sm--line-height) !important;
   }
 
   .text-base {
     font-size: var(--text-base) !important;
+    line-height: var(--text-base--line-height) !important;
+  }
+
+  .text-md {
+    font-size: var(--text-md) !important;
+    line-height: var(--text-md--line-height) !important;
   }
 
   .text-lg {
     font-size: var(--text-lg) !important;
+    line-height: var(--text-lg--line-height) !important;
   }
 
   .text-xl {
     font-size: var(--text-xl) !important;
+    line-height: var(--text-xl--line-height) !important;
   }
 
   .text-2xl {
     font-size: var(--text-2xl) !important;
+    line-height: var(--text-2xl--line-height) !important;
   }
 
   .text-3xl {
     font-size: var(--text-3xl) !important;
+    line-height: var(--text-3xl--line-height) !important;
   }
 
   .text-4xl {
     font-size: var(--text-4xl) !important;
+    line-height: var(--text-4xl--line-height) !important;
   }
 
   .text-5xl {
     font-size: var(--text-5xl) !important;
+    line-height: var(--text-5xl--line-height) !important;
   }
 
   .text-6xl {
     font-size: var(--text-6xl) !important;
+    line-height: var(--text-6xl--line-height) !important;
   }
 
   .text-7xl {
     font-size: var(--text-7xl) !important;
+    line-height: var(--text-7xl--line-height) !important;
   }
 
   .text-8xl {
     font-size: var(--text-8xl) !important;
+    line-height: var(--text-8xl--line-height) !important;
   }
 
   .text-9xl {
     font-size: var(--text-9xl) !important;
+    line-height: var(--text-9xl--line-height) !important;
   }
 }
