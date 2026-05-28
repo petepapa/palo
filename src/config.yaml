@@ -168,8 +168,8 @@ border:
   paginationWidth: '0.1rem'   # Pagination 分页按钮 / Pagination buttons
   toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
   mediaWidth: '0'              # 图片 / Images
-  surfaceWidth: '0.05rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
-  dividerWidth: '10.05rem'     # 分隔线 / Dividers
+  surfaceWidth: '0.1rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
+  dividerWidth: '0.075rem'     # 分隔线 / Dividers
 
 
 # ╔══════════════════════════════════════════════════════════════╗
