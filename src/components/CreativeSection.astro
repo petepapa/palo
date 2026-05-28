@@ -22,6 +22,8 @@ type PaddingBlock =
   | '5xl'
   | (string & {})
 
+type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
+
 interface Props {
   /**
    * 是否全屏显示 (占满视口高度) / Whether to display fullscreen (fill viewport height)
@@ -57,6 +59,12 @@ interface Props {
    */
   backgroundOverlayOpacity?: number
   /**
+   * 分割线位置 / Divider position.
+   * 默认 true 或留空为下方；可选 top/both/bottom/false，也支持 上方/上下/下方.
+   * Defaults to bottom when true or empty; accepts top/both/bottom/false.
+   */
+  showDivider?: DividerPlacement
+  /**
    * 上下内边距 / Vertical padding.
    * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
    * 支持 space token: 5xs, 4xs, 3xs, 2xs, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl.
@@ -83,6 +91,7 @@ const {
   backgroundColor = '',
   backgroundFixed = false,
   backgroundOverlayOpacity = 0,
+  showDivider = true,
   paddingBlock = '',
   contentVerticalAlign = '',
   class: className = '',
@@ -118,6 +127,14 @@ const sectionContentAlignMap = {
   center: 'center',
   bottom: 'flex-end',
 } as const
+const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both' | 'bottom' | false => {
+  const normalizedValue = typeof value === 'string' ? value.trim().toLowerCase() : value
+  if (normalizedValue === false || normalizedValue === 'false') return false
+  if (normalizedValue === 'top' || normalizedValue === '上方') return 'top'
+  if (normalizedValue === 'both' || normalizedValue === '上下') return 'both'
+  return 'bottom'
+}
+const dividerPlacement = resolveDividerPlacement(showDivider)
 const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
 const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)
@@ -140,6 +157,8 @@ const sectionStyle = {
     'creative-section',
     { 'is-fullscreen': fullscreen },
     { 'has-fixed-background': backgroundFixed },
+    { 'has-divider-top': dividerPlacement === 'top' || dividerPlacement === 'both' },
+    { 'has-divider-bottom': dividerPlacement === 'bottom' || dividerPlacement === 'both' },
     className
   ]}
   style={sectionStyle}
@@ -203,6 +222,14 @@ const sectionStyle = {
       contain: paint;
       clip-path: inset(0);
       background-image: none;
+    }
+
+    .creative-section.has-divider-top {
+      border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    .creative-section.has-divider-bottom {
+      border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
 
     /* 全屏显示模式 / Fullscreen display mode */

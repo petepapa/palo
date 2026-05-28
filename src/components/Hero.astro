@@ -27,6 +27,8 @@ type PaddingBlock =
   | '5xl'
   | (string & {})
 
+type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
+
 interface Props {
   fullscreen?: boolean
   contentColor?: string
@@ -36,7 +38,12 @@ interface Props {
   backgroundFixed?: boolean
   backgroundOverlayOpacity?: number
   topNavigationTheme?: string
-  showDivider?: boolean
+  /**
+   * 分割线位置 / Divider position.
+   * 默认 true 或留空为下方；可选 top/both/bottom/false，也支持 上方/上下/下方.
+   * Defaults to bottom when true or empty; accepts top/both/bottom/false.
+   */
+  showDivider?: DividerPlacement
   /**
    * 上下内边距 / Vertical padding.
    * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
@@ -94,6 +101,14 @@ const heroContentAlignMap = {
   center: 'center',
   bottom: 'end',
 } as const
+const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both' | 'bottom' | false => {
+  const normalizedValue = typeof value === 'string' ? value.trim().toLowerCase() : value
+  if (normalizedValue === false || normalizedValue === 'false') return false
+  if (normalizedValue === 'top' || normalizedValue === '上方') return 'top'
+  if (normalizedValue === 'both' || normalizedValue === '上下') return 'both'
+  return 'bottom'
+}
+const dividerPlacement = resolveDividerPlacement(showDivider)
 const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
 const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)
@@ -122,7 +137,8 @@ const heroStyle = [
     'hero',
     fullscreen ? 'section-fullscreen' : 'hero--standard',
     backgroundFixed && 'hero--background-fixed',
-    showDivider && 'hero--with-divider',
+    (dividerPlacement === 'top' || dividerPlacement === 'both') && 'hero--with-divider-top',
+    (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'hero--with-divider-bottom',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
@@ -166,7 +182,11 @@ const heroStyle = [
       padding-block-end: var(--hero-padding-block, var(--space-xl));
     }
 
-    .hero--with-divider {
+    .hero--with-divider-top {
+      border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    .hero--with-divider-bottom {
       border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
 
