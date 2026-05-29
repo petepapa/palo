@@ -8,6 +8,7 @@ site:
   name: Palo
   titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo" / Tab title separator, e.g. "About | Palo"
   trailingSlash: false        # URL 尾部斜杠 / Trailing slash: false → /about, true → /about/
+  defaultTheme: auto          # 默认主题：auto 跟随系统 / light 浅色 / dark 深色 / Default theme: auto follows system / light / dark
   showDarkModeToggle: true    # 显示深色模式切换 / Show dark mode toggle
   showLauncher: true          # 启用快捷启动器（Cmd+K / Ctrl+K）。可选值：false / true / default / gradientBorder。true 与 default 均表示默认按钮样式。/ Enable the launcher (Cmd+K / Ctrl+K). Valid values: false / true / default / gradientBorder. true and default both mean the default button style.
 

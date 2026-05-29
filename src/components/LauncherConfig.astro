@@ -9,6 +9,7 @@ import {
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { BLOG_API_URL } from 'astro:env/server'
+import themeConfig from '@config'
 import { slugify } from '@utils/slugify'
 import { navigationItems, socialItems } from '../navigation'
 
@@ -17,10 +18,14 @@ import { navigationItems, socialItems } from '../navigation'
  * @type {Array<{ label: string, onAction: string }>}
  */
 const launcherPreferenceItems = [
-  {
-    label: 'Dark mode',
-    onAction: 'toggle-dark-mode',
-  },
+  ...(themeConfig.site.showDarkModeToggle
+    ? [
+        {
+          label: 'Dark mode',
+          onAction: 'toggle-dark-mode',
+        },
+      ]
+    : []),
   {
     label: 'High contrast',
     onAction: 'toggle-high-contrast',

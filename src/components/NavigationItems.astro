@@ -69,7 +69,7 @@ const itemsToRender = variant === 'primary' ? primaryItems : variant === 'utilit
   {
     variant !== 'primary' && themeConfig.site.showDarkModeToggle && (
       <li class="menu-item type-icon animate-rotate menu-item--utility">
-        <DarkMode>
+        <DarkMode initialMode={themeConfig.site.defaultTheme}>
           <Icon aria-hidden="true" name="ph:moon" slot="light" />
           <Icon aria-hidden="true" name="ph:sun" slot="dark" />
         </DarkMode>

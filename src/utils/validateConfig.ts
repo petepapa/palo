@@ -92,6 +92,10 @@ const activeStyleEnum = z
   .enum(['wavy', 'underline', 'bold'])
   .describe('active link style')
 
+const defaultThemeEnum = z
+  .enum(['auto', 'light', 'dark'])
+  .describe('default theme mode')
+
 // ---------------------------------------------------------------------------
 // Section schemas
 // ---------------------------------------------------------------------------
@@ -103,6 +107,7 @@ const siteConfigSchema = z
     trailingSlash: z.boolean({
       error: 'site.trailingSlash must be true or false',
     }),
+    defaultTheme: defaultThemeEnum,
     showDarkModeToggle: z.boolean({
       error: 'site.showDarkModeToggle must be true or false',
     }),
