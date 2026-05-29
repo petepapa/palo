@@ -299,6 +299,7 @@ const paginationBorderWidth = resolveCssLength(themeConfig.border?.paginationWid
 const toggleBorderWidth = resolveCssLength(themeConfig.border?.toggleWidth, defaultBorderWidth)
 const mediaBorderWidth = resolveCssLength(themeConfig.border?.mediaWidth, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surfaceWidth, defaultBorderWidth)
+const codeBlockBorderWidth = resolveCssLength(themeConfig.border?.codeBlockWidth, surfaceBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.dividerWidth, defaultBorderWidth)
 const defaultRadiusSize = resolveCssLength(themeConfig.radius?.globalSize, '0.5rem')
 const buttonRadiusSize = resolveCssLength(themeConfig.radius?.buttonSize, defaultRadiusSize)
@@ -554,6 +555,7 @@ const themeVariablesCss = `
   --border-width-toggle: ${toggleBorderWidth};
   --border-width-media: ${mediaBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
+  --border-width-code-block: ${codeBlockBorderWidth};
   --border-width-divider: ${dividerBorderWidth};
   --radius-global: ${defaultRadiusSize};
   --radius-xs: calc(${defaultRadiusSize} * 0.25);

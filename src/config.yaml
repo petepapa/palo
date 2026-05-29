@@ -170,6 +170,7 @@ border:
   toggleWidth: '0.1rem'       # Toggle 切换按钮 / Toggle buttons
   mediaWidth: '0'              # 图片 / Images
   surfaceWidth: '0.1rem'           # 下拉菜单、面板等容器 / Dropdowns, panels, surfaces
+  codeBlockWidth: '0'          # 代码块描边 / Code block border width
   dividerWidth: '0.075rem'     # 分隔线 / Dividers
 
 

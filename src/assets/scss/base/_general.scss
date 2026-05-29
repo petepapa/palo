@@ -92,6 +92,11 @@ article {
 }
 
 pre,
+code:not(pre code) {
+  border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+}
+
+pre,
 code:not(pre code),
 kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
@@ -366,6 +371,11 @@ img.rounded-lg,
   .tab[aria-selected='true'] {
     z-index: 2;
   }
+}
+
+pre,
+code:not(pre code) {
+  border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
 }
 
 pre,

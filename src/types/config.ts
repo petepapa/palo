@@ -60,7 +60,9 @@ export interface BorderConfig {
   notificationWidth?: string
   paginationWidth?: string
   toggleWidth?: string
+  mediaWidth?: string
   surfaceWidth?: string
+  codeBlockWidth?: string
   dividerWidth?: string
 }
 

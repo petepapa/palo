@@ -237,6 +237,7 @@ const borderConfigSchema = z
     toggleWidth: cssLengthOptional('border.toggleWidth'),
     mediaWidth: cssLengthOptional('border.mediaWidth'),
     surfaceWidth: cssLengthOptional('border.surfaceWidth'),
+    codeBlockWidth: cssLengthOptional('border.codeBlockWidth'),
     dividerWidth: cssLengthOptional('border.dividerWidth'),
   })
   .strip()

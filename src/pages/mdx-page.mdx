@@ -1,12 +1,28 @@
 ---
 layout: ../layouts/MarkdownLayout.astro
 title: MDX Page
+description: A demonstration of using Astro MDX content with PaloPageHeader.
+narrow: true
+pageHeader:
+  title: MDX Page
+  subtitle: Use Astro components directly inside Markdown-style content.
+  fullscreen: false
+  backgroundImage: ''
+  backgroundVideo: ''
+  backgroundColor: ''
+  backgroundFixed: false
+  backgroundOverlayOpacity: 0
+  contentColor: ''
+  topNavigationTheme: ''
+  showDivider: true
+  paddingBlock: xl
+  contentVerticalAlign: center
+  contentHorizontalAlign: left
+  textAlign: left
 ---
 
 import { Icon } from 'astro-icon/components'
 import { Notification } from 'accessible-astro-components'
-
-# MDX Page
 
 <Notification type="info">
   <Icon aria-hidden="true" name="ph:info" />

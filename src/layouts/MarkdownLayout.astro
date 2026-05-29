@@ -10,10 +10,10 @@ const pageHeader = frontmatter.pageHeader
 <DefaultLayout
   title={frontmatter.title}
   description={frontmatter.description}
-  image={frontmatter.image}
-  author={frontmatter.author}
-  type={frontmatter.type}
-  useTitleTemplate={frontmatter.useTitleTemplate}
+  {...(frontmatter.image ? { image: frontmatter.image } : {})}
+  {...(frontmatter.author ? { author: frontmatter.author } : {})}
+  {...(frontmatter.type ? { type: frontmatter.type } : {})}
+  {...(frontmatter.useTitleTemplate === undefined ? {} : { useTitleTemplate: frontmatter.useTitleTemplate })}
 >
   {
     pageHeader && (
@@ -24,9 +24,15 @@ const pageHeader = frontmatter.pageHeader
         backgroundImage={pageHeader.backgroundImage ?? ''}
         backgroundVideo={pageHeader.backgroundVideo ?? ''}
         backgroundColor={pageHeader.backgroundColor ?? ''}
+        backgroundFixed={pageHeader.backgroundFixed ?? false}
+        backgroundOverlayOpacity={pageHeader.backgroundOverlayOpacity ?? 0}
         contentColor={pageHeader.contentColor ?? ''}
         topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
         showDivider={pageHeader.showDivider ?? true}
+        paddingBlock={pageHeader.paddingBlock ?? ''}
+        contentVerticalAlign={pageHeader.contentVerticalAlign ?? ''}
+        contentHorizontalAlign={pageHeader.contentHorizontalAlign ?? ''}
+        textAlign={pageHeader.textAlign ?? ''}
       />
     )
   }
