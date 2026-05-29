@@ -5,6 +5,8 @@ import PaloPageHeader from '@components/PaloPageHeader.astro'
 const { frontmatter } = Astro.props
 const containerClass = frontmatter.narrow ? 'narrow container' : 'container'
 const pageHeader = frontmatter.pageHeader
+const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
+const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
 ---
 
 <DefaultLayout
@@ -18,8 +20,8 @@ const pageHeader = frontmatter.pageHeader
   {
     pageHeader && (
       <PaloPageHeader
-        title={pageHeader.title}
-        subtitle={pageHeader.subtitle}
+        title={pageHeaderTitle}
+        subtitle={pageHeaderSubtitle}
         fullscreen={pageHeader.fullscreen ?? false}
         backgroundImage={pageHeader.backgroundImage ?? ''}
         backgroundVideo={pageHeader.backgroundVideo ?? ''}

@@ -1,23 +1,21 @@
 ---
 layout: ../layouts/MarkdownLayout.astro
 title: Markdown Page
-description: A demonstration of writing a standard Markdown page with PaloPageHeader.
-narrow: true
+description: A clean content page powered by standard Markdown.
+narrow: false
+
 pageHeader:
-  title: Markdown Page
-  subtitle: A clean content page powered by standard Markdown.
-  fullscreen: false
-  backgroundImage: ''
+  fullscreen: true
+  contentColor: '#fff'
+  backgroundImage: '/123.jpeg'
   backgroundVideo: ''
-  backgroundColor: ''
+  backgroundColor: 'red'
   backgroundFixed: false
-  backgroundOverlayOpacity: 0
-  contentColor: ''
+  backgroundOverlayOpacity: 0.45
   topNavigationTheme: ''
-  showDivider: true
   paddingBlock: xl
-  contentVerticalAlign: center
-  contentHorizontalAlign: left
+  showDivider: true
+  contentVerticalAlign: bottom
   textAlign: left
 ---
 
