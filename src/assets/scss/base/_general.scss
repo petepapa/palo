@@ -96,6 +96,61 @@ code:not(pre code) {
   border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
 }
 
+.code-block {
+  overflow: hidden;
+  border: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+}
+
+.code-block__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-block-end: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  padding: var(--space-3xs) var(--space-xs);
+  color: var(--foreground-color);
+}
+
+.code-block__language {
+  font-weight: var(--font-weight-accent, 600);
+  font-size: var(--text-xs);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.code-block__copy {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    background-color var(--animation-speed-fast) var(--cubic-bezier),
+    color var(--animation-speed-fast) var(--cubic-bezier);
+  cursor: pointer;
+  border: var(--border-width-toggle, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s)));
+  background-color: transparent;
+  padding: var(--space-4xs);
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: inherit;
+}
+
+.code-block__copy:hover,
+.code-block__copy:focus-visible {
+  background-color: var(--foreground-color);
+  color: var(--background-color);
+}
+
+.code-block pre {
+  margin: 0;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+}
+
 pre,
 code:not(pre code),
 kbd:not(.launcher-trigger kbd):not(.launcher kbd),
@@ -376,6 +431,61 @@ img.rounded-lg,
 pre,
 code:not(pre code) {
   border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+}
+
+.code-block {
+  overflow: hidden;
+  border: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+}
+
+.code-block__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-block-end: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  padding: var(--space-3xs) var(--space-xs);
+  color: var(--foreground-color);
+}
+
+.code-block__language {
+  font-weight: var(--font-weight-accent, 600);
+  font-size: var(--text-xs);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.code-block__copy {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    background-color var(--animation-speed-fast) var(--cubic-bezier),
+    color var(--animation-speed-fast) var(--cubic-bezier);
+  cursor: pointer;
+  border: var(--border-width-toggle, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s)));
+  background-color: transparent;
+  padding: var(--space-4xs);
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: inherit;
+}
+
+.code-block__copy:hover,
+.code-block__copy:focus-visible {
+  background-color: var(--foreground-color);
+  color: var(--background-color);
+}
+
+.code-block pre {
+  margin: 0;
+  border-width: 0 !important;
+  border-radius: 0 !important;
 }
 
 pre,
