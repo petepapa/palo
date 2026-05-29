@@ -1,0 +1,180 @@
+@use '../base/breakpoint' as *;
+
+@layer components {
+  .prose {
+    // ──────────────────────────────────────────────
+    // 1. INLINE CODE (CRITICAL)
+    // ──────────────────────────────────────────────
+    code:not(pre code) {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-size: 0.875em;
+      padding: 0.18em 0.4em;
+      border-radius: var(--radius-small, var(--radius-s, 0.25rem)) !important;
+      background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.1)) !important;
+      border: 1px solid light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)) !important;
+      color: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
+      word-break: break-word;
+      box-shadow: none !important;
+    }
+
+    // ──────────────────────────────────────────────
+    // 2. HEADINGS VISUAL ENHANCEMENT (NO SIZES/MARGINS/FONTS OVERRIDES)
+    // ──────────────────────────────────────────────
+    // Keep headings visually consistent with default styles as requested.
+
+    // ──────────────────────────────────────────────
+    // 3. LISTS (ul, ol, li)
+    // ──────────────────────────────────────────────
+    ul:not([class]),
+    ol:not([class]) {
+      padding-inline-start: var(--space-s);
+      
+      li {
+        padding-inline-start: var(--space-3xs);
+        margin-block-end: var(--space-3xs);
+        
+        &::marker {
+          font-weight: var(--font-weight-accent, 600);
+        }
+      }
+    }
+
+    ul:not([class]) {
+      list-style-type: disc;
+      
+      li::marker {
+        color: var(--brand-primary);
+      }
+      
+      ul {
+        li::marker {
+          color: var(--brand-secondary);
+        }
+      }
+    }
+
+    ol:not([class]) {
+      list-style-type: decimal;
+      
+      li::marker {
+        color: var(--brand-primary);
+      }
+      
+      ol {
+        list-style-type: lower-alpha;
+        li::marker {
+          color: var(--brand-secondary);
+        }
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 4. BLOCKQUOTES
+    // ──────────────────────────────────────────────
+    blockquote {
+      border-inline-start: 4px solid var(--brand-primary);
+      background-color: light-dark(rgba(0, 0, 0, 0.02), rgba(255, 255, 255, 0.02));
+      padding: var(--space-xs) var(--space-s);
+      margin-block: var(--space-m);
+      font-style: italic;
+      color: light-dark(var(--color-neutral-700), var(--color-neutral-300));
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+
+      > p:last-child {
+        margin-block-end: 0;
+      }
+
+      blockquote {
+        border-inline-start-color: var(--brand-secondary);
+        background-color: light-dark(rgba(0, 0, 0, 0.04), rgba(255, 255, 255, 0.04));
+        margin-block: var(--space-s);
+        font-size: 0.95em;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 5. TABLES (STYLING ELEMENTS FOR RESPONSIVENESS)
+    // ──────────────────────────────────────────────
+    table {
+      inline-size: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+      text-align: inline-start;
+
+      th {
+        background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+        color: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+        font-weight: var(--font-weight-accent, 600);
+        padding: var(--space-2xs) var(--space-xs);
+        border-block-end: 2px solid light-dark(var(--color-neutral-400), var(--color-neutral-600));
+        border-inline: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+      }
+
+      td {
+        padding: var(--space-2xs) var(--space-xs);
+        border-block-end: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+        border-inline: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+        color: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+        transition: background-color 0.2s ease;
+      }
+
+      tr:nth-child(even) {
+        background-color: light-dark(rgba(0, 0, 0, 0.015), rgba(255, 255, 255, 0.015));
+      }
+
+      tr:hover td {
+        background-color: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
+      }
+    }
+
+    // Horizontal Scroll Wrapper styling for tables (injected via client-side script)
+    .table-wrapper {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+      border: 1px solid light-dark(var(--color-neutral-300), var(--color-neutral-700));
+      border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+      margin-block: var(--space-m);
+      
+      &::-webkit-scrollbar {
+        block-size: 6px;
+      }
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: light-dark(var(--color-neutral-400), var(--color-neutral-600));
+        border-radius: 9999px;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 6. IMAGES
+    // ──────────────────────────────────────────────
+    img {
+      max-inline-size: 100%;
+      block-size: auto;
+      border-radius: var(--radius-media, var(--radius-global, var(--radius-l))) !important;
+      border: var(--border-width-media, var(--border-width-global, 3px)) solid var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-700)));
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+      margin-inline: auto;
+      display: block;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.005);
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 7. HORIZONTAL RULES
+    // ──────────────────────────────────────────────
+    hr {
+      border: 0;
+      block-size: 2px;
+      background: linear-gradient(to right, var(--brand-primary), var(--brand-secondary), transparent);
+      margin-block: var(--space-l);
+      opacity: 0.8;
+      border-radius: 9999px;
+    }
+  }
+}
