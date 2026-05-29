@@ -47,12 +47,30 @@ To create a heading, add number signs (#) in front of a word or phrase. The numb
 ###### Heading level 6
 ```
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae veniam repellat deleniti obcaecati facilis non, praesentium aperiam laudantium excepturi assumenda doloremque animi quis aliquam eligendi quia nemo asperiores et eaque, sunt voluptatibus, saepe exercitationem id. Quis sequi maxime fugiat nam reprehenderit nesciunt quaerat obcaecati, ipsa dignissimos voluptatum voluptatem, optio quidem quos repudiandae dolorem voluptatibus fuga officia odio nemo recusandae voluptas.
-
-```js
-console.log('Hello Accessible World!')
+```html
+<h1>Heading level 1</h1>
+<h2>Heading level 2</h2>
+<h3>Heading level 3</h3>
+<h4>Heading level 4</h4>
+<h5>Heading level 5</h5>
+<h6>Heading level 6</h6>
 ```
 
-Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae veniam repellat deleniti obcaecati facilis non, praesentium aperiam laudantium excepturi assumenda doloremque animi quis aliquam eligendi quia nemo asperiores et eaque, sunt voluptatibus, saepe exercitationem id. Quis sequi maxime fugiat nam reprehenderit nesciunt quaerat obcaecati, ipsa dignissimos voluptatum voluptatem, optio quidem quos repudiandae dolorem voluptatibus fuga officia odio nemo recusandae voluptas.
+### Alternate Syntax
 
-[Get this theme on GitHub](https://github.com/markteekman/accessible-astro-starter)
+Alternatively, on the line below the text, add any number of == characters for heading level 1 or -- characters for heading level 2.
+
+或者，在文本下方的行中，输入任意数量的 == 字符以设置一级标题，或输入任意数量的 -- 字符以设置二级标题。
+
+```markdown
+Heading level 1
+===============	
+Heading level 2
+---------------
+```
+
+```html
+<h1>Heading level 1</h1>
+<h2>Heading level 1</h2>
+```
+
