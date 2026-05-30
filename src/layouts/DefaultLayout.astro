@@ -747,6 +747,9 @@ ${bodyLineHeights}
           const code = pre.querySelector('code')
           if (!(code instanceof HTMLElement)) return
 
+          const isMermaid = /\b(?:language|lang)-mermaid\b/.test(pre.dataset.language || pre.className || '') || /\b(?:language|lang)-mermaid\b/.test(code.className || '')
+          if (isMermaid) return
+
           const wrapper = document.createElement('div')
           wrapper.className = 'code-block'
 

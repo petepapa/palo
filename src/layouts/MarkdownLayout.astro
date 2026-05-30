@@ -45,8 +45,10 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
   </div>
 </DefaultLayout>
 
-<script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" is:inline></script>
+<script is:inline>
   const initProseEnhancements = async () => {
+    const DEBUG = document.documentElement.dataset.paloDebug === 'true'
     // 1. Table responsive wrapping
     document.querySelectorAll('.prose table').forEach((table) => {
       if (table.parentElement?.classList.contains('table-wrapper')) return
@@ -58,44 +60,86 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
       wrapper.appendChild(table)
     })
 
-    // 2. Dynamic client-side Mermaid rendering (zero-overhead)
-    const mermaidBlocks = document.querySelectorAll('.prose pre > code.language-mermaid, .prose pre.language-mermaid > code, .prose pre.language-mermaid')
-    if (mermaidBlocks.length > 0) {
-      try {
-        const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')
-        const isDark = document.documentElement.classList.contains('darkmode')
-        
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: isDark ? 'dark' : 'neutral',
-          securityLevel: 'loose',
-        })
+    // 2. Dynamic client-side Mermaid rendering
+    const allMermaidBlocks = []
+    document.querySelectorAll('.prose pre').forEach((pre) => {
+      if (pre.dataset.paloMermaidProcessed === 'true') return
+      
+      const code = pre.querySelector('code')
+      if (!code) return
+      
+      // Check if it's a mermaid block - check multiple possible locations
+      const isMermaid = pre.dataset.language === 'mermaid' ||
+                        code.classList.contains('language-mermaid') || 
+                        code.classList.contains('lang-mermaid') ||
+                        /\blanguage-mermaid\b|\blang-mermaid\b/.test(pre.className)
+      
+      if (isMermaid) {
+        if (DEBUG) console.log('Found Mermaid block:', pre)
+        allMermaidBlocks.push(pre)
+      }
+    })
 
-        for (const block of mermaidBlocks) {
-          const pre = block.tagName === 'PRE' ? block : block.parentElement
-          if (!pre) continue
+    if (allMermaidBlocks.length > 0 && typeof mermaid !== 'undefined') {
+      try {
+        if (DEBUG) console.log('Found', allMermaidBlocks.length, 'Mermaid block(s)')
+        const isDark = document.documentElement.classList.contains('darkmode')
+
+        // Use site CSS variables so Mermaid matches the site's light/dark themes
+        try {
+          const cs = getComputedStyle(document.documentElement)
+          const fg = cs.getPropertyValue('--foreground-color')?.trim() || (isDark ? '#fff' : '#111')
+          const bg = cs.getPropertyValue('--background-color')?.trim() || (isDark ? '#111' : '#fff')
+          const primary = cs.getPropertyValue('--link-color')?.trim() || cs.getPropertyValue('--color-primary-400')?.trim() || '#4f46e5'
+          const border = cs.getPropertyValue('--border-color')?.trim() || '#888'
+
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: isDark ? 'dark' : 'default',
+            securityLevel: 'loose',
+            themeVariables: {
+              background: bg,
+              textColor: fg,
+              primaryColor: primary,
+              lineColor: border,
+            },
+          })
+        } catch (errTheme) {
+          // fallback to simple init
+          mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default', securityLevel: 'loose' })
+        }
+
+        for (let i = 0; i < allMermaidBlocks.length; i++) {
+          const pre = allMermaidBlocks[i]
+          const code = pre.querySelector('code')
+          const content = code?.textContent || pre.textContent || ''
           
-          const code = block.tagName === 'PRE' ? block.querySelector('code')?.textContent : block.textContent
-          const content = code || pre.textContent || ''
-          
+          // Create container
           const container = document.createElement('div')
-          container.className = 'mermaid my-6 flex justify-center w-full overflow-x-auto'
+          container.className = 'mermaid'
+          container.id = 'mermaid-' + Date.now() + '-' + i
           container.textContent = content.trim()
           
+          pre.dataset.paloMermaidProcessed = 'true'
           pre.replaceWith(container)
         }
-        
+
         await mermaid.run()
+        if (DEBUG) console.log('Mermaid render complete')
       } catch (err) {
         console.error('Failed to load or render Mermaid:', err)
       }
     }
   }
 
-  // Handle standard page loads and View Transitions (Astro 3.x/4.x/5.x+)
+  // Handle standard page loads and View Transitions
   document.addEventListener('astro:page-load', initProseEnhancements)
   document.addEventListener('astro:after-swap', initProseEnhancements)
   
-  // Direct fallback invocation
-  initProseEnhancements()
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProseEnhancements)
+  } else {
+    // Small delay to ensure mermaid CDN script is loaded
+    setTimeout(initProseEnhancements, 100)
+  }
 </script>

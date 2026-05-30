@@ -2,7 +2,7 @@
 layout: ../layouts/MarkdownLayout.astro
 title: Markdown Page
 description: A clean content page powered by standard Markdown.
-narrow: true
+narrow: false
 
 pageHeader:
   fullscreen: true
@@ -85,6 +85,7 @@ alert(message);
 ```
 
 ### Mermaid diagrams
+
 ```mermaid
 graph TD
   A[Start] --> B{Decision}
@@ -95,13 +96,4 @@ graph TD
 ### Inline code
 
 This web site is using `markedjs/marked`.
-
-
-
-
-
-
-
-
-
 

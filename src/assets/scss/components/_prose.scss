@@ -176,5 +176,27 @@
       opacity: 0.8;
       border-radius: 9999px;
     }
+    
+    // ──────────────────────────────────────────────
+    // 8. MERMAID DIAGRAMS
+    // ──────────────────────────────────────────────
+    .mermaid {
+      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+      border: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid 
+        var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-700)));
+      border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+      padding: var(--space-s);
+      margin-block: var(--space-m);
+      overflow-x: auto;
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      
+      // Fix mermaid SVG sizing
+      svg {
+        max-width: 100%;
+        height: auto;
+      }
+    }
   }
 }
