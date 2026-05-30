@@ -170,11 +170,10 @@
     // ──────────────────────────────────────────────
     hr {
       border: 0;
-      block-size: 2px;
-      background: linear-gradient(to right, var(--brand-primary), var(--brand-secondary), transparent);
-      margin-block: var(--space-l);
-      opacity: 0.8;
-      border-radius: 9999px;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-700)));
+      margin-block: var(--space-m);
+      border-radius: 0;
     }
     
     // ──────────────────────────────────────────────
