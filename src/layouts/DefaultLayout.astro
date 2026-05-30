@@ -399,8 +399,37 @@ const selectStaticFontFile = (weight: number): string | null => {
 }
 
 const variableFontFile =
-  availableFontFiles.find((filePath) => /variablefont/i.test(filePath) && /\.(woff2|woff|ttf|otf)$/i.test(filePath)) ??
-  null
+  availableFontFiles.find(
+    (filePath) =>
+      /variablefont/i.test(filePath) &&
+      !/italic/i.test(filePath) &&
+      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
+  ) ?? null
+
+const variableFontItalicFile =
+  availableFontFiles.find(
+    (filePath) =>
+      /italic/i.test(filePath) &&
+      /variablefont/i.test(filePath) &&
+      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
+  ) ?? null
+
+const selectStaticItalicFontFile = (weight: number): string | null => {
+  const hints = fontWeightFileHints[weight] ?? [String(weight)]
+  const normalizedFiles = availableFontFiles
+    .filter((filePath) => /italic/i.test(filePath) && !/variablefont/i.test(filePath))
+    .map((filePath) => ({
+      path: filePath,
+      name: filePath.split('/').pop()?.toLowerCase() ?? '',
+    }))
+
+  for (const hint of hints) {
+    const match = normalizedFiles.find((file) => file.name.includes(hint))
+    if (match) return match.path
+  }
+
+  return null
+}
 
 const buildFontFaceCss = (): string => {
   if (variableFontFile) {
@@ -413,7 +442,7 @@ const buildFontFaceCss = (): string => {
           ? 'opentype'
           : 'truetype'
 
-    return `
+    let fontFaceRules = `
 @font-face {
   font-family: "${font.name}";
   src: url("${publicUrl}") format("${format}");
@@ -422,9 +451,32 @@ const buildFontFaceCss = (): string => {
   font-display: swap;
 }
 `.trim()
+
+    if (variableFontItalicFile) {
+      const italicPublicUrl = getPublicUrl(variableFontItalicFile)
+      const italicFormat = italicPublicUrl.endsWith('.woff2')
+        ? 'woff2'
+        : italicPublicUrl.endsWith('.woff')
+          ? 'woff'
+          : italicPublicUrl.endsWith('.otf')
+            ? 'opentype'
+            : 'truetype'
+
+      fontFaceRules += `
+
+@font-face {
+  font-family: "${font.name}";
+  src: url("${italicPublicUrl}") format("${italicFormat}");
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}`
+    }
+
+    return fontFaceRules
   }
 
-  return uniqueConfiguredWeights
+  let fontFaceRules = uniqueConfiguredWeights
     .map((weight) => {
       const filePath = selectStaticFontFile(weight)
       if (!filePath) return ''
@@ -438,18 +490,43 @@ const buildFontFaceCss = (): string => {
             ? 'opentype'
             : 'truetype'
 
-      return `
+      let rule = `
 @font-face {
   font-family: "${font.name}";
   src: url("${publicUrl}") format("${format}");
   font-style: normal;
   font-weight: ${weight};
   font-display: swap;
-}
-`.trim()
+}`.trim()
+
+      const italicFilePath = selectStaticItalicFontFile(weight)
+      if (italicFilePath) {
+        const italicPublicUrl = getPublicUrl(italicFilePath)
+        const italicFormat = italicPublicUrl.endsWith('.woff2')
+          ? 'woff2'
+          : italicPublicUrl.endsWith('.woff')
+            ? 'woff'
+            : italicPublicUrl.endsWith('.otf')
+              ? 'opentype'
+              : 'truetype'
+
+        rule += `
+
+@font-face {
+  font-family: "${font.name}";
+  src: url("${italicPublicUrl}") format("${italicFormat}");
+  font-style: italic;
+  font-weight: ${weight};
+  font-display: swap;
+}`
+      }
+
+      return rule
     })
     .filter(Boolean)
     .join('\n')
+
+  return fontFaceRules
 }
 
 const fontFaceCss = buildFontFaceCss()

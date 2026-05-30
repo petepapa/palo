@@ -18,12 +18,23 @@
     }
 
     // ──────────────────────────────────────────────
-    // 2. HEADINGS VISUAL ENHANCEMENT (NO SIZES/MARGINS/FONTS OVERRIDES)
+    // 2. INLINE TEXT EMPHASIS (em, strong)
+    // ──────────────────────────────────────────────
+    :where(em, i) {
+      font-style: italic;
+    }
+
+    :where(strong, b) {
+      font-weight: var(--font-weight-accent, 500);
+    }
+
+    // ──────────────────────────────────────────────
+    // 3. HEADINGS VISUAL ENHANCEMENT (NO SIZES/MARGINS/FONTS OVERRIDES)
     // ──────────────────────────────────────────────
     // Keep headings visually consistent with default styles as requested.
 
     // ──────────────────────────────────────────────
-    // 3. LISTS (ul, ol, li)
+    // 4. LISTS (ul, ol, li)
     // ──────────────────────────────────────────────
     ul:not([class]),
     ol:not([class]) {
@@ -69,7 +80,7 @@
     }
 
     // ──────────────────────────────────────────────
-    // 4. BLOCKQUOTES
+    // 5. BLOCKQUOTES
     // ──────────────────────────────────────────────
     blockquote {
       border-inline-start: 4px solid var(--brand-primary);
@@ -93,7 +104,7 @@
     }
 
     // ──────────────────────────────────────────────
-    // 5. TABLES (STYLING ELEMENTS FOR RESPONSIVENESS)
+    // 6. TABLES (STYLING ELEMENTS FOR RESPONSIVENESS)
     // ──────────────────────────────────────────────
     table {
       inline-size: 100%;
@@ -148,7 +159,7 @@
     }
 
     // ──────────────────────────────────────────────
-    // 6. IMAGES
+    // 7. IMAGES
     // ──────────────────────────────────────────────
     img {
       max-inline-size: 100%;
@@ -166,7 +177,7 @@
     }
 
     // ──────────────────────────────────────────────
-    // 7. HORIZONTAL RULES
+    // 8. HORIZONTAL RULES
     // ──────────────────────────────────────────────
     hr {
       border: 0;
@@ -177,7 +188,7 @@
     }
     
     // ──────────────────────────────────────────────
-    // 8. MERMAID DIAGRAMS
+    // 9. MERMAID DIAGRAMS
     // ──────────────────────────────────────────────
     .mermaid {
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
@@ -195,6 +206,20 @@
       svg {
         max-width: 100%;
         height: auto;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 10. CODE BLOCKS - RESET EMPHASIS
+    // ──────────────────────────────────────────────
+    pre,
+    code {
+      :where(strong, b) {
+        font-weight: inherit !important;
+      }
+      
+      :where(em, i) {
+        font-style: inherit !important;
       }
     }
   }

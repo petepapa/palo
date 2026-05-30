@@ -83,7 +83,7 @@
   :where(header, nav, aside, footer) :where(a, button, [role='button'], summary),
   :where(button, .button, .badge, .breadcrumbs, .pagination, label, legend, summary, th, caption),
   :where(kbd:not(.launcher-trigger kbd):not(.launcher kbd)),
-  :where(.font-medium, .font-semibold, .font-bold, strong, b) {
+  :where(.font-medium, .font-semibold, .font-bold) {
     font-weight: var(--font-weight-accent, 400);
     text-transform: var(--display-text-transform, none);
   }
