@@ -61,7 +61,7 @@ branding:
 
   font:
     name: 'League Spartan'         # 字体族名称 / Font family name
-    path: '/fonts/Noto_Sans_SC/' # 字体目录，放 /public 下 / Font folder, place in /public
+    path: '/fonts/League_Spartan/' # 字体目录，放 /public 下 / Font folder, place in /public
 
     # 各场景字重 / Font weights per context
     weights:
