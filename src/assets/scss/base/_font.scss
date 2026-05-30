@@ -96,6 +96,12 @@
 }
 
 @layer overrides {
+  // Override accessible-astro-components Heading font-weight
+  .h1,
+  .h2 {
+    font-weight: var(--font-weight-heading, 600) !important;
+  }
+  
   h1.heading.h1:not(.launcher h1.heading.h1):not(.launcher h1):not(.launcher .heading.h1),
   h1:not(.launcher h1),
   .heading.h1:not(.launcher .heading.h1) {

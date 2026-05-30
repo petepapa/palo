@@ -29,9 +29,14 @@
     }
 
     // ──────────────────────────────────────────────
-    // 3. HEADINGS VISUAL ENHANCEMENT (NO SIZES/MARGINS/FONTS OVERRIDES)
+    // 3. HEADINGS
     // ──────────────────────────────────────────────
-    // Keep headings visually consistent with default styles as requested.
+    h1,
+    h2,
+    .h1,
+    .h2 {
+      font-weight: var(--font-weight-heading, 600) !important;
+    }
 
     // ──────────────────────────────────────────────
     // 4. LISTS (ul, ol, li)

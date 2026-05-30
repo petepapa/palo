@@ -60,14 +60,14 @@ branding:
   # ── 字体 / Font ──────────────────────────────────────────────
 
   font:
-    name: 'Raleway'         # 字体族名称 / Font family name
-    path: '/fonts/Raleway/' # 字体目录，放 /public 下 / Font folder, place in /public
+    name: 'League Spartan'         # 字体族名称 / Font family name
+    path: '/fonts/Noto_Sans_SC/' # 字体目录，放 /public 下 / Font folder, place in /public
 
     # 各场景字重 / Font weights per context
     weights:
-      body: 100     # 正文 / Body paragraphs
-      accent: 900   # 导航、按钮、标签等 / Navigation, buttons, labels
-      heading: 100  # 所有标题 / All headings
+      body: 300     # 正文 / Body paragraphs
+      accent: 500   # 导航、按钮、标签等 / Navigation, buttons, labels
+      heading: 600  # 所有标题 / All headings
 
     # checkbox / radio 与 label 的垂直对齐微调，根据实际字体调整
     # Vertical alignment offset for checkbox/radio vs label — adjust per font
