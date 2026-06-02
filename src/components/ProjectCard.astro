@@ -169,17 +169,16 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       --project-card-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
 
       break-inside: avoid;
-      margin-block-end: var(--space-m, 1.5rem);
+      margin-block-end: 0;
       overflow: hidden;
-      overflow: clip;
+      transform: translateZ(0);
       border-radius: var(--project-card-radius);
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-      clip-path: inset(0 round var(--project-card-radius));
+      -webkit-mask-image: -webkit-radial-gradient(white, black);
       backface-visibility: hidden;
 
       .project-card__media {
         border-radius: inherit;
-        clip-path: inherit;
       }
 
       .project-card__content {
