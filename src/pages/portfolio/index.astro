@@ -4,42 +4,25 @@ import PaloPageHeader from '@components/PaloPageHeader.astro'
 import ProjectCard from '@components/ProjectCard.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
-import type { GetStaticPaths, Page } from 'astro'
-import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
 
-export const getStaticPaths = (async ({ paginate }) => {
-  const projects = await getCollection('projects')
-  const allTags = projects.map((project) => project.data.tags).flat()
-  const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
-  const uniqueTags = uniqueTagLabels.map((label) => ({
-    label,
-    slug: slugify(label),
-  }))
+// Editing guide / 编辑引导
+// 1. Edit pageTitle/pageDescription/pageHeading/pageSubtitle for page copy and SEO.
+//    修改 pageTitle/pageDescription/pageHeading/pageSubtitle 来调整页面文案和 SEO。
+// 2. Edit pageHeaderAppearance to control PaloPageHeader visual behavior.
+//    修改 pageHeaderAppearance 来控制 PaloPageHeader 的视觉表现。
+// 3. Edit the ProjectCard props near the card list to adjust card layout or heading level.
+//    在卡片列表附近修改 ProjectCard 参数，以调整卡片布局或标题层级。
 
-  const projectsWithImages = projects.map((project, index) => {
-    return {
-      ...project,
-      featuredImage: projectImages[index % projectImages.length],
-    }
-  })
+// Page metadata / 页面元信息
+const pageTitle = 'Portfolio'
+const pageDescription = 'A complete visual index of portfolio projects, arranged as an overlay masonry gallery.'
+const pageHeading = 'All Projects'
+const pageSubtitle = 'A visual summary of every project, arranged as an overlay masonry gallery.'
 
-  return paginate(projectsWithImages, {
-    pageSize: 99,
-    props: { uniqueTags },
-  })
-}) satisfies GetStaticPaths
-
-interface Props {
-  page: Page<CollectionEntry<'projects'> & { featuredImage: any }>
-  uniqueTags: { label: string; slug: string }[]
-}
-
-const { page, uniqueTags } = Astro.props
-
-// PaloPageHeader settings / 页面头部设置
+// PaloPageHeader settings / PaloPageHeader 参数设置
 const pageHeaderAppearance = {
   fullscreen: false, // Fill viewport / 撑满屏幕
   contentColor: '', // Text color; empty = theme / 内容颜色，空=跟随主题
@@ -54,35 +37,58 @@ const pageHeaderAppearance = {
   contentHorizontalAlign: '', // left | center | right; empty = left / 水平对齐，空=左对齐
   showDivider: true, // true/empty=bottom; top/both/bottom/false / true或空=下方；上方/上下/下方/false
 }
+
+const projects = await getCollection('projects')
+const uniqueTags = [...new Set(projects.map((project) => project.data.tags).flat())]
+  .sort((a, b) => a.localeCompare(b))
+  .map((label) => ({
+    label,
+    slug: slugify(label),
+  }))
+
+const projectsWithImages = projects.map((project, index) => ({
+  ...project,
+  featuredImage: projectImages[index % projectImages.length],
+}))
 ---
 
-<DefaultLayout
-  title="Portfolio"
-  description="A showcase of projects built with Astro Content Collections, demonstrating dynamic content management."
->
-  <PaloPageHeader
-    title="All Projects"
-    subtitle="A visual summary of every project, arranged as an overlay masonry gallery."
-    {...pageHeaderAppearance}
-  />
+<DefaultLayout title={pageTitle} description={pageDescription}>
+  <!--
+    PaloPageHeader custom parameters / PaloPageHeader 自定义参数：
+    - title uses pageHeading above / title 使用上方 pageHeading
+    - subtitle uses pageSubtitle above / subtitle 使用上方 pageSubtitle
+    - pageHeaderAppearance controls background, spacing, divider, and nav theme / pageHeaderAppearance 控制背景、间距、分隔线和导航主题
+  -->
+  <PaloPageHeader title={pageHeading} subtitle={pageSubtitle} {...pageHeaderAppearance} />
   <section class="my-12">
     <div class="container">
       <Heading level="h2" size="h5" class="mb-2">Tags</Heading>
       <div class="flex flex-wrap gap-4">
         {
-          uniqueTags.map((tag: { label: string; slug: string }) => (
+          uniqueTags.map((tag) => (
             <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
           ))
         }
       </div>
       <p class="mt-8 text-sm">
-        <em>{page.total} total projects</em>
+        <em>{projectsWithImages.length} total projects</em>
       </p>
       <ul class="project-masonry mt-3">
         {
-          page.data.map((project) => (
+          projectsWithImages.map((project) => (
             <li class="project-masonry__item">
-              <ProjectCard project={project} image={project.featuredImage} layout="overlay" />
+              <!--
+                ProjectCard custom parameters / ProjectCard 自定义参数：
+                - layout="overlay" uses image-first masonry cards / overlay 用于瀑布流纯图卡片
+                - image uses the generated project thumbnail / image 使用自动匹配的项目缩略图
+                - headingLevel="h4" renders project titles as h4 / headingLevel="h4" 将项目标题渲染为 h4
+                - descriptionClass can set the description size, for example text-base or text-lg / descriptionClass 可设置描述字号，例如 text-base 或 text-lg
+              -->
+              <ProjectCard project={project} image={project.featuredImage} 
+              layout="standard" 
+              headingLevel="h5"
+              descriptionClass="text-base" 
+              />
             </li>
           ))
         }

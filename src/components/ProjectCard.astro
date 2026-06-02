@@ -13,6 +13,7 @@ interface Props {
   image: ImageMetadata | string
   layout?: ProjectCardLayout
   headingLevel?: ProjectCardHeadingLevel
+  descriptionClass?: string
   class?: string
 }
 
@@ -21,6 +22,7 @@ const {
   image,
   layout = 'standard',
   headingLevel = 'h5',
+  descriptionClass = 'text-base',
   class: className,
 } = Astro.props
 
@@ -47,9 +49,8 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
     />
   </span>
   <span class="project-card__content">
-    <span class="project-card__type">{projectType.label} · {projectType.ratioLabel}</span>
     <HeadingTag class="project-card__title">{project.data.title}</HeadingTag>
-    <span class="project-card__description">{project.data.description}</span>
+    <span class:list={['project-card__description', descriptionClass]}>{project.data.description}</span>
     {
       layout === 'standard' && project.data.tags.length > 0 && (
         <span class="project-card__tags" aria-label="Project tags">
@@ -113,13 +114,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       -webkit-line-clamp: 2;
     }
 
-    .project-card__type {
-      font-weight: var(--font-weight-accent, 600);
-      font-size: var(--text-xs, 0.75rem);
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
     .project-card--standard {
       .project-card__content {
         display: grid;
@@ -128,14 +122,8 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         padding-inline: var(--space-3xs, 0.5rem);
       }
 
-      .project-card__type {
-        color: var(--color-neutral-600);
-      }
-
       .project-card__description {
-        color: var(--color-neutral-600);
-        font-size: var(--text-sm, 0.875rem);
-        line-height: var(--text-sm--line-height, 1.5);
+        color: inherit;
       }
 
       .project-card__tags {
@@ -149,7 +137,7 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         border: var(--border-width-badge, 1px) solid var(--border-color-subtle);
         border-radius: var(--radius-badge, var(--radius-s));
         padding: 0.15rem 0.45rem;
-        color: var(--color-neutral-700);
+        color: inherit;
         font-size: var(--text-xs, 0.75rem);
         line-height: 1.2;
       }
@@ -157,10 +145,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       &:where(:hover, :focus-visible) {
         .project-card__image {
           transform: scale(1.04);
-        }
-
-        .project-card__title {
-          color: var(--link-color);
         }
       }
     }
@@ -198,11 +182,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         color: white;
       }
 
-      .project-card__type {
-        margin-block-end: var(--space-4xs, 0.25rem);
-        color: var(--link-color);
-      }
-
       .project-card__title {
         color: white;
       }
@@ -210,8 +189,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       .project-card__description {
         margin-block-start: var(--space-4xs, 0.25rem);
         color: rgb(255 255 255 / 0.82);
-        font-size: var(--text-xs, 0.75rem);
-        line-height: var(--text-xs--line-height, 1.4);
       }
 
       &:where(:hover, :focus-visible) {

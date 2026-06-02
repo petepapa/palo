@@ -112,6 +112,13 @@ const pageHeaderAppearance = {
         {
           page.data.map((project) => (
             <li class="project-masonry__item">
+              <!--
+                ProjectCard custom parameters / ProjectCard 自定义参数：
+                - layout="overlay" uses image-first masonry cards / overlay 用于瀑布流纯图卡片
+                - image uses the generated project thumbnail / image 使用自动匹配的项目缩略图
+                - headingLevel is omitted, so ProjectCard defaults to h5 / 未传 headingLevel，默认渲染 h5
+                - descriptionClass can set the description size, for example text-base or text-lg / descriptionClass 可设置描述字号，例如 text-base 或 text-lg
+              -->
               <ProjectCard project={project} image={project.featuredImage} layout="overlay" />
             </li>
           ))
