@@ -10,6 +10,7 @@ import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 
 export const getStaticPaths = (async ({ paginate }) => {
   const projects = await getCollection('projects')
@@ -57,7 +58,9 @@ interface Props {
 }
 
 const { page, currentTag, uniqueTags } = Astro.props
+const projectListWidth: ProjectListWidth = 'container' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
 const projectListGapClass = 'gap-6' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
+const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
 
 // PaloPageHeader settings / 页面头部设置
@@ -111,7 +114,10 @@ const pageHeaderAppearance = {
           }"</em
         >
       </p>
-      <ul class:list={['project-masonry mt-3', projectListGapClass]} style={`--project-list-gap: ${projectListGapSize}`}>
+      <ul
+        class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
+        style={`--project-list-gap: ${projectListGapSize}`}
+      >
         {
           page.data.map((project) => (
             <li class="project-masonry__item">

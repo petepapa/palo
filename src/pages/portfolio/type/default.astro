@@ -8,6 +8,7 @@ import { getProjectTypeDefinition } from '../../../projectTypes'
 import { projectImages } from '@utils/projectImages'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 
 // Editing guide / 编辑引导
 // 1. Edit pageTitle/pageDescription/pageHeading/pageSubtitle for page copy and SEO.
@@ -16,8 +17,8 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 //    修改 projectType 来改变此页面展示的项目缩略图类型。
 // 3. Edit pageHeaderAppearance to control PaloPageHeader visual behavior.
 //    修改 pageHeaderAppearance 来控制 PaloPageHeader 的视觉表现。
-// 4. Edit projectListGapClass and ProjectCard props near the card list to adjust list gap, card layout, or heading level.
-//    修改 projectListGapClass 和卡片列表附近的 ProjectCard 参数，以调整列表间隙、卡片布局或标题层级。
+// 4. Edit projectListWidth, projectListGapClass, and ProjectCard props near the card list to adjust list width, gap, card layout, or heading level.
+//    修改 projectListWidth、projectListGapClass 和卡片列表附近的 ProjectCard 参数，以调整列表宽度、间隙、卡片布局或标题层级。
 
 // Page metadata / 页面元信息
 const pageTitle = 'Portfolio - Default'
@@ -25,7 +26,9 @@ const pageDescription = 'Default portfolio projects using the 8:5 thumbnail rati
 const pageHeading = 'Default Projects'
 const pageSubtitle = 'Balanced landscape thumbnails for general portfolio work. <a href="/portfolio">View all projects</a>.'
 const projectType = getProjectTypeDefinition('default')
+const projectListWidth: ProjectListWidth = 'container' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
 const projectListGapClass = 'gap-8' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
+const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 
 // PaloPageHeader settings / PaloPageHeader 参数设置
 const pageHeaderAppearance = {
@@ -79,7 +82,7 @@ const filteredProjects = projectsWithImages.filter((project) => project.data.typ
       <p class="mt-8 text-sm">
         <em>Project 1 through {filteredProjects.length} of {filteredProjects.length} total {projectType.label} projects</em>
       </p>
-      <ul class:list={['mt-3 grid list-none grid-cols-1 p-0 md:grid-cols-2 lg:grid-cols-3', projectListGapClass]}>
+      <ul class:list={['mt-3 grid list-none grid-cols-1 p-0 md:grid-cols-2 lg:grid-cols-3', projectListWidthClass, projectListGapClass]}>
         {
           filteredProjects.map((project) => (
             <li>

@@ -24,6 +24,25 @@
     }
   }
 
+  .project-list-width--container {
+    inline-size: 100%;
+  }
+
+  .project-list-width--full {
+    margin-inline: calc(50% - 50vw);
+    padding-inline: var(--grid-gutter);
+    inline-size: 100vw;
+    max-inline-size: 100vw;
+
+    @include breakpoint(m) {
+      padding-inline: 2rem;
+    }
+
+    @include breakpoint(xl) {
+      padding-inline: calc(2rem / 2);
+    }
+  }
+
   .center-content {
     display: grid;
     place-items: center;

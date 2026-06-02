@@ -8,21 +8,24 @@ import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 
 // Editing guide / 编辑引导
 // 1. Edit pageTitle/pageDescription/pageHeading/pageSubtitle for page copy and SEO.
 //    修改 pageTitle/pageDescription/pageHeading/pageSubtitle 来调整页面文案和 SEO。
 // 2. Edit pageHeaderAppearance to control PaloPageHeader visual behavior.
 //    修改 pageHeaderAppearance 来控制 PaloPageHeader 的视觉表现。
-// 3. Edit projectListGapClass and ProjectCard props near the card list to adjust list gap, card layout, or heading level.
-//    修改 projectListGapClass 和卡片列表附近的 ProjectCard 参数，以调整列表间隙、卡片布局或标题层级。
+// 3. Edit projectListWidth, projectListGapClass, and ProjectCard props near the card list to adjust list width, gap, card layout, or heading level.
+//    修改 projectListWidth、projectListGapClass 和卡片列表附近的 ProjectCard 参数，以调整列表宽度、间隙、卡片布局或标题层级。
 
 // Page metadata / 页面元信息
 const pageTitle = 'Portfolio'
 const pageDescription = 'A complete visual index of portfolio projects, arranged as an overlay masonry gallery.'
 const pageHeading = 'All Projects'
 const pageSubtitle = 'A visual summary of every project, arranged as an overlay masonry gallery.'
+const projectListWidth: ProjectListWidth = 'full' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
 const projectListGapClass = 'gap-6' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
+const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
 
 // PaloPageHeader settings / PaloPageHeader 参数设置
@@ -76,7 +79,10 @@ const projectsWithImages = projects.map((project, index) => ({
       <p class="mt-8 text-sm">
         <em>{projectsWithImages.length} total projects</em>
       </p>
-      <ul class:list={['project-masonry mt-3', projectListGapClass]} style={`--project-list-gap: ${projectListGapSize}`}>
+      <ul
+        class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
+        style={`--project-list-gap: ${projectListGapSize}`}
+      >
         {
           projectsWithImages.map((project) => (
             <li class="project-masonry__item">
