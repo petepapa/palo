@@ -1,0 +1,246 @@
+---
+import { Image } from 'astro:assets'
+import type { CollectionEntry } from 'astro:content'
+import type { ImageMetadata } from 'astro'
+import { getProjectTypeDefinition } from '../projectTypes'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+type ProjectCardLayout = 'standard' | 'overlay'
+type ProjectCardHeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+
+interface Props {
+  project: CollectionEntry<'projects'>
+  image: ImageMetadata | string
+  layout?: ProjectCardLayout
+  headingLevel?: ProjectCardHeadingLevel
+  class?: string
+}
+
+const {
+  project,
+  image,
+  layout = 'standard',
+  headingLevel = 'h5',
+  class: className,
+} = Astro.props
+
+const HeadingTag = headingLevel
+const projectType = getProjectTypeDefinition(project.data.type)
+const projectUrl = ensureTrailingSlash(`/portfolio/${project.id}`)
+const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
+---
+
+<a
+  class:list={['project-card', `project-card--${layout}`, className]}
+  href={projectUrl}
+  style={aspectStyle}
+  aria-label={`View project: ${project.data.title}`}
+>
+  <span class="project-card__media" aria-hidden="true">
+    <Image
+      src={image}
+      alt=""
+      width={1200}
+      height={900}
+      loading="lazy"
+      class="project-card__image"
+    />
+  </span>
+  <span class="project-card__content">
+    <span class="project-card__type">{projectType.label} · {projectType.ratioLabel}</span>
+    <HeadingTag class="project-card__title">{project.data.title}</HeadingTag>
+    <span class="project-card__description">{project.data.description}</span>
+    {
+      layout === 'standard' && project.data.tags.length > 0 && (
+        <span class="project-card__tags" aria-label="Project tags">
+          {project.data.tags.map((tag) => (
+            <span class="project-card__tag">{tag}</span>
+          ))}
+        </span>
+      )
+    }
+  </span>
+</a>
+
+<style lang="scss">
+  @layer components {
+    .project-card {
+      display: block;
+      position: relative;
+      border: 0;
+      border-radius: 0;
+      color: inherit;
+      text-decoration: none;
+
+      &:where(:hover, :focus-visible) {
+        color: inherit;
+      }
+    }
+
+    .project-card__media {
+      display: block;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: var(--project-card-aspect-ratio, 8 / 5);
+      border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
+      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+      inline-size: 100%;
+    }
+
+    .project-card__image {
+      display: block;
+      transition:
+        transform var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease),
+        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease);
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+    }
+
+    .project-card__title {
+      margin: 0;
+      transition: color var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease);
+      color: inherit;
+      font-size: var(--text-lg, 1.125rem);
+      line-height: var(--text-lg--line-height, 1.25);
+      letter-spacing: 0;
+    }
+
+    .project-card__description {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      -webkit-line-clamp: 2;
+    }
+
+    .project-card__type {
+      font-weight: var(--font-weight-accent, 600);
+      font-size: var(--text-xs, 0.75rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .project-card--standard {
+      .project-card__content {
+        display: grid;
+        gap: var(--space-3xs, 0.5rem);
+        padding-block-start: var(--space-xs, 1rem);
+        padding-inline: var(--space-3xs, 0.5rem);
+      }
+
+      .project-card__type {
+        color: var(--color-neutral-600);
+      }
+
+      .project-card__description {
+        color: var(--color-neutral-600);
+        font-size: var(--text-sm, 0.875rem);
+        line-height: var(--text-sm--line-height, 1.5);
+      }
+
+      .project-card__tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-4xs, 0.25rem);
+        margin-block-start: var(--space-4xs, 0.25rem);
+      }
+
+      .project-card__tag {
+        border: var(--border-width-badge, 1px) solid var(--border-color-subtle);
+        border-radius: var(--radius-badge, var(--radius-s));
+        padding: 0.15rem 0.45rem;
+        color: var(--color-neutral-700);
+        font-size: var(--text-xs, 0.75rem);
+        line-height: 1.2;
+      }
+
+      &:where(:hover, :focus-visible) {
+        .project-card__image {
+          transform: scale(1.04);
+        }
+
+        .project-card__title {
+          color: var(--link-color);
+        }
+      }
+    }
+
+    .project-card--overlay {
+      --project-card-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
+
+      break-inside: avoid;
+      margin-block-end: var(--space-m, 1.5rem);
+      overflow: hidden;
+      overflow: clip;
+      border-radius: var(--project-card-radius);
+      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+      clip-path: inset(0 round var(--project-card-radius));
+      backface-visibility: hidden;
+
+      .project-card__media {
+        border-radius: inherit;
+        clip-path: inherit;
+      }
+
+      .project-card__content {
+        display: flex;
+        position: absolute;
+        inset: 0;
+        flex-direction: column;
+        justify-content: flex-end;
+        opacity: 0;
+        transform: translateY(0.5rem);
+        transition:
+          opacity var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease),
+          transform var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease);
+        border-radius: inherit;
+        background: linear-gradient(to top, rgb(0 0 0 / 0.9), rgb(0 0 0 / 0.45), transparent);
+        padding: clamp(1rem, 4vw, 1.5rem);
+        color: white;
+      }
+
+      .project-card__type {
+        margin-block-end: var(--space-4xs, 0.25rem);
+        color: var(--link-color);
+      }
+
+      .project-card__title {
+        color: white;
+      }
+
+      .project-card__description {
+        margin-block-start: var(--space-4xs, 0.25rem);
+        color: rgb(255 255 255 / 0.82);
+        font-size: var(--text-xs, 0.75rem);
+        line-height: var(--text-xs--line-height, 1.4);
+      }
+
+      &:where(:hover, :focus-visible) {
+        .project-card__image {
+          transform: scale(1.05);
+          filter: brightness(0.75);
+        }
+
+        .project-card__content {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .project-card__image,
+      .project-card__content,
+      .project-card__title {
+        transition: none;
+      }
+    }
+
+    @media (hover: none) {
+      .project-card--overlay .project-card__content {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  }
+</style>

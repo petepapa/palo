@@ -1,20 +1,14 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
-import { Badge, Card, Heading, Link, Pagination } from 'accessible-astro-components'
+import ProjectCard from '@components/ProjectCard.astro'
+import { Heading, Link, Pagination } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
 import type { GetStaticPaths, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-
-// Import images directly for optimization
-import projectImage1 from '@assets/images/projects/project-image-1.png'
-import projectImage2 from '@assets/images/projects/project-image-2.png'
-import projectImage3 from '@assets/images/projects/project-image-3.png'
-import projectImage4 from '@assets/images/projects/project-image-4.png'
-import projectImage5 from '@assets/images/projects/project-image-5.png'
-import projectImage6 from '@assets/images/projects/project-image-6.png'
+import { projectImages } from '@utils/projectImages'
 
 export const getStaticPaths = (async ({ paginate }) => {
   const projects = await getCollection('projects')
@@ -24,8 +18,6 @@ export const getStaticPaths = (async ({ paginate }) => {
     label,
     slug: slugify(label),
   }))
-
-  const projectImages = [projectImage1, projectImage2, projectImage3, projectImage4, projectImage5, projectImage6]
 
   const projectsWithImages = projects.map((project, index) => {
     return {
@@ -116,26 +108,11 @@ const pageHeaderAppearance = {
           }"</em
         >
       </p>
-      <ul class="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <ul class="project-masonry mt-3">
         {
           page.data.map((project) => (
-            <li>
-              <Card
-                imageComponent={project.featuredImage}
-                url={ensureTrailingSlash('/portfolio/' + project.id)}
-                title={project.data.title}
-                headingLevel="h2"
-                footer={'Author: ' + project.data.author}
-                fullHeight={true}
-              >
-                <span slot="meta">
-                  {project.data.tags.map((tag) => {
-                    const isCurrentTag = tag === currentTag.label
-                    return isCurrentTag ? <Badge class="bg-blue-600 text-white">{tag}</Badge> : <Badge>{tag}</Badge>
-                  })}
-                </span>
-                {project.data.description}
-              </Card>
+            <li class="project-masonry__item">
+              <ProjectCard project={project} image={project.featuredImage} layout="overlay" />
             </li>
           ))
         }
@@ -160,3 +137,31 @@ const pageHeaderAppearance = {
     </div>
   </section>
 </DefaultLayout>
+
+<style lang="scss">
+  @layer components {
+    .project-masonry {
+      column-count: 1;
+      column-gap: var(--space-m, 1.5rem);
+      list-style: none;
+      padding: 0;
+    }
+
+    .project-masonry__item {
+      break-inside: avoid;
+      backface-visibility: hidden;
+    }
+
+    @media (min-width: 640px) {
+      .project-masonry {
+        column-count: 2;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .project-masonry {
+        column-count: 3;
+      }
+    }
+  }
+</style>

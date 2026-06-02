@@ -1,13 +1,10 @@
 ---
-import { Card, Heading, Link } from 'accessible-astro-components'
+import ProjectCard from '@components/ProjectCard.astro'
+import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-
-// Import images directly for optimization
-import projectImage1 from '@assets/images/projects/project-image-1.png'
-import projectImage2 from '@assets/images/projects/project-image-2.png'
-import projectImage3 from '@assets/images/projects/project-image-3.png'
+import { projectImages } from '@utils/projectImages'
 
 /**
  * FeaturedProjects Component
@@ -35,7 +32,6 @@ const { class: className, limit = 3, title = 'Featured projects' } = Astro.props
 
 // Get projects from content collection
 const projects = await getCollection('projects')
-const projectImages = [projectImage1, projectImage2, projectImage3]
 
 // Limit projects and add featured images
 const featuredProjects = projects.slice(0, limit).map((project, index) => ({
@@ -50,15 +46,7 @@ const featuredProjects = projects.slice(0, limit).map((project, index) => ({
     <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
       {
         featuredProjects.map((project) => (
-          <Card
-            imageComponent={project.featuredImage}
-            url={ensureTrailingSlash('/portfolio/' + project.id)}
-            headingLevel="h2"
-            title={project.data.title}
-            footer={'Author: ' + project.data.author}
-          >
-            {project.data.description}
-          </Card>
+          <ProjectCard project={project} image={project.featuredImage} layout="standard" />
         ))
       }
     </div>

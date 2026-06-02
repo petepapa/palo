@@ -1,0 +1,129 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import ProjectCard from '@components/ProjectCard.astro'
+import { Heading, Link, Pagination } from 'accessible-astro-components'
+import { getCollection } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
+import type { GetStaticPaths, Page } from 'astro'
+import { projectTypeById, projectTypes, type ProjectType } from '../../../../projectTypes'
+import { projectImages } from '@utils/projectImages'
+import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+export const getStaticPaths = (async ({ paginate }) => {
+  const projects = await getCollection('projects')
+  const allTags = projects.map((project) => project.data.tags).flat()
+  const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
+  const uniqueTags = uniqueTagLabels.map((label) => ({
+    label,
+    slug: slugify(label),
+  }))
+
+  const projectsWithImages = projects.map((project, index) => ({
+    ...project,
+    featuredImage: projectImages[index % projectImages.length],
+  }))
+
+  const allPaginatedPages = []
+
+  for (const projectType of projectTypes) {
+    const filteredProjects = projectsWithImages.filter((project) => project.data.type === projectType.id)
+    const paginatedPages = paginate(filteredProjects, {
+      pageSize: 6,
+      params: { type: projectType.id },
+      props: { projectType, uniqueTags },
+    })
+
+    allPaginatedPages.push(...paginatedPages)
+  }
+
+  return allPaginatedPages
+}) satisfies GetStaticPaths
+
+interface Props {
+  page: Page<CollectionEntry<'projects'> & { featuredImage: any }>
+  projectType: (typeof projectTypes)[number]
+  uniqueTags?: { label: string; slug: string }[]
+}
+
+const { page, projectType, uniqueTags } = Astro.props
+const safeProjectType = projectTypeById[projectType.id as ProjectType]
+const visibleTags =
+  uniqueTags?.length
+    ? uniqueTags
+    : [...new Set(page.data.map((project) => project.data.tags).flat())]
+        .sort((a, b) => a.localeCompare(b))
+        .map((label) => ({
+          label,
+          slug: slugify(label),
+        }))
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  contentColor: '',
+  backgroundVideo: '',
+  backgroundImage: '',
+  backgroundColor: '',
+  backgroundFixed: false,
+  backgroundOverlayOpacity: 0,
+  topNavigationTheme: '',
+  paddingBlock: '',
+  contentVerticalAlign: '',
+  contentHorizontalAlign: '',
+  showDivider: true,
+}
+---
+
+<DefaultLayout
+  title={`Portfolio - ${safeProjectType.label}`}
+  description={`${safeProjectType.label} projects using the ${safeProjectType.ratioLabel} thumbnail ratio.`}
+>
+  <PaloPageHeader
+    title={`${safeProjectType.label} Projects`}
+    subtitle={`${safeProjectType.description} <a href="${ensureTrailingSlash('/portfolio')}">View all projects</a>.`}
+    {...pageHeaderAppearance}
+  />
+  <section class="my-12">
+    <div class="container">
+      <Heading level="h2" size="h5" class="mb-2">Tags</Heading>
+      <div class="flex flex-wrap gap-4">
+        <Link href={ensureTrailingSlash('/portfolio')}>All projects</Link>
+        {
+          visibleTags.map((tag) => (
+            <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
+          ))
+        }
+      </div>
+      <p class="mt-8 text-sm">
+        <em
+          >Project {page.start + 1} through {page.end + 1} of {page.total} total {safeProjectType.label} projects</em
+        >
+      </p>
+      <ul class="mt-3 grid list-none grid-cols-1 gap-8 p-0 md:grid-cols-2 lg:grid-cols-3">
+        {
+          page.data.map((project) => (
+            <li>
+              <ProjectCard project={project} image={project.featuredImage} layout="standard" />
+            </li>
+          ))
+        }
+      </ul>
+      {
+        page && page.lastPage > 1 && (
+          <div class="mt-12 grid place-content-center">
+            <Pagination
+              firstPage={page.url.prev ? ensureTrailingSlash(`/portfolio/type/${safeProjectType.id}`) : null}
+              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+              lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/type/${safeProjectType.id}/${page.lastPage}`) : null}
+              currentPage={`${page.currentPage}`}
+              totalPages={`${page.lastPage}`}
+              ariaLabel={`${safeProjectType.label} portfolio pagination`}
+            />
+          </div>
+        )
+      }
+    </div>
+  </section>
+</DefaultLayout>

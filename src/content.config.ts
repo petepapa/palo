@@ -1,6 +1,7 @@
 // 1. Import utilities from `astro:content`
 import { defineCollection } from 'astro:content'
 import { z } from 'astro/zod'
+import { defaultProjectType, projectTypeIds } from './projectTypes'
 
 // 2. Import loader(s)
 import { glob } from 'astro/loaders'
@@ -12,6 +13,7 @@ const projects = defineCollection({
     title: z.string(),
     author: z.string(),
     description: z.string(),
+    type: z.enum(projectTypeIds).default(defaultProjectType),
     tags: z.array(z.string()).default([]),
   }),
 })

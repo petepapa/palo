@@ -1,4 +1,5 @@
 import type { NavigationItem, SocialItem } from './types/config'
+import { projectTypes } from './projectTypes'
 
 /**
  * Navigation menu items for the site.
@@ -15,7 +16,14 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     label: 'Portfolio',
-    href: '/portfolio',
+    type: 'dropdown',
+    items: [
+      { label: 'All projects', href: '/portfolio' },
+      ...projectTypes.map((projectType) => ({
+        label: `${projectType.label} (${projectType.ratioLabel})`,
+        href: `/portfolio/type/${projectType.id}`,
+      })),
+    ],
   },
   {
     label: 'Features',
