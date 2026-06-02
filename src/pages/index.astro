@@ -2,16 +2,11 @@
 import DefaultLayout from '@layouts/DefaultLayout.astro'
 import Hero from '@components/Hero.astro'
 import CreativeSection from '@components/CreativeSection.astro'
-import Feature from '@components/Feature.astro'
-import Counter from '@components/Counter.astro'
 import ContentMedia from '@components/ContentMedia.astro'
 import FeaturedProjects from '@components/FeaturedProjects.astro'
 import FeaturedPosts from '@components/FeaturedPosts.astro'
-import AccordionStable from '@components/AccordionStable.astro'
-import AccordionItemStable from '@components/AccordionItemStable.astro'
-import { Avatar, AvatarGroup, Heading, Link } from 'accessible-astro-components'
+import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
-import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { Card } from 'accessible-astro-components'
 ---
 
@@ -19,6 +14,7 @@ import { Card } from 'accessible-astro-components'
 
   {/* HERO========================================*/}
 
+  {/* true/空=下方；top/both/bottom/false 可选 / true/empty=bottom; accepts top/both/bottom/false */}
   <Hero
     fullscreen={true}
     contentColor=""
@@ -30,7 +26,7 @@ import { Card } from 'accessible-astro-components'
     topNavigationTheme=""
     paddingBlock=""
     contentVerticalAlign="center"
-    showDivider="true"                  // true/空=下方；top/both/bottom/false 可选 / true/empty=bottom; accepts top/both/bottom/false
+    showDivider="true"
   >
     {/* 可编辑区域开始 / Editable Content Start */}
     <div class="flex flex-col items-center  text-center gap-6">
@@ -161,7 +157,7 @@ import { Card } from 'accessible-astro-components'
     </p>
   </ContentMedia>
   
-  <FeaturedProjects />
+  <FeaturedProjects limit={5} layout="overlay" projectListWidth="full" projectListGapClass="gap-5" />
   <FeaturedPosts />
 
   

@@ -5,6 +5,10 @@ import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+
+type FeaturedProjectLayout = 'standard' | 'overlay'
 
 /**
  * FeaturedProjects Component
@@ -26,9 +30,34 @@ interface Props {
    * @default "Featured projects"
    */
   title?: string
+  /**
+   * Project card layout
+   * @default "standard"
+   */
+  layout?: FeaturedProjectLayout
+  /**
+   * Project list width
+   * @default "container"
+   */
+  projectListWidth?: ProjectListWidth
+  /**
+   * Project list gap class
+   * @default "gap-12"
+   */
+  projectListGapClass?: string
 }
 
-const { class: className, limit = 3, title = 'Featured projects' } = Astro.props
+const {
+  class: className,
+  limit = 3,
+  title = 'Featured projects',
+  layout = 'standard',
+  projectListWidth = 'container',
+  projectListGapClass = 'gap-12',
+} = Astro.props
+const projectListWidthClass = getProjectListWidthClass(projectListWidth)
+const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
+const isOverlayLayout = layout === 'overlay'
 
 // Get projects from content collection
 const projects = await getCollection('projects')
@@ -43,13 +72,24 @@ const featuredProjects = projects.slice(0, limit).map((project, index) => ({
 <section class:list={[className, 'my-8']}>
   <div class="container">
     <Heading level="h2" class="mb-6">{title}</Heading>
-    <div class="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+    <ul
+      class:list={[
+        isOverlayLayout
+          ? 'featured-projects__masonry'
+          : 'grid grid-cols-1 list-none p-0 md:grid-cols-2 lg:grid-cols-3',
+        projectListWidthClass,
+        projectListGapClass,
+      ]}
+      style={`--featured-projects-gap: ${projectListGapSize}`}
+    >
       {
         featuredProjects.map((project) => (
-          <ProjectCard project={project} image={project.featuredImage} layout="standard" />
+          <li class:list={[isOverlayLayout && 'featured-projects__masonry-item']}>
+            <ProjectCard project={project} image={project.featuredImage} layout={layout} />
+          </li>
         ))
       }
-    </div>
+    </ul>
     <div class="mt-12">
       <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
         View all projects
@@ -58,3 +98,45 @@ const featuredProjects = projects.slice(0, limit).map((project, index) => ({
     </div>
   </div>
 </section>
+
+<style lang="scss">
+  @layer components {
+    .featured-projects__masonry {
+      column-count: 1;
+      gap: var(--featured-projects-gap, var(--space-m, 1.5rem));
+      column-fill: balance;
+      list-style: none;
+      padding-block: 0;
+    }
+
+    .featured-projects__masonry-item {
+      display: inline-block;
+      box-sizing: border-box;
+      inline-size: 100%;
+      vertical-align: top;
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      page-break-inside: avoid;
+      margin: 0;
+      padding-block: 0 var(--featured-projects-gap, var(--space-m, 1.5rem));
+      padding-inline: 0;
+      backface-visibility: hidden;
+    }
+
+    .featured-projects__masonry-item > .project-card {
+      inline-size: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .featured-projects__masonry {
+        column-count: 2;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .featured-projects__masonry {
+        column-count: 3;
+      }
+    }
+  }
+</style>
