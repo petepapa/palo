@@ -9,6 +9,7 @@ import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 
 export const getStaticPaths = (async ({ paginate }) => {
   const projects = await getCollection('projects')
@@ -56,6 +57,8 @@ interface Props {
 }
 
 const { page, currentTag, uniqueTags } = Astro.props
+const projectListGapClass = 'gap-6' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
+const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
 
 // PaloPageHeader settings / 页面头部设置
 const pageHeaderAppearance = {
@@ -108,7 +111,7 @@ const pageHeaderAppearance = {
           }"</em
         >
       </p>
-      <ul class="project-masonry mt-3">
+      <ul class:list={['project-masonry mt-3', projectListGapClass]} style={`--project-list-gap: ${projectListGapSize}`}>
         {
           page.data.map((project) => (
             <li class="project-masonry__item">
@@ -149,7 +152,7 @@ const pageHeaderAppearance = {
   @layer components {
     .project-masonry {
       column-count: 1;
-      column-gap: var(--space-m, 1.5rem);
+      gap: var(--project-list-gap, var(--space-m, 1.5rem));
       column-fill: balance;
       list-style: none;
       padding: 0;
@@ -165,7 +168,7 @@ const pageHeaderAppearance = {
       -webkit-column-break-inside: avoid;
       page-break-inside: avoid;
       margin: 0;
-      padding-block: 0 var(--space-m, 1.5rem);
+      padding-block: 0 var(--project-list-gap, var(--space-m, 1.5rem));
       padding-inline: 0;
       backface-visibility: hidden;
     }
