@@ -4,7 +4,7 @@ import Hero from '@components/Hero.astro'
 import CreativeSection from '@components/CreativeSection.astro'
 import ContentMedia from '@components/ContentMedia.astro'
 import FeaturedProjects from '@components/FeaturedProjects.astro'
-import FeaturedPosts from '@components/FeaturedPosts.astro'
+import LatestPosts from '@components/LatestPosts.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { Card } from 'accessible-astro-components'
@@ -63,7 +63,7 @@ import { Card } from 'accessible-astro-components'
     backgroundVideo=""
     backgroundImage=""
     backgroundColor="#ff4b00"
-    backgroundFixed={}
+    backgroundFixed={false}
     backgroundOverlayOpacity={0.5}
     paddingBlock=""
     contentVerticalAlign="center"
@@ -135,32 +135,15 @@ import { Card } from 'accessible-astro-components'
     </div>
   </CreativeSection>
 
-  <div class="">
-    <ContentMedia imgSrc="/accessible-components.webp">
-      <Heading level="h3">Accessible components</Heading>
-      <p class="text-lg">
-        This theme provides plenty of tried and tested Accessible Astro Components. Some are native to this theme and a
-        lot of others are integrated using a <Link
-          isExternal
-          href="https://github.com/incluud/accessible-astro-components">separate package</Link
-        >. They'll get you up and running in building an accessible solution for your visitors.
-      </p>
-  </ContentMedia>
-  </div>
   
-  <ContentMedia imgSrc="/wcag-compliant.webp" reverseImg={true}>
-    <Heading level="h3">WCAG 2.2 AA compliant</Heading>
-    <p class="text-lg">
-      Using semantic HTML, landmarks, skip links, screen reader friendly content, aria-labels, keyboard accessible
-      navigation and components, clear outlines and tab indicators and the right color contrast, you're more certain of
-      reaching WCAG AA compliance.
-    </p>
-  </ContentMedia>
-  
-  <FeaturedProjects limit={5} layout="overlay" projectListWidth="full" projectListGapClass="gap-5" />
-  <FeaturedPosts />
 
   
+  <FeaturedProjects limit={5} layout="overlay" projectListWidth="full" projectListGapClass="gap-5" />
+
+  {/* LATEST POSTS SECTION ========================================*/}
+
+  <LatestPosts limit={3} />
+
 </DefaultLayout>
 
 <style>

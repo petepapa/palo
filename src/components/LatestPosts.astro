@@ -1,0 +1,82 @@
+---
+import PostCard from '@components/PostCard.astro'
+import { Heading, Link } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import postImage1 from '@assets/images/posts/post-image-1.png'
+import postImage2 from '@assets/images/posts/post-image-2.png'
+import postImage3 from '@assets/images/posts/post-image-3.png'
+
+/**
+ * LatestPosts Component
+ *
+ * @description A component that displays the latest blog posts from Astro Content Collections
+ */
+interface Props {
+  /**
+   * Additional classes to apply to the section
+   */
+  class?: string
+  /**
+   * The number of posts to display
+   * @default 3
+   */
+  limit?: number
+  /**
+   * The title for the section
+   * @default "Latest posts"
+   */
+  title?: string
+}
+
+const { class: className, limit = 3, title = 'Latest posts' } = Astro.props
+
+const postImages = [postImage1, postImage2, postImage3]
+const coverImageRatio = '8 / 5'
+
+// Get posts from content collection
+const posts = await getCollection('posts')
+
+// Sort by date and limit posts
+const latestPosts = posts
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, limit)
+  .map((post, index) => ({
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description,
+    author: post.data.author,
+    featuredImage: post.data.coverImage || postImages[index % postImages.length],
+    url: ensureTrailingSlash(`/blog/${post.id}`),
+  }))
+---
+
+<section class:list={[className, 'my-8']}>
+  <div class="container">
+    <Heading level="h2" class="mb-6">{title}</Heading>
+    <ul class="my-8 grid grid-cols-1 gap-24">
+      {
+        latestPosts.map((post) => (
+          <li>
+            <PostCard
+              image={post.featuredImage}
+              imageRatio={coverImageRatio}
+              url={post.url}
+              title={post.title}
+              footer={post.author}
+            >
+              {post.description}
+            </PostCard>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="mt-12">
+      <Link href={ensureTrailingSlash('/blog')} isButton animateOnHover animationType="nudge">
+        Read all posts
+        <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
+      </Link>
+    </div>
+  </div>
+</section>
