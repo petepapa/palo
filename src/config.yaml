@@ -101,8 +101,8 @@ navigation:
 
   desktopFontSize: 'lg'           # 桌面端主导航，支持 24px / base / 3xl / --text-3xl / Desktop main nav
   dropdownDesktopFontSize: 'md'   # 桌面端下拉子菜单，支持字号 token / Desktop dropdown, accepts text size tokens
-  mobileFontSize: '2xl'            # 手机端展开菜单，支持字号 token / Mobile expanded menu, accepts text size tokens
-  dropdownMobileFontSize: 'xl'    # 手机端下拉子菜单，支持字号 token / Mobile dropdown, accepts text size tokens
+  mobileFontSize: 'xl'            # 手机端展开菜单，支持字号 token / Mobile expanded menu, accepts text size tokens
+  dropdownMobileFontSize: 'lg'    # 手机端下拉子菜单，支持字号 token / Mobile dropdown, accepts text size tokens
   mainMenuLineHeightScale: 1.25      # 主菜单竖排行高倍数，数值越大越宽松 / Main menu vertical line-height scale
   dropdownMenuLineHeightScale: 0.85  # 下拉菜单竖排行高倍数，数值越大越宽松 / Dropdown menu vertical line-height scale
 

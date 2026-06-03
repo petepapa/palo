@@ -66,7 +66,7 @@ const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
 const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalSize ?? '0'
 ---
 
-<article class:list={['post-card grid grid-cols-1 gap-24 md:grid-cols-2', className]}>
+<article class:list={['post-card grid grid-cols-1 gap-12 md:gap-24 md:grid-cols-2', className]}>
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
     {
       typeof image === 'string' ? (
