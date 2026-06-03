@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import themeConfig from '@config'
 
 /**
  * PostCard Component
@@ -62,10 +63,11 @@ const {
 const HeadingTag = headingLevel
 const postUrl = ensureTrailingSlash(url)
 const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
+const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalSize ?? '0'
 ---
 
 <article class:list={['post-card grid grid-cols-1 gap-24 md:grid-cols-2', className]}>
-  <a class="post-card__media rounded-lg" href={postUrl} aria-label={`Read post: ${title}`} style={imageRatioStyle}>
+  <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
     {
       typeof image === 'string' ? (
         <img src={image} alt={imageAlt} width="800" height="500" loading="lazy" decoding="async" />
@@ -89,6 +91,8 @@ const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
   @layer components {
     .post-card {
       color: inherit;
+      border: none;
+      border-radius: 0;
     }
 
     .post-card__media {
@@ -96,6 +100,7 @@ const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       aspect-ratio: var(--post-card-image-ratio, 8 / 5);
       overflow: hidden;
+      border-radius: var(--post-card-radius, 0);
     }
 
     .post-card__media :where(img),
@@ -104,6 +109,13 @@ const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
+      border-radius: var(--post-card-radius, 0);
+    }
+
+    /* Remove focus outline/box-shadow for blog list cards (visual only) */
+    .post-card__media:where(:focus, :focus-visible) {
+      outline: none;
+      box-shadow: none;
     }
 
     .post-card__title {
