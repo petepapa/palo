@@ -70,7 +70,7 @@ const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalS
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
     {
       typeof image === 'string' ? (
-        <img src={image} alt={imageAlt} width="800" height="500" loading="lazy" decoding="async" />
+        <img src={image} alt={imageAlt} width="800" height="500" loading="lazy" decoding="async" class="post-card__image" />
       ) : (
         <Image src={image} alt={imageAlt} width={800} height={500} loading="lazy" class="post-card__image" />
       )
@@ -110,6 +110,8 @@ const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalS
       block-size: 100%;
       object-fit: cover;
       border-radius: var(--post-card-radius, 0);
+      transition: transform var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease),
+        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease);
     }
 
     /* Remove focus outline/box-shadow for blog list cards (visual only) */
@@ -133,8 +135,22 @@ const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalS
       color: var(--color-primary);
     }
 
+    .post-card__media:where(:hover, :focus-visible) {
+      .post-card__image,
+      :where(img) {
+        transform: scale(1.04);
+      }
+    }
+
     .post-card__footer {
       color: var(--color-neutral-700);
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .post-card__image,
+      .post-card__title {
+        transition: none;
+      }
     }
   }
 </style>
