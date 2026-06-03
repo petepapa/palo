@@ -2,7 +2,7 @@
 import PostCard from '@components/PostCard.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
-import { BLOG_API_URL } from 'astro:env/server'
+import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
@@ -13,7 +13,7 @@ import postImage3 from '@assets/images/posts/post-image-3.png'
 /**
  * FeaturedPosts Component
  *
- * @description A component that displays featured blog posts from JSONPlaceholder API
+ * @description A component that displays the latest blog posts from local content/posts
  */
 interface Props {
   /**
@@ -32,42 +32,23 @@ interface Props {
   title?: string
 }
 
-interface Post {
-  id: number
-  userId: number
-  title: string
-  body: string
-  featuredImage: any
-  shortUrl: string
-}
-
 const { class: className, limit = 3, title = 'Latest posts' } = Astro.props
 
-let data: Post[] = []
-
-if (BLOG_API_URL) {
-  try {
-    const response = await fetch(BLOG_API_URL)
-
-    if (!response.ok) {
-      console.warn(`Failed to fetch featured blog posts: ${response.status} ${response.statusText}`)
-    } else {
-      data = (await response.json()) as Post[]
-    }
-  } catch (error) {
-    console.warn('Failed to fetch featured blog posts', error)
-  }
-}
-
+const posts = await getCollection('posts')
 const postImages = [postImage1, postImage2, postImage3]
 const coverImageRatio = '8 / 5'
 
-// Process and limit posts for featured section
-const featuredPosts: Post[] = data.slice(0, limit).map((post: any) => ({
-  ...post,
-  featuredImage: postImages[post.id % postImages.length],
-  shortUrl: post.title.replaceAll(' ', '-').toLowerCase(),
-}))
+const featuredPosts = posts
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
+  .slice(0, limit)
+  .map((post, index) => ({
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description,
+    author: post.data.author,
+    featuredImage: post.data.coverImage || postImages[index % postImages.length],
+    url: ensureTrailingSlash(`/blog/${post.id}`),
+  }))
 ---
 
 <section class:list={[className, 'my-8']}>
@@ -80,11 +61,11 @@ const featuredPosts: Post[] = data.slice(0, limit).map((post: any) => ({
             <PostCard
               image={post.featuredImage}
               imageRatio={coverImageRatio}
-              url={ensureTrailingSlash('/blog/' + post.shortUrl)}
+              url={post.url}
               title={post.title}
-              footer={'User ID: ' + post.userId}
+              footer={post.author}
             >
-              {post.body}
+              {post.description}
             </PostCard>
           </li>
         ))
