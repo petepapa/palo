@@ -14,6 +14,7 @@ interface ApiPost {
   userId: number
   title: string
   body: string
+  coverImage?: string
 }
 
 interface Props {
@@ -49,26 +50,16 @@ export async function getStaticPaths() {
     { src: '/posts/post-image-6.png' },
   ]
 
-  function truncateTitle(title: string) {
-    const words = title.split(' ')
-    const truncated = words.slice(0, 4).join(' ')
-    return {
-      full: title,
-      truncated: truncated,
-    }
-  }
-
   return data.map((post) => {
-    const titleObj = truncateTitle(post.title)
+    const featuredImage = post.coverImage || postImages[post.id % postImages.length].src
 
     const postWithImage = {
       ...post,
-      featuredImage: postImages[post.id % postImages.length].src,
-      title: titleObj.truncated,
+      featuredImage,
     }
 
     return {
-      params: { post: slugify(titleObj.truncated) },
+      params: { post: slugify(post.title) },
       props: { post: postWithImage },
     }
   })
@@ -87,7 +78,7 @@ const author = {
 }
 ---
 
-<DefaultLayout title={post.title} description={post.body} url={canonicalUrl}>
+<DefaultLayout title={post.title} description={post.body} url={canonicalUrl} image={post.featuredImage}>
   <PageHeader
     title={post.title}
     subtitle={post.body}

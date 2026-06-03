@@ -24,7 +24,7 @@ export const getStaticPaths = (async ({ paginate }) => {
   const projectsWithImages = projects.map((project, index) => {
     return {
       ...project,
-      featuredImage: projectImages[index % projectImages.length],
+      featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
     }
   })
 

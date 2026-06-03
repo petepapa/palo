@@ -8,13 +8,14 @@ import { glob } from 'astro/loaders'
 
 // 3. Define your collection(s)
 const projects = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
   schema: z.object({
     title: z.string(),
     author: z.string(),
     description: z.string(),
     type: z.enum(projectTypeIds).default(defaultProjectType),
     tags: z.array(z.string()).default([]),
+    coverImage: z.string().optional(),
   }),
 })
 

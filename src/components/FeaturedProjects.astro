@@ -65,7 +65,7 @@ const projects = await getCollection('projects')
 // Limit projects and add featured images
 const featuredProjects = projects.slice(0, limit).map((project, index) => ({
   ...project,
-  featuredImage: projectImages[index % projectImages.length],
+  featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
 }))
 ---
 

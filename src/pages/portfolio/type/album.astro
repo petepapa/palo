@@ -55,7 +55,7 @@ const uniqueTags = [...new Set(projects.map((project) => project.data.tags).flat
   }))
 const projectsWithImages = projects.map((project, index) => ({
   ...project,
-  featuredImage: projectImages[index % projectImages.length],
+  featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
 }))
 const filteredProjects = projectsWithImages.filter((project) => project.data.type === projectType.id)
 ---
