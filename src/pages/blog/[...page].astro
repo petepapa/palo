@@ -1,7 +1,8 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
-import { Card, Pagination } from 'accessible-astro-components'
+import PostCard from '@components/PostCard.astro'
+import { Pagination } from 'accessible-astro-components'
 import type { PaginateFunction, Page } from 'astro'
 import { BLOG_API_URL } from 'astro:env/server'
 import type { ImageMetadata } from 'astro'
@@ -73,6 +74,7 @@ interface Props {
 }
 
 const { page } = Astro.props as Props
+const coverImageRatio = '8 / 5'
 
 // PaloPageHeader settings / 页面头部设置
 const pageHeaderAppearance = {
@@ -104,20 +106,19 @@ const pageHeaderAppearance = {
   <section class="my-12">
     <div class="container">
       <p class="text-sm"><em>Post {page.start + 1} through {page.end + 1} of {page.total} total posts</em></p>
-      <ul class="my-3 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <ul class="my-8 grid grid-cols-1 gap-24">
         {
           page.data.map((post) => (
             <li>
-              <Card
-                imageComponent={post.featuredImage}
+              <PostCard
+                image={post.featuredImage}
+                imageRatio={coverImageRatio}
                 url={ensureTrailingSlash('/blog/' + post.shortUrl)}
                 title={post.title}
-                headingLevel="h2"
                 footer={'userId:' + post.userId}
-                fullHeight={true}
               >
                 {post.body}
-              </Card>
+              </PostCard>
             </li>
           ))
         }
