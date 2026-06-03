@@ -5,171 +5,76 @@ import SocialShares from '@components/SocialShares.astro'
 import BreakoutImage from '@components/BreakoutImage.astro'
 import { Heading } from 'accessible-astro-components'
 import { Image } from 'astro:assets'
-import { BLOG_API_URL } from 'astro:env/server'
-import { slugify } from '@utils/slugify'
+import { getCollection, render } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
-interface ApiPost {
-  id: number
-  userId: number
-  title: string
-  body: string
-  coverImage?: string
-}
-
-interface Props {
-  post: ApiPost & {
-    featuredImage: string
-  }
-}
-
 export async function getStaticPaths() {
-  if (!BLOG_API_URL) {
-    console.warn('BLOG_API_URL not set; skipping blog generation.')
-    return []
-  }
-  let data: ApiPost[] = []
-  try {
-    const response = await fetch(BLOG_API_URL)
-    if (!response.ok) {
-      console.warn(`BLOG_API_URL returned ${response.status}`)
-      return []
-    }
-    data = (await response.json()) as ApiPost[]
-  } catch (error) {
-    console.warn('Failed to fetch blog posts', error)
-    return []
-  }
+  const posts = await getCollection('posts')
 
-  const postImages = [
-    { src: '/posts/post-image-1.png' },
-    { src: '/posts/post-image-2.png' },
-    { src: '/posts/post-image-3.png' },
-    { src: '/posts/post-image-4.png' },
-    { src: '/posts/post-image-5.png' },
-    { src: '/posts/post-image-6.png' },
+  const defaultImages = [
+    '/posts/post-image-1.png',
+    '/posts/post-image-2.png',
+    '/posts/post-image-3.png',
+    '/posts/post-image-4.png',
+    '/posts/post-image-5.png',
+    '/posts/post-image-6.png',
   ]
 
-  return data.map((post) => {
-    const featuredImage = post.coverImage || postImages[post.id % postImages.length].src
-
-    const postWithImage = {
-      ...post,
-      featuredImage,
-    }
+  return posts.map((post, index) => {
+    const featuredImage = post.data.coverImage || defaultImages[index % defaultImages.length]
 
     return {
-      params: { post: slugify(post.title) },
-      props: { post: postWithImage },
+      params: { post: post.id },
+      props: { post, featuredImage },
     }
   })
 }
 
-const { post } = Astro.props as Props
-const postSlug = Astro.params.post ?? slugify(post.title)
-const canonicalUrl = new URL(
-  ensureTrailingSlash(`/blog/${postSlug}`),
-  Astro.site ?? Astro.url
-).href
-const author = {
-  name: 'A11Y Person',
-  image: '/posts/post-image-1.png',
-  bio: 'Pasionate accessibility advocate',
+const { post, featuredImage } = Astro.props
+const { Content } = await render(post)
+
+const { title, description, author, publishDate } = post.data
+
+const formattedDate = publishDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
+
+const authorInfo = {
+  name: author || 'Anonymous',
+  image: featuredImage,
+  bio: 'Blog Author',
 }
 ---
 
-<DefaultLayout title={post.title} description={post.body} url={canonicalUrl} image={post.featuredImage}>
+<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${post.id}`)}>
   <PageHeader
-    title={post.title}
-    subtitle={post.body}
-    author={author}
+    title={title}
+    subtitle={description}
+    author={authorInfo}
     bgType="bordered"
-    featuredImage={post.featuredImage}
+    featuredImage={featuredImage}
   />
   <section class="my-12">
-    <div class="narrow container">
-      <p class="text-2xl">{post.body}</p>
-    </div>
-  </section>
-  <section class="my-12">
-    <div class="narrow space-content container">
-      <Heading level="h2">Demo content</Heading>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-      </p>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</p>
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Image
-          src="/posts/post-image-1.png"
-          alt=""
-          width={1200}
-          height={600}
-          class="h-[250px] w-full rounded-lg object-cover"
-        />
-        <Image
-          src="/posts/post-image-2.png"
-          alt=""
-          width={1200}
-          height={600}
-          class="h-[250px] w-full rounded-lg object-cover"
-        />
-        <Image
-          src="/posts/post-image-3.png"
-          alt=""
-          width={1200}
-          height={600}
-          class="h-[250px] w-full rounded-lg object-cover"
-        />
-        <Image
-          src="/posts/post-image-4.png"
-          alt=""
-          width={1200}
-          height={600}
-          class="h-[250px] w-full rounded-lg object-cover"
-        />
-      </div>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem
-        ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-      </p>
-      <Heading level="h3">Demo content</Heading>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-      </p>
-      <ul class="list-inside list-disc">
-        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-        <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.</li>
-      </ul>
-      <Heading level="h3">Breakout Image</Heading>
-      <p>
-        This image breaks out of the narrow container on larger screens, creating a more immersive visual experience.
-      </p>
-      <BreakoutImage src="/posts/post-image-2.png" decorative={true} />
-      <p>
-        Notice how the image above extends beyond the boundaries of the text content, creating visual interest and
-        drawing attention to important visual elements.
-      </p>
-      <Heading level="h3">Demo content</Heading>
-      <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem
-        ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur
-        adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
-      </p>
+    <div class="narrow prose space-content container">
+      <Content />
     </div>
   </section>
   <section class="my-12">
     <div class="narrow space-content container">
       <Heading level="h2">Share this post</Heading>
-      <p>Like this post? Share it with your friends!</p>
+      <p>Like this post? Share it with your network!</p>
       <SocialShares />
     </div>
   </section>
 </DefaultLayout>
+
+<style lang="scss" is:global>
+  @layer components {
+    .narrow {
+      margin-inline: auto;
+      max-width: 65ch;
+    }
+  }
+</style>

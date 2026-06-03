@@ -4,9 +4,8 @@ import PaloPageHeader from '@components/PaloPageHeader.astro'
 import PostCard from '@components/PostCard.astro'
 import { Pagination } from 'accessible-astro-components'
 import type { PaginateFunction, Page } from 'astro'
-import { BLOG_API_URL } from 'astro:env/server'
 import type { ImageMetadata } from 'astro'
-import { slugify } from '@utils/slugify'
+import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
 // Import images directly for optimization
@@ -17,54 +16,25 @@ import postImage4 from '@assets/images/posts/post-image-4.png'
 import postImage5 from '@assets/images/posts/post-image-5.png'
 import postImage6 from '@assets/images/posts/post-image-6.png'
 
-interface ApiPost {
-  id: number
-  userId: number
+interface Post {
+  id: string
   title: string
-  body: string
-}
-
-interface Post extends ApiPost {
-  featuredImage: ImageMetadata
-  shortUrl: string
+  description: string
+  author: string
+  publishDate: Date
+  featuredImage: string | ImageMetadata
 }
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  if (!BLOG_API_URL) {
-    console.warn('BLOG_API_URL not set; skipping blog generation.')
-    return []
-  }
-  let data: ApiPost[] = []
-  try {
-    const response = await fetch(BLOG_API_URL)
-    if (!response.ok) {
-      console.warn(`BLOG_API_URL returned ${response.status}`)
-      return []
-    }
-    data = (await response.json()) as ApiPost[]
-  } catch (error) {
-    console.warn('Failed to fetch blog posts', error)
-    return []
-  }
+  const posts = await getCollection('posts')
+  
+  const defaultImages = [postImage1, postImage2, postImage3, postImage4, postImage5, postImage6]
 
-  const postImages = [postImage1, postImage2, postImage3, postImage4, postImage5, postImage6]
-
-  function truncateTitle(title: string) {
-    const words = title.split(' ')
-    const truncated = words.slice(0, 4).join(' ')
-    return truncated
-  }
-
-  // Limit to the first 30 posts for demo purposes
-  const postsWithImages = data.slice(0, 30).map((post) => {
-    const truncatedTitle = truncateTitle(post.title)
-    return {
-      ...post,
-      featuredImage: postImages[post.id % postImages.length],
-      title: truncatedTitle,
-      shortUrl: slugify(truncatedTitle),
-    }
-  })
+  const postsWithImages = posts.map((post, index) => ({
+    ...post.data,
+    id: post.id,
+    featuredImage: post.data.coverImage || defaultImages[index % defaultImages.length],
+  }))
 
   return paginate(postsWithImages, { pageSize: 6 })
 }
@@ -95,17 +65,17 @@ const pageHeaderAppearance = {
 
 <DefaultLayout
   title="Blog"
-  description="An example of a blog with dynamic content fetched from JSONPlaceholder using the title, body and userId."
+  description="Insights, tutorials, and thoughts on web development, accessibility, and design."
 >
   <PaloPageHeader
     title="Blog"
-    subtitle='An example of a blog with dynamic content fetched from <a href="https://jsonplaceholder.typicode.com/posts">JSONPlaceholder</a> using the title, body and userId. The Accessible Astro Card Component is used here to display al the posts.'
+    subtitle="Latest articles on web development, accessibility, and design best practices."
     {...pageHeaderAppearance}
   />
 
   <section class="my-12">
     <div class="container">
-      <p class="text-sm"><em>Post {page.start + 1} through {page.end + 1} of {page.total} total posts</em></p>
+      <p class="text-sm"><em>Post {page.start + 1} through {page.end} of {page.total} total posts</em></p>
       <ul class="my-8 grid grid-cols-1 gap-24">
         {
           page.data.map((post) => (
@@ -113,11 +83,11 @@ const pageHeaderAppearance = {
               <PostCard
                 image={post.featuredImage}
                 imageRatio={coverImageRatio}
-                url={ensureTrailingSlash('/blog/' + post.shortUrl)}
+                url={ensureTrailingSlash('/blog/' + post.id)}
                 title={post.title}
-                footer={'userId:' + post.userId}
+                footer={post.author}
               >
-                {post.body}
+                {post.description}
               </PostCard>
             </li>
           ))
