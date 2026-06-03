@@ -126,10 +126,11 @@ const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalS
     .post-card__title a {
       color: inherit;
       text-decoration: none;
+      transition: color 300ms ease;
     }
 
     .post-card__title a:where(:hover, :focus-visible) {
-      text-decoration: underline;
+      color: var(--color-primary);
     }
 
     .post-card__footer {

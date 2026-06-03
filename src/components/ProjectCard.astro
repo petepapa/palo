@@ -100,7 +100,7 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
 
     .project-card__title {
       margin: 0;
-      transition: color var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease);
+      transition: color 300ms ease;
       color: inherit;
       font-size: var(--text-lg, 1.125rem);
       line-height: var(--text-lg--line-height, 1.25);
@@ -145,6 +145,10 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       &:where(:hover, :focus-visible) {
         .project-card__image {
           transform: scale(1.04);
+        }
+
+        .project-card__title {
+          color: var(--color-primary);
         }
       }
     }
