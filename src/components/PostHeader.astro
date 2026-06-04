@@ -26,15 +26,7 @@ type Props = {
   joinLastBreadcrumb?: boolean
   source?: string
   liveDemo?: string
-  /**
-   * Divider position.
-   * Defaults to bottom when true or empty; accepts top/both/bottom/false.
-   */
   showDivider?: DividerPlacement
-  /**
-   * Cover image position.
-   * Defaults to top when true; accepts top/bottom/false.
-   */
   coverImagePosition?: CoverImagePosition
 }
 
@@ -162,13 +154,13 @@ const sanitizedSubtitle: string = subtitle
       {sanitizedSubtitle && <p class="text-lg mt-4" set:html={sanitizedSubtitle} />}
       
       <div class="post-header__meta">
-        <div class="post-header__meta-left">
+        <div class="post-header__author">
           {author?.name && (
             <Avatar title={author.name} {...(author.image && { img: author.image })} subtitle={author.bio} />
           )}
         </div>
         {(source || liveDemo) && (
-          <div class="post-header__meta-right">
+          <div class="post-header__actions">
             <div class="post-header__links">
               {source && (
                 <a href={source} target="_blank" rel="noopener noreferrer">
@@ -208,28 +200,25 @@ const sanitizedSubtitle: string = subtitle
       }
 
       .post-header__meta {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
         align-items: center;
-        justify-content: space-between;
         gap: 1rem;
-        flex-wrap: wrap;
         margin-top: 1.5rem;
       }
 
-      .post-header__meta-left {
-        flex: 1;
-        min-width: 0;
+      .post-header__author {
+        justify-self: start;
       }
 
-      .post-header__meta-right {
-        flex-shrink: 0;
+      .post-header__actions {
+        justify-self: end;
       }
 
       .post-header__links {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        justify-content: flex-end;
 
         a {
           text-decoration: none;
@@ -261,6 +250,21 @@ const sanitizedSubtitle: string = subtitle
 
       &--with-divider-bottom {
         border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+      }
+
+      @media (max-width: 768px) {
+        .post-header__meta {
+          grid-template-columns: 1fr;
+        }
+
+        .post-header__author {
+          justify-self: start;
+        }
+
+        .post-header__actions {
+          justify-self: start;
+          margin-top: 1rem;
+        }
       }
     }
   }
