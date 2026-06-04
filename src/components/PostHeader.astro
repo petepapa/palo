@@ -102,8 +102,12 @@ const sanitizedSubtitle: string = subtitle
                 return formatSegment(segment)
               })()
 
+              const label = isLast && customBreadcrumbLabels?.['current']
+                ? customBreadcrumbLabels['current']
+                : formattedName
+
               return (
-                <BreadcrumbsItem href={isLast ? undefined : url} label={formattedName} currentPage={isLast} />
+                <BreadcrumbsItem href={isLast ? undefined : url} label={label} currentPage={isLast} />
               )
             })
           })()}

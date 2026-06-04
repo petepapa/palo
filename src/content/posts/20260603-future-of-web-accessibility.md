@@ -9,8 +9,12 @@ author:
 tags: ['Accessibility', 'Web Development', 'Future Trends']
 coverImage: /123.jpeg
 showBreadcrumbs: true
-source: "https://github.com/example/repo"
-liveDemo: "https://example.com/demo"
+customBreadcrumbLabels:
+  "blog": "博客"
+  "current": ""
+joinLastBreadcrumb: false
+source: "https://github.com/petepapa/palo"
+liveDemo: "https://palo.petepa.com/"
 ---
 
 ## The Evolution of Web Accessibility
