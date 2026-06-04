@@ -43,6 +43,7 @@ const {
   showDivider,
   coverImagePosition,
   showTableOfContents,
+  narrow,
 } = project.data
 
 const authorInfo = typeof author === 'object'
@@ -73,29 +74,31 @@ const authorInfo = typeof author === 'object'
     coverImagePosition={coverImagePosition}
   />
   <section class="my-12">
-    <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
-      <div class="article-content__main">
-        <div class="narrow prose space-content">
-          <Content />
-        </div>
-        <div class="narrow space-content mt-12">
-          <Heading level="h2">Share this project</Heading>
-          <p>Like this project? Share it with your network!</p>
-          <SocialShares />
-        </div>
-      </div>
-      {showTableOfContents && (
-        <div class="article-content__toc">
-          <div class="article-toc space-content">
-            <Heading level="h3" size="h4">On this page</Heading>
-            <nav aria-label="On this page">
-              <ul class="list-none">
-                <!-- 导航项将通过 JS 动态生成 -->
-              </ul>
-            </nav>
+    <div class="container">
+      <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
+        <div class="article-content__main">
+          <div class={`prose space-content ${!showTableOfContents ? 'narrow' : ''}`}>
+            <Content />
+          </div>
+          <div class={`space-content mt-12 ${!showTableOfContents ? 'narrow' : ''}`}>
+            <Heading level="h2">Share this project</Heading>
+            <p>Like this project? Share it with your network!</p>
+            <SocialShares />
           </div>
         </div>
-      )}
+        {showTableOfContents && (
+          <div class="article-content__toc">
+            <div class="article-toc space-content">
+              <Heading level="h3" size="h4">On this page</Heading>
+              <nav aria-label="On this page">
+                <ul class="list-none">
+                  <!-- 导航项将通过 JS 动态生成 -->
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   </section>
 </DefaultLayout>

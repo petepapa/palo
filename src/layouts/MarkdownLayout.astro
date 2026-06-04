@@ -1,9 +1,11 @@
 ---
 import DefaultLayout from './DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
+import { Heading } from 'accessible-astro-components'
 
 const { frontmatter } = Astro.props
-const containerClass = frontmatter.narrow ? 'narrow container' : 'container'
+const showTableOfContents = frontmatter.showTableOfContents ?? false
+const narrow = frontmatter.narrow ?? false
 const pageHeader = frontmatter.pageHeader
 const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
 const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
@@ -38,11 +40,29 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
       />
     )
   }
-  <div class={containerClass}>
-    <div class="prose space-content my-12">
-      <slot />
+  <section class="my-12">
+    <div class="container">
+      <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
+        <div class="article-content__main">
+          <div class={`prose space-content ${!showTableOfContents ? 'narrow' : ''}`}>
+            <slot />
+          </div>
+        </div>
+        {showTableOfContents && (
+          <div class="article-content__toc">
+            <div class="article-toc space-content">
+              <Heading level="h3" size="h4">On this page</Heading>
+              <nav aria-label="On this page">
+                <ul class="list-none">
+                  <!-- 导航项将通过 JS 动态生成 -->
+                </ul>
+              </nav>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
+  </section>
 </DefaultLayout>
 
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" is:inline></script>
@@ -132,14 +152,257 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
     }
   }
 
+  // 目录导航功能
+  const paloInitTableOfContents = () => {
+    const tocContainer = document.querySelector('.article-toc nav ul')
+    if (!tocContainer) return
+
+    // 从内容中找到所有 H2 和 H3 标题
+    const contentMain = document.querySelector('.article-content__main')
+    if (!contentMain) return
+
+    const headings = [
+      ...contentMain.querySelectorAll('h2'),
+      ...contentMain.querySelectorAll('h3'),
+    ].sort((a, b) => a.offsetTop - b.offsetTop)
+
+    if (headings.length === 0) {
+      // 如果没有标题，隐藏目录
+      const tocWrapper = document.querySelector('.article-content__toc')
+      const mainContent = document.querySelector('.article-content__main')
+      if (tocWrapper) tocWrapper.style.display = 'none'
+      if (mainContent) mainContent.style.gridColumn = '1 / -1'
+      return
+    }
+
+    // 为每个标题添加 id（如果没有的话）
+    headings.forEach((heading, index) => {
+      if (!heading.id) {
+        const id = heading.textContent?.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') || `heading-${index}`
+        heading.id = id
+      }
+      // 添加滚动边距
+      heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + 2rem)'
+    })
+
+    // 生成导航链接
+    // 先清空容器避免重复
+    tocContainer.innerHTML = ''
+
+    const navItems = headings.map((heading) => {
+      const level = heading.tagName.toLowerCase()
+      const li = document.createElement('li')
+      li.className = `my-1 article-toc__item article-toc__item--${level}`
+      const a = document.createElement('a')
+      a.href = `#${heading.id}`
+      a.className = 'text-sm'
+      a.textContent = heading.textContent || ''
+      li.appendChild(a)
+      return li
+    })
+
+    navItems.forEach((item) => tocContainer.appendChild(item))
+
+    // 初始化导航高亮和滚动功能
+    initTocNavigation()
+  }
+
+  const initTocNavigation = () => {
+    const navLinks = [...document.querySelectorAll('.article-toc nav a')]
+    if (navLinks.length === 0) return
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let activeScrollFrame = null
+
+    const setActiveLink = (activeLink) => {
+      navLinks.forEach((link) => {
+        const isActive = link === activeLink
+        link.classList.toggle('active', isActive)
+        if (isActive) {
+          link.setAttribute('aria-current', 'true')
+        } else {
+          link.removeAttribute('aria-current')
+        }
+      })
+    }
+
+    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+
+    const smoothScrollToHeading = (heading) => {
+      if (prefersReducedMotion) {
+        heading.scrollIntoView({ block: 'start' })
+        return
+      }
+
+      if (activeScrollFrame) {
+        cancelAnimationFrame(activeScrollFrame)
+        activeScrollFrame = null
+      }
+
+      const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
+      const startY = window.scrollY
+      const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - headerHeight)
+      const distance = targetY - startY
+      const duration = 600
+      const startTime = performance.now()
+      const rootStyle = document.documentElement.style
+      const previousScrollBehavior = rootStyle.scrollBehavior
+      rootStyle.scrollBehavior = 'auto'
+
+      if (Math.abs(distance) < 2) {
+        rootStyle.scrollBehavior = previousScrollBehavior
+        return
+      }
+
+      const step = (currentTime) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const eased = easeOutCubic(progress)
+        window.scrollTo(0, startY + distance * eased)
+
+        if (progress < 1) {
+          activeScrollFrame = requestAnimationFrame(step)
+        } else {
+          rootStyle.scrollBehavior = previousScrollBehavior
+          activeScrollFrame = null
+        }
+      }
+
+      window.scrollTo(0, startY)
+      step(startTime)
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
+
+        const topEntry = visibleEntries[0]
+        if (!topEntry) return
+
+        const link = document.querySelector(`.article-toc nav a[href="#${topEntry.target.id}"]`)
+        if (link instanceof HTMLAnchorElement) {
+          setActiveLink(link)
+        }
+      },
+      { rootMargin: '-12% 0px -55% 0px', threshold: [0.1, 0.25, 0.5, 0.75, 1] },
+    )
+
+    navLinks.forEach((link) => {
+      if (!(link instanceof HTMLAnchorElement)) return
+
+      const id = link.getAttribute('href')?.replace('#', '')
+      const heading = id && document.getElementById(id)
+      if (!heading) return
+
+      observer.observe(heading)
+
+      if (link.dataset.paloBound === 'true') return
+
+      link.addEventListener('click', (event) => {
+        event.preventDefault()
+        setActiveLink(link)
+        history.replaceState(null, '', `#${id}`)
+        smoothScrollToHeading(heading)
+      })
+
+      link.dataset.paloBound = 'true'
+    })
+
+    // 设置初始激活状态
+    const initialHash = window.location.hash.replace('#', '')
+    if (initialHash) {
+      const initialLink = document.querySelector(`.article-toc nav a[href="#${initialHash}"]`)
+      if (initialLink instanceof HTMLAnchorElement) {
+        setActiveLink(initialLink)
+      }
+    } else if (navLinks[0] instanceof HTMLAnchorElement) {
+      setActiveLink(navLinks[0])
+    }
+  }
+
   // Handle standard page loads and View Transitions
   document.addEventListener('astro:page-load', initProseEnhancements)
   document.addEventListener('astro:after-swap', initProseEnhancements)
+  document.addEventListener('astro:page-load', paloInitTableOfContents)
+  document.addEventListener('astro:after-swap', paloInitTableOfContents)
   
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initProseEnhancements)
+    document.addEventListener('DOMContentLoaded', paloInitTableOfContents)
   } else {
     // Small delay to ensure mermaid CDN script is loaded
     setTimeout(initProseEnhancements, 100)
+    paloInitTableOfContents()
   }
 </script>
+
+<style lang="scss" is:global>
+  @use 'scss/base/breakpoint' as *;
+
+  @layer components {
+    .article-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+
+      &--with-toc {
+        @include breakpoint(m) {
+          grid-template-columns: 2fr 1fr;
+        }
+      }
+    }
+
+    .article-content__main {
+      @include breakpoint(m) {
+        border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+        padding-inline-end: var(--space-l);
+      }
+    }
+
+    .article-content__toc {
+      grid-row: 1;
+
+      @include breakpoint(m) {
+        position: sticky;
+        grid-row: auto;
+        align-self: start;
+        inset-block-start: calc(var(--header-height) + var(--space-l));
+        padding-inline-end: var(--space-l);
+        max-inline-size: 100%;
+        max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
+        overflow-y: auto;
+        transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+      }
+    }
+
+    .article-toc a {
+      display: inline-block;
+      transform-origin: left center;
+      transition:
+        transform 0.22s var(--cubic-bezier),
+        font-size 0.22s var(--cubic-bezier),
+        color 0.22s var(--cubic-bezier);
+    }
+
+    .article-toc__item--h3 {
+      padding-inline-start: var(--space-s);
+    }
+
+    .article-toc .active {
+      transform: scale(1.08) !important;
+      font-weight: var(--font-weight-heading, 500) !important;
+      font-size: 1.25rem !important;
+    }
+
+    ul:not([class]) li {
+      margin-block-end: 0.35rem;
+    }
+
+    .narrow {
+      margin-inline: auto;
+      max-width: 65ch;
+    }
+  }
+</style>
