@@ -1,5 +1,6 @@
 ---
-import { Avatar, Breadcrumbs, BreadcrumbsItem, Heading } from 'accessible-astro-components'
+import { Avatar, Breadcrumbs, BreadcrumbsItem, Button, Heading } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import sanitizeHtml from 'sanitize-html'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
@@ -19,6 +20,9 @@ type Props = {
   showBreadcrumbs?: boolean
   customBreadcrumbLabels?: Record<string, string>
   joinLastBreadcrumb?: boolean
+  source?: string
+  liveDemo?: string
+  showDivider?: boolean
 }
 
 const {
@@ -30,6 +34,9 @@ const {
   showBreadcrumbs = true,
   customBreadcrumbLabels,
   joinLastBreadcrumb = false,
+  source,
+  liveDemo,
+  showDivider = true,
 } = Astro.props as Props
 
 const formatSegment = (segment: string): string => {
@@ -54,7 +61,7 @@ const sanitizedSubtitle: string = subtitle
   : ''
 ---
 
-<section class:list={[className, 'post-header']}>
+<section class:list={[className, 'post-header', showDivider && 'post-header--with-divider']}>
   {featuredImage && (
     <div class="post-header__image">
       <Image
@@ -69,40 +76,79 @@ const sanitizedSubtitle: string = subtitle
 
   <div class="container py-10">
     {showBreadcrumbs && (
-      <Breadcrumbs>
-        <BreadcrumbsItem href="/" label="Home" />
-        {(() => {
-          const path = Astro.url.pathname
-          const segments = path.split('/').filter(Boolean)
+      <div class="post-header__top-row">
+        <Breadcrumbs>
+          <BreadcrumbsItem href="/" label="Home" hasIcon>
+            <Icon aria-hidden="true" name="ph:house" slot="icon" />
+          </BreadcrumbsItem>
+          {(() => {
+            const path = Astro.url.pathname
+            const segments = path.split('/').filter(Boolean)
 
-          return segments.map((segment, index) => {
-            if (joinLastBreadcrumb && index === segments.length - 1) {
-              return null
-            }
-
-            const url = ensureTrailingSlash(`/${segments.slice(0, index + 1).join('/')}`)
-            const isLast = index === segments.length - 1 || (joinLastBreadcrumb && index === segments.length - 2)
-
-            const formattedName = (() => {
-              if (joinLastBreadcrumb && isLast) {
-                const prevSegment = segments[segments.length - 2]
-                const lastSegment = segments[segments.length - 1]
-                return `${formatSegment(prevSegment)}: ${formatSegment(lastSegment)}`
+            return segments.map((segment, index) => {
+              if (joinLastBreadcrumb && index === segments.length - 1) {
+                return null
               }
-              return formatSegment(segment)
-            })()
 
-            return <BreadcrumbsItem href={isLast ? undefined : url} label={formattedName} currentPage={isLast} />
-          })
-        })()}
-      </Breadcrumbs>
+              const url = ensureTrailingSlash(`/${segments.slice(0, index + 1).join('/')}`)
+              const isLast = index === segments.length - 1 || (joinLastBreadcrumb && index === segments.length - 2)
+
+              const formattedName = (() => {
+                if (joinLastBreadcrumb && isLast) {
+                  const prevSegment = segments[segments.length - 2]
+                  const lastSegment = segments[segments.length - 1]
+                  return `${formatSegment(prevSegment)}: ${formatSegment(lastSegment)}`
+                }
+                return formatSegment(segment)
+              })()
+
+              return (
+                <BreadcrumbsItem href={isLast ? undefined : url} label={formattedName} currentPage={isLast} />
+              )
+            })
+          })()}
+        </Breadcrumbs>
+
+        {(source || liveDemo) && (
+          <div class="post-header__links">
+            {source && (
+              <a href={source} target="_blank" rel="noopener noreferrer">
+                <Button>Source</Button>
+              </a>
+            )}
+            {liveDemo && (
+              <a href={liveDemo} target="_blank" rel="noopener noreferrer">
+                <Button>Live Demo</Button>
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    )}
+
+    {!showBreadcrumbs && (source || liveDemo) && (
+      <div class="post-header__top-row">
+        <div></div>
+        <div class="post-header__links">
+          {source && (
+            <a href={source} target="_blank" rel="noopener noreferrer">
+              <Button>Source</Button>
+            </a>
+          )}
+          {liveDemo && (
+            <a href={liveDemo} target="_blank" rel="noopener noreferrer">
+              <Button>Live Demo</Button>
+            </a>
+          )}
+        </div>
+      </div>
     )}
 
     <Heading level="h2" class="mt-6">{title}</Heading>
     {sanitizedSubtitle && <p class="mt-4 text-lg" set:html={sanitizedSubtitle} />}
     {author && (
       <div class="mt-6 flex items-center gap-4">
-        <Avatar title={author.name} image={author.image} subtitle={author.bio} />
+        <Avatar title={author.name} img={author.image} subtitle={author.bio} />
       </div>
     )}
   </div>
@@ -111,6 +157,24 @@ const sanitizedSubtitle: string = subtitle
 <style lang="scss">
   @layer components {
     .post-header {
+      .post-header__top-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .post-header__links {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        a {
+          text-decoration: none;
+        }
+      }
+
       .post-header__image {
         position: relative;
         left: 50%;
@@ -124,6 +188,10 @@ const sanitizedSubtitle: string = subtitle
 
       .post-header__image > img {
         border-radius: 0;
+      }
+
+      &--with-divider {
+        border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
       }
     }
   }

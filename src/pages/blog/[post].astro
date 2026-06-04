@@ -31,7 +31,7 @@ export async function getStaticPaths() {
 const { post, featuredImage } = Astro.props
 const { Content } = await render(post)
 
-const { title, description, author, publishDate } = post.data
+const { title, description, author, publishDate, showBreadcrumbs, source, liveDemo, customBreadcrumbLabels, joinLastBreadcrumb } = post.data
 
 const formattedDate = publishDate.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -39,11 +39,17 @@ const formattedDate = publishDate.toLocaleDateString('en-US', {
   day: 'numeric',
 })
 
-const authorInfo = {
-  name: author || 'Anonymous',
-  image: featuredImage,
-  bio: 'Blog Author',
-}
+const authorInfo = typeof author === 'object'
+  ? {
+      name: author.name,
+      image: author.image || featuredImage,
+      bio: author.bio || 'Blog Author',
+    }
+  : {
+      name: author || 'Anonymous',
+      image: featuredImage,
+      bio: 'Blog Author',
+    }
 ---
 
 <DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${post.id}`)}>
@@ -52,6 +58,11 @@ const authorInfo = {
     subtitle={description}
     author={authorInfo}
     featuredImage={featuredImage}
+    showBreadcrumbs={showBreadcrumbs}
+    source={source}
+    liveDemo={liveDemo}
+    customBreadcrumbLabels={customBreadcrumbLabels}
+    joinLastBreadcrumb={joinLastBreadcrumb}
   />
   <section class="my-12">
     <div class="narrow prose space-content container">

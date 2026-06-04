@@ -25,9 +25,21 @@ const posts = defineCollection({
     title: z.string(),
     description: z.string(),
     publishDate: z.date(),
-    author: z.string().default('Anonymous'),
+    author: z.union([
+      z.string(),
+      z.object({
+        name: z.string(),
+        image: z.string().optional(),
+        bio: z.string().optional(),
+      }),
+    ]).default('Anonymous'),
     tags: z.array(z.string()).default([]),
     coverImage: z.string().optional(),
+    showBreadcrumbs: z.boolean().default(true),
+    source: z.string().optional(),
+    liveDemo: z.string().optional(),
+    customBreadcrumbLabels: z.any().optional(),
+    joinLastBreadcrumb: z.boolean().default(false),
   }),
 })
 

@@ -1,5 +1,6 @@
 ---
 import { Avatar, Breadcrumbs, BreadcrumbsItem, Heading } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import sanitizeHtml from 'sanitize-html'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
@@ -106,7 +107,9 @@ const sanitizedSubtitle: string = subtitle
 
           return (
             <Breadcrumbs>
-              <BreadcrumbsItem href="/" label="Home" />
+              <BreadcrumbsItem href="/" label="Home" hasIcon>
+                <Icon aria-hidden="true" name="ph:house" slot="icon" />
+              </BreadcrumbsItem>
               {segments.map((segment, index) => {
                 if (joinLastBreadcrumb && index === segments.length - 1) {
                   return null
@@ -125,7 +128,9 @@ const sanitizedSubtitle: string = subtitle
                   return formatSegment(segment)
                 })()
 
-                return <BreadcrumbsItem href={isLast ? undefined : url} label={formattedName} currentPage={isLast} />
+                return (
+                  <BreadcrumbsItem href={isLast ? undefined : url} label={isLast ? title : formattedName} currentPage={isLast} />
+                )
               })}
             </Breadcrumbs>
           )
@@ -150,12 +155,12 @@ const sanitizedSubtitle: string = subtitle
       <Heading level="h1">{title}</Heading>
       {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
       {
-        author && (
-          <div class="mt-6 flex items-center">
-            <Avatar title={author.name} image={author.image} subtitle={author.bio} />
-          </div>
-        )
-      }
+      author && (
+        <div class="mt-6 flex items-center">
+          <Avatar title={author.name} img={author.image} subtitle={author.bio} />
+        </div>
+      )
+    }
     </div>
   </div>
 </section>
