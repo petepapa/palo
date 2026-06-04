@@ -40,6 +40,7 @@ const posts = defineCollection({
     liveDemo: z.string().optional(),
     customBreadcrumbLabels: z.any().optional(),
     joinLastBreadcrumb: z.boolean().default(false),
+    showDivider: z.union([z.boolean(), z.enum(['top', 'both', 'bottom'])]).default(true),
   }),
 })
 

@@ -11,6 +11,8 @@ type Author = {
   bio: string
 }
 
+type DividerPlacement = boolean | 'top' | 'both' | 'bottom'
+
 type Props = {
   class?: string
   featuredImage?: string
@@ -22,7 +24,11 @@ type Props = {
   joinLastBreadcrumb?: boolean
   source?: string
   liveDemo?: string
-  showDivider?: boolean
+  /**
+   * Divider position.
+   * Defaults to bottom when true or empty; accepts top/both/bottom/false.
+   */
+  showDivider?: DividerPlacement
 }
 
 const {
@@ -50,6 +56,15 @@ const formatSegment = (segment: string): string => {
     .join(' ')
 }
 
+const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both' | 'bottom' | false => {
+  if (value === false) return false
+  if (value === 'top') return 'top'
+  if (value === 'both') return 'both'
+  return 'bottom'
+}
+
+const dividerPlacement = resolveDividerPlacement(showDivider)
+
 const sanitizedSubtitle: string = subtitle
   ? sanitizeHtml(subtitle, {
       allowedTags: ['b', 'i', 'em', 'strong', 'a', 'span', 'br'],
@@ -61,7 +76,14 @@ const sanitizedSubtitle: string = subtitle
   : ''
 ---
 
-<section class:list={[className, 'post-header', showDivider && 'post-header--with-divider']}>
+<section
+  class:list={[
+    className,
+    'post-header',
+    (dividerPlacement === 'top' || dividerPlacement === 'both') && 'post-header--with-divider-top',
+    (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'post-header--with-divider-bottom',
+  ]}
+>
   {featuredImage && (
     <div class="post-header__image">
       <Image
@@ -194,7 +216,11 @@ const sanitizedSubtitle: string = subtitle
         border-radius: 0;
       }
 
-      &--with-divider {
+      &--with-divider-top {
+        border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+      }
+
+      &--with-divider-bottom {
         border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
       }
     }

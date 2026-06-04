@@ -15,6 +15,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
+showDivider: true
 ---
 
 ## The Evolution of Web Accessibility
