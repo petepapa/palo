@@ -17,8 +17,8 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: false
-narrow: false
+showTableOfContents: true
+
 ---
 
 ### The Evolution of Web Accessibility
