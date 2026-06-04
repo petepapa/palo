@@ -19,11 +19,11 @@ liveDemo: "https://palo.petepa.com/"
 showDivider: true
 ---
 
-## The Evolution of Web Accessibility
+### The Evolution of Web Accessibility
 
 As we enter 2026, web accessibility has evolved from a niche concern to a fundamental aspect of web development. This article explores the most exciting trends shaping the future of accessible web experiences.
 
-## AI-Powered Accessibility Tools
+### AI-Powered Accessibility Tools
 
 Artificial intelligence is transforming how we approach accessibility testing and implementation:
 
@@ -31,7 +31,7 @@ Artificial intelligence is transforming how we approach accessibility testing an
 - **Intelligent color contrast suggestions** - Machine learning algorithms suggest optimal color combinations
 - **Adaptive interfaces** - AI-powered interfaces that learn and adapt to user preferences
 
-## Emerging Standards and Guidelines
+### Emerging Standards and Guidelines
 
 The web accessibility landscape continues to evolve with new standards:
 
@@ -39,7 +39,7 @@ The web accessibility landscape continues to evolve with new standards:
 2. **ARIA 1.3** - Enhanced screen reader support
 3. **Cross-platform accessibility APIs** - Unified approaches across devices
 
-## Practical Implementation Tips
+### Practical Implementation Tips
 
 Making your website accessible doesn't have to be overwhelming:
 
@@ -49,7 +49,7 @@ Making your website accessible doesn't have to be overwhelming:
 - Use proper color contrast ratios
 - Provide clear focus indicators
 
-## Conclusion
+### Conclusion
 
 The future of web accessibility is bright, with technology advancing to make the web more inclusive than ever before. By staying informed and adopting best practices, we can create digital experiences that work for everyone.
 

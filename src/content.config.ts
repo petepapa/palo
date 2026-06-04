@@ -30,6 +30,7 @@ const projects = defineCollection({
     joinLastBreadcrumb: z.boolean().default(false),
     showDivider: z.union([z.boolean(), z.enum(['top', 'both', 'bottom'])]).default(true),
     coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head'),
+    showTableOfContents: z.boolean().default(true),
   }),
 })
 
@@ -56,6 +57,7 @@ const posts = defineCollection({
     joinLastBreadcrumb: z.boolean().default(false),
     showDivider: z.union([z.boolean(), z.enum(['top', 'both', 'bottom'])]).default(true),
     coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head'),
+    showTableOfContents: z.boolean().default(true),
   }),
 })
 
