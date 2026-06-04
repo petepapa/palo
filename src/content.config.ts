@@ -41,6 +41,7 @@ const posts = defineCollection({
     customBreadcrumbLabels: z.any().optional(),
     joinLastBreadcrumb: z.boolean().default(false),
     showDivider: z.union([z.boolean(), z.enum(['top', 'both', 'bottom'])]).default(true),
+    coverImagePosition: z.union([z.boolean(), z.enum(['top', 'bottom'])]).default(true),
   }),
 })
 

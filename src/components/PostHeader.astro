@@ -13,6 +13,8 @@ type Author = {
 
 type DividerPlacement = boolean | 'top' | 'both' | 'bottom'
 
+type CoverImagePosition = boolean | 'top' | 'bottom'
+
 type Props = {
   class?: string
   featuredImage?: string
@@ -29,6 +31,11 @@ type Props = {
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
   showDivider?: DividerPlacement
+  /**
+   * Cover image position.
+   * Defaults to top when true; accepts top/bottom/false.
+   */
+  coverImagePosition?: CoverImagePosition
 }
 
 const {
@@ -43,6 +50,7 @@ const {
   source,
   liveDemo,
   showDivider = true,
+  coverImagePosition = true,
 } = Astro.props as Props
 
 const formatSegment = (segment: string): string => {
@@ -63,7 +71,17 @@ const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both'
   return 'bottom'
 }
 
+const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'bottom' | false => {
+  if (value === false) return false
+  if (value === 'bottom') return 'bottom'
+  return 'top'
+}
+
 const dividerPlacement = resolveDividerPlacement(showDivider)
+const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
+const shouldShowCoverImage = !!featuredImage && !!coverImagePlacement
+const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
+const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'
 
 const sanitizedSubtitle: string = subtitle
   ? sanitizeHtml(subtitle, {
@@ -84,7 +102,7 @@ const sanitizedSubtitle: string = subtitle
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'post-header--with-divider-bottom',
   ]}
 >
-  {featuredImage && (
+  {isCoverImageTop && (
     <div class="post-header__image">
       <Image
         src={featuredImage}
@@ -146,7 +164,7 @@ const sanitizedSubtitle: string = subtitle
       <div class="post-header__meta">
         <div class="post-header__meta-left">
           {author && (
-            <Avatar title={author.name} img={author.image} subtitle={author.bio} />
+            <Avatar title={author.name} {...(author.image && { img: author.image })} subtitle={author.bio} />
           )}
         </div>
         {(source || liveDemo) && (
@@ -168,6 +186,18 @@ const sanitizedSubtitle: string = subtitle
       </div>
     </div>
   </div>
+
+  {isCoverImageBottom && (
+    <div class="post-header__image post-header__image--bottom">
+      <Image
+        src={featuredImage}
+        alt=""
+        width={1600}
+        height={900}
+        class="w-full h-[min(60vh,520px)] object-cover"
+      />
+    </div>
+  )}
 </section>
 
 <style lang="scss">
@@ -215,6 +245,10 @@ const sanitizedSubtitle: string = subtitle
         width: 100vw;
         max-width: 100vw;
         overflow: hidden;
+      }
+
+      .post-header__image--bottom {
+        border-block-start: 1px solid var(--border-color-subtle);
       }
 
       .post-header__image > img {
