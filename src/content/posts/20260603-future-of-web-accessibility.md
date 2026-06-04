@@ -2,9 +2,13 @@
 title: The Future of Web Accessibility in 2026
 description: Exploring the latest trends and innovations in web accessibility, from AI-powered tools to emerging standards
 publishDate: 2026-06-03
-author: Pete Lee
+author:
+  name: "Alex Chen"
+  image: "/authors/alex.jpg"
+  bio: "Accessibility Advocate & Web Developer"
 tags: ['Accessibility', 'Web Development', 'Future Trends']
 coverImage: /123.jpeg
+showBreadcrumbs: false
 ---
 
 ## The Evolution of Web Accessibility

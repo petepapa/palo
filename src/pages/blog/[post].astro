@@ -1,10 +1,8 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PostHeader from '@components/PostHeader.astro'
 import SocialShares from '@components/SocialShares.astro'
-import BreakoutImage from '@components/BreakoutImage.astro'
 import { Heading } from 'accessible-astro-components'
-import { Image } from 'astro:assets'
 import { getCollection, render } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
@@ -49,11 +47,10 @@ const authorInfo = {
 ---
 
 <DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${post.id}`)}>
-  <PageHeader
+  <PostHeader
     title={title}
     subtitle={description}
     author={authorInfo}
-    bgType="bordered"
     featuredImage={featuredImage}
   />
   <section class="my-12">
