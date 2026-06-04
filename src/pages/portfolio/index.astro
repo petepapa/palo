@@ -27,6 +27,7 @@ const projectListWidth: ProjectListWidth = 'full' // Project list width: contain
 const projectListGapClass = 'gap-6' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
 const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
+const isFullWidthList = projectListWidth === 'full'
 
 // PaloPageHeader settings / PaloPageHeader 参数设置
 const pageHeaderAppearance = {
@@ -79,72 +80,50 @@ const projectsWithImages = projects.map((project, index) => ({
       <p class="mt-8 text-sm">
         <em>{projectsWithImages.length} total projects</em>
       </p>
-      <ul
-        class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
-        style={`--project-list-gap: ${projectListGapSize}`}
-      >
-        {
-          projectsWithImages.map((project) => (
-            <li class="project-masonry__item">
-              <!--
-                ProjectCard custom parameters / ProjectCard 自定义参数：
-                - layout="overlay" uses image-first masonry cards / overlay 用于瀑布流纯图卡片
-                - image uses the generated project thumbnail / image 使用自动匹配的项目缩略图
-                - headingLevel="h4" renders project titles as h4 / headingLevel="h4" 将项目标题渲染为 h4
-                - descriptionClass can set the description size, for example text-base or text-lg / descriptionClass 可设置描述字号，例如 text-base 或 text-lg
-              -->
-              <ProjectCard project={project} image={project.featuredImage} 
-              layout="overlay" 
-              headingLevel="h5"
-              descriptionClass="text-base" 
-              />
-            </li>
-          ))
-        }
-      </ul>
+      {
+        !isFullWidthList && (
+          <ul
+            class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
+            style={`--project-list-gap: ${projectListGapSize}`}
+          >
+            {
+              projectsWithImages.map((project) => (
+                <li class="project-masonry__item">
+                  <ProjectCard
+                    project={project}
+                    image={project.featuredImage}
+                    layout="overlay"
+                    headingLevel="h5"
+                    descriptionClass="text-base"
+                  />
+                </li>
+              ))
+            }
+          </ul>
+        )
+      }
     </div>
+    {
+      isFullWidthList && (
+        <ul
+          class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
+          style={`--project-list-gap: ${projectListGapSize}`}
+        >
+          {
+            projectsWithImages.map((project) => (
+              <li class="project-masonry__item">
+                <ProjectCard
+                  project={project}
+                  image={project.featuredImage}
+                  layout="overlay"
+                  headingLevel="h5"
+                  descriptionClass="text-base"
+                />
+              </li>
+            ))
+          }
+        </ul>
+      )
+    }
   </section>
 </DefaultLayout>
-
-<style lang="scss">
-  @layer components {
-    .project-masonry {
-      column-count: 1;
-      gap: var(--project-list-gap, var(--space-m, 1.5rem));
-      column-fill: balance;
-      list-style: none;
-      padding: 0;
-    }
-
-    /* Safari ignores margin-bottom on column items; use padding + inline-block instead */
-    .project-masonry__item {
-      display: inline-block;
-      box-sizing: border-box;
-      inline-size: 100%;
-      vertical-align: top;
-      break-inside: avoid;
-      -webkit-column-break-inside: avoid;
-      page-break-inside: avoid;
-      margin: 0;
-      padding-block: 0 var(--project-list-gap, var(--space-m, 1.5rem));
-      padding-inline: 0;
-      backface-visibility: hidden;
-    }
-
-    .project-masonry__item > .project-card {
-      inline-size: 100%;
-    }
-
-    @media (min-width: 640px) {
-      .project-masonry {
-        column-count: 2;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .project-masonry {
-        column-count: 3;
-      }
-    }
-  }
-</style>

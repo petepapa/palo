@@ -28,11 +28,13 @@
     inline-size: 100%;
   }
 
+  /* Use on a direct child of <main>/<section>, not inside .container (see FeaturedProjects / portfolio pages) */
   .project-list-width--full {
-    margin-inline: calc(50% - 50vw);
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    margin-inline: 0;
     padding-inline: var(--grid-gutter);
-    inline-size: 100vw;
-    max-inline-size: 100vw;
 
     @include breakpoint(m) {
       padding-inline: 2rem;

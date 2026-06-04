@@ -4,7 +4,7 @@ description: Exploring the latest trends and innovations in web accessibility, f
 publishDate: 2026-06-03
 author: Pete Lee
 tags: ['Accessibility', 'Web Development', 'Future Trends']
-coverImage: https://images.unsplash.com/photo-1779464433199-ca57ba28339b?q=80&w=3629&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D
+coverImage: /123.jpeg
 ---
 
 ## The Evolution of Web Accessibility
@@ -40,3 +40,5 @@ Making your website accessible doesn't have to be overwhelming:
 ## Conclusion
 
 The future of web accessibility is bright, with technology advancing to make the web more inclusive than ever before. By staying informed and adopting best practices, we can create digital experiences that work for everyone.
+
+# 123

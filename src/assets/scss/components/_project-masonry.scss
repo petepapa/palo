@@ -1,0 +1,46 @@
+@layer components {
+  /* Multi-column masonry for overlay project cards */
+  .project-masonry {
+    columns: 1;
+    column-fill: balance;
+    column-gap: var(--project-list-gap, var(--space-m, 1.5rem));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  /* Safari ignores margin-bottom on column items; use padding + inline-block instead */
+  .project-masonry__item {
+    display: inline-block;
+    box-sizing: border-box;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    vertical-align: top;
+    break-inside: avoid-column;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0;
+    padding-block: 0 var(--project-list-gap, var(--space-m, 1.5rem));
+    padding-inline: 0;
+    backface-visibility: hidden;
+  }
+
+  .project-masonry__item > .project-card {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .project-masonry {
+      columns: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .project-masonry {
+      columns: 3;
+    }
+  }
+}
