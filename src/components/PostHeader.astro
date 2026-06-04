@@ -13,7 +13,7 @@ type Author = {
 
 type DividerPlacement = boolean | 'top' | 'both' | 'bottom'
 
-type CoverImagePosition = boolean | 'top' | 'bottom'
+type CoverImagePosition = boolean | 'top' | 'head' | 'bottom'
 
 type Props = {
   class?: string
@@ -42,7 +42,7 @@ const {
   source,
   liveDemo,
   showDivider = true,
-  coverImagePosition = true,
+  coverImagePosition = 'head',
 } = Astro.props as Props
 
 const formatSegment = (segment: string): string => {
@@ -63,9 +63,10 @@ const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both'
   return 'bottom'
 }
 
-const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'bottom' | false => {
+const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'head' | 'bottom' | false => {
   if (value === false) return false
   if (value === 'bottom') return 'bottom'
+  if (value === 'head') return 'head'
   return 'top'
 }
 
@@ -73,6 +74,7 @@ const dividerPlacement = resolveDividerPlacement(showDivider)
 const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
 const shouldShowCoverImage = !!featuredImage && !!coverImagePlacement
 const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
+const isCoverImageHead = shouldShowCoverImage && coverImagePlacement === 'head'
 const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'
 
 const sanitizedSubtitle: string = subtitle
@@ -143,6 +145,18 @@ const sanitizedSubtitle: string = subtitle
           })
         })()}
       </Breadcrumbs>
+    </div>
+  )}
+
+  {isCoverImageHead && (
+    <div class="post-header__image post-header__image--head">
+      <Image
+        src={featuredImage}
+        alt=""
+        width={1600}
+        height={900}
+        class="w-full h-[min(60vh,520px)] object-cover"
+      />
     </div>
   )}
 
@@ -234,6 +248,10 @@ const sanitizedSubtitle: string = subtitle
         width: 100vw;
         max-width: 100vw;
         overflow: hidden;
+      }
+
+      .post-header__image--head {
+        margin-block-start: 0;
       }
 
       .post-header__image--bottom {
