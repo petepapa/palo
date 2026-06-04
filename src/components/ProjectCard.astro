@@ -224,5 +224,59 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         transform: none;
       }
     }
+
+    @media (max-width: 768px) {
+      .project-card--overlay {
+        .project-card__content {
+          display: grid;
+          position: static;
+          opacity: 1;
+          transform: none;
+          background: transparent;
+          padding-block-start: var(--space-xs, 1rem);
+          padding-inline: var(--space-3xs, 0.5rem);
+          color: inherit;
+        }
+
+        .project-card__title {
+          color: inherit;
+        }
+
+        .project-card__description {
+          color: inherit;
+          -webkit-line-clamp: 2;
+        }
+
+        .project-card__tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-4xs, 0.25rem);
+          margin-block-start: var(--space-4xs, 0.25rem);
+        }
+
+        .project-card__tag {
+          border: var(--border-width-badge, 1px) solid var(--border-color-subtle);
+          border-radius: var(--radius-badge, var(--radius-s));
+          padding: 0.15rem 0.45rem;
+          color: inherit;
+          font-size: var(--text-xs, 0.75rem);
+          line-height: 1.2;
+        }
+
+        .project-card__media {
+          border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
+        }
+
+        &:where(:hover, :focus-visible) {
+          .project-card__image {
+            transform: scale(1.04);
+          }
+
+          .project-card__title {
+            color: var(--color-primary);
+          }
+        }
+      }
+    }
   }
 </style>
