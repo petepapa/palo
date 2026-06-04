@@ -96,105 +96,110 @@ const sanitizedSubtitle: string = subtitle
     </div>
   )}
 
-  <div class="container py-10">
-    {showBreadcrumbs && (
-      <div class="post-header__top-row">
-        <Breadcrumbs>
-          <BreadcrumbsItem href="/" label="Home" hasIcon>
-            <Icon aria-hidden="true" name="ph:house" slot="icon" />
-          </BreadcrumbsItem>
-          {(() => {
-            const path = Astro.url.pathname
-            const segments = path.split('/').filter(Boolean)
+  {showBreadcrumbs && (
+    <div class="container my-3">
+      <Breadcrumbs>
+        <BreadcrumbsItem href="/" label="Home" hasIcon>
+          <Icon aria-hidden="true" name="ph:house" slot="icon" />
+        </BreadcrumbsItem>
+        {(() => {
+          const path = Astro.url.pathname
+          const segments = path.split('/').filter(Boolean)
 
-            return segments.map((segment, index) => {
-              if (joinLastBreadcrumb && index === segments.length - 1) {
-                return null
+          return segments.map((segment, index) => {
+            if (joinLastBreadcrumb && index === segments.length - 1) {
+              return null
+            }
+
+            const url = ensureTrailingSlash(`/${segments.slice(0, index + 1).join('/')}`)
+            const isLast = index === segments.length - 1 || (joinLastBreadcrumb && index === segments.length - 2)
+
+            const formattedName = (() => {
+              if (joinLastBreadcrumb && isLast) {
+                const prevSegment = segments[segments.length - 2]
+                const lastSegment = segments[segments.length - 1]
+                return `${formatSegment(prevSegment)}: ${formatSegment(lastSegment)}`
               }
+              return formatSegment(segment)
+            })()
 
-              const url = ensureTrailingSlash(`/${segments.slice(0, index + 1).join('/')}`)
-              const isLast = index === segments.length - 1 || (joinLastBreadcrumb && index === segments.length - 2)
+            const label = isLast && customBreadcrumbLabels?.['current']
+              ? customBreadcrumbLabels['current']
+              : formattedName
 
-              const formattedName = (() => {
-                if (joinLastBreadcrumb && isLast) {
-                  const prevSegment = segments[segments.length - 2]
-                  const lastSegment = segments[segments.length - 1]
-                  return `${formatSegment(prevSegment)}: ${formatSegment(lastSegment)}`
-                }
-                return formatSegment(segment)
-              })()
+            return (
+              <BreadcrumbsItem href={isLast ? undefined : url} label={label} currentPage={isLast} />
+            )
+          })
+        })()}
+      </Breadcrumbs>
+    </div>
+  )}
 
-              const label = isLast && customBreadcrumbLabels?.['current']
-                ? customBreadcrumbLabels['current']
-                : formattedName
+  <div class="post-header__divider"></div>
 
-              return (
-                <BreadcrumbsItem href={isLast ? undefined : url} label={label} currentPage={isLast} />
-              )
-            })
-          })()}
-        </Breadcrumbs>
-
+  <div class="py-10">
+    <div class="space-content container">
+      <Heading level="h2">{title}</Heading>
+      {sanitizedSubtitle && <p class="text-lg mt-4" set:html={sanitizedSubtitle} />}
+      
+      <div class="post-header__meta">
+        <div class="post-header__meta-left">
+          {author && (
+            <Avatar title={author.name} img={author.image} subtitle={author.bio} />
+          )}
+        </div>
         {(source || liveDemo) && (
-          <div class="post-header__links">
-            {source && (
-              <a href={source} target="_blank" rel="noopener noreferrer">
-                <Button>Source</Button>
-              </a>
-            )}
-            {liveDemo && (
-              <a href={liveDemo} target="_blank" rel="noopener noreferrer">
-                <Button>Live Demo</Button>
-              </a>
-            )}
+          <div class="post-header__meta-right">
+            <div class="post-header__links">
+              {source && (
+                <a href={source} target="_blank" rel="noopener noreferrer">
+                  <Button>Source</Button>
+                </a>
+              )}
+              {liveDemo && (
+                <a href={liveDemo} target="_blank" rel="noopener noreferrer">
+                  <Button>Live Demo</Button>
+                </a>
+              )}
+            </div>
           </div>
         )}
       </div>
-    )}
-
-    {!showBreadcrumbs && (source || liveDemo) && (
-      <div class="post-header__top-row">
-        <div></div>
-        <div class="post-header__links">
-          {source && (
-            <a href={source} target="_blank" rel="noopener noreferrer">
-              <Button>Source</Button>
-            </a>
-          )}
-          {liveDemo && (
-            <a href={liveDemo} target="_blank" rel="noopener noreferrer">
-              <Button>Live Demo</Button>
-            </a>
-          )}
-        </div>
-      </div>
-    )}
-
-    <Heading level="h2" class="mt-6">{title}</Heading>
-    {sanitizedSubtitle && <p class="mt-4 text-lg" set:html={sanitizedSubtitle} />}
-    {author && (
-      <div class="mt-6 flex items-center gap-4">
-        <Avatar title={author.name} img={author.image} subtitle={author.bio} />
-      </div>
-    )}
+    </div>
   </div>
 </section>
 
 <style lang="scss">
   @layer components {
     .post-header {
-      .post-header__top-row {
+      .post-header__divider {
+        border-block-end: 1px solid var(--border-color-subtle);
+      }
+
+      .post-header__meta {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
         flex-wrap: wrap;
+        margin-top: 1.5rem;
+      }
+
+      .post-header__meta-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .post-header__meta-right {
+        flex-shrink: 0;
       }
 
       .post-header__links {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        justify-content: flex-end;
 
         a {
           text-decoration: none;
