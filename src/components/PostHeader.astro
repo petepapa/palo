@@ -163,7 +163,7 @@ const sanitizedSubtitle: string = subtitle
       
       <div class="post-header__meta">
         <div class="post-header__meta-left">
-          {author && (
+          {author?.name && (
             <Avatar title={author.name} {...(author.image && { img: author.image })} subtitle={author.bio} />
           )}
         </div>
