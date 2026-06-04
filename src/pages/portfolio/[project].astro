@@ -1,6 +1,6 @@
 ---
 import DefaultLayout from '@layouts/DefaultLayout.astro'
-import PageHeader from '@components/PageHeader.astro'
+import PostHeader from '@components/PostHeader.astro'
 import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
 import { getCollection, render } from 'astro:content'
@@ -31,20 +31,45 @@ interface Props {
 const { project } = Astro.props
 const { Content } = await render(project)
 
-const author = {
-  name: project.data.author,
-  image: '/projects/project-image-1.png',
-  bio: 'Project Creator',
-}
+const {
+  title,
+  description,
+  author,
+  showBreadcrumbs,
+  source,
+  liveDemo,
+  customBreadcrumbLabels,
+  joinLastBreadcrumb,
+  showDivider,
+  coverImagePosition,
+} = project.data
+
+const authorInfo = typeof author === 'object'
+  ? {
+      name: author.name,
+      image: author.image || undefined,
+      bio: author.bio || 'Project Creator',
+    }
+  : {
+      name: author || 'Anonymous',
+      image: undefined,
+      bio: 'Project Creator',
+    }
 ---
 
 <DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={project.featuredImage}>
-  <PageHeader
-    title={project.data.title}
-    subtitle={project.data.description}
-    author={author}
-    bgType="bordered"
+  <PostHeader
+    title={title}
+    subtitle={description}
+    author={authorInfo}
     featuredImage={project.featuredImage}
+    showBreadcrumbs={showBreadcrumbs}
+    source={source}
+    liveDemo={liveDemo}
+    customBreadcrumbLabels={customBreadcrumbLabels}
+    joinLastBreadcrumb={joinLastBreadcrumb}
+    showDivider={showDivider}
+    coverImagePosition={coverImagePosition}
   />
   <section class="my-12">
     <div class="narrow prose space-content container">
