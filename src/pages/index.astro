@@ -58,7 +58,7 @@ import { Card } from 'accessible-astro-components'
   </Hero>
 
   <CreativeSection
-    fullscreen={false}
+    fullscreen={true}
     contentColor="#fff" 
     backgroundVideo=""
     backgroundImage=""
@@ -94,46 +94,13 @@ import { Card } from 'accessible-astro-components'
 
   {/* FEATURES======================================== */}
 
-  <CreativeSection
-    paddingBlock=''
-  >
-    <div class=" ">
-      
+  <section class="my-64">
+    <div class="container">
       <h2 class="mb-8">Features</h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-    
-        <Card 
-          img="/123.jpeg"
-          title=""
-          class="flex flex-col"
-          >
-          <h4>One Config. Total Control.</h4>
-          <p>Set your colors, fonts, border radius, and layout from a single YAML file. No scattered CSS variables, no theme overrides. Palo's design system is a single source of truth.</p>
-        </Card>
-
-        <Card 
-          img="/123.jpeg"
-          title=""
-          class="flex flex-col"
-          >
-          <h4>One Config. Total Control.</h4>
-          <p>Set your colors, fonts, border radius, and layout from a single YAML file. No scattered CSS variables, no theme overrides. Palo's design system is a single source of truth.</p>
-        </Card>
-
-        <Card 
-          img="/123.jpeg"
-          title=""
-          class="flex flex-col"
-          >
-          <h4>One Config. Total Control.</h4>
-          <p>Set your colors, fonts, border radius, and layout from a single YAML file. No scattered CSS variables, no theme overrides. Palo's design system is a single source of truth.</p>
-        </Card>
-
-      </div>
-
     </div>
-  </CreativeSection>
+    
+</section>
+    
 
   
 
