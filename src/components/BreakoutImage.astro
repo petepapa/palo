@@ -67,7 +67,7 @@ const altText = decorative ? '' : alt
 const containerClasses = {
   full: '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]',
   wide: 'mx-0 md:-mx-4 lg:-mx-[calc(50vw-50%-1rem)]',
-  contained: 'mx-0',
+  contained: 'mx-0 md:-mx-[calc(50vw-2rem-50%)] lg:-mx-[calc(min(50vw-1rem,var(--grid-max-width)/2-1rem)-50%)]',
 }[resolvedLayout]
 
 // Define border radius classes based on layout
