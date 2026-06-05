@@ -17,12 +17,12 @@ import BreakoutImage from '@components/BreakoutImage.astro'
 import { Image } from 'astro:assets'
 
 ---
-// 默认：撑满屏幕
-<BreakoutImage src="/123.jpeg" alt="描述" />
+// 默认full 撑满屏幕
+<BreakoutImage src="/123.jpeg" alt="描述" layout="full" />
 
-// 不完全撑满，左右留一点空隙
+// contained 网站页面宽度
 <BreakoutImage src="/123.jpeg" alt="描述" layout="contained" />
-
+// wide 几乎全屏，保留圆角两侧有空隙
 <BreakoutImage src="/projects/project-image-1.png" layout="wide" decorative={true} />
 
 ## Technical Challenges
