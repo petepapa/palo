@@ -3,6 +3,7 @@ layout: ../layouts/MarkdownLayout.astro
 title: bella Markdown Page
 description: A clean content page powered by standard Markdown.
 showTableOfContents: true
+narrow: false
 
 pageHeader:
   fullscreen: true
