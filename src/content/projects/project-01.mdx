@@ -16,7 +16,14 @@ import BlockQuote from '@components/BlockQuote.astro'
 import BreakoutImage from '@components/BreakoutImage.astro'
 import { Image } from 'astro:assets'
 
-<BreakoutImage src="/projects/project-image-1.png" decorative={true} />
+---
+// 默认：撑满屏幕
+<BreakoutImage src="/123.jpeg" alt="描述" />
+
+// 限制在容器内
+<BreakoutImage src="/123.jpeg" alt="描述" fullWidth={false} />
+
+<BreakoutImage src="/projects/project-image-1.png" fullWidth={false} decorative={true} />
 
 ## Technical Challenges
 
