@@ -350,27 +350,5 @@ const authorInfo = typeof author === 'object'
       margin-inline: auto;
       max-width: 65ch;
     }
-
-    // 当有目录导航时，限制 BreakoutImage 组件不撑出容器
-    .article-content--with-toc .article-content__main .relative.my-8 {
-      margin-inline: 0 !important;
-    }
-
-    // 当没有目录导航时，让 BreakoutImage 撑满屏幕
-    .article-content:not(.article-content--with-toc) .article-content__main .relative.my-8 {
-      // 使用负外边距撑出 container
-      margin-inline: calc(-1 * var(--grid-gutter)) !important;
-      width: calc(100% + var(--grid-gutter) * 2) !important;
-
-      @media (min-width: 768px) {
-        margin-inline: -2rem !important;
-        width: calc(100% + 4rem) !important;
-      }
-
-      @media (min-width: 1200px) {
-        margin-inline: calc(-2rem / 2) !important;
-        width: calc(100% + 2rem) !important;
-      }
-    }
   }
 </style>

@@ -4,7 +4,17 @@ import { Image } from 'astro:assets'
 /**
  * BreakoutImage Component
  *
- * @description A component for displaying a landscape image that breaks out of the container
+ * @description A component for displaying a landscape image that can break out of the container
+ *
+ * @example
+ * // Default: full width (breaks out of container)
+ * <BreakoutImage src="/some-img.png" alt="Full width image" />
+ *
+ * // Constrained: within container
+ * <BreakoutImage src="/some-img.png" alt="Constrained image" fullWidth={false} />
+ *
+ * // Decorative image
+ * <BreakoutImage src="/some-img.png" decorative />
  */
 type Props = {
   /**
@@ -12,40 +22,33 @@ type Props = {
    */
   src: string
   /**
-   * Whether to constrain the image within the container (e.g. when table of contents is shown)
+   * Whether the image should break out of the container to be full width (default: true)
    */
-  constrained?: boolean
-} &
-  /**
-   * Alt text describing the image for screen readers.
-   * Required if the image is not decorative.
-   *
-   * If the image is decorative and conveys no meaning,
-   * set decorative: true and omit alt.
-   *
-   * Accessibility guidelines:
-   * - Set `alt` when the image conveys important information.
-   * - Set `decorative: true` if the image is purely visual and add no value
-   *   (sets empty alt text and hides from assistive tech).
-   *
-   * @example
-   * // Meaningful image
-   * <BreakoutImage src="/some-img.png" alt="Person using a screen reader" />
-   *
-   * // Decorative image
-   * <BreakoutImage src="/some-img.png" decorative />
-   *
-   * // Constrained image (within container)
-   * <BreakoutImage src="/some-img.png" alt="Image" constrained />
-   */
-  ({ alt: string; decorative?: never } | { alt?: never; decorative: true })
+  fullWidth?: boolean
+} & (
+  | {
+      /**
+       * Alt text describing the image for screen readers.
+       * Required if the image is not decorative.
+       */
+      alt: string
+      decorative?: never
+    }
+  | {
+      /**
+       * Set to true if the image is purely decorative
+       */
+      decorative: true
+      alt?: never
+    }
+)
 
-const { src, decorative = false, alt = '', constrained = false } = Astro.props
+const { src, fullWidth = true, decorative = false, alt = '' } = Astro.props
 
 const altText = decorative ? '' : alt
 ---
 
-<div class={`relative my-8 ${constrained ? '' : '-mx-4 md:-mx-8 lg:-mx-[120px]'}`}>
+<div class:list={['relative', 'my-8', fullWidth ? '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]' : '']}>
   <Image
     src={src}
     alt={altText}
