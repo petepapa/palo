@@ -348,14 +348,20 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
       gap: var(--space-l);
 
       &--with-toc {
-        @include breakpoint(m) {
-          grid-template-columns: 2fr 1fr;
+        @media (min-width: 768px) {
+          grid-template-columns: minmax(0, 1fr) 280px;
+        }
+
+        @media (min-width: 1200px) {
+          grid-template-columns: minmax(0, 1fr) 320px;
         }
       }
     }
 
     .article-content__main {
-      @include breakpoint(m) {
+      min-width: 0; // 防止内容溢出
+
+      @media (min-width: 768px) {
         border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
         padding-inline-end: var(--space-l);
       }
@@ -364,12 +370,12 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
     .article-content__toc {
       grid-row: 1;
 
-      @include breakpoint(m) {
+      @media (min-width: 768px) {
         position: sticky;
         grid-row: auto;
         align-self: start;
         inset-block-start: calc(var(--header-height) + var(--space-l));
-        padding-inline-end: var(--space-l);
+        padding-inline-start: var(--space-l);
         max-inline-size: 100%;
         max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
         overflow-y: auto;
@@ -408,6 +414,23 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
     // 当有目录导航时，限制 BreakoutImage 组件不撑出容器
     .article-content--with-toc .article-content__main .relative.my-8 {
       margin-inline: 0 !important;
+    }
+
+    // 当没有目录导航时，让 BreakoutImage 撑满屏幕
+    .article-content:not(.article-content--with-toc) .article-content__main .relative.my-8 {
+      // 使用负外边距撑出 container
+      margin-inline: calc(-1 * var(--grid-gutter)) !important;
+      width: calc(100% + var(--grid-gutter) * 2) !important;
+
+      @media (min-width: 768px) {
+        margin-inline: -2rem !important;
+        width: calc(100% + 4rem) !important;
+      }
+
+      @media (min-width: 1200px) {
+        margin-inline: calc(-2rem / 2) !important;
+        width: calc(100% + 2rem) !important;
+      }
     }
   }
 </style>
