@@ -360,7 +360,9 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
 
     .article-content__main {
       min-width: 0; // 防止内容溢出
+    }
 
+    .article-content--with-toc .article-content__main {
       @media (min-width: 768px) {
         border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
         padding-inline-end: var(--space-l);

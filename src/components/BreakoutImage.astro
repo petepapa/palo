@@ -22,6 +22,14 @@ type Props = {
    */
   src: string
   /**
+   * The layout style of the image (default: 'full')
+   * - 'full': Expands left and right to touch the screen edges, forced sharp/straight corners.
+   * - 'wide': Expands left and right but leaves a small gap to the screen edges, retaining rounded corners.
+   * - 'contained': Stays within the normal container, retaining rounded corners.
+   */
+  layout?: 'full' | 'wide' | 'contained'
+  /**
+   * Deprecated: Use layout="contained" instead.
    * Whether the image should break out of the container to be full width (default: true)
    */
   fullWidth?: boolean
@@ -43,19 +51,39 @@ type Props = {
     }
 )
 
-const { src, fullWidth = true, decorative = false, alt = '' } = Astro.props
+const { src, layout, fullWidth, decorative = false, alt = '' } = Astro.props
+
+// Determine layout style, supporting backward compatibility with fullWidth
+let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
+if (layout) {
+  resolvedLayout = layout
+} else if (fullWidth !== undefined) {
+  resolvedLayout = fullWidth ? 'full' : 'contained'
+}
 
 const altText = decorative ? '' : alt
+
+// Define container spacing classes based on layout
+const containerClasses = {
+  full: '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]',
+  wide: 'mx-0 md:-mx-4 lg:-mx-[calc(50vw-50%-1rem)]',
+  contained: 'mx-0',
+}[resolvedLayout]
+
+// Define border radius classes based on layout
+const radiusClass = resolvedLayout === 'full' 
+  ? 'rounded-none' 
+  : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
 ---
 
-<div class:list={['relative', 'my-8', fullWidth ? '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]' : '']}>
+<div class:list={['relative', 'my-8', containerClasses]}>
   <Image
     src={src}
     alt={altText}
     width={1400}
     height={700}
-    class="h-auto w-full rounded-lg object-cover"
+    class:list={['h-auto w-full object-cover', radiusClass]}
     loading="lazy"
   />
-  <div class="absolute inset-0 rounded-lg shadow-inner"></div>
+  <div class:list={['absolute inset-0 shadow-inner pointer-events-none', radiusClass]}></div>
 </div>
