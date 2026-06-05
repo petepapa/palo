@@ -324,13 +324,24 @@ const authorInfo = typeof author === 'object'
         padding-inline-start: 0;
         max-inline-size: 100%;
         max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
+        overflow-x: hidden;
         overflow-y: auto;
         transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
       }
     }
 
+    .article-toc {
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
     .article-toc a {
       display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       transform-origin: left center;
       transition:
         transform 0.22s var(--cubic-bezier),
@@ -338,9 +349,6 @@ const authorInfo = typeof author === 'object'
         color 0.22s var(--cubic-bezier);
     }
 
-    .article-toc__item--h3 {
-      padding-inline-start: var(--space-s);
-    }
 
     .article-toc .active {
       transform: scale(1.08) !important;
