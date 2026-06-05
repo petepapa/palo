@@ -11,6 +11,10 @@ type Props = {
    * The image source
    */
   src: string
+  /**
+   * Whether to constrain the image within the container (e.g. when table of contents is shown)
+   */
+  constrained?: boolean
 } &
   /**
    * Alt text describing the image for screen readers.
@@ -30,15 +34,18 @@ type Props = {
    *
    * // Decorative image
    * <BreakoutImage src="/some-img.png" decorative />
+   *
+   * // Constrained image (within container)
+   * <BreakoutImage src="/some-img.png" alt="Image" constrained />
    */
   ({ alt: string; decorative?: never } | { alt?: never; decorative: true })
 
-const { src, decorative = false, alt = '' } = Astro.props
+const { src, decorative = false, alt = '', constrained = false } = Astro.props
 
 const altText = decorative ? '' : alt
 ---
 
-<div class="relative -mx-4 my-8 md:-mx-8 lg:-mx-[120px]">
+<div class={`relative my-8 ${constrained ? '' : '-mx-4 md:-mx-8 lg:-mx-[120px]'}`}>
   <Image
     src={src}
     alt={altText}

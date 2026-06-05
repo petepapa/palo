@@ -337,5 +337,10 @@ const authorInfo = typeof author === 'object'
       margin-inline: auto;
       max-width: 65ch;
     }
+
+    // 当有目录导航时，限制 BreakoutImage 组件不撑出容器
+    .article-content--with-toc .article-content__main .relative.my-8 {
+      margin-inline: 0 !important;
+    }
   }
 </style>
