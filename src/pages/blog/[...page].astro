@@ -30,11 +30,16 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   
   const defaultImages = [postImage1, postImage2, postImage3, postImage4, postImage5, postImage6]
 
-  const postsWithImages = posts.map((post, index) => ({
-    ...post.data,
-    id: post.id,
-    featuredImage: post.data.coverImage || defaultImages[index % defaultImages.length],
-  }))
+  const postsWithImages = posts.map((post, index) => {
+    const { author: originalAuthor, ...rest } = post.data
+    const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
+    return {
+      ...rest,
+      id: post.id,
+      author,
+      featuredImage: post.data.coverImage || defaultImages[index % defaultImages.length],
+    }
+  })
 
   return paginate(postsWithImages, { pageSize: 6 })
 }
