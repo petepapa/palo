@@ -8,8 +8,8 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  *
  * @description Logo description
  */
-const logoLight = themeConfig.branding.logoLight || themeConfig.branding.logoDark || ''
-const logoDark = themeConfig.branding.logoDark || themeConfig.branding.logoLight || ''
+const logoLight = themeConfig.branding.logoLight ? `/${themeConfig.branding.logoLight.replace(/^\//, '')}` : ''
+const logoDark = themeConfig.branding.logoDark ? `/${themeConfig.branding.logoDark.replace(/^\//, '')}` : ''
 const hasImageLogo = Boolean(logoLight || logoDark)
 ---
 

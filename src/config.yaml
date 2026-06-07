@@ -38,8 +38,8 @@ branding:
 
   # Logo：两个都留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
   # Logo: leave both empty = show text logo, path = show image (place in /public)
-  logoLight: 'branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
-  logoDark: 'branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
+  logoLight: '/branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
+  logoDark: '/branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
   logoSize: '40px'  # Logo 大小：支持 40px / 3xl / text-3xl / --text-3xl；文字为字号，图片为高度 / Logo size: accepts 40px / 3xl / text-3xl / --text-3xl
 
   # ── 颜色 / Colors ────────────────────────────────────────────
