@@ -8,7 +8,7 @@ author:
   bio: "PetePa.com"
 tags: ['Accessibility', 'Web Development', 'Future Trends']
 coverImage: /123.jpeg
-coverImagePosition: head
+coverImagePosition: bottom
 showBreadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
