@@ -37,7 +37,7 @@ export const getStaticPaths = (async ({ paginate }) => {
     )
 
     const paginatedPages = paginate(filteredProjects, {
-      pageSize: 6,
+      pageSize: 10,
       params: { tag: tag.slug },
       props: {
         currentTag: tag,

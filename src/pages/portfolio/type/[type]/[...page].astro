@@ -1,0 +1,127 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import ProjectCard from '@components/ProjectCard.astro'
+import { Heading, Link, Pagination } from 'accessible-astro-components'
+import { getCollection } from 'astro:content'
+import type { PaginateFunction, Page } from 'astro'
+import type { CollectionEntry } from 'astro:content'
+import { getProjectTypeDefinition, projectTypeIds } from '../../../../projectTypes'
+import { projectImages } from '@utils/projectImages'
+import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
+
+const projectListWidth: ProjectListWidth = 'container'
+const projectListGapClass = 'gap-8'
+const projectListWidthClass = getProjectListWidthClass(projectListWidth)
+
+const pageHeaderAppearance = {
+  fullscreen: false,
+  contentColor: '',
+  backgroundVideo: '',
+  backgroundImage: '',
+  backgroundColor: '',
+  backgroundFixed: false,
+  backgroundOverlayOpacity: 0,
+  topNavigationTheme: '',
+  paddingBlock: '',
+  contentVerticalAlign: '',
+  contentHorizontalAlign: '',
+  showDivider: true,
+}
+
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const projects = await getCollection('projects')
+  const uniqueTags = [...new Set(projects.map((project) => project.data.tags).flat())]
+    .sort((a, b) => a.localeCompare(b))
+    .map((label) => ({
+      label,
+      slug: slugify(label),
+    }))
+
+  const projectsWithImages = projects.map((project, index) => ({
+    ...project,
+    featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
+  }))
+
+  const allPaginatedPages: Array<any> = []
+
+  for (const typeId of projectTypeIds) {
+    const currentType = getProjectTypeDefinition(typeId)
+    const filteredProjects = projectsWithImages.filter((project) => project.data.type === typeId)
+
+    const paginatedPages = paginate(filteredProjects, {
+      pageSize: 10,
+      params: { type: typeId },
+      props: {
+        currentType,
+        uniqueTags,
+      },
+    })
+
+    allPaginatedPages.push(...paginatedPages)
+  }
+
+  return allPaginatedPages
+}
+
+interface Props {
+  page: Page<CollectionEntry<'projects'> & { featuredImage: any }>
+  currentType: { id: string; label: string; ratioLabel: string; description: string }
+  uniqueTags: { label: string; slug: string }[]
+}
+
+const { page, currentType, uniqueTags } = Astro.props as Props
+const currentTypeUrl = `/portfolio/type/${currentType.id}`
+const pageTitle = `Portfolio - ${currentType.label}`
+const pageDescription = `${currentType.label} portfolio projects using the ${currentType.ratioLabel} thumbnail ratio.`
+const pageHeading = `${currentType.label} Projects`
+const pageSubtitle = `${currentType.description} <a href="/portfolio">View all projects</a>.`
+---
+
+<DefaultLayout title={pageTitle} description={pageDescription}>
+  <PaloPageHeader title={pageHeading} subtitle={pageSubtitle} {...pageHeaderAppearance} />
+
+  <section class="my-12">
+    <div class="container">
+      <Heading level="h2" size="h5" class="mb-2">Tags</Heading>
+      <div class="flex flex-wrap gap-4">
+        <Link href={ensureTrailingSlash('/portfolio')}>All projects</Link>
+        {
+          uniqueTags.map((tag) => (
+            <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
+          ))
+        }
+      </div>
+      <p class="mt-8 text-sm">
+        <em>Project {page.start + 1} through {page.end} of {page.total} total {currentType.label} projects</em>
+      </p>
+      <ul class:list={['mt-3 grid list-none grid-cols-1 p-0 md:grid-cols-2 lg:grid-cols-3', projectListWidthClass, projectListGapClass]}>
+        {
+          page.data.map((project) => (
+            <li>
+              <ProjectCard project={project} image={project.featuredImage} layout="standard" />
+            </li>
+          ))
+        }
+      </ul>
+
+      {
+        page && page.lastPage > 1 && (
+          <div class="mt-12 grid place-content-center">
+            <Pagination
+              firstPage={page.url.prev ? ensureTrailingSlash(currentTypeUrl) : null}
+              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+              lastPage={page.url.next ? ensureTrailingSlash(`${currentTypeUrl}/${page.lastPage}`) : null}
+              currentPage={`${page.currentPage}`}
+              totalPages={`${page.lastPage}`}
+              ariaLabel={`${currentType.label} portfolio pagination`}
+            />
+          </div>
+        )
+      }
+    </div>
+  </section>
+</DefaultLayout>
