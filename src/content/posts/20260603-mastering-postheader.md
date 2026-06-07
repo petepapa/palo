@@ -8,7 +8,7 @@ author:
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'PostHeader']
 coverImage: /posts/docs/cover01.jpg
-coverImagePosition: head
+coverImagePosition: top
 showBreadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
