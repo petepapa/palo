@@ -4,9 +4,13 @@ import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import postImage1 from '@assets/images/posts/post-image-1.png'
-import postImage2 from '@assets/images/posts/post-image-2.png'
-import postImage3 from '@assets/images/posts/post-image-3.png'
+
+// Default images from public/posts directory
+const postImages = [
+  '/posts/post-image-1.jpg',
+  '/posts/post-image-2.jpg',
+  '/posts/post-image-3.jpg',
+]
 
 /**
  * LatestPosts Component
@@ -32,7 +36,6 @@ interface Props {
 
 const { class: className, limit = 3, title = 'Latest posts' } = Astro.props
 
-const postImages = [postImage1, postImage2, postImage3]
 const coverImageRatio = '8 / 5'
 
 // Get posts from content collection

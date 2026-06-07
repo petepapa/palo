@@ -10,12 +10,12 @@ export async function getStaticPaths() {
   const posts = await getCollection('posts')
 
   const defaultImages = [
-    '/posts/post-image-1.png',
-    '/posts/post-image-2.png',
-    '/posts/post-image-3.png',
-    '/posts/post-image-4.png',
-    '/posts/post-image-5.png',
-    '/posts/post-image-6.png',
+    '/posts/post-image-1.jpg',
+    '/posts/post-image-2.jpg',
+    '/posts/post-image-3.jpg',
+    '/posts/post-image-4.jpg',
+    '/posts/post-image-5.jpg',
+    '/posts/post-image-6.jpg',
   ]
 
   return posts.map((post, index) => {

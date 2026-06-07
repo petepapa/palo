@@ -277,7 +277,7 @@ A simple header with just a title and cover image.
 ```yaml
 ---
 title: My Blog Post
-coverImage: /posts/post-image-1.png
+coverImage: /posts/post-image-1.jpg
 coverImagePosition: head
 showBreadcrumbs: true
 showDivider: true
