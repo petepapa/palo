@@ -101,13 +101,14 @@ const authorInfo = typeof author === 'object'
     const tocContainer = document.querySelector('.article-toc nav ul')
     if (!tocContainer) return
 
-    // 从内容中找到所有 H2 和 H3 标题
+    // 从内容中找到所有 H2、H3 和 H4 标题
     const contentMain = document.querySelector('.article-content__main')
     if (!contentMain) return
 
     const headings = [
       ...contentMain.querySelectorAll('h2'),
       ...contentMain.querySelectorAll('h3'),
+      ...contentMain.querySelectorAll('h4'),
     ].sort((a, b) => a.offsetTop - b.offsetTop)
 
     if (headings.length === 0) {
