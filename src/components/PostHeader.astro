@@ -17,7 +17,7 @@ type CoverImagePosition = boolean | 'top' | 'head' | 'bottom'
 
 type Props = {
   class?: string
-  featuredImage?: string
+  coverImage?: string
   title: string
   subtitle?: string
   author?: Author
@@ -34,7 +34,7 @@ const {
   class: className,
   title,
   subtitle,
-  featuredImage,
+  coverImage,
   author,
   showBreadcrumbs = true,
   customBreadcrumbLabels,
@@ -72,7 +72,7 @@ const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'h
 
 const dividerPlacement = resolveDividerPlacement(showDivider)
 const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
-const shouldShowCoverImage = !!featuredImage && !!coverImagePlacement
+const shouldShowCoverImage = !!coverImage && !!coverImagePlacement
 const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
 const isCoverImageHead = shouldShowCoverImage && coverImagePlacement === 'head'
 const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'
@@ -99,7 +99,7 @@ const sanitizedSubtitle: string = subtitle
   {isCoverImageTop && (
     <div class="post-header__image">
       <Image
-        src={featuredImage}
+        src={coverImage}
         alt=""
         width={1600}
         height={900}
@@ -151,7 +151,7 @@ const sanitizedSubtitle: string = subtitle
   {isCoverImageHead && (
     <div class="post-header__image post-header__image--head">
       <Image
-        src={featuredImage}
+        src={coverImage}
         alt=""
         width={1600}
         height={900}
@@ -196,7 +196,7 @@ const sanitizedSubtitle: string = subtitle
   {isCoverImageBottom && (
     <div class="post-header__image post-header__image--bottom">
       <Image
-        src={featuredImage}
+        src={coverImage}
         alt=""
         width={1600}
         height={900}

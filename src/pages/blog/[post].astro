@@ -19,16 +19,16 @@ export async function getStaticPaths() {
   ]
 
   return posts.map((post, index) => {
-    const featuredImage = post.data.coverImage || defaultImages[index % defaultImages.length]
+    const coverImage = post.data.coverImage || defaultImages[index % defaultImages.length]
 
     return {
       params: { post: post.id },
-      props: { post, featuredImage },
+      props: { post, coverImage },
     }
   })
 }
 
-const { post, featuredImage } = Astro.props
+const { post, coverImage } = Astro.props
 const { Content } = await render(post)
 
 const { title, description, author, publishDate, showBreadcrumbs, source, liveDemo, customBreadcrumbLabels, joinLastBreadcrumb, showDivider, coverImagePosition, showTableOfContents, narrow } = post.data
@@ -57,7 +57,7 @@ const authorInfo = typeof author === 'object'
     title={title}
     subtitle={description}
     author={authorInfo}
-    featuredImage={featuredImage}
+    coverImage={coverImage}
     showBreadcrumbs={showBreadcrumbs}
     source={source}
     liveDemo={liveDemo}
