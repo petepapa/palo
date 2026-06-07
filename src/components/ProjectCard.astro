@@ -98,6 +98,10 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
+      border-radius: inherit;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      will-change: transform;
     }
 
     .project-card__title {
@@ -162,6 +166,8 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       margin-block-end: 0;
       overflow: hidden;
       transform: translateZ(0);
+      transform-style: preserve-3d;
+      -webkit-transform-style: preserve-3d;
       border-radius: var(--project-card-radius);
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       -webkit-mask-image: -webkit-radial-gradient(white, black);
