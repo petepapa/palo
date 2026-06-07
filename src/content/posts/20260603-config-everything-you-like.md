@@ -4,7 +4,7 @@ description: "Explore Palo theme's config.yaml configuration system - control yo
 publishDate: 2026-06-03
 author: Pete Lee
 tags: ['Configuration', 'Palo Theme', 'Web Design', 'YAML']
-coverImage: /posts/config.png
+coverImage: /posts/docs/config.png
 
 ---
 
