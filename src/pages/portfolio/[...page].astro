@@ -60,7 +60,12 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
       slug: slugify(label),
     }))
 
-  // Sort projects by latest (default)
+  // ========== SORTING CONFIGURATION / 排序配置 ==========
+  // Modify the sort function below to change project order
+  // 修改下方的排序函数来改变项目顺序
+  // Current: Latest first (by ID) / 当前: 最新优先 (按ID)
+  // Options: a.id.localeCompare(b.id) - Earliest first / 最早优先
+  //          a.data.title.localeCompare(b.data.title) - Alphabetical / 按字母序
   const sortedProjects = [...allProjects].sort((a, b) => b.id.localeCompare(a.id))
 
   const projectsWithImages = sortedProjects.map((project, index) => ({
@@ -68,7 +73,10 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
   }))
 
-  // Change pageSize to adjust items per page
+  // ========== PAGINATION CONFIGURATION / 分页配置 ==========
+  // Modify pageSize to change items per page
+  // 修改 pageSize 来改变每页显示的项目数量
+  // Current: 10 items per page / 当前: 每页10个项目
   return paginate(projectsWithImages, { pageSize: 10 })
 }
 

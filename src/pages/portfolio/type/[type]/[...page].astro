@@ -51,6 +51,18 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     const currentType = getProjectTypeDefinition(typeId)
     const filteredProjects = projectsWithImages.filter((project) => project.data.type === typeId)
 
+    // ========== SORTING CONFIGURATION / 排序配置 ==========
+    // Add sorting here if needed. Currently using default collection order.
+    // 如果需要排序，在这里添加。当前使用默认数据库顺序。
+    // Example: const sortedFilteredProjects = [...filteredProjects].sort((a, b) => b.id.localeCompare(a.id))
+    // then use sortedFilteredProjects in paginate() below
+    // 示例: const sortedFilteredProjects = [...filteredProjects].sort((a, b) => b.id.localeCompare(a.id))
+    // 然后在下方 paginate() 中使用 sortedFilteredProjects
+
+    // ========== PAGINATION CONFIGURATION / 分页配置 ==========
+    // Modify pageSize to change items per page for type pages
+    // 修改 pageSize 来改变类型页每页显示的项目数量
+    // Current: 10 items per page / 当前: 每页10个项目
     const paginatedPages = paginate(filteredProjects, {
       pageSize: 10,
       params: { type: typeId },

@@ -36,6 +36,18 @@ export const getStaticPaths = (async ({ paginate }) => {
       project.data.tags.map((tag) => slugify(tag)).includes(tag.slug),
     )
 
+    // ========== SORTING CONFIGURATION / 排序配置 ==========
+    // Add sorting here if needed. Currently using default collection order.
+    // 如果需要排序，在这里添加。当前使用默认数据库顺序。
+    // Example: const sortedFilteredProjects = [...filteredProjects].sort((a, b) => b.id.localeCompare(a.id))
+    // then use sortedFilteredProjects in paginate() below
+    // 示例: const sortedFilteredProjects = [...filteredProjects].sort((a, b) => b.id.localeCompare(a.id))
+    // 然后在下方 paginate() 中使用 sortedFilteredProjects
+
+    // ========== PAGINATION CONFIGURATION / 分页配置 ==========
+    // Modify pageSize to change items per page for tag pages
+    // 修改 pageSize 来改变标签页每页显示的项目数量
+    // Current: 10 items per page / 当前: 每页10个项目
     const paginatedPages = paginate(filteredProjects, {
       pageSize: 10,
       params: { tag: tag.slug },
@@ -58,8 +70,8 @@ interface Props {
 }
 
 const { page, currentTag, uniqueTags } = Astro.props
-const projectListWidth: ProjectListWidth = 'container' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
-const projectListGapClass = 'gap-6' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
+const projectListWidth: ProjectListWidth = 'full' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
+const projectListGapClass = 'gap-5' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
 const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
 const isFullWidthList = projectListWidth === 'full'
@@ -131,23 +143,6 @@ const pageHeaderAppearance = {
           </ul>
         )
       }
-
-      <!-- Pagination -->
-      {
-        page && page.lastPage > 1 && (
-          <div class="mt-12 grid place-content-center">
-            <Pagination
-              firstPage={page.url.prev ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}`) : null}
-              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
-              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
-              lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}/${page.lastPage}`) : null}
-              currentPage={`${page.currentPage}`}
-              totalPages={`${page.lastPage}`}
-              ariaLabel={`${currentTag.label} portfolio pagination`}
-            />
-          </div>
-        )
-      }
     </div>
     {
       isFullWidthList && (
@@ -165,5 +160,22 @@ const pageHeaderAppearance = {
         </ul>
       )
     }
+    <div class="container">
+      {
+        page && page.lastPage > 1 && (
+          <div class="mt-12 grid place-content-center">
+            <Pagination
+              firstPage={page.url.prev ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}`) : null}
+              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+              lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}/${page.lastPage}`) : null}
+              currentPage={`${page.currentPage}`}
+              totalPages={`${page.lastPage}`}
+              ariaLabel={`${currentTag.label} portfolio pagination`}
+            />
+          </div>
+        )
+      }
+    </div>
   </section>
 </DefaultLayout>
