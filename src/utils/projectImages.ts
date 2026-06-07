@@ -1,9 +1,9 @@
-import projectImage1 from '@assets/images/projects/project-image-1.png'
-import projectImage2 from '@assets/images/projects/project-image-2.png'
-import projectImage3 from '@assets/images/projects/project-image-3.png'
-import projectImage4 from '@assets/images/projects/project-image-4.png'
-import projectImage5 from '@assets/images/projects/project-image-5.png'
-import projectImage6 from '@assets/images/projects/project-image-6.png'
+import projectImage1 from '@assets/images/projects/project-image-1.jpg'
+import projectImage2 from '@assets/images/projects/project-image-2.jpg'
+import projectImage3 from '@assets/images/projects/project-image-3.jpg'
+import projectImage4 from '@assets/images/projects/project-image-4.jpg'
+import projectImage5 from '@assets/images/projects/project-image-5.jpg'
+import projectImage6 from '@assets/images/projects/project-image-6.jpg'
 
 export const projectImages = [
   projectImage1,
@@ -15,10 +15,10 @@ export const projectImages = [
 ]
 
 export const publicProjectImages = [
-  '/projects/project-image-1.png',
-  '/projects/project-image-2.png',
-  '/projects/project-image-3.png',
-  '/projects/project-image-4.png',
-  '/projects/project-image-5.png',
-  '/projects/project-image-6.png',
+  '/projects/project-image-1.jpg',
+  '/projects/project-image-2.jpg',
+  '/projects/project-image-3.jpg',
+  '/projects/project-image-4.jpg',
+  '/projects/project-image-5.jpg',
+  '/projects/project-image-6.jpg',
 ]

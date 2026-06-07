@@ -1,0 +1,88 @@
+---
+title: "Motion Design System Library"
+author: Alex Nakamura
+description: "A comprehensive design system for consistent, accessible motion design across web and mobile applications, with built-in performance optimization"
+type: default
+tags: ['Design Systems', 'Animation', 'UI/UX', 'Accessibility']
+showTableOfContents: false
+views: 720
+---
+
+## Project Overview
+
+We built a production-ready motion design system that brings consistency, performance, and accessibility to animation across digital products. The library provides developers and designers with a shared vocabulary for motion, reducing implementation time while ensuring delightful user experiences.
+
+import BreakoutImage from '@components/BreakoutImage.astro'
+
+---
+
+<BreakoutImage src="/projects/project-image-3.jpg" alt="Motion design system components" layout="full" />
+
+## Why Motion Matters
+
+Animation isn't decoration—it's communication. Every transition, micro-interaction, and loading state conveys meaning. Inconsistent motion creates:
+
+- **Cognitive friction** - Users can't predict what will happen
+- **Trust issues** - Janky animations suggest unstable apps
+- **Accessibility barriers** - Motion can trigger vestibular disorders
+
+## System Architecture
+
+### Design Tokens
+Motion parameters defined as semantic tokens:
+
+```css
+--duration-fast: 150ms;
+--duration-normal: 300ms;
+--duration-slow: 500ms;
+
+--easing-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+--easing-decelerate: cubic-bezier(0.0, 0.0, 0.2, 1);
+--easing-accelerate: cubic-bezier(0.4, 0.0, 1.0, 1);
+```
+
+### Component Library
+Pre-built animated components for common patterns:
+
+- **Entrance orchestration** - Staggered list reveals
+- **State transitions** - Loading, success, error states
+- **Navigation patterns** - Page transitions, modals, drawers
+- **Data visualization** - Charts, graphs, progress indicators
+
+<BreakoutImage src="/projects/project-image-4.jpg" alt="Animation presets showcase" layout="contained" />
+
+## Accessibility First
+
+Every animation respects user preferences:
+
+### prefers-reduced-motion
+When enabled, the system automatically:
+
+- Replaces motion with static alternatives
+- Provides instant state changes
+- Maintains information hierarchy without movement
+
+### Performance Budgets
+Built-in metrics ensure animations stay performant:
+
+- **Frame rate monitoring** - Targets 60fps
+- **Paint complexity analysis** - Prevents jank
+- **Memory usage tracking** - Prevents memory leaks
+
+## Documentation & Testing
+
+Comprehensive documentation includes:
+
+- **Visual examples** for every animation
+- **Code snippets** for React, Vue, and vanilla JS
+- **Accessibility guidelines** with do's and don'ts
+- **Automated visual regression tests**
+
+## Adoption Results
+
+The design system has been adopted by:
+
+- **5 major product teams** within the organization
+- **40% faster** animation implementation
+- **Zero accessibility violations** in user testing
+- **Nominated** for CSS Design Awards

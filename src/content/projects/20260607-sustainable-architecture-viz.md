@@ -1,0 +1,66 @@
+---
+title: "Sustainable Architecture Visualization"
+author: Emma Lindqvist
+description: "An interactive visualization platform for exploring sustainable building designs, featuring energy efficiency simulations and environmental impact assessments"
+type: default
+tags: ['Architecture', 'Sustainability', 'Data Visualization', 'Climate Tech']
+showTableOfContents: false
+views: 480
+---
+
+## Project Overview
+
+We created a comprehensive visualization platform that helps architects and urban planners explore the environmental impact of building designs. By simulating energy consumption, carbon footprint, and long-term sustainability metrics, the tool enables data-driven decisions for greener construction.
+
+import BreakoutImage from '@components/BreakoutImage.astro'
+
+---
+
+<BreakoutImage src="/projects/project-image-1.jpg" alt="Sustainable architecture overview" layout="wide" />
+
+## The Vision
+
+Climate change demands immediate action in the construction industry, responsible for **39% of global carbon emissions**. Our platform empowers architects to design buildings that not only look beautiful but actively contribute to a sustainable future.
+
+## Core Features
+
+### Energy Modeling
+Real-time energy consumption simulation based on:
+
+- Building orientation and window placement
+- Insulation materials and R-values
+- HVAC system efficiency
+- Renewable energy integration potential
+
+### Carbon Accounting
+Comprehensive lifecycle assessment including:
+
+- Embodied carbon in construction materials
+- Operational carbon over building lifetime
+- End-of-life deconstruction impact
+
+### Solar Analysis
+Precise solar gain calculations showing:
+
+- Shadow patterns throughout the year
+- Rooftop solar panel optimization
+- Daylighting quality assessment
+
+<BreakoutImage src="/projects/project-image-2.jpg" alt="Solar analysis visualization" layout="contained" />
+
+## Integration with Design Tools
+
+The platform integrates seamlessly with popular BIM software:
+
+- **AutoCAD** and **Revit** export/import
+- **SketchUp** and **Rhino** compatibility
+- ** IFC format** support for interoperability
+
+## Impact Metrics
+
+Since deployment with our pilot architecture firm:
+
+- **45% improvement** in building energy ratings
+- **2,400 tons** of CO2 saved in first year
+- **Zero-energy designs** achieved on 12 projects
+- **Awarded** the Green Tech Innovation Prize 2026
