@@ -35,25 +35,47 @@ PostHeader 组件是博客文章和项目页面的多功能强大头部组件。
 
 ### What is PostHeader Component?
 
-The PostHeader component is more than just a simple header - it's a complete header solution that handles:
+The PostHeader component is more than just a simple header - combined with the article page layout, it's a complete reading experience solution that handles:
 - Displaying cover images in various positions
 - Breadcrumb navigation with customization
 - Author information with avatars
 - Source and live demo links
 - Content dividers
 - Responsive design
+- Auto-generated table of contents navigation
 
-PostHeader 组件不仅仅是一个简单的头部 - 它是一个完整的头部解决方案，可以处理：
+PostHeader 组件不仅仅是一个简单的头部 - 结合文章页面布局，它是一个完整的阅读体验解决方案，可以处理：
 - 在不同位置显示封面图
 - 可自定义的面包屑导航
 - 带头像的作者信息
 - 源代码和在线演示链接
 - 内容分隔线
 - 响应式设计
+- 自动生成的目录导航
 
 ---
-
 ### Core Parameters
+
+#### Content Navigation Parameters
+
+##### `showTableOfContents`
+- **Type**: `boolean`
+- **Required**: `false`
+- **Default**: `true`
+- **Function**: Whether to display the table of contents sidebar
+
+This feature automatically extracts all H2, H3, and H4 headings from your content and creates a sticky navigation sidebar on the right (desktop) or at the top (mobile). Users can click on the links to jump directly to the corresponding sections, and the current section will be highlighted as they scroll.
+
+是否显示侧边的目录导航。
+
+此功能会自动从内容中提取所有 H2、H3 和 H4 标题，并在右侧（桌面端）或顶部（移动端）创建一个粘性导航侧边栏。用户可以点击链接直接跳转到对应的章节，滚动时当前章节会高亮显示。
+
+**Example**:
+```yaml
+showTableOfContents: true
+```
+
+---
 
 #### Basic Parameters
 
