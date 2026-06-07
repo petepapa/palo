@@ -5,6 +5,7 @@ description: A modern design studio portfolio showcasing innovative design solut
 type: default
 tags: ['Design', 'Portfolio', 'Creative']
 coverImage: /123.jpeg
+views: 500
 ---
 
 ## Project Overview

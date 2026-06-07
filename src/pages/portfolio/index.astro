@@ -29,6 +29,8 @@ const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
 const isFullWidthList = projectListWidth === 'full'
 
+type SortBy = 'latest' | 'popular' | 'earliest'
+
 // PaloPageHeader settings / PaloPageHeader 参数设置
 const pageHeaderAppearance = {
   fullscreen: false, // Fill viewport / 撑满屏幕
@@ -53,7 +55,10 @@ const uniqueTags = [...new Set(projects.map((project) => project.data.tags).flat
     slug: slugify(label),
   }))
 
-const projectsWithImages = projects.map((project, index) => ({
+// Sort projects by latest (default)
+const sortedProjects = [...projects].sort((a, b) => b.id.localeCompare(a.id))
+
+const projectsWithImages = sortedProjects.map((project, index) => ({
   ...project,
   featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
 }))

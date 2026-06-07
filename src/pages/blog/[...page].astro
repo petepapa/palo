@@ -17,6 +17,8 @@ const defaultImages = [
   '/posts/post-image-6.jpg',
 ]
 
+type SortBy = 'latest' | 'popular' | 'earliest'
+
 interface Post {
   id: string
   title: string
@@ -24,12 +26,18 @@ interface Post {
   author: string
   publishDate: Date
   featuredImage: string
+  views: number
 }
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const posts = await getCollection('posts')
 
-  const postsWithImages = posts.map((post, index) => {
+  // Sort posts by latest (default) for pagination
+  const sortedPosts = [...posts].sort(
+    (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+  )
+
+  const postsWithImages = sortedPosts.map((post, index) => {
     const { author: originalAuthor, ...rest } = post.data
     const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
     return {
@@ -37,6 +45,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
       id: post.id,
       author,
       featuredImage: post.data.coverImage || defaultImages[index % defaultImages.length],
+      views: post.data.views || 0,
     }
   })
 

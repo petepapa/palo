@@ -32,6 +32,7 @@ const projects = defineCollection({
     coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head'),
     showTableOfContents: z.boolean().default(true),
     narrow: z.boolean().default(true),
+    views: z.number().default(0),
   }),
 })
 
@@ -60,6 +61,7 @@ const posts = defineCollection({
     coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head'),
     showTableOfContents: z.boolean().default(true),
     narrow: z.boolean().default(true),
+    views: z.number().default(0),
   }),
 })
 

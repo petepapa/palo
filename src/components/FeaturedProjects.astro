@@ -10,6 +10,8 @@ import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 
 type FeaturedProjectLayout = 'standard' | 'overlay'
 
+type SortBy = 'latest' | 'popular' | 'earliest'
+
 /**
  * FeaturedProjects Component
  *
@@ -45,6 +47,11 @@ interface Props {
    * @default "gap-12"
    */
   projectListGapClass?: string
+  /**
+   * Sort projects by: latest (newest first), popular (most views), earliest (oldest first)
+   * @default "latest"
+   */
+  sortBy?: SortBy
 }
 
 const {
@@ -54,6 +61,7 @@ const {
   layout = 'standard',
   projectListWidth = 'container',
   projectListGapClass = 'gap-12',
+  sortBy = 'latest',
 } = Astro.props
 const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
@@ -71,8 +79,23 @@ const listBaseClasses = [
 // Get projects from content collection
 const projects = await getCollection('projects')
 
+// Sort projects based on sortBy parameter
+const sortedProjects = [...projects].sort((a, b) => {
+  switch (sortBy) {
+    case 'latest':
+      // For projects, we'll use the filename or a default date order
+      return b.id.localeCompare(a.id)
+    case 'popular':
+      return (b.data.views || 0) - (a.data.views || 0)
+    case 'earliest':
+      return a.id.localeCompare(b.id)
+    default:
+      return b.id.localeCompare(a.id)
+  }
+})
+
 // Limit projects and add featured images
-const featuredProjects = projects.slice(0, limit).map((project, index) => ({
+const featuredProjects = sortedProjects.slice(0, limit).map((project, index) => ({
   ...project,
   featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
 }))
