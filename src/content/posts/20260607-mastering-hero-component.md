@@ -2,9 +2,22 @@
 title: "Mastering the Hero Component"
 description: "Learn how to use Palo's Hero component to create stunning, accessible page headers with customizable backgrounds, layouts, and interactive elements"
 publishDate: 2026-06-07
-author: Pete Lee
+author:
+  name: "Pete"
+  image: "/avater.svg"
+  bio: "PetePa.com"
 tags: ['Components', 'Palo Theme', 'Web Design', 'Hero Section']
 coverImage: /posts/docs/hero.png
+coverImagePosition: head
+showBreadcrumbs: true
+customBreadcrumbLabels:
+  "blog": "博客"
+  "current": ""
+joinLastBreadcrumb: false
+source: "https://github.com/petepapa/palo"
+liveDemo: "https://palo.petepa.com/"
+showDivider: true
+showTableOfContents: true
 
 ---
 

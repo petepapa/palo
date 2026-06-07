@@ -2,9 +2,22 @@
 title: "Config Everything You Like"
 description: "Explore Palo theme's config.yaml configuration system - control your site's appearance, layout, and features through simple parameter settings"
 publishDate: 2026-06-03
-author: Pete Lee
+author:
+  name: "Pete"
+  image: "/avater.svg"
+  bio: "PetePa.com"
 tags: ['Configuration', 'Palo Theme', 'Web Design', 'YAML']
 coverImage: /posts/docs/config.png
+coverImagePosition: head
+showBreadcrumbs: true
+customBreadcrumbLabels:
+  "blog": "博客"
+  "current": ""
+joinLastBreadcrumb: false
+source: "https://github.com/petepapa/palo"
+liveDemo: "https://palo.petepa.com/"
+showDivider: true
+showTableOfContents: true
 
 ---
 
