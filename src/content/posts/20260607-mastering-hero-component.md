@@ -4,7 +4,7 @@ description: "Learn how to use Palo's Hero component to create stunning, accessi
 publishDate: 2026-06-07
 author:
   name: "Pete"
-  image: "/avater.svg"
+  image: "/branding/avater.png"
   bio: "PetePa.com"
 tags: ['Components', 'Palo Theme', 'Web Design', 'Hero Section']
 coverImage: /posts/docs/hero.png

@@ -4,7 +4,7 @@ description: A comprehensive guide to the PostHeader component, covering all par
 publishDate: 2026-06-03
 author:
   name: "Pete"
-  image: "/avater.svg"
+  image: "/branding/avater.png"
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'PostHeader']
 coverImage: /posts/docs/cover01.jpg
