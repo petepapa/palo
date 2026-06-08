@@ -99,7 +99,7 @@ const currentYear = new Date().getFullYear()
   </section>
 
   <CreativeSection
-    fullscreen={false}
+    fullscreen={true}
     contentColor="" 
     backgroundVideo=""
     backgroundImage=""
@@ -107,10 +107,11 @@ const currentYear = new Date().getFullYear()
     backgroundFixed={false}
     backgroundOverlayOpacity={0.5}
     class="py-16 bg-primary text-neutral-100"
-    contentVerticalAlign="center"
+    contentVerticalAlign="bottom"
     showDivider="false" 
+    useContainer={false}
   >
-    <div class="text-center">
+    <div class="text-center w-full bg-info">
       <p class="text-xl font-semiboldss">
         A portfolio framework that gets out of your way — and stays true to your aesthetic.
       </p>

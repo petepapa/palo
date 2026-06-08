@@ -50,6 +50,11 @@ interface Props {
    */
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
+  /**
    * 附加的类名 / Additional CSS classes
    */
   class?: string
@@ -65,6 +70,7 @@ const {
   backgroundOverlayOpacity = 0,
   showDivider = true,
   contentVerticalAlign = '',
+  useContainer = true,
   class: className = '',
 } = Astro.props
 
@@ -141,7 +147,7 @@ const sectionStyle = {
   )}
 
   <!-- 层 3: 前景内容 Slot (自动居中布局) / Layer 3: Foreground content Slot (auto-centering layout) -->
-  <div class="section-content container">
+  <div class:list={['section-content', useContainer && 'container']}>
     <slot />
   </div>
 </section>

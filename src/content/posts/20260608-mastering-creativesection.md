@@ -243,6 +243,30 @@ Controls where the content slot is positioned vertically.
 
 ---
 
+#### Content Wrapper Parameters
+
+##### `useContainer`
+- **Type**: `boolean`
+- **Required**: `false`
+- **Default**: `true`
+- **Function**: Whether to wrap the content in a container
+
+When `true`, content will be wrapped in Palo's standard `container` class for proper horizontal spacing and max-width. When `false`, content will stretch to the full width of the section.
+
+是否用 container 容器包裹内容。
+
+当为 `true` 时，内容将被包裹在 Palo 的标准 `container` 类中，以获得适当的水平间距和最大宽度。当为 `false` 时，内容将拉伸到区块的全宽度。
+
+**Example**:
+```astro
+<CreativeSection useContainer={false}>
+  <h1>Full-Width Content</h1>
+  <p>This content stretches to the edges</p>
+</CreativeSection>
+```
+
+---
+
 #### Section Separation Parameters
 
 ##### `showDivider`
@@ -346,6 +370,23 @@ A simple section using brand colors without background media.
 >
   <h2>Information Section</h2>
   <p>Important information for our users</p>
+</CreativeSection>
+```
+
+#### Example 5: Full-Width Content
+A section without container, allowing content to stretch to full width.
+
+不带 container 的区块，让内容拉伸到全宽度。
+
+```astro
+<CreativeSection
+  backgroundColor="var(--color-neutral-100)"
+  useContainer={false}
+>
+  <div class="bg-primary text-neutral-100 px-8 py-16">
+    <h2>Full-Width Banner</h2>
+    <p>This content stretches from edge to edge</p>
+  </div>
 </CreativeSection>
 ```
 
