@@ -243,6 +243,30 @@ Control how content aligns vertically within the hero.
 
 ---
 
+#### Content Container
+
+Control whether content is wrapped in a container or spans the full width.
+
+控制内容是否包裹在 container 中，还是占满全宽度。
+
+```astro
+<!-- Default: with container (standard width) -->
+<Hero>
+  <h1>Standard Width Content</h1>
+</Hero>
+
+<!-- Without container (full width) -->
+<Hero useContainer={false}>
+  <h1>Full Width Content</h1>
+</Hero>
+```
+
+| Parameter | Type | Default | Description | 说明 |
+|-----------|------|---------|-------------|------|
+| `useContainer` | boolean | `true` | Wrap content in container for proper width | 是否将内容包裹在 container 中以获得适当的宽度 |
+
+---
+
 #### Custom Classes
 
 Add your own CSS classes for additional styling.
@@ -348,6 +372,23 @@ Add your own CSS classes for additional styling.
 >
   <h1>Transform Your Business</h1>
   <p>Innovative solutions for modern enterprises</p>
+</Hero>
+```
+
+---
+
+#### Full-Width Hero / 全宽度 Hero
+
+```astro
+<Hero
+  fullscreen={false}
+  backgroundColor="#f1f5f9"
+  useContainer={false}
+>
+  <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-24">
+    <h1>Full-Width Banner</h1>
+    <p>Content stretches edge to edge</p>
+  </div>
 </Hero>
 ```
 

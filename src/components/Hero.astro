@@ -25,6 +25,11 @@ interface Props {
    */
   showDivider?: DividerPlacement
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
+  /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
   class?: string
 }
 
@@ -39,6 +44,7 @@ const {
   topNavigationTheme = '',
   showDivider = true,
   contentVerticalAlign = '',
+  useContainer = true,
   class: className = '',
 } = Astro.props
 const resolvedContentVerticalAlign =
@@ -100,7 +106,7 @@ const heroStyle = [
 
   {(backgroundVideo || backgroundImage) && <div class="hero__background-overlay" aria-hidden="true"></div>}
 
-  <div class="container hero__content">
+  <div class:list={['hero__content', useContainer && 'container']}>
     <slot />
   </div>
 </section>

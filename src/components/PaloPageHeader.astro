@@ -54,6 +54,11 @@ interface Props {
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   contentHorizontalAlign?: '' | 'left' | 'center' | 'right'
   textAlign?: '' | 'left' | 'center' | 'right'
+  /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
 }
 
 const {
@@ -73,6 +78,7 @@ const {
   contentVerticalAlign = '',
   contentHorizontalAlign = 'left',
   textAlign = '',
+  useContainer = true,
 } = Astro.props
 
 const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
@@ -185,7 +191,7 @@ const sanitizedSubtitle: string = subtitle
 
   {(backgroundVideo || backgroundImage) && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
 
-  <div class="container palo-page-header__content space-content">
+  <div class:list={['palo-page-header__content', 'space-content', useContainer && 'container']}>
     <Heading level="h1">{title}</Heading>
     {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
   </div>
