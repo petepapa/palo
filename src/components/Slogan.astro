@@ -25,24 +25,25 @@ const {
 const Tag = as || 'div';
 
 const speedMap = {
-  slow: 30,
-  normal: 15,
-  fast: 8
+  slow: 25,
+  normal: 10,
+  fast: 5
 };
 
 const animationSpeed = speedMap[speed as keyof typeof speedMap] || speedMap.normal;
+const isRight = direction === 'right';
 
 const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
-const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 {variant === 'marquee' ? (
   <Tag
-    class={`palo-marquee-wrapper ${className}`}
-    id={marqueeId}
+    class={`palo-marquee-wrapper palo-marquee-${direction} ${className}`}
+    data-speed={animationSpeed}
   >
     <div class="palo-marquee-track">
       <span class="palo-marquee-item">{text}</span>
+      <span class="palo-marquee-item" aria-hidden="true">{text}</span>
     </div>
   </Tag>
 ) : variant === 'inline' ? (
@@ -57,9 +58,8 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
   </Tag>
 )}
 
-<script define:vars={{ inlineId, marqueeId, animationSpeed, direction }}>
+<script define:vars={{ inlineId }}>
   (function () {
-    // 复用离屏探测元素，避免反复创建/销毁
     var probe = null;
 
     function getProbe() {
@@ -71,7 +71,6 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
       return probe;
     }
 
-    // ========== Inline 变体：字号自适应撑满 ==========
     function fitTextToWidth() {
       var wrapper = document.getElementById(inlineId);
       if (!wrapper) return;
@@ -88,7 +87,6 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
 
       p.style.fontSize = '200px';
 
-      // 继承目标元素的字体样式
       var cs = window.getComputedStyle(textEl);
       p.style.fontFamily = cs.fontFamily;
       p.style.fontWeight = cs.fontWeight;
@@ -102,67 +100,9 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
       textEl.style.fontSize = ((containerWidth - 1) * 200 / measuredWidth) + 'px';
     }
 
-    // ========== Marquee 变体：JS 驱动无缝滚动 ==========
-    function setupMarquee() {
-      var wrapper = document.getElementById(marqueeId);
-      if (!wrapper) return;
-
-      var track = wrapper.querySelector('.palo-marquee-track');
-      var firstItem = wrapper.querySelector('.palo-marquee-item');
-      if (!track || !firstItem) return;
-
-      while (track.children.length > 1) {
-        track.removeChild(track.lastChild);
-      }
-
-      var itemWidth = firstItem.offsetWidth;
-      if (itemWidth <= 0) return;
-
-      var wrapperWidth = wrapper.offsetWidth;
-      if (wrapperWidth <= 0) return;
-
-      var neededItems = Math.ceil(wrapperWidth / itemWidth) + 1;
-
-      for (var i = 1; i < neededItems; i++) {
-        track.appendChild(firstItem.cloneNode(true));
-      }
-
-      // 将整组内容再完整克隆一遍，实现无缝衔接
-      var originalCount = track.children.length;
-      for (var j = 0; j < originalCount; j++) {
-        track.appendChild(track.children[j].cloneNode(true));
-      }
-
-      var distance = track.scrollWidth / 2;
-      
-      // 根据 direction 设置动画方向
-      var startTransform, endTransform;
-      if (direction === 'right') {
-        startTransform = 'translateX(-' + distance + 'px)';
-        endTransform = 'translateX(0)';
-      } else {
-        startTransform = 'translateX(0)';
-        endTransform = 'translateX(-' + distance + 'px)';
-      }
-
-      track.animate(
-        [
-          { transform: startTransform },
-          { transform: endTransform }
-        ],
-        {
-          duration: animationSpeed * 1000,
-          iterations: Infinity,
-          easing: 'linear'
-        }
-      );
-    }
-
-    // ========== 启动 ==========
     function init() {
       requestAnimationFrame(function () {
         fitTextToWidth();
-        setupMarquee();
       });
     }
 
@@ -207,30 +147,68 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
     margin: 0;
   }
 
+  /* ========== 跑马灯样式 ========== */
   .palo-marquee-wrapper {
     overflow: hidden;
     white-space: nowrap;
-    display: flex;
     width: 100%;
-    pointer-events: none;
   }
 
   .palo-marquee-track {
     display: flex;
     width: max-content;
-    flex-shrink: 0;
   }
 
   .palo-marquee-item {
     display: inline-block;
     line-height: 1;
-    margin-inline: 2rem;
+    padding-inline: 2rem;
+    flex-shrink: 0;
   }
 
+  /* Hover 暂停 */
+  .palo-marquee-wrapper:hover .palo-marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* 从左向右滚动 (默认) */
+  .palo-marquee-left .palo-marquee-track {
+    animation: marquee-left 10s linear infinite;
+  }
+
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* 从右向左滚动 */
+  .palo-marquee-right .palo-marquee-track {
+    animation: marquee-right 10s linear infinite;
+  }
+
+  @keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* 速度控制 */
+  .palo-marquee-wrapper[data-speed="5"] .palo-marquee-track {
+    animation-duration: 5s;
+  }
+  .palo-marquee-wrapper[data-speed="10"] .palo-marquee-track {
+    animation-duration: 10s;
+  }
+  .palo-marquee-wrapper[data-speed="25"] .palo-marquee-track {
+    animation-duration: 25s;
+  }
+
+  /* 无障碍：减少动态效果 */
   @media (prefers-reduced-motion: reduce) {
     .palo-marquee-wrapper {
       overflow-x: auto;
-      pointer-events: auto;
+    }
+    .palo-marquee-wrapper .palo-marquee-track {
+      animation: none;
     }
   }
 </style>
