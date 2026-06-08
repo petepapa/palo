@@ -9,8 +9,10 @@ interface Props {
   as?: 'div' | 'p' | 'h1' | 'h2' | 'h3' | '';
   variant?: 'default' | 'inline' | 'marquee';
   class?: string;
+  wrapperClass?: string;
   speed?: 'slow' | 'normal' | 'fast';
   direction?: 'left' | 'right';
+  pause?: boolean;
 }
 
 const {
@@ -18,37 +20,38 @@ const {
   as = 'div',
   variant = 'default',
   class: className = '',
+  wrapperClass: wrapperClassName = '',
   speed = 'normal',
-  direction = 'left'
+  direction = 'left',
+  pause = true
 } = Astro.props;
 
 const Tag = as || 'div';
 
-const speedMap = {
-  slow: 25,
-  normal: 10,
-  fast: 5
-};
+const speedMap = { slow: 40, normal: 80, fast: 160 };
+const pxPerSec = speedMap[speed as keyof typeof speedMap] ?? speedMap.normal;
 
-const animationSpeed = speedMap[speed as keyof typeof speedMap] || speedMap.normal;
-const isRight = direction === 'right';
-
-const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
+const uid = Math.random().toString(36).substr(2, 9);
 ---
 
 {variant === 'marquee' ? (
-  <Tag
-    class={`palo-marquee-wrapper palo-marquee-${direction} ${className}`}
-    data-speed={animationSpeed}
+  <div
+    class={`palo-marquee-wrapper palo-marquee-${direction} ${pause ? 'palo-marquee-pause' : ''} ${wrapperClassName}`}
+    data-marquee-id={uid}
+    data-px-per-sec={pxPerSec}
+    data-direction={direction}
+    aria-label={text}
   >
     <div class="palo-marquee-track">
-      <span class="palo-marquee-item">{text}</span>
-      <span class="palo-marquee-item" aria-hidden="true">{text}</span>
+      <span class={`palo-marquee-item ${className}`} aria-hidden="true">{text}</span>
     </div>
-  </Tag>
+  </div>
 ) : variant === 'inline' ? (
-  <div class={`palo-slogan-inline-wrapper ${className}`} id={inlineId}>
-    <Tag class="palo-slogan-inline" data-slogan-text={text}>
+  <div
+    class={`palo-slogan-inline-wrapper ${wrapperClassName}`}
+    data-inline-id={uid}
+  >
+    <Tag class={`palo-slogan-inline ${className}`} data-slogan-text={text}>
       {text}
     </Tag>
   </div>
@@ -58,7 +61,8 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
   </Tag>
 )}
 
-<script define:vars={{ inlineId }}>
+<script>
+  /* ===== Inline fit-to-width ===== */
   (function () {
     var probe = null;
 
@@ -71,10 +75,7 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
       return probe;
     }
 
-    function fitTextToWidth() {
-      var wrapper = document.getElementById(inlineId);
-      if (!wrapper) return;
-
+    function fitOne(wrapper) {
       var textEl = wrapper.querySelector('.palo-slogan-inline');
       if (!textEl) return;
 
@@ -82,11 +83,10 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
       if (containerWidth <= 0) return;
 
       var p = getProbe();
-      p.textContent = textEl.dataset.sloganText || textEl.textContent;
-      if (!p.textContent || p.textContent.length === 0) return;
+      p.textContent = textEl.dataset.sloganText || textEl.textContent || '';
+      if (!p.textContent) return;
 
       p.style.fontSize = '200px';
-
       var cs = window.getComputedStyle(textEl);
       p.style.fontFamily = cs.fontFamily;
       p.style.fontWeight = cs.fontWeight;
@@ -100,14 +100,14 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
       textEl.style.fontSize = ((containerWidth - 1) * 200 / measuredWidth) + 'px';
     }
 
-    function init() {
-      requestAnimationFrame(function () {
-        fitTextToWidth();
-      });
+    function fitAll() {
+      document.querySelectorAll('[data-inline-id]').forEach(fitOne);
     }
 
     function start() {
-      document.fonts.ready.then(init);
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(fitAll);
+      });
     }
 
     if (document.readyState === 'complete') {
@@ -118,10 +118,124 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
       });
     }
 
-    var resizeTimer;
+    /** @type {number} */
+    var inlineTimer;
     window.addEventListener('resize', function () {
-      if (resizeTimer) cancelAnimationFrame(resizeTimer);
-      resizeTimer = requestAnimationFrame(start);
+      if (inlineTimer) cancelAnimationFrame(inlineTimer);
+      inlineTimer = requestAnimationFrame(fitAll);
+    });
+  })();
+
+  /* ===== Marquee seamless loop ===== */
+  (function () {
+    // 存储事件监听器引用，方便后续清理
+    var eventListeners = new Map();
+
+    function setupMarquee(wrapper) {
+      var track = wrapper.querySelector('.palo-marquee-track');
+      if (!track) return;
+
+      // 清理旧的事件监听器
+      var oldListeners = eventListeners.get(wrapper);
+      if (oldListeners) {
+        wrapper.removeEventListener('mouseenter', oldListeners.onEnter);
+        wrapper.removeEventListener('mouseleave', oldListeners.onLeave);
+        eventListeners.delete(wrapper);
+      }
+
+      // 保留第一个原始 item，移除其余所有
+      var items = track.querySelectorAll('.palo-marquee-item');
+      for (var i = items.length - 1; i > 0; i--) {
+        items[i].remove();
+      }
+      var firstItem = track.querySelector('.palo-marquee-item');
+      if (!firstItem) return;
+
+      var pxPerSec = parseFloat(wrapper.dataset.pxPerSec || '80') || 80;
+      var isRight = wrapper.dataset.direction === 'right';
+
+      // 等 fonts ready + 一帧确保 item 完全渲染
+      requestAnimationFrame(function () {
+        // 直接用 getBoundingClientRect 获取实际渲染宽度（含 margin）
+        var rect = firstItem.getBoundingClientRect();
+        // 计算完整的外盒宽度：margin-box
+        var cs = window.getComputedStyle(firstItem);
+        var ml = parseFloat(cs.marginLeft) || 0;
+        var mr = parseFloat(cs.marginRight) || 0;
+        var itemW = rect.width + ml + mr;
+        if (itemW <= 0) return;
+
+        var wrapperW = wrapper.offsetWidth;
+        // 至少需要覆盖 wrapper 宽度的 items
+        var groupCount = Math.max(1, Math.ceil(wrapperW / itemW) + 1);
+
+        // 克隆第一组
+        for (var j = 1; j < groupCount; j++) {
+          var clone = firstItem.cloneNode(true);
+          clone.setAttribute('aria-hidden', 'true');
+          track.appendChild(clone);
+        }
+
+        // 将整组再克隆一遍（双倍内容）
+        var allCurrent = track.querySelectorAll('.palo-marquee-item');
+        for (var k = 0; k < allCurrent.length; k++) {
+          var dup = allCurrent[k].cloneNode(true);
+          dup.setAttribute('aria-hidden', 'true');
+          track.appendChild(dup);
+        }
+
+        // 一组内容的宽度 = groupCount * itemW
+        var groupWidth = groupCount * itemW;
+        var duration = groupWidth / pxPerSec;
+
+        // 重置 transform，清除旧动画
+        track.style.transform = '';
+        track.style.animation = 'none';
+        track.style.animationPlayState = 'running';
+        void track.offsetWidth; // force reflow
+
+        // 使用静态的 keyframes 名称
+        track.style.setProperty('--_mgw', groupWidth + 'px');
+        track.style.animation = (isRight ? 'marquee-seamless-right' : 'marquee-seamless-left') + ' ' + duration + 's linear infinite';
+
+        // 添加 hover 暂停功能
+        if (wrapper.classList.contains('palo-marquee-pause')) {
+          var onEnter = function() {
+            track.style.animationPlayState = 'paused';
+          };
+          var onLeave = function() {
+            track.style.animationPlayState = 'running';
+          };
+          wrapper.addEventListener('mouseenter', onEnter);
+          wrapper.addEventListener('mouseleave', onLeave);
+          eventListeners.set(wrapper, { onEnter: onEnter, onLeave: onLeave });
+        }
+      });
+    }
+
+    function initAll() {
+      document.querySelectorAll('[data-marquee-id]').forEach(function (wrapper) {
+        setupMarquee(wrapper);
+      });
+    }
+
+    function startMarquee() {
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(initAll);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startMarquee);
+    } else {
+      startMarquee();
+    }
+
+    /** @type {number} */
+    var marqueeTimer;
+    window.addEventListener('resize', function () {
+      if (marqueeTimer) clearTimeout(marqueeTimer);
+      marqueeTimer = setTimeout(initAll, 150);
     });
   })();
 </script>
@@ -147,68 +261,47 @@ const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
     margin: 0;
   }
 
-  /* ========== 跑马灯样式 ========== */
+  /* ========== 跑马灯 ========== */
   .palo-marquee-wrapper {
     overflow: hidden;
-    white-space: nowrap;
     width: 100%;
   }
 
   .palo-marquee-track {
     display: flex;
+    flex-wrap: nowrap;
     width: max-content;
+    will-change: transform;
   }
 
   .palo-marquee-item {
-    display: inline-block;
-    line-height: 1;
-    padding-inline: 2rem;
     flex-shrink: 0;
+    margin-inline: 2rem;
+    white-space: nowrap;
+    line-height: 1;
   }
 
-  /* Hover 暂停 */
-  .palo-marquee-wrapper:hover .palo-marquee-track {
+  /* 核心关键帧动画 */
+  @keyframes marquee-seamless-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-1 * var(--_mgw))); }
+  }
+
+  @keyframes marquee-seamless-right {
+    from { transform: translateX(calc(-1 * var(--_mgw))); }
+    to   { transform: translateX(0); }
+  }
+
+  .palo-marquee-pause:hover .palo-marquee-track {
     animation-play-state: paused;
   }
 
-  /* 从左向右滚动 (默认) */
-  .palo-marquee-left .palo-marquee-track {
-    animation: marquee-left 10s linear infinite;
-  }
-
-  @keyframes marquee-left {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
-
-  /* 从右向左滚动 */
-  .palo-marquee-right .palo-marquee-track {
-    animation: marquee-right 10s linear infinite;
-  }
-
-  @keyframes marquee-right {
-    0% { transform: translateX(-50%); }
-    100% { transform: translateX(0); }
-  }
-
-  /* 速度控制 */
-  .palo-marquee-wrapper[data-speed="5"] .palo-marquee-track {
-    animation-duration: 5s;
-  }
-  .palo-marquee-wrapper[data-speed="10"] .palo-marquee-track {
-    animation-duration: 10s;
-  }
-  .palo-marquee-wrapper[data-speed="25"] .palo-marquee-track {
-    animation-duration: 25s;
-  }
-
-  /* 无障碍：减少动态效果 */
   @media (prefers-reduced-motion: reduce) {
     .palo-marquee-wrapper {
       overflow-x: auto;
     }
     .palo-marquee-wrapper .palo-marquee-track {
-      animation: none;
+      animation: none !important;
     }
   }
 </style>
