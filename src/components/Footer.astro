@@ -1,5 +1,5 @@
 ---
-import CallToAction from './CallToAction.astro'
+import CreativeSection from './CreativeSection.astro'
 import Logo from './Logo.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
@@ -11,10 +11,10 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  */
 const currentYear = new Date().getFullYear()
 ---
-
 <footer>
-  <CallToAction />
-  <section class="py-20">
+`
+
+  <section class="py-20 mt-32">
     <Heading level="h2" class="sr-only">Footer</Heading>
     <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-4">
@@ -97,6 +97,28 @@ const currentYear = new Date().getFullYear()
       </p>
     </div>
   </section>
+
+  <CreativeSection
+    fullscreen={false}
+    contentColor="#fff" 
+    backgroundVideo=""
+    backgroundImage=""
+    backgroundColor="#ff4b00"
+    backgroundFixed={false}
+    backgroundOverlayOpacity={0.5}
+    class="py-16"
+    contentVerticalAlign="center"
+    showDivider="false" 
+  >
+    <div class="text-center">
+      <p class="text-xl font-semibold">
+        A portfolio framework that gets out of your way — and stays true to your aesthetic.
+      </p>
+      <!--
+      -->
+    </div>
+  </CreativeSection>
+
 </footer>
 
 <style lang="scss">

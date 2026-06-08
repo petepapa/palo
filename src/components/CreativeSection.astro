@@ -2,26 +2,6 @@
 // src/components/CreativeSection.astro
 import { normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 
-type PaddingBlock =
-  | ''
-  | '5xs'
-  | '4xs'
-  | '3xs'
-  | '2xs'
-  | 'xs'
-  | 's'
-  | 'sm'
-  | 'm'
-  | 'md'
-  | 'l'
-  | 'lg'
-  | 'xl'
-  | '2xl'
-  | '3xl'
-  | '4xl'
-  | '5xl'
-  | (string & {})
-
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
 interface Props {
@@ -65,14 +45,6 @@ interface Props {
    */
   showDivider?: DividerPlacement
   /**
-   * 上下内边距 / Vertical padding.
-   * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
-   * 支持 space token: 5xs, 4xs, 3xs, 2xs, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl.
-   * 也支持别名 sm/md/lg，以及具体 CSS 值，如 "4rem"、"48px"、"clamp(2rem, 5vw, 6rem)".
-   * Supports space tokens, sm/md/lg aliases, and custom CSS values such as "4rem", "48px", or "clamp(2rem, 5vw, 6rem)".
-   */
-  paddingBlock?: PaddingBlock
-  /**
    * 内容垂直位置 / Vertical content position
    * 留空等同 center，可选 top / center / bottom / Empty equals center; accepts top / center / bottom
    */
@@ -84,7 +56,7 @@ interface Props {
 }
 
 const {
-  fullscreen = false, // 默认不全屏 / Default to non-fullscreen
+  fullscreen = false,
   contentColor = '',
   backgroundVideo = '',
   backgroundImage = '',
@@ -92,34 +64,10 @@ const {
   backgroundFixed = false,
   backgroundOverlayOpacity = 0,
   showDivider = true,
-  paddingBlock = '',
   contentVerticalAlign = '',
   class: className = '',
 } = Astro.props
 
-const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
-  '5xs': 'var(--space-5xs)',
-  '4xs': 'var(--space-4xs)',
-  '3xs': 'var(--space-3xs)',
-  '2xs': 'var(--space-2xs)',
-  xs: 'var(--space-xs)',
-  s: 'var(--space-s)',
-  sm: 'var(--space-s)',
-  m: 'var(--space-m)',
-  md: 'var(--space-m)',
-  l: 'var(--space-l)',
-  lg: 'var(--space-l)',
-  xl: 'var(--space-xl)',
-  '2xl': 'var(--space-2xl)',
-  '3xl': 'var(--space-3xl)',
-  '4xl': 'var(--space-4xl)',
-  '5xl': 'var(--space-5xl)',
-}
-const resolvePaddingBlock = (value?: PaddingBlock): string => {
-  const normalizedValue = typeof value === 'string' ? value.trim() : ''
-  return normalizedValue ? (paddingBlockMap[normalizedValue] ?? normalizedValue) : 'var(--space-xl)'
-}
-const resolvedPaddingBlock = resolvePaddingBlock(paddingBlock)
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const sectionContentAlignMap = {
@@ -146,7 +94,6 @@ const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
 // 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
 const sectionStyle = {
   '--section-bg': backgroundColor || 'transparent',
-  '--section-padding-block': resolvedPaddingBlock,
   '--section-content-align': sectionContentAlignMap[resolvedContentVerticalAlign],
   '--section-overlay-opacity': resolvedBackgroundOverlayOpacity,
   ...(contentColor ? { '--section-color': contentColor } : {}),
@@ -210,7 +157,6 @@ const sectionStyle = {
       flex-direction: column;
       align-items: center;
       justify-content: var(--section-content-align, center);
-      padding-block: var(--section-padding-block, var(--space-xl)); /* 提供合理的默认上下呼吸间距 / Provides a reasonable default padding-block */
       
       /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */
       background-color: var(--section-bg, transparent);
@@ -239,7 +185,6 @@ const sectionStyle = {
       block-size: 100vh;
       min-block-size: 100vh;
       box-sizing: border-box;
-      padding-block: var(--section-padding-block, var(--space-xl));
     }
 
     /* 媒体容器层 / Background media container layer */
