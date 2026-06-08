@@ -1,0 +1,228 @@
+---
+/**
+ * Slogan Component
+ *
+ * @description A versatile component for displaying brand slogans with multiple variants
+ */
+interface Props {
+  text: string;
+  as?: 'div' | 'p' | 'h1' | 'h2' | 'h3' | '';
+  variant?: 'default' | 'inline' | 'marquee';
+  class?: string;
+  speed?: 'slow' | 'normal' | 'fast';
+  direction?: 'left' | 'right';
+}
+
+const {
+  text,
+  as = 'div',
+  variant = 'default',
+  class: className = '',
+  speed = 'normal',
+  direction = 'left'
+} = Astro.props;
+
+const Tag = as || 'div';
+
+const speedMap = {
+  slow: 30,
+  normal: 15,
+  fast: 8
+};
+
+const animationSpeed = speedMap[speed as keyof typeof speedMap] || speedMap.normal;
+
+const inlineId = `slogan-inline-${Math.random().toString(36).substr(2, 9)}`;
+const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+{variant === 'marquee' ? (
+  <Tag
+    class={`palo-marquee-wrapper ${className}`}
+    id={marqueeId}
+  >
+    <div class="palo-marquee-track">
+      <span class="palo-marquee-item">{text}</span>
+    </div>
+  </Tag>
+) : variant === 'inline' ? (
+  <div class={`palo-slogan-inline-wrapper ${className}`} id={inlineId}>
+    <Tag class="palo-slogan-inline" data-slogan-text={text}>
+      {text}
+    </Tag>
+  </div>
+) : (
+  <Tag class={`palo-slogan-default ${className}`}>
+    {text}
+  </Tag>
+)}
+
+<script define:vars={{ inlineId, marqueeId, animationSpeed }}>
+  (function () {
+    // 复用离屏探测元素，避免反复创建/销毁
+    var probe = null;
+
+    function getProbe() {
+      if (!probe) {
+        probe = document.createElement('span');
+        probe.style.cssText = 'position:fixed;visibility:hidden;white-space:nowrap;pointer-events:none;z-index:-1';
+        document.body.appendChild(probe);
+      }
+      return probe;
+    }
+
+    // ========== Inline 变体：字号自适应撑满 ==========
+    function fitTextToWidth() {
+      var wrapper = document.getElementById(inlineId);
+      if (!wrapper) return;
+
+      var textEl = wrapper.querySelector('.palo-slogan-inline');
+      if (!textEl) return;
+
+      var containerWidth = wrapper.clientWidth;
+      if (containerWidth <= 0) return;
+
+      var p = getProbe();
+      p.textContent = textEl.dataset.sloganText || textEl.textContent;
+      if (!p.textContent || p.textContent.length === 0) return;
+
+      p.style.fontSize = '200px';
+
+      // 继承目标元素的字体样式
+      var cs = window.getComputedStyle(textEl);
+      p.style.fontFamily = cs.fontFamily;
+      p.style.fontWeight = cs.fontWeight;
+      p.style.fontStyle = cs.fontStyle;
+      p.style.letterSpacing = cs.letterSpacing;
+      p.style.textTransform = cs.textTransform;
+
+      var measuredWidth = p.offsetWidth;
+      if (measuredWidth <= 0) return;
+
+      textEl.style.fontSize = ((containerWidth - 1) * 200 / measuredWidth) + 'px';
+    }
+
+    // ========== Marquee 变体：JS 驱动无缝滚动 ==========
+    function setupMarquee() {
+      var wrapper = document.getElementById(marqueeId);
+      if (!wrapper) return;
+
+      var track = wrapper.querySelector('.palo-marquee-track');
+      var firstItem = wrapper.querySelector('.palo-marquee-item');
+      if (!track || !firstItem) return;
+
+      while (track.children.length > 1) {
+        track.removeChild(track.lastChild);
+      }
+
+      var itemWidth = firstItem.offsetWidth;
+      if (itemWidth <= 0) return;
+
+      var wrapperWidth = wrapper.offsetWidth;
+      if (wrapperWidth <= 0) return;
+
+      var neededItems = Math.ceil(wrapperWidth / itemWidth) + 1;
+
+      for (var i = 1; i < neededItems; i++) {
+        track.appendChild(firstItem.cloneNode(true));
+      }
+
+      // 将整组内容再完整克隆一遍，实现无缝衔接
+      var originalCount = track.children.length;
+      for (var j = 0; j < originalCount; j++) {
+        track.appendChild(track.children[j].cloneNode(true));
+      }
+
+      var distance = track.scrollWidth / 2;
+
+      track.animate(
+        [
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-' + distance + 'px)' }
+        ],
+        {
+          duration: animationSpeed * 1000,
+          iterations: Infinity,
+          easing: 'linear'
+        }
+      );
+    }
+
+    // ========== 启动 ==========
+    function init() {
+      // 利用 requestAnimationFrame 保证在下一帧测量，
+      // 字体和布局都已稳定，无需额外双 rAF
+      requestAnimationFrame(function () {
+        fitTextToWidth();
+        setupMarquee();
+      });
+    }
+
+    function start() {
+      document.fonts.ready.then(init);
+    }
+
+    if (document.readyState === 'complete') {
+      start();
+    } else {
+      document.addEventListener('readystatechange', function () {
+        if (document.readyState === 'complete') start();
+      });
+    }
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      if (resizeTimer) cancelAnimationFrame(resizeTimer);
+      resizeTimer = requestAnimationFrame(start);
+    });
+  })();
+</script>
+
+<style lang="scss">
+  .palo-slogan-default {
+    display: block;
+    line-height: 1.2;
+  }
+
+  .palo-slogan-inline-wrapper {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .palo-slogan-inline {
+    display: block;
+    line-height: 1;
+    white-space: nowrap;
+    text-align: left;
+    margin: 0;
+  }
+
+  .palo-marquee-wrapper {
+    overflow: hidden;
+    white-space: nowrap;
+    display: flex;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .palo-marquee-track {
+    display: flex;
+    width: max-content;
+    flex-shrink: 0;
+  }
+
+  .palo-marquee-item {
+    display: inline-block;
+    line-height: 1;
+    margin-inline: 2rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .palo-marquee-wrapper {
+      overflow-x: auto;
+      pointer-events: auto;
+    }
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import CreativeSection from './CreativeSection.astro'
 import Logo from './Logo.astro'
+import Slogan from './Slogan.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
@@ -12,8 +13,6 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 const currentYear = new Date().getFullYear()
 ---
 <footer>
-`
-
   <section class="py-20 mt-24">
     <Heading level="h2" class="sr-only">Footer</Heading>
     <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
@@ -99,25 +98,26 @@ const currentYear = new Date().getFullYear()
   </section>
 
   <CreativeSection
-    fullscreen={true}
-    contentColor="" 
+    fullscreen={false}
+    contentColor=""
     backgroundVideo=""
     backgroundImage=""
     backgroundColor=""
     backgroundFixed={false}
     backgroundOverlayOpacity={0.5}
-    class="py-16 bg-primary text-neutral-100"
+    class="py-0 bg-primary pt-12 px-7"
     contentVerticalAlign="bottom"
-    showDivider="false" 
+    showDivider={false}
     useContainer={false}
   >
-    <div class="text-center w-full bg-info">
-      <p class="text-xl font-semiboldss">
-        A portfolio framework that gets out of your way — and stays true to your aesthetic.
-      </p>
-      <!--
-      -->
-    </div>
+    <Slogan
+      text="Palo Theme"
+      as=""
+      variant="inline"
+      class="text-neutral-100 uppercase"
+    />
+      
+      
   </CreativeSection>
 
 </footer>
