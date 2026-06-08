@@ -105,16 +105,19 @@ const currentYear = new Date().getFullYear()
     backgroundColor=""
     backgroundFixed={false}
     backgroundOverlayOpacity={0.5}
-    class="py-0 bg-primary pt-12 px-7"
+    class="bg-primary p-4 lg:p-16"
     contentVerticalAlign="bottom"
     showDivider={false}
     useContainer={false}
   >
+  <img src="/branding/logo-text.svg" class="w-full" />
     <Slogan
-      text="Palo Theme"
+      text="Palo Astro Theme"
       as=""
-      variant="inline"
-      class="text-neutral-100 uppercase"
+      variant="marquee"
+      speed="slow"
+      direction="lwft"
+      class="text-neutral-100 uppercase text-lg mt-8"
     />
       
       
