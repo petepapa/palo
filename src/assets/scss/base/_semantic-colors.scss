@@ -1,0 +1,562 @@
+@layer utilities {
+  /* ========================
+     Background color - primary (base)
+     ======================== */
+  .bg-primary {
+    background-color: var(--brand-primary) !important;
+  }
+
+  /* ========================
+     Background color - primary tones (100 lightest → 500 darkest)
+     ======================== */
+  .bg-primary-100 {
+    background-color: var(--color-primary-100) !important;
+  }
+  .bg-primary-200 {
+    background-color: var(--color-primary-200) !important;
+  }
+  .bg-primary-300 {
+    background-color: var(--color-primary-300) !important;
+  }
+  .bg-primary-400 {
+    background-color: var(--color-primary-400) !important;
+  }
+  .bg-primary-500 {
+    background-color: var(--color-primary-500) !important;
+  }
+
+  /* ========================
+     Background color - secondary (base)
+     ======================== */
+  .bg-secondary {
+    background-color: var(--brand-secondary) !important;
+  }
+
+  /* ========================
+     Background color - secondary tones
+     ======================== */
+  .bg-secondary-100 {
+    background-color: var(--color-secondary-100) !important;
+  }
+  .bg-secondary-200 {
+    background-color: var(--color-secondary-200) !important;
+  }
+  .bg-secondary-300 {
+    background-color: var(--color-secondary-300) !important;
+  }
+  .bg-secondary-400 {
+    background-color: var(--color-secondary-400) !important;
+  }
+  .bg-secondary-500 {
+    background-color: var(--color-secondary-500) !important;
+  }
+
+  /* ========================
+     Background color - info (base)
+     ======================== */
+  .bg-info {
+    background-color: var(--brand-info) !important;
+  }
+
+  /* ========================
+     Background color - info tones
+     ======================== */
+  .bg-info-100 {
+    background-color: var(--color-info-100) !important;
+  }
+  .bg-info-200 {
+    background-color: var(--color-info-200) !important;
+  }
+  .bg-info-300 {
+    background-color: var(--color-info-300) !important;
+  }
+  .bg-info-400 {
+    background-color: var(--color-info-400) !important;
+  }
+  .bg-info-500 {
+    background-color: var(--color-info-500) !important;
+  }
+
+  /* ========================
+     Background color - success (base)
+     ======================== */
+  .bg-success {
+    background-color: var(--brand-success) !important;
+  }
+
+  /* ========================
+     Background color - success tones
+     ======================== */
+  .bg-success-100 {
+    background-color: var(--color-success-100) !important;
+  }
+  .bg-success-200 {
+    background-color: var(--color-success-200) !important;
+  }
+  .bg-success-300 {
+    background-color: var(--color-success-300) !important;
+  }
+  .bg-success-400 {
+    background-color: var(--color-success-400) !important;
+  }
+  .bg-success-500 {
+    background-color: var(--color-success-500) !important;
+  }
+
+  /* ========================
+     Background color - warning (base)
+     ======================== */
+  .bg-warning {
+    background-color: var(--brand-warning) !important;
+  }
+
+  /* ========================
+     Background color - warning tones
+     ======================== */
+  .bg-warning-100 {
+    background-color: var(--color-warning-100) !important;
+  }
+  .bg-warning-200 {
+    background-color: var(--color-warning-200) !important;
+  }
+  .bg-warning-300 {
+    background-color: var(--color-warning-300) !important;
+  }
+  .bg-warning-400 {
+    background-color: var(--color-warning-400) !important;
+  }
+  .bg-warning-500 {
+    background-color: var(--color-warning-500) !important;
+  }
+
+  /* ========================
+     Background color - error (base)
+     ======================== */
+  .bg-error {
+    background-color: var(--brand-error) !important;
+  }
+
+  /* ========================
+     Background color - error tones
+     ======================== */
+  .bg-error-100 {
+    background-color: var(--color-error-100) !important;
+  }
+  .bg-error-200 {
+    background-color: var(--color-error-200) !important;
+  }
+  .bg-error-300 {
+    background-color: var(--color-error-300) !important;
+  }
+  .bg-error-400 {
+    background-color: var(--color-error-400) !important;
+  }
+  .bg-error-500 {
+    background-color: var(--color-error-500) !important;
+  }
+
+  /* ========================
+     Background color - neutral tones
+     ======================== */
+  .bg-neutral-100 {
+    background-color: var(--color-neutral-100) !important;
+  }
+  .bg-neutral-200 {
+    background-color: var(--color-neutral-200) !important;
+  }
+  .bg-neutral-300 {
+    background-color: var(--color-neutral-300) !important;
+  }
+  .bg-neutral-400 {
+    background-color: var(--color-neutral-400) !important;
+  }
+  .bg-neutral-500 {
+    background-color: var(--color-neutral-500) !important;
+  }
+  .bg-neutral-600 {
+    background-color: var(--color-neutral-600) !important;
+  }
+  .bg-neutral-700 {
+    background-color: var(--color-neutral-700) !important;
+  }
+  .bg-neutral-800 {
+    background-color: var(--color-neutral-800) !important;
+  }
+  .bg-neutral-900 {
+    background-color: var(--color-neutral-900) !important;
+  }
+
+  /* ========================
+     Text color - primary (base)
+     ======================== */
+  .text-primary {
+    color: var(--brand-primary) !important;
+  }
+
+  /* ========================
+     Text color - primary tones
+     ======================== */
+  .text-primary-100 {
+    color: var(--color-primary-100) !important;
+  }
+  .text-primary-200 {
+    color: var(--color-primary-200) !important;
+  }
+  .text-primary-300 {
+    color: var(--color-primary-300) !important;
+  }
+  .text-primary-400 {
+    color: var(--color-primary-400) !important;
+  }
+  .text-primary-500 {
+    color: var(--color-primary-500) !important;
+  }
+
+  /* ========================
+     Text color - secondary (base)
+     ======================== */
+  .text-secondary {
+    color: var(--brand-secondary) !important;
+  }
+
+  /* ========================
+     Text color - secondary tones
+     ======================== */
+  .text-secondary-100 {
+    color: var(--color-secondary-100) !important;
+  }
+  .text-secondary-200 {
+    color: var(--color-secondary-200) !important;
+  }
+  .text-secondary-300 {
+    color: var(--color-secondary-300) !important;
+  }
+  .text-secondary-400 {
+    color: var(--color-secondary-400) !important;
+  }
+  .text-secondary-500 {
+    color: var(--color-secondary-500) !important;
+  }
+
+  /* ========================
+     Text color - info (base)
+     ======================== */
+  .text-info {
+    color: var(--brand-info) !important;
+  }
+
+  /* ========================
+     Text color - info tones
+     ======================== */
+  .text-info-100 {
+    color: var(--color-info-100) !important;
+  }
+  .text-info-200 {
+    color: var(--color-info-200) !important;
+  }
+  .text-info-300 {
+    color: var(--color-info-300) !important;
+  }
+  .text-info-400 {
+    color: var(--color-info-400) !important;
+  }
+  .text-info-500 {
+    color: var(--color-info-500) !important;
+  }
+
+  /* ========================
+     Text color - success (base)
+     ======================== */
+  .text-success {
+    color: var(--brand-success) !important;
+  }
+
+  /* ========================
+     Text color - success tones
+     ======================== */
+  .text-success-100 {
+    color: var(--color-success-100) !important;
+  }
+  .text-success-200 {
+    color: var(--color-success-200) !important;
+  }
+  .text-success-300 {
+    color: var(--color-success-300) !important;
+  }
+  .text-success-400 {
+    color: var(--color-success-400) !important;
+  }
+  .text-success-500 {
+    color: var(--color-success-500) !important;
+  }
+
+  /* ========================
+     Text color - warning (base)
+     ======================== */
+  .text-warning {
+    color: var(--brand-warning) !important;
+  }
+
+  /* ========================
+     Text color - warning tones
+     ======================== */
+  .text-warning-100 {
+    color: var(--color-warning-100) !important;
+  }
+  .text-warning-200 {
+    color: var(--color-warning-200) !important;
+  }
+  .text-warning-300 {
+    color: var(--color-warning-300) !important;
+  }
+  .text-warning-400 {
+    color: var(--color-warning-400) !important;
+  }
+  .text-warning-500 {
+    color: var(--color-warning-500) !important;
+  }
+
+  /* ========================
+     Text color - error (base)
+     ======================== */
+  .text-error {
+    color: var(--brand-error) !important;
+  }
+
+  /* ========================
+     Text color - error tones
+     ======================== */
+  .text-error-100 {
+    color: var(--color-error-100) !important;
+  }
+  .text-error-200 {
+    color: var(--color-error-200) !important;
+  }
+  .text-error-300 {
+    color: var(--color-error-300) !important;
+  }
+  .text-error-400 {
+    color: var(--color-error-400) !important;
+  }
+  .text-error-500 {
+    color: var(--color-error-500) !important;
+  }
+
+  /* ========================
+     Text color - neutral tones
+     ======================== */
+  .text-neutral-100 {
+    color: var(--color-neutral-100) !important;
+  }
+  .text-neutral-200 {
+    color: var(--color-neutral-200) !important;
+  }
+  .text-neutral-300 {
+    color: var(--color-neutral-300) !important;
+  }
+  .text-neutral-400 {
+    color: var(--color-neutral-400) !important;
+  }
+  .text-neutral-500 {
+    color: var(--color-neutral-500) !important;
+  }
+  .text-neutral-600 {
+    color: var(--color-neutral-600) !important;
+  }
+  .text-neutral-700 {
+    color: var(--color-neutral-700) !important;
+  }
+  .text-neutral-800 {
+    color: var(--color-neutral-800) !important;
+  }
+  .text-neutral-900 {
+    color: var(--color-neutral-900) !important;
+  }
+
+  /* ========================
+     Border color - primary (base)
+     ======================== */
+  .border-primary {
+    border-color: var(--brand-primary) !important;
+  }
+
+  /* ========================
+     Border color - primary tones
+     ======================== */
+  .border-primary-100 {
+    border-color: var(--color-primary-100) !important;
+  }
+  .border-primary-200 {
+    border-color: var(--color-primary-200) !important;
+  }
+  .border-primary-300 {
+    border-color: var(--color-primary-300) !important;
+  }
+  .border-primary-400 {
+    border-color: var(--color-primary-400) !important;
+  }
+  .border-primary-500 {
+    border-color: var(--color-primary-500) !important;
+  }
+
+  /* ========================
+     Border color - secondary (base)
+     ======================== */
+  .border-secondary {
+    border-color: var(--brand-secondary) !important;
+  }
+
+  /* ========================
+     Border color - secondary tones
+     ======================== */
+  .border-secondary-100 {
+    border-color: var(--color-secondary-100) !important;
+  }
+  .border-secondary-200 {
+    border-color: var(--color-secondary-200) !important;
+  }
+  .border-secondary-300 {
+    border-color: var(--color-secondary-300) !important;
+  }
+  .border-secondary-400 {
+    border-color: var(--color-secondary-400) !important;
+  }
+  .border-secondary-500 {
+    border-color: var(--color-secondary-500) !important;
+  }
+
+  /* ========================
+     Border color - info (base)
+     ======================== */
+  .border-info {
+    border-color: var(--brand-info) !important;
+  }
+
+  /* ========================
+     Border color - info tones
+     ======================== */
+  .border-info-100 {
+    border-color: var(--color-info-100) !important;
+  }
+  .border-info-200 {
+    border-color: var(--color-info-200) !important;
+  }
+  .border-info-300 {
+    border-color: var(--color-info-300) !important;
+  }
+  .border-info-400 {
+    border-color: var(--color-info-400) !important;
+  }
+  .border-info-500 {
+    border-color: var(--color-info-500) !important;
+  }
+
+  /* ========================
+     Border color - success (base)
+     ======================== */
+  .border-success {
+    border-color: var(--brand-success) !important;
+  }
+
+  /* ========================
+     Border color - success tones
+     ======================== */
+  .border-success-100 {
+    border-color: var(--color-success-100) !important;
+  }
+  .border-success-200 {
+    border-color: var(--color-success-200) !important;
+  }
+  .border-success-300 {
+    border-color: var(--color-success-300) !important;
+  }
+  .border-success-400 {
+    border-color: var(--color-success-400) !important;
+  }
+  .border-success-500 {
+    border-color: var(--color-success-500) !important;
+  }
+
+  /* ========================
+     Border color - warning (base)
+     ======================== */
+  .border-warning {
+    border-color: var(--brand-warning) !important;
+  }
+
+  /* ========================
+     Border color - warning tones
+     ======================== */
+  .border-warning-100 {
+    border-color: var(--color-warning-100) !important;
+  }
+  .border-warning-200 {
+    border-color: var(--color-warning-200) !important;
+  }
+  .border-warning-300 {
+    border-color: var(--color-warning-300) !important;
+  }
+  .border-warning-400 {
+    border-color: var(--color-warning-400) !important;
+  }
+  .border-warning-500 {
+    border-color: var(--color-warning-500) !important;
+  }
+
+  /* ========================
+     Border color - error (base)
+     ======================== */
+  .border-error {
+    border-color: var(--brand-error) !important;
+  }
+
+  /* ========================
+     Border color - error tones
+     ======================== */
+  .border-error-100 {
+    border-color: var(--color-error-100) !important;
+  }
+  .border-error-200 {
+    border-color: var(--color-error-200) !important;
+  }
+  .border-error-300 {
+    border-color: var(--color-error-300) !important;
+  }
+  .border-error-400 {
+    border-color: var(--color-error-400) !important;
+  }
+  .border-error-500 {
+    border-color: var(--color-error-500) !important;
+  }
+
+  /* ========================
+     Border color - neutral tones
+     ======================== */
+  .border-neutral-100 {
+    border-color: var(--color-neutral-100) !important;
+  }
+  .border-neutral-200 {
+    border-color: var(--color-neutral-200) !important;
+  }
+  .border-neutral-300 {
+    border-color: var(--color-neutral-300) !important;
+  }
+  .border-neutral-400 {
+    border-color: var(--color-neutral-400) !important;
+  }
+  .border-neutral-500 {
+    border-color: var(--color-neutral-500) !important;
+  }
+  .border-neutral-600 {
+    border-color: var(--color-neutral-600) !important;
+  }
+  .border-neutral-700 {
+    border-color: var(--color-neutral-700) !important;
+  }
+  .border-neutral-800 {
+    border-color: var(--color-neutral-800) !important;
+  }
+  .border-neutral-900 {
+    border-color: var(--color-neutral-900) !important;
+  }
+}
