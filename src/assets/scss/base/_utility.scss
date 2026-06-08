@@ -248,6 +248,302 @@
     line-height: var(--text-9xl--line-height);
   }
 
+  /* 响应式 text-* 类 */
+  @include breakpoint(s) {
+    .sm\:text-xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
+    }
+    .sm\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+    .sm\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--text-base--line-height);
+    }
+    .sm\:text-md {
+      font-size: var(--text-md);
+      line-height: var(--text-md--line-height);
+    }
+    .sm\:text-lg {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+    }
+    .sm\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    .sm\:text-2xl {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    .sm\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+    }
+    .sm\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+    }
+    .sm\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+    }
+    .sm\:text-6xl {
+      font-size: var(--text-6xl);
+      line-height: var(--text-6xl--line-height);
+    }
+    .sm\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--text-7xl--line-height);
+    }
+    .sm\:text-8xl {
+      font-size: var(--text-8xl);
+      line-height: var(--text-8xl--line-height);
+    }
+    .sm\:text-9xl {
+      font-size: var(--text-9xl);
+      line-height: var(--text-9xl--line-height);
+    }
+  }
+
+  @include breakpoint(m) {
+    .md\:text-xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
+    }
+    .md\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+    .md\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--text-base--line-height);
+    }
+    .md\:text-md {
+      font-size: var(--text-md);
+      line-height: var(--text-md--line-height);
+    }
+    .md\:text-lg {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+    }
+    .md\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    .md\:text-2xl {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    .md\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+    }
+    .md\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+    }
+    .md\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+    }
+    .md\:text-6xl {
+      font-size: var(--text-6xl);
+      line-height: var(--text-6xl--line-height);
+    }
+    .md\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--text-7xl--line-height);
+    }
+    .md\:text-8xl {
+      font-size: var(--text-8xl);
+      line-height: var(--text-8xl--line-height);
+    }
+    .md\:text-9xl {
+      font-size: var(--text-9xl);
+      line-height: var(--text-9xl--line-height);
+    }
+  }
+
+  @include breakpoint(l) {
+    .lg\:text-xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
+    }
+    .lg\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+    .lg\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--text-base--line-height);
+    }
+    .lg\:text-md {
+      font-size: var(--text-md);
+      line-height: var(--text-md--line-height);
+    }
+    .lg\:text-lg {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+    }
+    .lg\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    .lg\:text-2xl {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    .lg\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+    }
+    .lg\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+    }
+    .lg\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+    }
+    .lg\:text-6xl {
+      font-size: var(--text-6xl);
+      line-height: var(--text-6xl--line-height);
+    }
+    .lg\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--text-7xl--line-height);
+    }
+    .lg\:text-8xl {
+      font-size: var(--text-8xl);
+      line-height: var(--text-8xl--line-height);
+    }
+    .lg\:text-9xl {
+      font-size: var(--text-9xl);
+      line-height: var(--text-9xl--line-height);
+    }
+  }
+
+  @include breakpoint(xl) {
+    .xl\:text-xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
+    }
+    .xl\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+    .xl\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--text-base--line-height);
+    }
+    .xl\:text-md {
+      font-size: var(--text-md);
+      line-height: var(--text-md--line-height);
+    }
+    .xl\:text-lg {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+    }
+    .xl\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    .xl\:text-2xl {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    .xl\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+    }
+    .xl\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+    }
+    .xl\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+    }
+    .xl\:text-6xl {
+      font-size: var(--text-6xl);
+      line-height: var(--text-6xl--line-height);
+    }
+    .xl\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--text-7xl--line-height);
+    }
+    .xl\:text-8xl {
+      font-size: var(--text-8xl);
+      line-height: var(--text-8xl--line-height);
+    }
+    .xl\:text-9xl {
+      font-size: var(--text-9xl);
+      line-height: var(--text-9xl--line-height);
+    }
+  }
+
+  @include breakpoint(2xl) {
+    .\32xl\:text-xs {
+      font-size: var(--text-xs);
+      line-height: var(--text-xs--line-height);
+    }
+    .\32xl\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--text-sm--line-height);
+    }
+    .\32xl\:text-base {
+      font-size: var(--text-base);
+      line-height: var(--text-base--line-height);
+    }
+    .\32xl\:text-md {
+      font-size: var(--text-md);
+      line-height: var(--text-md--line-height);
+    }
+    .\32xl\:text-lg {
+      font-size: var(--text-lg);
+      line-height: var(--text-lg--line-height);
+    }
+    .\32xl\:text-xl {
+      font-size: var(--text-xl);
+      line-height: var(--text-xl--line-height);
+    }
+    .\32xl\:text-2xl {
+      font-size: var(--text-2xl);
+      line-height: var(--text-2xl--line-height);
+    }
+    .\32xl\:text-3xl {
+      font-size: var(--text-3xl);
+      line-height: var(--text-3xl--line-height);
+    }
+    .\32xl\:text-4xl {
+      font-size: var(--text-4xl);
+      line-height: var(--text-4xl--line-height);
+    }
+    .\32xl\:text-5xl {
+      font-size: var(--text-5xl);
+      line-height: var(--text-5xl--line-height);
+    }
+    .\32xl\:text-6xl {
+      font-size: var(--text-6xl);
+      line-height: var(--text-6xl--line-height);
+    }
+    .\32xl\:text-7xl {
+      font-size: var(--text-7xl);
+      line-height: var(--text-7xl--line-height);
+    }
+    .\32xl\:text-8xl {
+      font-size: var(--text-8xl);
+      line-height: var(--text-8xl--line-height);
+    }
+    .\32xl\:text-9xl {
+      font-size: var(--text-9xl);
+      line-height: var(--text-9xl--line-height);
+    }
+  }
+
   .space-content {
     > * + *,
     > dl > * + * {

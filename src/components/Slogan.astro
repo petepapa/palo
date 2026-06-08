@@ -57,7 +57,7 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
   </Tag>
 )}
 
-<script define:vars={{ inlineId, marqueeId, animationSpeed }}>
+<script define:vars={{ inlineId, marqueeId, animationSpeed, direction }}>
   (function () {
     // 复用离屏探测元素，避免反复创建/销毁
     var probe = null;
@@ -134,11 +134,21 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
       }
 
       var distance = track.scrollWidth / 2;
+      
+      // 根据 direction 设置动画方向
+      var startTransform, endTransform;
+      if (direction === 'right') {
+        startTransform = 'translateX(-' + distance + 'px)';
+        endTransform = 'translateX(0)';
+      } else {
+        startTransform = 'translateX(0)';
+        endTransform = 'translateX(-' + distance + 'px)';
+      }
 
       track.animate(
         [
-          { transform: 'translateX(0)' },
-          { transform: 'translateX(-' + distance + 'px)' }
+          { transform: startTransform },
+          { transform: endTransform }
         ],
         {
           duration: animationSpeed * 1000,
@@ -150,8 +160,6 @@ const marqueeId = `slogan-marquee-${Math.random().toString(36).substr(2, 9)}`;
 
     // ========== 启动 ==========
     function init() {
-      // 利用 requestAnimationFrame 保证在下一帧测量，
-      // 字体和布局都已稳定，无需额外双 rAF
       requestAnimationFrame(function () {
         fitTextToWidth();
         setupMarquee();
