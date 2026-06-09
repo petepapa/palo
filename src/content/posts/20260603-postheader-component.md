@@ -1,6 +1,6 @@
 ---
-title: Mastering PostHeader Component
-description: A comprehensive guide to the PostHeader component, covering all parameters and customization options
+title: PostHeader Component
+description: Learn all about the PostHeader component - covering parameters for titles, subtitles, author information, publish dates, reading time, and customizable breadcrumb labels. Perfect for creating consistent post page headers
 publishDate: 2026-06-03
 author:
   name: "Pete"

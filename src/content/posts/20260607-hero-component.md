@@ -1,6 +1,6 @@
 ---
-title: "Mastering the Hero Component"
-description: "Learn how to use Palo's Hero component to create stunning, accessible page headers with customizable backgrounds, layouts, and interactive elements"
+title: Hero Component
+description: Build stunning page headers with the Hero component - featuring customizable backgrounds including images and videos, text overlays, call-to-action buttons, and responsive layouts. Supports useContainer parameter for flexible content containers
 publishDate: 2026-06-07
 author:
   name: "Pete"

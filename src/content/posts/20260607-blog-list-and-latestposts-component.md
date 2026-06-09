@@ -1,6 +1,6 @@
 ---
-title: Mastering Blog List Pages and LatestPosts Component
-description: A comprehensive guide to blog list pages, pagination, sorting options, and the LatestPosts component
+title: Blog List and LatestPosts Component
+description: Explore blog list pages in Palo - learn about pagination configuration, sorting options, and how to use the LatestPosts component to showcase recent blog posts with customizable layouts and styling options
 publishDate: 2026-06-07
 author:
   name: "Pete"

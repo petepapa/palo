@@ -1,6 +1,6 @@
 ---
 title: "Config Everything You Like"
-description: "Explore Palo theme's config.yaml configuration system - control your site's appearance, layout, and features through simple parameter settings"
+description: "Explore Palo theme's powerful config.yaml configuration system - control your site's appearance, layout options, header and footer settings, branding, and feature toggles through simple parameter settings. No coding required"
 publishDate: 2026-06-03
 author:
   name: "Pete"
@@ -59,7 +59,7 @@ site:
 | Parameter | Description | 说明 |
 |-----------|-------------|------|
 | `name` | Site name displayed in header and titles | 网站名称，会显示在页头和页面标题中 |
-| `titleSeparator` | Page title separator, e.g. "About \| Palo" | 页面标题的分隔符，例如 "关于我们 \| Palo" |
+| `titleSeparator` | Page title separator, e.g. "About | Palo" | 页面标题的分隔符，例如 "关于我们 | Palo" |
 | `trailingSlash` | Controls if URLs end with a slash | 控制 URL 是否以斜杠结尾 |
 | `defaultTheme` | Default theme: `auto`, `light`, or `dark` | 默认主题：`auto`（跟随系统）、`light`（浅色）或 `dark`（深色） |
 | `showDarkModeToggle` | Show/hide dark mode toggle button | 是否显示深色模式切换按钮 |

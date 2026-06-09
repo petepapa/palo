@@ -1,6 +1,6 @@
 ---
-title: Mastering Slogan Component (Beta)
-description: A comprehensive guide to the Slogan component, a versatile component for displaying brand slogans with multiple variants including marquee scrolling effects
+title: Slogan Component Beta
+description: Discover the Slogan component - a versatile tool for displaying brand messages with three display variants (default, inline, marquee scrolling). Learn about customizable speeds, scrolling directions, hover pause functionality, and how to control text styles through class parameters
 publishDate: 2026-06-09
 author:
   name: "Pete"

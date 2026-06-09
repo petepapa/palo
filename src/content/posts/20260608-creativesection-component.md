@@ -1,6 +1,6 @@
 ---
-title: Mastering CreativeSection Component
-description: A comprehensive guide to the CreativeSection component, a versatile section for hero areas with background media
+title: CreativeSection Component
+description: Learn how to use the CreativeSection component to create dynamic section layouts with background media (images and videos), flexible content containers, and various display modes. Supports useContainer parameter for controlling container behavior
 publishDate: 2026-06-08
 author:
   name: "Pete"
@@ -413,6 +413,8 @@ A section without container, allowing content to stretch to full width.
 ### Accessibility First
 
 The CreativeSection component is built with accessibility at its core:
+
+CreativeSection 组件以无障碍为核心构建：
 
 - **`prefers-reduced-motion` Support**: Videos are automatically hidden when users have motion reduction enabled
 - **Semantic HTML**: Uses proper `<section>` element for content grouping

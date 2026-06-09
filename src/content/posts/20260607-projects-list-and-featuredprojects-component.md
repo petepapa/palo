@@ -1,6 +1,6 @@
 ---
-title: Mastering Project List Pages and FeaturedProjects Component
-description: A comprehensive guide to project list pages, tag filtering, type filtering, and the FeaturedProjects component
+title: Projects List and FeaturedProjects Component
+description: Discover project portfolio pages in Palo - master tag filtering, type filtering, and learn how to use the FeaturedProjects component to display your work with beautiful card layouts and hover effects
 publishDate: 2026-06-07
 author:
   name: "Pete"

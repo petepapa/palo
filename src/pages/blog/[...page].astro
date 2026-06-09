@@ -58,8 +58,8 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   // ========== PAGINATION CONFIGURATION / 分页配置 ==========
   // Modify pageSize to change items per page
   // 修改 pageSize 来改变每页显示的文章数量
-  // Current: 6 items per page / 当前: 每页6篇文章
-  return paginate(postsWithImages, { pageSize: 6 })
+  // Current: 10 items per page / 当前: 每页10篇文章
+  return paginate(postsWithImages, { pageSize: 10 })
 }
 
 interface Props {

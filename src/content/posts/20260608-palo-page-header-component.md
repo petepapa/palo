@@ -1,6 +1,6 @@
 ---
-title: Mastering PaloPageHeader Component
-description: Learn how to use Palo's PaloPageHeader component to create beautiful page headers with titles, subtitles, and flexible layout options
+title: PaloPageHeader Component
+description: Master the PaloPageHeader component for creating elegant page headers - customize titles, subtitles, background colors, and content layouts. Supports the useContainer parameter to control content container behavior
 publishDate: 2026-06-08
 author:
   name: "Pete"

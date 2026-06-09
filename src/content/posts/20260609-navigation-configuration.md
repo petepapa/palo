@@ -1,6 +1,6 @@
 ---
-title: Mastering Navigation Configuration
-description: A comprehensive guide to configuring the main navigation menu, including menu items, social links, and customization options
+title: Navigation Configuration
+description: Learn how to customize your website's main navigation menu in Palo - add navigation items and dropdown menus, configure social media links, change menu order and visibility, and discover how AI can help you set up navigation effortlessly
 publishDate: 2026-06-09
 author:
   name: "Pete"
