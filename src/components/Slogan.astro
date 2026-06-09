@@ -225,11 +225,18 @@ const uid = Math.random().toString(36).substr(2, 9);
       });
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', startMarquee);
-    } else {
+    // 立即执行
+    startMarquee();
+
+    // 监听 Astro 页面导航事件
+    document.addEventListener('astro:page-load', function () {
       startMarquee();
-    }
+    });
+
+    // 同时也监听 astro:after-swap 作为备选
+    document.addEventListener('astro:after-swap', function () {
+      startMarquee();
+    });
 
     /** @type {number} */
     var marqueeTimer;
