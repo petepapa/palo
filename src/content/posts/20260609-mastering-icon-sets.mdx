@@ -1,0 +1,443 @@
+---
+title: Mastering Icon Sets
+description: A comprehensive guide to using icons in Palo, including Phosphor Icons integration, different styles, and usage examples
+publishDate: 2026-06-09
+author:
+  name: "Pete"
+  image: "/branding/avater.png"
+  bio: "PetePa.com"
+tags: ['Documentation', 'Icons', 'Design']
+coverImage: /posts/docs/icons.png
+coverImagePosition: head
+showBreadcrumbs: true
+customBreadcrumbLabels:
+  "blog": "博客"
+  "current": ""
+joinLastBreadcrumb: false
+source: "https://github.com/petepapa/palo"
+liveDemo: "https://palo.petepa.com/"
+showDivider: true
+showTableOfContents: true
+views: 600
+
+---
+
+import { Icon } from 'astro-icon/components'
+
+### Introduction
+
+Icons are essential visual elements that help users understand and navigate your website. Palo integrates with Phosphor Icons, one of the most comprehensive and versatile icon libraries available.
+
+Icons 是帮助用户理解和浏览网站的基本视觉元素。Palo 与 Phosphor Icons 集成，这是目前最全面，最通用的图标库之一。
+
+Phosphor Icons offers:
+- Thousands of icons in one unified family
+- Multiple visual styles (stroke, fill, duotone)
+- Various stroke weights
+- Consistent and cohesive design
+
+---
+
+### Icon Set: Phosphor Icons
+
+**Website**: [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/)
+
+Phosphor Icons is a flexible icon family for interfaces, diagrams, presentations, and more. It provides:
+
+Phosphor Icons 是一个灵活的图标系列，适用于界面、图表、演示等。它提供：
+
+#### Styles Available
+
+| Style | Description | When to Use |
+|-------|-------------|-------------|
+| **Regular** (默认) | Clean, balanced stroke weight | General purpose, UI elements |
+| **Fill** | Solid filled icons | Emphasis, buttons, active states |
+| **Bold** | Thicker strokes | Headings, large displays |
+| **Thin** | Delicate strokes | Elegant designs, small sizes |
+| **Light** | Light weight strokes | Modern, subtle designs |
+| **Duotone** | Two-tone with color fills | Decorative, feature highlights |
+
+#### Stroke Weights
+
+Phosphor offers multiple stroke weights that you can customize:
+
+| Weight | Stroke Size | Best For |
+|--------|-------------|----------|
+| Thin | 1px | Small icons, elegant designs |
+| Light | 1.5px | Clean, modern interfaces |
+| Regular | 2px | Default, balanced look |
+| Bold | 2.5px | Emphasis, larger displays |
+| Fill | N/A | Solid filled style |
+
+#### Icon Style Variations (Real Demo)
+
+Here's a real demonstration using the same icon (Heart) in all styles:
+
+<div class="flex flex-wrap gap-4 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart" size="64" />
+    <span class="text-sm font-medium">Regular</span>
+    <code class="text-xs text-muted">ph:heart</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart-fill" size="64" />
+    <span class="text-sm font-medium">Fill</span>
+    <code class="text-xs text-muted">ph:heart-fill</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart-bold" size="64" />
+    <span class="text-sm font-medium">Bold</span>
+    <code class="text-xs text-muted">ph:heart-bold</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart-thin" size="64" />
+    <span class="text-sm font-medium">Thin</span>
+    <code class="text-xs text-muted">ph:heart-thin</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart-light" size="64" />
+    <span class="text-sm font-medium">Light</span>
+    <code class="text-xs text-muted">ph:heart-light</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:heart-duotone" size="64" />
+    <span class="text-sm font-medium">Duotone</span>
+    <code class="text-xs text-muted">ph:heart-duotone</code>
+  </div>
+</div>
+
+And the same variations with another icon (Star):
+
+<div class="flex flex-wrap gap-4 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star" size="64" />
+    <span class="text-sm font-medium">Regular</span>
+    <code class="text-xs text-muted">ph:star</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star-fill" size="64" />
+    <span class="text-sm font-medium">Fill</span>
+    <code class="text-xs text-muted">ph:star-fill</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star-bold" size="64" />
+    <span class="text-sm font-medium">Bold</span>
+    <code class="text-xs text-muted">ph:star-bold</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star-thin" size="64" />
+    <span class="text-sm font-medium">Thin</span>
+    <code class="text-xs text-muted">ph:star-thin</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star-light" size="64" />
+    <span class="text-sm font-medium">Light</span>
+    <code class="text-xs text-muted">ph:star-light</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:star-duotone" size="64" />
+    <span class="text-sm font-medium">Duotone</span>
+    <code class="text-xs text-muted">ph:star-duotone</code>
+  </div>
+</div>
+
+And one more example with (House) icon:
+
+<div class="flex flex-wrap gap-4 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house" size="64" />
+    <span class="text-sm font-medium">Regular</span>
+    <code class="text-xs text-muted">ph:house</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house-fill" size="64" />
+    <span class="text-sm font-medium">Fill</span>
+    <code class="text-xs text-muted">ph:house-fill</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house-bold" size="64" />
+    <span class="text-sm font-medium">Bold</span>
+    <code class="text-xs text-muted">ph:house-bold</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house-thin" size="64" />
+    <span class="text-sm font-medium">Thin</span>
+    <code class="text-xs text-muted">ph:house-thin</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house-light" size="64" />
+    <span class="text-sm font-medium">Light</span>
+    <code class="text-xs text-muted">ph:house-light</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
+    <Icon name="ph:house-duotone" size="64" />
+    <span class="text-sm font-medium">Duotone</span>
+    <code class="text-xs text-muted">ph:house-duotone</code>
+  </div>
+</div>
+
+---
+
+### Search and Browse Icons
+
+Visit **[icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/)** to search and browse all available icons.
+
+You can:
+- Search by icon name (e.g., "github", "youtube", "home")
+- Filter by style (stroke, fill, duotone)
+- Preview different sizes
+- Copy icon names directly
+
+---
+
+### How to Use Icons in Palo
+
+#### Basic Usage
+
+Import and use icons in your Astro components:
+
+```astro
+---
+import { Icon } from 'astro-icon/components'
+---
+
+<!-- Basic icon -->
+<Icon name="ph:house" />
+
+<!-- With size -->
+<Icon name="ph:github-logo" size="24" />
+
+<!-- With custom color -->
+<Icon name="ph:youtube-logo" size="32" class="text-red-500" />
+```
+
+#### Using Different Styles
+
+Use style variants by changing the icon name:
+
+```astro
+<!-- Regular (default) -->
+<Icon name="ph:heart" size="32" />
+
+<!-- Fill style -->
+<Icon name="ph:heart-fill" size="32" />
+
+<!-- Bold style -->
+<Icon name="ph:heart-bold" size="32" />
+
+<!-- Thin style -->
+<Icon name="ph:heart-thin" size="32" />
+
+<!-- Light style -->
+<Icon name="ph:heart-light" size="32" />
+
+<!-- Duotone style -->
+<Icon name="ph:heart-duotone" size="32" />
+```
+
+#### Using in Navigation
+
+Add icons to your navigation items in `src/navigation.ts`:
+
+```typescript
+{
+  label: 'GitHub',
+  href: 'https://github.com/your-username',
+  icon: 'ph:github-logo',
+},
+```
+
+#### Using in Components
+
+```astro
+<button>
+  <Icon name="ph:magnifying-glass" size="20" />
+  Search
+</button>
+
+<!-- Or use it standalone -->
+<div class="flex items-center gap-2">
+  <Icon name="ph:envelope" size="24" />
+  <span>contact@example.com</span>
+</div>
+```
+
+---
+
+### Icon Showcase
+
+Here's a demonstration of different icon styles and sizes:
+
+#### Social Media Icons
+
+<div class="flex flex-wrap gap-6 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:github-logo" size="48" />
+    <span class="text-sm font-medium">GitHub</span>
+    <code class="text-xs text-muted">ph:github-logo</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:youtube-logo" size="48" />
+    <span class="text-sm font-medium">YouTube</span>
+    <code class="text-xs text-muted">ph:youtube-logo</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:x-logo" size="48" />
+    <span class="text-sm font-medium">X (Twitter)</span>
+    <code class="text-xs text-muted">ph:x-logo</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:linkedin-logo" size="48" />
+    <span class="text-sm font-medium">LinkedIn</span>
+    <code class="text-xs text-muted">ph:linkedin-logo</code>
+  </div>
+</div>
+
+#### UI Icons
+
+<div class="flex flex-wrap gap-6 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:house" size="48" />
+    <span class="text-sm font-medium">Home</span>
+    <code class="text-xs text-muted">ph:house</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:magnifying-glass" size="48" />
+    <span class="text-sm font-medium">Search</span>
+    <code class="text-xs text-muted">ph:magnifying-glass</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:gear" size="48" />
+    <span class="text-sm font-medium">Settings</span>
+    <code class="text-xs text-muted">ph:gear</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:user" size="48" />
+    <span class="text-sm font-medium">User</span>
+    <code class="text-xs text-muted">ph:user</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:envelope" size="48" />
+    <span class="text-sm font-medium">Email</span>
+    <code class="text-xs text-muted">ph:envelope</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:heart" size="48" />
+    <span class="text-sm font-medium">Heart</span>
+    <code class="text-xs text-muted">ph:heart</code>
+  </div>
+</div>
+
+#### Action Icons
+
+<div class="flex flex-wrap gap-6 my-8">
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:plus" size="48" />
+    <span class="text-sm font-medium">Plus</span>
+    <code class="text-xs text-muted">ph:plus</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:pencil" size="48" />
+    <span class="text-sm font-medium">Edit</span>
+    <code class="text-xs text-muted">ph:pencil</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:trash" size="48" />
+    <span class="text-sm font-medium">Delete</span>
+    <code class="text-xs text-muted">ph:trash</code>
+  </div>
+  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+    <Icon name="ph:download" size="48" />
+    <span class="text-sm font-medium">Download</span>
+    <code class="text-xs text-muted">ph:download</code>
+  </div>
+</div>
+
+#### Different Sizes
+
+<div class="flex items-end gap-8 my-8">
+  <div class="flex flex-col items-center gap-2">
+    <Icon name="ph:star" size="16" />
+    <span class="text-xs">16px</span>
+  </div>
+  <div class="flex flex-col items-center gap-2">
+    <Icon name="ph:star" size="24" />
+    <span class="text-xs">24px</span>
+  </div>
+  <div class="flex flex-col items-center gap-2">
+    <Icon name="ph:star" size="32" />
+    <span class="text-xs">32px</span>
+  </div>
+  <div class="flex flex-col items-center gap-2">
+    <Icon name="ph:star" size="48" />
+    <span class="text-xs">48px</span>
+  </div>
+  <div class="flex flex-col items-center gap-2">
+    <Icon name="ph:star" size="64" />
+    <span class="text-xs">64px</span>
+  </div>
+</div>
+
+---
+
+### Common Icon Names
+
+Here are some commonly used icons in Palo:
+
+#### Navigation & UI
+
+| Icon | Name | Use Case |
+|------|------|----------|
+| <Icon name="ph:house" size="20" /> | `ph:house` | Home link |
+| <Icon name="ph:list" size="20" /> | `ph:list` | Mobile menu |
+| <Icon name="ph:x" size="20" /> | `ph:x` | Close button |
+| <Icon name="ph:arrow-right" size="20" /> | `ph:arrow-right` | Next/Continue |
+| <Icon name="ph:arrow-left" size="20" /> | `ph:arrow-left` | Back |
+| <Icon name="ph:caret-down" size="20" /> | `ph:caret-down` | Dropdowns |
+| <Icon name="ph:magnifying-glass" size="20" /> | `ph:magnifying-glass` | Search input |
+| <Icon name="ph:gear" size="20" /> | `ph:gear` | Settings page |
+
+#### Social Media
+
+| Icon | Name |
+|------|------|
+| <Icon name="ph:github-logo" size="20" /> | `ph:github-logo` |
+| <Icon name="ph:youtube-logo" size="20" /> | `ph:youtube-logo` |
+| <Icon name="ph:x-logo" size="20" /> | `ph:x-logo` |
+| <Icon name="ph:linkedin-logo" size="20" /> | `ph:linkedin-logo` |
+| <Icon name="ph:chat-dots" size="20" /> | `ph:chat-dots` |
+
+#### Actions
+
+| Icon | Name | Use Case |
+|------|------|----------|
+| <Icon name="ph:plus" size="20" /> | `ph:plus` | Add new |
+| <Icon name="ph:pencil" size="20" /> | `ph:pencil` | Edit content |
+| <Icon name="ph:trash" size="20" /> | `ph:trash` | Delete action |
+| <Icon name="ph:download" size="20" /> | `ph:download` | Download file |
+| <Icon name="ph:share-network" size="20" /> | `ph:share-network` | Share content |
+| <Icon name="ph:arrow-square-out" size="20" /> | `ph:arrow-square-out` | External link |
+
+---
+
+### Tips
+
+1. **Consistency**: Use the same icon style throughout your site
+2. **Size Matters**: Match icon sizes to text sizes for visual harmony
+3. **Accessibility**: Always include text labels or ARIA descriptions for screen readers
+4. **Color**: Use Tailwind classes like `text-primary` for easy color customization
+
+1. **一致性**：在整个网站中使用相同的图标风格
+2. **尺寸**：将图标尺寸与文字尺寸匹配以获得视觉和谐
+3. **无障碍**：始终为屏幕阅读器添加文字标签或 ARIA 描述
+4. **颜色**：使用 Tailwind 类如 `text-primary` 以便轻松自定义颜色
+
+---
+
+### Conclusion
+
+Phosphor Icons provides everything you need for beautiful, consistent iconography in your Palo website. With multiple styles, weights, and thousands of icons to choose from, you can create a cohesive visual language for your project.
+
+Phosphor Icons 为您的 Palo 网站提供了美丽、一致的图标所需的一切。凭借多种风格、重量和数千种图标可供选择，您可以为您的项目创建统一的视觉语言。
+
+Remember to visit [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/) whenever you need to find a specific icon!
