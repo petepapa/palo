@@ -181,7 +181,7 @@ export const socialItems: SocialItem[] = [
 
 ### Available Icons
 
-Palo uses Phosphor Icons. You can find all available icons and learn how to use them in our [Icon Sets Guide](/blog/20260609-mastering-icon-sets).
+Palo uses Phosphor Icons. You can find all available icons and learn how to use them in our [Phosphor Icons Guide](/blog/20260609-phosphor-icons-guide).
 
 **Common Icons**:
 
