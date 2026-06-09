@@ -45,7 +45,7 @@ export const navigationItems: NavigationItem[] = [
   },
   {
     label: 'Go to our GitHub page, opens in new tab',
-    href: 'https://github.com/incluud/accessible-astro-starter',
+    href: 'https://github.com/petepapa/palo',
     icon: 'ph:github-logo',
     external: true,
     excludeFromLauncher: true,
@@ -58,17 +58,12 @@ export const navigationItems: NavigationItem[] = [
 export const socialItems: SocialItem[] = [
   {
     label: 'GitHub',
-    href: 'https://github.com/incluud/',
+    href: 'https://github.com/petepapa',
     icon: 'ph:github-logo',
   },
   {
-    label: 'Bluesky',
-    href: 'https://bsky.app/profile/incluud.dev',
-    icon: 'ph:chat-dots',
-  },
-  {
-    label: 'Open Collective',
-    href: 'https://opencollective.com/incluud',
-    icon: 'ph:hands-praying',
+    label: 'YouTube',
+    href: 'https://www.youtube.com/@petepatv',
+    icon: 'ph:youtube-logo',
   },
 ]

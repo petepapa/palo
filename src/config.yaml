@@ -24,7 +24,7 @@ metadata:
   title: 'Palo — The Astro Theme for Creative Portfolios'
   description: 'Palo is a minimalist Astro theme for artists, musicians, and designers. Control colors, typography, and layouts from one config file. Build your creative portfolio your way.a'
   author: Pete Lee
-  image: '/branding/social-preview-image.png'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
+  image: '/branding/social-preview-image.gif'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
   favicon: '/branding/favicon.svg'             # 标签页图标，放 /public 下 / Favicon, place in /public
 
 
