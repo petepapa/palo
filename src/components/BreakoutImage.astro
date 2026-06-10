@@ -84,7 +84,7 @@ const radiusClass = resolvedLayout === 'full'
   : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
 ---
 
-<div class:list={['relative', 'my-8', containerClasses]}>
+<div class:list={['relative', 'my-8', 'breakout-image-container', containerClasses]}>
   <Image
     src={src}
     alt={altText}
