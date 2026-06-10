@@ -22,13 +22,16 @@ interface Post {
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const posts = await getCollection('posts')
 
+  // 过滤草稿：仅保留已发布的文章
+  const publishedPosts = posts.filter((post) => !post.data.draft)
+
   // ========== SORTING CONFIGURATION / 排序配置 ==========
   // Modify the sort function below to change post order
   // 修改下方的排序函数来改变文章顺序
   // Current: Latest first (by publishDate) / 当前: 最新优先 (按发布日期)
   // Options: (a, b) => a.data.publishDate.valueOf() - b.data.publishDate.valueOf() - Earliest first / 最早优先
   //          (a, b) => a.data.title.localeCompare(b.data.title) - Alphabetical / 按字母序
-  const sortedPosts = [...posts].sort(
+  const sortedPosts = [...publishedPosts].sort(
     (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
   )
 

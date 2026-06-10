@@ -4,12 +4,12 @@ description: A practical guide to using Tailwind CSS utility classes for typogra
 publishDate: 2026-06-09
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Documentation', 'Tailwind', 'Typography', 'CSS']
 coverImage: /posts/docs/cover05.jpg
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 900
 
 ---

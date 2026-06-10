@@ -44,9 +44,9 @@ interface Props {
   }
   bgType?: 'primary' | 'secondary' | 'neutral' | 'gradient' | 'bordered'
   /**
-   * Whether to show the breadcrumbs
+   * Whether to show the breadcrumbs / 是否显示面包屑
    */
-  showBreadcrumbs?: boolean
+  breadcrumbs?: boolean
   /**
    * Custom breadcrumb labels to override the default URL-based labels
    * @description Object mapping URL segments to their display labels
@@ -64,7 +64,7 @@ const {
   title,
   subtitle,
   bgType,
-  showBreadcrumbs = true,
+  breadcrumbs = true,
   featuredImage,
   author,
   customBreadcrumbLabels,
@@ -97,7 +97,7 @@ const sanitizedSubtitle: string = subtitle
 <section class:list={[className, 'page-header']}>
   <div class="container my-3">
     {
-      showBreadcrumbs &&
+      breadcrumbs &&
         (() => {
           const path = Astro.url.pathname
           const segments = path.split('/').filter(Boolean)

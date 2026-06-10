@@ -4,7 +4,7 @@ import PaloPageHeader from '@components/PaloPageHeader.astro'
 import { Heading } from 'accessible-astro-components'
 
 const { frontmatter } = Astro.props
-const showTableOfContents = frontmatter.showTableOfContents ?? false
+const toc = frontmatter.toc ?? false
 const narrow = frontmatter.narrow ?? false
 const pageHeader = frontmatter.pageHeader
 const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
@@ -42,13 +42,13 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
   }
   <section class="my-12">
     <div class="container">
-      <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
+      <div class={`article-content ${toc ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
           <div class={`prose space-content ${narrow ? 'narrow' : ''}`}>
             <slot />
           </div>
         </div>
-        {showTableOfContents && (
+        {toc && (
           <div class="article-content__toc">
             <div class="article-toc space-content">
               <Heading level="h3" size="h4">On this page</Heading>

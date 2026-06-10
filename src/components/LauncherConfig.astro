@@ -90,11 +90,13 @@ const launcherBlogItems = await (async () => {
  *
  * @type {Array<{ label: string, href: string, keywords: Array<string> }>}
  */
-const launcherProjectItems = (await getCollection('projects')).map((project) => ({
-  label: project.data.title,
-  href: `/portfolio/${project.id}`,
-  keywords: [project.data.author, ...project.data.tags],
-}))
+const launcherProjectItems = (await getCollection('projects'))
+  .filter((project) => !project.data.draft)
+  .map((project) => ({
+    label: project.data.title,
+    href: `/portfolio/${project.id}`,
+    keywords: [project.data.author, ...project.data.tags],
+  }))
 
 /**
  * Navigation items for the launcher, built from the site-config navigation items.

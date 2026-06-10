@@ -5,8 +5,10 @@ import { Heading, Notification } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
-// Get all portfolio projects
-const projects = await getCollection('projects')
+// Get all portfolio projects (过滤草稿)
+const projects = (await getCollection('projects')).filter(
+  (project) => !project.data.draft,
+)
 
 // Define static pages with their descriptions
 const staticPages = [

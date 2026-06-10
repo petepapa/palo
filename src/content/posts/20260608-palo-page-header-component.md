@@ -4,12 +4,12 @@ description: Master the PaloPageHeader component for creating elegant page heade
 publishDate: 2026-06-08
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Components', 'Palo Theme', 'Page Headers', 'Web Design']
 coverImage: /posts/docs/cover03.jpg
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 1900
 ---
 

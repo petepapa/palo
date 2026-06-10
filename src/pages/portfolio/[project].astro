@@ -43,7 +43,10 @@ import {
 export async function getStaticPaths() {
   const projects = await getCollection('projects')
 
-  return projects.map((project) => ({
+  // 过滤草稿：draft=true 的项目不生成静态页面，不出现在任何列表
+  const publishedProjects = projects.filter((project) => !project.data.draft)
+
+  return publishedProjects.map((project) => ({
     params: { project: project.id },
     props: {},
   }))
@@ -103,14 +106,14 @@ const {
   title,
   description,
   author,
-  showBreadcrumbs,
+  breadcrumbs,
   source,
   liveDemo,
   customBreadcrumbLabels,
   joinLastBreadcrumb,
   showDivider,
   coverImagePosition,
-  showTableOfContents,
+  toc,
   narrow,
 } = projectEntry.data
 
@@ -133,7 +136,7 @@ const authorInfo = typeof author === 'object'
     subtitle={description}
     author={authorInfo}
     coverImage={coverImage}
-    showBreadcrumbs={showBreadcrumbs}
+    breadcrumbs={breadcrumbs}
     source={source}
     liveDemo={liveDemo}
     customBreadcrumbLabels={customBreadcrumbLabels}
@@ -143,18 +146,20 @@ const authorInfo = typeof author === 'object'
   />
   <section class="my-12">
     <div class="container">
-      <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
+      <div class={`article-content ${toc ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
-          <div class={`prose space-content ${!showTableOfContents ? 'narrow' : ''}`}>
+          <div class={`prose space-content ${!toc ? 'narrow' : ''}`}>
             {fallbackHtml ? <div set:html={fallbackHtml} /> : <Content />}
           </div>
-          <div class={`space-content mt-12 ${!showTableOfContents ? 'narrow' : ''}`}>
-            <Heading level="h5">Share this project</Heading>
-            <p>Like this project? Share it with your network!</p>
-            <SocialShares />
-          </div>
+          {projectEntry.data.share !== false && (
+            <div class={`space-content mt-12 ${!projectEntry.data.toc ? 'narrow' : ''}`}>
+              <Heading level="h5">Share this project</Heading>
+              <p>Like this project? Share it with your network!</p>
+              <SocialShares />
+            </div>
+          )}
         </div>
-        {showTableOfContents && (
+        {toc && (
           <div class="article-content__toc">
             <div class="article-toc space-content">
               <Heading level="h3" size="h4">On this page</Heading>

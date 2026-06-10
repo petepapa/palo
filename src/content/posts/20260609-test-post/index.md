@@ -4,15 +4,16 @@ description: This is a blank post.
 publishDate: 2026-06-10
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 coverImage: 
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showTableOfContents: true
-views: 2100
+toc: true
+draft: true
+share: true
 
 ---
 

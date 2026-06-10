@@ -4,12 +4,12 @@ description: Discover project portfolio pages in Palo - master tag filtering, ty
 publishDate: 2026-06-07
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'Portfolio', 'Projects']
 coverImage: /posts/docs/projectslist.png
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "Blog"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 1850
 ---
 

@@ -33,7 +33,10 @@ const pageHeaderAppearance = {
 }
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  const projects = await getCollection('projects')
+  // 过滤草稿：仅保留已发布的项目
+  const projects = (await getCollection('projects')).filter(
+    (project) => !project.data.draft,
+  )
   const uniqueTags = [...new Set(projects.map((project) => project.data.tags).flat())]
     .sort((a, b) => a.localeCompare(b))
     .map((label) => ({

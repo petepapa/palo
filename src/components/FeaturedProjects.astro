@@ -77,8 +77,10 @@ const listBaseClasses = [
   projectListGapClass,
 ]
 
-// Get projects from content collection
-const projects = await getCollection('projects')
+// Get projects from content collection (过滤草稿)
+const projects = (await getCollection('projects')).filter(
+  (project) => !project.data.draft,
+)
 
 // Sort projects based on sortBy parameter
 const sortedProjects = [...projects].sort((a, b) => {

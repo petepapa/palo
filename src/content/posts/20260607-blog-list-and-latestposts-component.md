@@ -4,12 +4,12 @@ description: Explore blog list pages in Palo - learn about pagination configurat
 publishDate: 2026-06-07
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'Blog', 'Posts']
 coverImage: /posts/docs/postslist.png
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "Blog"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 2100
 ---
 
@@ -412,7 +412,7 @@ description: A comprehensive guide to web accessibility
 publishDate: 2026-06-07
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
 tags: ['Accessibility', 'Web Development', 'CSS']
 coverImage: /posts/docs/cover01.jpg
 views: 1850

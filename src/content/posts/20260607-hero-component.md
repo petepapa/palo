@@ -4,12 +4,12 @@ description: Build stunning page headers with the Hero component - featuring cus
 publishDate: 2026-06-07
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Components', 'Palo Theme', 'Web Design', 'Hero Section']
 coverImage: /posts/docs/hero.png
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 2300
 
 ---

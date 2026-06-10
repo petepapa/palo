@@ -39,8 +39,8 @@ const { class: className, limit = 3, title = 'Latest posts', sortBy = 'latest' }
 
 const coverImageRatio = '8 / 5'
 
-// Get posts from content collection
-const posts = await getCollection('posts')
+// Get posts from content collection (过滤草稿)
+const posts = (await getCollection('posts')).filter((post) => !post.data.draft)
 
 // Sort posts based on sortBy parameter
 const sortedPosts = [...posts].sort((a, b) => {

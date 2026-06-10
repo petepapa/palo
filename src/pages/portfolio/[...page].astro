@@ -51,7 +51,9 @@ const pageHeaderAppearance = {
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   // Get all projects
-  const allProjects = await getCollection('projects')
+  const allProjects = (await getCollection('projects')).filter(
+    (project) => !project.data.draft,
+  )
   
   // Get all unique tags
   const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).flat())]
@@ -86,8 +88,10 @@ interface Props {
 
 const { page } = Astro.props
 
-// Get all unique tags for display (recalculate since getStaticPaths runs in isolation)
-const allProjects = await getCollection('projects')
+// Get all unique tags for display (过滤掉草稿)
+const allProjects = (await getCollection('projects')).filter(
+  (project) => !project.data.draft,
+)
 const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).flat())]
   .sort((a, b) => a.localeCompare(b))
   .map((label) => ({

@@ -4,12 +4,12 @@ description: Learn all about the PostHeader component - covering parameters for 
 publishDate: 2026-06-03
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'PostHeader']
 coverImage: /posts/docs/cover01.jpg
 coverImagePosition: top
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 1600
 
 ---
@@ -59,11 +59,11 @@ PostHeader 组件不仅仅是一个简单的头部 - 结合文章页面布局，
 
 #### Content Navigation Parameters
 
-##### `showTableOfContents`
+##### `toc`
 - **Type**: `boolean`
 - **Required**: `false`
 - **Default**: `true`
-- **Function**: Whether to display the table of contents sidebar
+- **Function**: Whether to display the table of contents sidebar (industry-standard abbreviation)
 
 This feature automatically extracts all H2, H3, and H4 headings from your content and creates a sticky navigation sidebar on the right (desktop) or at the top (mobile). Users can click on the links to jump directly to the corresponding sections, and the current section will be highlighted as they scroll.
 
@@ -73,7 +73,7 @@ This feature automatically extracts all H2, H3, and H4 headings from your conten
 
 **Example**:
 ```yaml
-showTableOfContents: true
+toc: true
 ```
 
 ---
@@ -179,7 +179,7 @@ The author object supports three properties:
 ```yaml
 author:
   name: "Pete"
-  image: "/avater.svg"
+  image: "/avatar.svg"
   bio: "PetePa.com"
 ```
 
@@ -187,11 +187,11 @@ author:
 
 #### Breadcrumb Parameters
 
-##### `showBreadcrumbs`
+##### `breadcrumbs`
 - **Type**: `boolean`
 - **Required**: `false`
 - **Default**: `true`
-- **Function**: Whether to display breadcrumb navigation
+- **Function**: Whether to display breadcrumb navigation (replaces legacy `showBreadcrumbs`)
 
 是否显示面包屑导航
 
@@ -280,7 +280,7 @@ A simple header with just a title and cover image.
 title: My Blog Post
 coverImage: /posts/post-image-1.jpg
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 showDivider: true
 ---
 ```
@@ -298,9 +298,9 @@ coverImage: /posts/docs/cover01.jpg
 coverImagePosition: head
 author:
   name: "Pete"
-  image: "/avater.svg"
+  image: "/avatar.svg"
   bio: "PetePa.com"
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -308,7 +308,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 ---
 ```
 

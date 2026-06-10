@@ -43,7 +43,10 @@ import {
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
 
-  return posts.map((post) => ({
+  // 过滤草稿：draft=true 的文章不生成静态页面，不出现在任何列表
+  const publishedPosts = posts.filter((post) => !post.data.draft)
+
+  return publishedPosts.map((post) => ({
     params: { post: post.id },
     props: {},
   }))
@@ -122,7 +125,7 @@ const authorInfo = typeof author === 'object'
     subtitle={description}
     author={authorInfo}
     coverImage={coverImage}
-    showBreadcrumbs={postEntry.data.showBreadcrumbs}
+    breadcrumbs={postEntry.data.breadcrumbs}
     source={postEntry.data.source}
     liveDemo={postEntry.data.liveDemo}
     customBreadcrumbLabels={postEntry.data.customBreadcrumbLabels}
@@ -132,18 +135,20 @@ const authorInfo = typeof author === 'object'
   />
   <section class="my-12">
     <div class="container">
-      <div class={`article-content ${postEntry.data.showTableOfContents ? 'article-content--with-toc' : ''}`}>
+      <div class={`article-content ${postEntry.data.toc ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
-          <div class={`prose space-content ${!postEntry.data.showTableOfContents ? 'narrow' : ''}`}>
+          <div class={`prose space-content ${!postEntry.data.toc ? 'narrow' : ''}`}>
             {fallbackHtml ? <div set:html={fallbackHtml} /> : <Content />}
           </div>
-          <div class={`space-content mt-12 ${!postEntry.data.showTableOfContents ? 'narrow' : ''}`}>
-            <Heading level="h5">Share this post</Heading>
-            <p>Like this post? Share it with your network!</p>
-            <SocialShares />
-          </div>
+          {postEntry.data.share !== false && (
+            <div class={`space-content mt-12 ${!postEntry.data.toc ? 'narrow' : ''}`}>
+              <Heading level="h5">Share this post</Heading>
+              <p>Like this post? Share it with your network!</p>
+              <SocialShares />
+            </div>
+          )}
         </div>
-        {postEntry.data.showTableOfContents && (
+        {postEntry.data.toc && (
           <div class="article-content__toc">
             <div class="article-toc space-content">
               <Heading level="h3" size="h4">On this page</Heading>

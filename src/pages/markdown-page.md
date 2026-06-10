@@ -2,7 +2,7 @@
 layout: ../layouts/MarkdownLayout.astro
 title: bella Markdown Page
 description: A clean content page powered by standard Markdown.
-showTableOfContents: true
+toc: true
 narrow: false
 
 pageHeader:

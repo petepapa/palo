@@ -4,12 +4,12 @@ description: "Explore Palo theme's powerful config.yaml configuration system - c
 publishDate: 2026-06-03
 author:
   name: "Pete"
-  image: "/branding/avater.png"
+  image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Configuration', 'Palo Theme', 'Web Design', 'YAML']
 coverImage: /posts/docs/config.png
 coverImagePosition: head
-showBreadcrumbs: true
+breadcrumbs: true
 customBreadcrumbLabels:
   "blog": "博客"
   "current": ""
@@ -17,7 +17,7 @@ joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
-showTableOfContents: true
+toc: true
 views: 1842
 
 ---
