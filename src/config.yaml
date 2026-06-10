@@ -24,8 +24,8 @@ metadata:
   title: 'Palo — The Astro Theme for Creative Portfolios'
   description: 'Palo is a minimalist Astro theme for artists, musicians, and designers. Control colors, typography, and layouts from one config file. Build your creative portfolio your way.a'
   author: Pete Lee
-  image: '/branding/social-preview-image.gif'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
-  favicon: '/branding/favicon.svg'             # 标签页图标，放 /public 下 / Favicon, place in /public
+  image: '@assets/branding/social-preview-image.gif'  # 社交分享预览图，放 /public 下 / Social sharing image, place in /public
+  favicon: '@assets/branding/favicon.svg'             # 标签页图标，放 /public 下 / Favicon, place in /public
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -38,8 +38,8 @@ branding:
 
   # Logo：两个都留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
   # Logo: leave both empty = show text logo, path = show image (place in /public)
-  logoLight: '/branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
-  logoDark: '/branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
+  logoLight: '@assets/branding/logo-light.svg' # 浅色主题 Logo / Logo for light theme
+  logoDark: '@assets/branding/logo-dark.svg'   # 深色主题 Logo / Logo for dark theme
   logoSize: '40px'  # Logo 大小：支持 40px / 3xl / text-3xl / --text-3xl；文字为字号，图片为高度 / Logo size: accepts 40px / 3xl / text-3xl / --text-3xl
 
   # ── 颜色 / Colors ────────────────────────────────────────────
@@ -61,7 +61,7 @@ branding:
 
   font:
     name: 'League Spartan'         # 字体族名称 / Font family name
-    path: '/fonts/League_Spartan/' # 字体目录，放 /public 下 / Font folder, place in /public
+    path: '@assets/fonts/League_Spartan/' # 字体目录，放 /public 下 / Font folder, place in /public
 
     # 各场景字重 / Font weights per context
     weights:
