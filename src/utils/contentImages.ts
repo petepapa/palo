@@ -1,6 +1,7 @@
 import type { ImageMetadata } from 'astro'
 import type { CollectionEntry, RenderResult } from 'astro:content'
 import { render } from 'astro:content'
+import defaultPostImage from '@assets/images/posts/default.png'
 
 export type ResolvedImage = ImageMetadata | string
 export type ContentCollection = 'posts' | 'projects'
@@ -14,6 +15,12 @@ export function isImageMetadata(value: unknown): value is ImageMetadata {
     'height' in value &&
     'format' in value
   )
+}
+
+export { defaultPostImage }
+
+export function getPostDefaultImage(): ImageMetadata {
+  return defaultPostImage
 }
 
 export function isPublicImagePath(path: string): boolean {
@@ -62,15 +69,6 @@ export function resolveRelativeImagePath(
   
   return relativePath
 }
-
-export const defaultPostImages = [
-  '/posts/post-image-1.jpg',
-  '/posts/post-image-2.jpg',
-  '/posts/post-image-3.jpg',
-  '/posts/post-image-4.jpg',
-  '/posts/post-image-5.jpg',
-  '/posts/post-image-6.jpg',
-] as const
 
 export function resolveContentImage(
   imagePath: string | ImageMetadata | undefined | null,

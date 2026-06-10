@@ -6,7 +6,7 @@ import { Heading } from 'accessible-astro-components'
 import { getCollection, getEntry } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { 
-  defaultPostImages, 
+  getPostDefaultImage, 
   resolveCollectionCoverImage, 
   type ResolvedImage,
   smartRender,
@@ -43,30 +43,25 @@ import {
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
 
-  return posts.map((post, index) => {
-    const coverImage = resolveCollectionCoverImage(
-      post.data.coverImage as ResolvedImage | undefined,
-      post.id,
-      'posts',
-      defaultPostImages[index % defaultPostImages.length],
-    )
-
-    return {
-      params: { post: post.id },
-      props: { coverImage },
-    }
-  })
+  return posts.map((post) => ({
+    params: { post: post.id },
+    props: {},
+  }))
 }
-
-const { coverImage } = Astro.props as { coverImage: ResolvedImage }
 
 const postId = Astro.params.post!
 const postEntry = await getEntry('posts', postId)
 
-// 第一层兜底：entry 不存在
 if (!postEntry) {
   throw new Error(`[blog/[post].astro] 找不到 content entry：posts/${postId}`)
 }
+
+const coverImage = resolveCollectionCoverImage(
+  postEntry.data.coverImage as ResolvedImage | undefined,
+  postId,
+  'posts',
+  getPostDefaultImage(),
+)
 
 // 🛡️ 智能渲染：带重试和自愈能力
 let Content: any = () => null

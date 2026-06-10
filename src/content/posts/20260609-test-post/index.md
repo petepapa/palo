@@ -7,7 +7,7 @@ author:
   image: "/branding/avater.png"
   bio: "PetePa.com"
 tags: ['Components', 'Documentation', 'CreativeSection']
-coverImage: ./cover.jpg
+coverImage: 
 coverImagePosition: head
 showBreadcrumbs: true
 customBreadcrumbLabels:

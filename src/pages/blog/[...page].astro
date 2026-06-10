@@ -6,7 +6,7 @@ import { Pagination } from 'accessible-astro-components'
 import type { PaginateFunction, Page } from 'astro'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { defaultPostImages, resolveCollectionCoverImage } from '@utils/contentImages'
+import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 
 type SortBy = 'latest' | 'popular' | 'earliest'
 
@@ -97,7 +97,7 @@ const pageHeaderAppearance = {
               post.coverImage,
               post.id,
               'posts',
-              defaultPostImages[(page.start + index) % defaultPostImages.length],
+              getPostDefaultImage(),
             )
 
             return (
