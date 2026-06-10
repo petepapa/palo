@@ -7,6 +7,7 @@ import { getCollection } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
+import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import type { PaginateFunction, Page } from 'astro'
@@ -68,10 +69,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   //          a.data.title.localeCompare(b.data.title) - Alphabetical / 按字母序
   const sortedProjects = [...allProjects].sort((a, b) => b.id.localeCompare(a.id))
 
-  const projectsWithImages = sortedProjects.map((project, index) => ({
-    ...project,
-    featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
-  }))
+  const projectsWithImages = sortedProjects
 
   // ========== PAGINATION CONFIGURATION / 分页配置 ==========
   // Modify pageSize to change items per page
@@ -124,11 +122,16 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
             style={`--project-list-gap: ${projectListGapSize}`}
           >
             {
-              page.data.map((project: any) => (
+              page.data.map((project: any, index: number) => (
                 <li class="project-masonry__item">
                   <ProjectCard
                     project={project}
-                    image={project.featuredImage}
+                    image={resolveCollectionCoverImage(
+                      project.data.coverImage,
+                      project.id,
+                      'projects',
+                      projectImages[(page.start + index) % projectImages.length],
+                    )}
                     layout="overlay"
                     headingLevel="h5"
                     descriptionClass="text-base"
@@ -147,11 +150,16 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
           style={`--project-list-gap: ${projectListGapSize}`}
         >
           {
-            page.data.map((project: any) => (
+            page.data.map((project: any, index: number) => (
               <li class="project-masonry__item">
                 <ProjectCard
                   project={project}
-                  image={project.featuredImage}
+                  image={resolveCollectionCoverImage(
+                    project.data.coverImage,
+                    project.id,
+                    'projects',
+                    projectImages[(page.start + index) % projectImages.length],
+                  )}
                   layout="overlay"
                   headingLevel="h5"
                   descriptionClass="text-base"

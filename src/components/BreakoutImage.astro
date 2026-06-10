@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets'
-
 /**
  * BreakoutImage Component
  *
@@ -16,11 +14,14 @@ import { Image } from 'astro:assets'
  * // Decorative image
  * <BreakoutImage src="/some-img.png" decorative />
  */
+import ContentImage from '@components/ContentImage.astro'
+import type { ImageMetadata } from 'astro'
+
 type Props = {
   /**
    * The image source
    */
-  src: string
+  src: string | ImageMetadata
   /**
    * The layout style of the image (default: 'full')
    * - 'full': Expands left and right to touch the screen edges, forced sharp/straight corners.
@@ -77,13 +78,12 @@ const radiusClass = resolvedLayout === 'full'
 ---
 
 <div class:list={['breakout-image-container', 'relative', 'my-8', containerClasses]}>
-  <Image
+  <ContentImage
     src={src}
     alt={altText}
     width={1400}
     height={700}
     class:list={['h-auto w-full object-cover', radiusClass]}
-    loading="lazy"
   />
   <div class:list={['absolute inset-0 shadow-inner pointer-events-none', radiusClass]}></div>
 </div>

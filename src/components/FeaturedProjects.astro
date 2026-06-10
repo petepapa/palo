@@ -5,6 +5,7 @@ import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
+import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 
@@ -97,7 +98,12 @@ const sortedProjects = [...projects].sort((a, b) => {
 // Limit projects and add featured images
 const featuredProjects = sortedProjects.slice(0, limit).map((project, index) => ({
   ...project,
-  featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
+  featuredImage: resolveCollectionCoverImage(
+    project.data.coverImage,
+    project.id,
+    'projects',
+    projectImages[index % projectImages.length],
+  ),
 }))
 ---
 

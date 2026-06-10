@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets'
+import ContentImage from '@components/ContentImage.astro'
 import type { ImageMetadata } from 'astro'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import themeConfig from '@config'
@@ -68,13 +68,7 @@ const cardRadius = themeConfig?.radius?.cardSize ?? themeConfig?.radius?.globalS
 
 <article class:list={['post-card grid grid-cols-1 gap-12 md:gap-24 md:grid-cols-2', className]}>
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
-    {
-      typeof image === 'string' ? (
-        <img src={image} alt={imageAlt} width="800" height="500" loading="lazy" decoding="async" class="post-card__image" />
-      ) : (
-        <Image src={image} alt={imageAlt} width={800} height={500} loading="lazy" class="post-card__image" />
-      )
-    }
+    <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" />
   </a>
   <div class="post-card__content space-content flex flex-col justify-center">
     <HeadingTag class="post-card__title">

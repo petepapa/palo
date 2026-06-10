@@ -6,15 +6,23 @@ import { Heading } from 'accessible-astro-components'
 import { getCollection, render } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { publicProjectImages } from '@utils/projectImages'
+import { projectImages } from '@utils/projectImages'
+import { getPublicImageUrl, resolveCollectionCoverImage, type ResolvedImage } from '@utils/contentImages'
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects')
 
   return projects.map((project, index) => {
+    const coverImage = resolveCollectionCoverImage(
+      project.data.coverImage,
+      project.id,
+      'projects',
+      projectImages[index % projectImages.length],
+    )
+
     const projectWithImage = {
       ...project,
-      coverImage: project.data.coverImage || publicProjectImages[index % publicProjectImages.length],
+      coverImage,
     }
 
     return {
@@ -25,10 +33,10 @@ export async function getStaticPaths() {
 }
 
 interface Props {
-  project: CollectionEntry<'projects'> & { coverImage: string }
+  project: CollectionEntry<'projects'> & { coverImage: ResolvedImage }
 }
 
-const { project } = Astro.props
+const { project } = Astro.props as Props
 const { Content } = await render(project)
 
 const {
@@ -59,7 +67,7 @@ const authorInfo = typeof author === 'object'
     }
 ---
 
-<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={project.coverImage}>
+<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={getPublicImageUrl(project.coverImage)}>
   <PostHeader
     title={title}
     subtitle={description}

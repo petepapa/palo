@@ -6,16 +6,7 @@ import { Pagination } from 'accessible-astro-components'
 import type { PaginateFunction, Page } from 'astro'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-
-// Default images from public/posts directory
-const defaultImages = [
-  '/posts/post-image-1.jpg',
-  '/posts/post-image-2.jpg',
-  '/posts/post-image-3.jpg',
-  '/posts/post-image-4.jpg',
-  '/posts/post-image-5.jpg',
-  '/posts/post-image-6.jpg',
-]
+import { defaultPostImages, resolveCollectionCoverImage } from '@utils/contentImages'
 
 type SortBy = 'latest' | 'popular' | 'earliest'
 
@@ -25,7 +16,7 @@ interface Post {
   description: string
   author: string
   publishDate: Date
-  featuredImage: string
+  coverImage?: string
   views: number
 }
 
@@ -43,14 +34,14 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
   )
 
-  const postsWithImages = sortedPosts.map((post, index) => {
+  const postsWithImages = sortedPosts.map((post) => {
     const { author: originalAuthor, ...rest } = post.data
     const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
     return {
       ...rest,
       id: post.id,
       author,
-      featuredImage: post.data.coverImage || defaultImages[index % defaultImages.length],
+      coverImage: post.data.coverImage,
       views: post.data.views || 0,
     }
   })
@@ -101,19 +92,28 @@ const pageHeaderAppearance = {
       <p class="text-sm"><em>Post {page.start + 1} through {page.end} of {page.total} total posts</em></p>
       <ul class="my-8 grid grid-cols-1 gap-24">
         {
-          page.data.map((post) => (
-            <li>
-              <PostCard
-                image={post.featuredImage}
-                imageRatio={coverImageRatio}
-                url={ensureTrailingSlash('/blog/' + post.id)}
-                title={post.title}
-                footer={post.author}
-              >
-                {post.description}
-              </PostCard>
-            </li>
-          ))
+          page.data.map((post, index) => {
+            const featuredImage = resolveCollectionCoverImage(
+              post.coverImage,
+              post.id,
+              'posts',
+              defaultPostImages[(page.start + index) % defaultPostImages.length],
+            )
+
+            return (
+              <li>
+                <PostCard
+                  image={featuredImage}
+                  imageRatio={coverImageRatio}
+                  url={ensureTrailingSlash('/blog/' + post.id)}
+                  title={post.title}
+                  footer={post.author}
+                >
+                  {post.description}
+                </PostCard>
+              </li>
+            )
+          })
         }
       </ul>
       {

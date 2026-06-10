@@ -4,13 +4,7 @@ import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-
-// Default images from public/posts directory
-const postImages = [
-  '/posts/post-image-1.jpg',
-  '/posts/post-image-2.jpg',
-  '/posts/post-image-3.jpg',
-]
+import { defaultPostImages, resolveCollectionCoverImage } from '@utils/contentImages'
 
 type SortBy = 'latest' | 'popular' | 'earliest'
 
@@ -70,7 +64,12 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
     title: post.data.title,
     description: post.data.description,
     author,
-    featuredImage: post.data.coverImage || postImages[index % postImages.length],
+    featuredImage: resolveCollectionCoverImage(
+      post.data.coverImage,
+      post.id,
+      'posts',
+      defaultPostImages[index % defaultPostImages.length],
+    ),
     url: ensureTrailingSlash(`/blog/${post.id}`),
   }
 })

@@ -8,6 +8,7 @@ import type { PaginateFunction, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { getProjectTypeDefinition, projectTypeIds } from '../../../../projectTypes'
 import { projectImages } from '@utils/projectImages'
+import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
@@ -40,10 +41,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
       slug: slugify(label),
     }))
 
-  const projectsWithImages = projects.map((project, index) => ({
-    ...project,
-    featuredImage: project.data.coverImage || projectImages[index % projectImages.length],
-  }))
+  const projectsWithImages = projects
 
   const allPaginatedPages: Array<any> = []
 
@@ -111,9 +109,18 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
       </p>
       <ul class:list={['mt-3 grid list-none grid-cols-1 p-0 md:grid-cols-2 lg:grid-cols-3', projectListWidthClass, projectListGapClass]}>
         {
-          page.data.map((project) => (
+          page.data.map((project, index) => (
             <li>
-              <ProjectCard project={project} image={project.featuredImage} layout="standard" />
+              <ProjectCard
+                project={project}
+                image={resolveCollectionCoverImage(
+                  project.data.coverImage,
+                  project.id,
+                  'projects',
+                  projectImages[(page.start + index) % projectImages.length],
+                )}
+                layout="standard"
+              />
             </li>
           ))
         }

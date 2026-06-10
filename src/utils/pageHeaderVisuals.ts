@@ -1,3 +1,5 @@
+import { getPublicImageUrl, resolveContentImage } from './contentImages'
+
 export type TopNavigationTheme = '' | 'dark' | 'light'
 
 interface PageHeaderVisualOptions {
@@ -23,7 +25,16 @@ export const normalizePublicAssetUrl = (value = ''): string => {
   return `/${trimmedValue.replace(/^\.?\//, '')}`
 }
 
-const cssUrl = (value: string): string => `url("${normalizePublicAssetUrl(value).replace(/"/g, '\\"')}")`
+/** Resolve public, @assets, or other supported image paths to a URL for CSS backgrounds. */
+export const resolveVisualImageUrl = (value = ''): string => {
+  const trimmedValue = String(value).trim()
+  if (!trimmedValue) return ''
+
+  const resolved = resolveContentImage(trimmedValue)
+  return getPublicImageUrl(resolved) ?? normalizePublicAssetUrl(trimmedValue)
+}
+
+const cssUrl = (value: string): string => `url("${resolveVisualImageUrl(value).replace(/"/g, '\\"')}")`
 
 export const resolveTopNavigationTheme = (value = ''): TopNavigationTheme => {
   const normalizedValue = String(value).trim()

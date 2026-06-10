@@ -5,21 +5,18 @@ import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
 import { getCollection, render } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { defaultPostImages, resolveCollectionCoverImage, type ResolvedImage } from '@utils/contentImages'
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
 
-  const defaultImages = [
-    '/posts/post-image-1.jpg',
-    '/posts/post-image-2.jpg',
-    '/posts/post-image-3.jpg',
-    '/posts/post-image-4.jpg',
-    '/posts/post-image-5.jpg',
-    '/posts/post-image-6.jpg',
-  ]
-
   return posts.map((post, index) => {
-    const coverImage = post.data.coverImage || defaultImages[index % defaultImages.length]
+    const coverImage = resolveCollectionCoverImage(
+      post.data.coverImage,
+      post.id,
+      'posts',
+      defaultPostImages[index % defaultPostImages.length],
+    )
 
     return {
       params: { post: post.id },
@@ -28,12 +25,12 @@ export async function getStaticPaths() {
   })
 }
 
-const { post, coverImage } = Astro.props
+const { post, coverImage } = Astro.props as { post: typeof Astro.props.post; coverImage: ResolvedImage }
 const { Content } = await render(post)
 
-const { title, description, author, publishDate, showBreadcrumbs, source, liveDemo, customBreadcrumbLabels, joinLastBreadcrumb, showDivider, coverImagePosition, showTableOfContents, narrow } = post.data
+const { title, description, author, publishDate } = post.data
 
-const formattedDate = publishDate.toLocaleDateString('en-US', {
+const formattedDate = publishDate?.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -58,28 +55,28 @@ const authorInfo = typeof author === 'object'
     subtitle={description}
     author={authorInfo}
     coverImage={coverImage}
-    showBreadcrumbs={showBreadcrumbs}
-    source={source}
-    liveDemo={liveDemo}
-    customBreadcrumbLabels={customBreadcrumbLabels}
-    joinLastBreadcrumb={joinLastBreadcrumb}
-    showDivider={showDivider}
-    coverImagePosition={coverImagePosition}
+    showBreadcrumbs={post.data.showBreadcrumbs}
+    source={post.data.source}
+    liveDemo={post.data.liveDemo}
+    customBreadcrumbLabels={post.data.customBreadcrumbLabels}
+    joinLastBreadcrumb={post.data.joinLastBreadcrumb}
+    showDivider={post.data.showDivider}
+    coverImagePosition={post.data.coverImagePosition}
   />
   <section class="my-12">
     <div class="container">
-      <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
+      <div class={`article-content ${post.data.showTableOfContents ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
-          <div class={`prose space-content ${!showTableOfContents ? 'narrow' : ''}`}>
+          <div class={`prose space-content ${!post.data.showTableOfContents ? 'narrow' : ''}`}>
             <Content />
           </div>
-          <div class={`space-content mt-12 ${!showTableOfContents ? 'narrow' : ''}`}>
+          <div class={`space-content mt-12 ${!post.data.showTableOfContents ? 'narrow' : ''}`}>
             <Heading level="h5">Share this post</Heading>
             <p>Like this post? Share it with your network!</p>
             <SocialShares />
           </div>
         </div>
-        {showTableOfContents && (
+        {post.data.showTableOfContents && (
           <div class="article-content__toc">
             <div class="article-toc space-content">
               <Heading level="h3" size="h4">On this page</Heading>
