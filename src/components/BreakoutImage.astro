@@ -13,13 +13,21 @@
  *
  * // Decorative image
  * <BreakoutImage src="/some-img.png" decorative />
+ *
+ * // Using co-located image (relative path)
+ * <BreakoutImage src="./cover.jpg" alt="My image" layout="full" />
  */
 import ContentImage from '@components/ContentImage.astro'
 import type { ImageMetadata } from 'astro'
+import { isRelativeContentImage } from '@utils/contentImages'
 
 type Props = {
   /**
    * The image source
+   * Can be:
+   * - An absolute path like `/images/my-image.jpg`
+   * - A relative path like `./cover.jpg` (requires contentId and collection)
+   * - An ImageMetadata object from Astro assets
    */
   src: string | ImageMetadata
   /**
@@ -34,6 +42,16 @@ type Props = {
    * Whether the image should break out of the container to be full width (default: true)
    */
   fullWidth?: boolean
+  /**
+   * The content ID (required when using relative paths)
+   * Example: 'project-01' or '20260611-asset-co-location-guide'
+   */
+  contentId?: string
+  /**
+   * The collection name (required when using relative paths)
+   * Either 'posts' or 'projects'
+   */
+  collection?: 'posts' | 'projects'
 } & (
   | {
       /**
@@ -52,7 +70,7 @@ type Props = {
     }
 )
 
-const { src, layout, fullWidth, decorative = false, alt = '' } = Astro.props
+const { src, layout, fullWidth, decorative = false, alt = '', contentId, collection } = Astro.props
 
 // Determine layout style, supporting backward compatibility with fullWidth
 let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
@@ -63,6 +81,37 @@ if (layout) {
 }
 
 const altText = decorative ? '' : alt
+
+let resolvedSrc = src
+
+if (typeof src === 'string' && isRelativeContentImage(src)) {
+  let resolvedContentId = contentId
+  let resolvedCollection = collection
+
+  if (!resolvedContentId || !resolvedCollection) {
+    const url = new URL(Astro.url)
+    const pathname = url.pathname
+    
+    if (pathname.startsWith('/portfolio/')) {
+      resolvedCollection = 'projects'
+      resolvedContentId = pathname.replace('/portfolio/', '').replace(/\/$/, '')
+    } else if (pathname.startsWith('/blog/')) {
+      resolvedCollection = 'posts'
+      resolvedContentId = pathname.replace('/blog/', '').replace(/\/$/, '')
+    }
+  }
+
+  if (resolvedContentId && resolvedCollection) {
+    const normalizedPath = src.replace(/^\.\//, '')
+    const basePath = resolvedCollection === 'posts' ? '/posts' : '/projects'
+    
+    const contentDir = resolvedContentId.includes('/') 
+      ? resolvedContentId.substring(0, resolvedContentId.lastIndexOf('/'))
+      : resolvedContentId
+    
+    resolvedSrc = `${basePath}/${contentDir}/${normalizedPath}`
+  }
+}
 
 // Define container spacing classes based on layout
 const containerClasses = {
@@ -79,7 +128,7 @@ const radiusClass = resolvedLayout === 'full'
 
 <div class:list={['breakout-image-container', 'relative', 'my-8', containerClasses]}>
   <ContentImage
-    src={src}
+    src={resolvedSrc}
     alt={altText}
     width={1400}
     height={700}

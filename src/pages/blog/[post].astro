@@ -3,16 +3,49 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PostHeader from '@components/PostHeader.astro'
 import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
-import { getCollection, render } from 'astro:content'
+import { getCollection, getEntry } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { defaultPostImages, resolveCollectionCoverImage, type ResolvedImage } from '@utils/contentImages'
+import { 
+  defaultPostImages, 
+  resolveCollectionCoverImage, 
+  type ResolvedImage,
+  smartRender,
+  getFallbackContentHtml,
+  isImageLoadingError,
+  isSchemaValidationError
+} from '@utils/contentImages'
+
+/**
+ * 动态路由：/blog/[post]
+ * 
+ * 终极防崩溃架构：
+ * 
+ * 第一层防护（Schema 层）：
+ *   - imageField 使用 .catch(undefined) 确保图片解析失败不阻断 collection
+ *   - 所有字段都有默认值和 catch 兜底
+ * 
+ * 第二层防护（路由层）：
+ *   - getStaticPaths 只传递纯数据 props（不传递 entry 对象）
+ *   - 路由主体用 getEntry() 重新获取完整 entry
+ *   - smartRender() 带指数退避重试机制
+ * 
+ * 第三层防护（渲染层）：
+ *   - render() 失败时显示友好的加载中占位符
+ *   - Dev 模式下显示错误详情和重新加载按钮
+ *   - 支持客户端自动重试和手动刷新
+ * 
+ * 自愈机制：
+ *   - 检测到图片加载错误时，自动使用 fallback 图片
+ *   - 检测到 Schema 验证错误时，跳过渲染并显示提示
+ *   - 支持指数退避重试策略
+ */
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
 
   return posts.map((post, index) => {
     const coverImage = resolveCollectionCoverImage(
-      post.data.coverImage,
+      post.data.coverImage as ResolvedImage | undefined,
       post.id,
       'posts',
       defaultPostImages[index % defaultPostImages.length],
@@ -20,15 +53,54 @@ export async function getStaticPaths() {
 
     return {
       params: { post: post.id },
-      props: { post, coverImage },
+      props: { coverImage },
     }
   })
 }
 
-const { post, coverImage } = Astro.props as { post: typeof Astro.props.post; coverImage: ResolvedImage }
-const { Content } = await render(post)
+const { coverImage } = Astro.props as { coverImage: ResolvedImage }
 
-const { title, description, author, publishDate } = post.data
+const postId = Astro.params.post!
+const postEntry = await getEntry('posts', postId)
+
+// 第一层兜底：entry 不存在
+if (!postEntry) {
+  throw new Error(`[blog/[post].astro] 找不到 content entry：posts/${postId}`)
+}
+
+// 🛡️ 智能渲染：带重试和自愈能力
+let Content: any = () => null
+let fallbackHtml: string | null = null
+const isDev = import.meta.env.DEV
+
+try {
+  const rendered = await smartRender(postEntry, {
+    maxRetries: 3,
+    retryDelay: 100,
+    onRetry: (attempt, error) => {
+      console.warn(`[smartRender] 第 ${attempt} 次重试渲染 ${postId}`, error.message)
+    },
+    onSuccess: () => {
+      console.info(`[smartRender] 成功渲染 ${postId}`)
+    },
+    onError: (error) => {
+      console.error(`[smartRender] 所有重试均失败 ${postId}`, error)
+    },
+  })
+  Content = rendered.Content
+} catch (error) {
+  const renderError = error instanceof Error ? error : new Error(String(error))
+  
+  if (isImageLoadingError(renderError)) {
+    console.warn(`[blog/[post].astro] 图片加载错误，将使用 fallback：`, renderError.message)
+  } else if (isSchemaValidationError(renderError)) {
+    console.warn(`[blog/[post].astro] Schema 验证错误：`, renderError.message)
+  }
+  
+  fallbackHtml = getFallbackContentHtml(postId, renderError, isDev)
+}
+
+const { title, description, author, publishDate } = postEntry.data
 
 const formattedDate = publishDate?.toLocaleDateString('en-US', {
   year: 'numeric',
@@ -49,34 +121,34 @@ const authorInfo = typeof author === 'object'
     }
 ---
 
-<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${post.id}`)}>
+<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${postId}`)}>
   <PostHeader
     title={title}
     subtitle={description}
     author={authorInfo}
     coverImage={coverImage}
-    showBreadcrumbs={post.data.showBreadcrumbs}
-    source={post.data.source}
-    liveDemo={post.data.liveDemo}
-    customBreadcrumbLabels={post.data.customBreadcrumbLabels}
-    joinLastBreadcrumb={post.data.joinLastBreadcrumb}
-    showDivider={post.data.showDivider}
-    coverImagePosition={post.data.coverImagePosition}
+    showBreadcrumbs={postEntry.data.showBreadcrumbs}
+    source={postEntry.data.source}
+    liveDemo={postEntry.data.liveDemo}
+    customBreadcrumbLabels={postEntry.data.customBreadcrumbLabels}
+    joinLastBreadcrumb={postEntry.data.joinLastBreadcrumb}
+    showDivider={postEntry.data.showDivider}
+    coverImagePosition={postEntry.data.coverImagePosition}
   />
   <section class="my-12">
     <div class="container">
-      <div class={`article-content ${post.data.showTableOfContents ? 'article-content--with-toc' : ''}`}>
+      <div class={`article-content ${postEntry.data.showTableOfContents ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
-          <div class={`prose space-content ${!post.data.showTableOfContents ? 'narrow' : ''}`}>
-            <Content />
+          <div class={`prose space-content ${!postEntry.data.showTableOfContents ? 'narrow' : ''}`}>
+            {fallbackHtml ? <div set:html={fallbackHtml} /> : <Content />}
           </div>
-          <div class={`space-content mt-12 ${!post.data.showTableOfContents ? 'narrow' : ''}`}>
+          <div class={`space-content mt-12 ${!postEntry.data.showTableOfContents ? 'narrow' : ''}`}>
             <Heading level="h5">Share this post</Heading>
             <p>Like this post? Share it with your network!</p>
             <SocialShares />
           </div>
         </div>
-        {post.data.showTableOfContents && (
+        {postEntry.data.showTableOfContents && (
           <div class="article-content__toc">
             <div class="article-toc space-content">
               <Heading level="h3" size="h4">On this page</Heading>
@@ -98,7 +170,6 @@ const authorInfo = typeof author === 'object'
     const tocContainer = document.querySelector('.article-toc nav ul')
     if (!tocContainer) return
 
-    // 从内容中找到所有 H2、H3 和 H4 标题
     const contentMain = document.querySelector('.article-content__main')
     if (!contentMain) return
 
@@ -109,7 +180,6 @@ const authorInfo = typeof author === 'object'
     ].sort((a, b) => a.offsetTop - b.offsetTop)
 
     if (headings.length === 0) {
-      // 如果没有标题，隐藏目录
       const tocWrapper = document.querySelector('.article-content__toc')
       const mainContent = document.querySelector('.article-content__main')
       if (tocWrapper) tocWrapper.style.display = 'none'
@@ -117,20 +187,16 @@ const authorInfo = typeof author === 'object'
       return
     }
 
-    // 为每个标题添加 id（如果没有的话）
     headings.forEach((heading, index) => {
       if (!heading.id) {
         const id = heading.textContent?.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') || `heading-${index}`
         heading.id = id
       }
-      // 添加滚动边距
       heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + 2rem)'
     })
 
-    // 生成导航链接
-    // 先清空容器避免重复
     tocContainer.innerHTML = ''
-    
+
     const navItems = headings.map((heading) => {
       const level = heading.tagName.toLowerCase()
       const li = document.createElement('li')
@@ -144,8 +210,6 @@ const authorInfo = typeof author === 'object'
     })
 
     navItems.forEach((item) => tocContainer.appendChild(item))
-
-    // 初始化导航高亮和滚动功能
     initTocNavigation()
   }
 
@@ -252,7 +316,6 @@ const authorInfo = typeof author === 'object'
       link.dataset.paloBound = 'true'
     })
 
-    // 设置初始激活状态
     const initialHash = window.location.hash.replace('#', '')
     if (initialHash) {
       const initialLink = document.querySelector(`.article-toc nav a[href="#${initialHash}"]`)
@@ -290,7 +353,7 @@ const authorInfo = typeof author === 'object'
     }
 
     .article-content__main {
-      min-width: 0; // 防止内容溢出
+      min-width: 0;
     }
 
     .article-content--with-toc .article-content__main {
@@ -346,7 +409,6 @@ const authorInfo = typeof author === 'object'
         font-size 0.22s var(--cubic-bezier),
         color 0.22s var(--cubic-bezier);
     }
-
 
     .article-toc .active {
       transform: scale(1.08) !important;

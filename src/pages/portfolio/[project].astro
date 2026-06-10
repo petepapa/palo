@@ -3,42 +3,109 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PostHeader from '@components/PostHeader.astro'
 import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
-import { getCollection, render } from 'astro:content'
-import type { CollectionEntry } from 'astro:content'
+import { getCollection, getEntry } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { projectImages } from '@utils/projectImages'
-import { getPublicImageUrl, resolveCollectionCoverImage, type ResolvedImage } from '@utils/contentImages'
+import { 
+  resolveCollectionCoverImage, 
+  type ResolvedImage,
+  smartRender,
+  getFallbackContentHtml,
+  isImageLoadingError,
+  isSchemaValidationError
+} from '@utils/contentImages'
+
+/**
+ * 动态路由：/portfolio/[project]
+ * 
+ * 终极防崩溃架构：
+ * 
+ * 第一层防护（Schema 层）：
+ *   - imageField 使用 .catch(undefined) 确保图片解析失败不阻断 collection
+ *   - 所有字段都有默认值和 catch 兜底
+ * 
+ * 第二层防护（路由层）：
+ *   - getStaticPaths 只传递纯数据 props（不传递 entry 对象）
+ *   - 路由主体用 getEntry() 重新获取完整 entry
+ *   - smartRender() 带指数退避重试机制
+ * 
+ * 第三层防护（渲染层）：
+ *   - render() 失败时显示友好的加载中占位符
+ *   - Dev 模式下显示错误详情和重新加载按钮
+ *   - 支持客户端自动重试和手动刷新
+ * 
+ * 自愈机制：
+ *   - 检测到图片加载错误时，自动使用 fallback 图片
+ *   - 检测到 Schema 验证错误时，跳过渲染并显示提示
+ *   - 支持指数退避重试策略
+ */
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects')
 
   return projects.map((project, index) => {
     const coverImage = resolveCollectionCoverImage(
-      project.data.coverImage,
+      project.data.coverImage as ResolvedImage | undefined,
       project.id,
       'projects',
       projectImages[index % projectImages.length],
     )
 
-    const projectWithImage = {
-      ...project,
-      coverImage,
-    }
-
     return {
       params: { project: project.id },
-      props: { project: projectWithImage },
+      props: { coverImage },
     }
   })
 }
 
 interface Props {
-  project: CollectionEntry<'projects'> & { coverImage: ResolvedImage }
+  coverImage: ResolvedImage
 }
 
-const { project } = Astro.props as Props
-const { coverImage } = project
-const { Content } = await render(project)
+const { coverImage } = Astro.props as Props
+
+const projectId = Astro.params.project!
+const projectEntry = await getEntry('projects', projectId)
+
+if (!projectEntry) {
+  throw new Error(`[portfolio/[project].astro] 找不到 content entry：projects/${projectId}`)
+}
+
+// 🛡️ 智能渲染：带重试和自愈能力
+let Content: any = () => null
+let fallbackHtml: string | null = null
+const isDev = import.meta.env.DEV
+
+try {
+  const rendered = await smartRender(projectEntry, {
+    maxRetries: 3,
+    retryDelay: 100,
+    onRetry: (attempt, error) => {
+      console.warn(`[smartRender] 第 ${attempt} 次重试渲染 ${projectId}`, error.message)
+    },
+    onSuccess: () => {
+      console.info(`[smartRender] 成功渲染 ${projectId}`)
+    },
+    onError: (error) => {
+      console.error(`[smartRender] 所有重试均失败 ${projectId}`, error)
+    },
+    renderProps: {
+      contentId: projectId,
+      collection: 'projects' as const,
+    },
+  })
+  Content = rendered.Content
+} catch (error) {
+  const renderError = error instanceof Error ? error : new Error(String(error))
+  
+  if (isImageLoadingError(renderError)) {
+    console.warn(`[portfolio/[project].astro] 图片加载错误，将使用 fallback：`, renderError.message)
+  } else if (isSchemaValidationError(renderError)) {
+    console.warn(`[portfolio/[project].astro] Schema 验证错误：`, renderError.message)
+  }
+  
+  fallbackHtml = getFallbackContentHtml(projectId, renderError, isDev)
+}
 
 const {
   title,
@@ -53,7 +120,7 @@ const {
   coverImagePosition,
   showTableOfContents,
   narrow,
-} = project.data
+} = projectEntry.data
 
 const authorInfo = typeof author === 'object'
   ? {
@@ -68,7 +135,7 @@ const authorInfo = typeof author === 'object'
     }
 ---
 
-<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={getPublicImageUrl(coverImage)}>
+<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/portfolio/${projectId}`)}>
   <PostHeader
     title={title}
     subtitle={description}
@@ -87,7 +154,7 @@ const authorInfo = typeof author === 'object'
       <div class={`article-content ${showTableOfContents ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
           <div class={`prose space-content ${!showTableOfContents ? 'narrow' : ''}`}>
-            <Content />
+            {fallbackHtml ? <div set:html={fallbackHtml} /> : <Content />}
           </div>
           <div class={`space-content mt-12 ${!showTableOfContents ? 'narrow' : ''}`}>
             <Heading level="h5">Share this project</Heading>
@@ -117,7 +184,6 @@ const authorInfo = typeof author === 'object'
     const tocContainer = document.querySelector('.article-toc nav ul')
     if (!tocContainer) return
 
-    // 从内容中找到所有 H2、H3 和 H4 标题
     const contentMain = document.querySelector('.article-content__main')
     if (!contentMain) return
 
@@ -128,7 +194,6 @@ const authorInfo = typeof author === 'object'
     ].sort((a, b) => a.offsetTop - b.offsetTop)
 
     if (headings.length === 0) {
-      // 如果没有标题，隐藏目录
       const tocWrapper = document.querySelector('.article-content__toc')
       const mainContent = document.querySelector('.article-content__main')
       if (tocWrapper) tocWrapper.style.display = 'none'
@@ -136,20 +201,16 @@ const authorInfo = typeof author === 'object'
       return
     }
 
-    // 为每个标题添加 id（如果没有的话）
     headings.forEach((heading, index) => {
       if (!heading.id) {
         const id = heading.textContent?.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') || `heading-${index}`
         heading.id = id
       }
-      // 添加滚动边距
       heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + 2rem)'
     })
 
-    // 生成导航链接
-    // 先清空容器避免重复
     tocContainer.innerHTML = ''
-    
+
     const navItems = headings.map((heading) => {
       const level = heading.tagName.toLowerCase()
       const li = document.createElement('li')
@@ -163,8 +224,6 @@ const authorInfo = typeof author === 'object'
     })
 
     navItems.forEach((item) => tocContainer.appendChild(item))
-
-    // 初始化导航高亮和滚动功能
     initTocNavigation()
   }
 
@@ -271,7 +330,6 @@ const authorInfo = typeof author === 'object'
       link.dataset.paloBound = 'true'
     })
 
-    // 设置初始激活状态
     const initialHash = window.location.hash.replace('#', '')
     if (initialHash) {
       const initialLink = document.querySelector(`.article-toc nav a[href="#${initialHash}"]`)
@@ -309,7 +367,7 @@ const authorInfo = typeof author === 'object'
     }
 
     .article-content__main {
-      min-width: 0; // 防止内容溢出
+      min-width: 0;
     }
 
     .article-content--with-toc .article-content__main {
@@ -365,7 +423,6 @@ const authorInfo = typeof author === 'object'
         font-size 0.22s var(--cubic-bezier),
         color 0.22s var(--cubic-bezier);
     }
-
 
     .article-toc .active {
       transform: scale(1.08) !important;

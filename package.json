@@ -10,7 +10,8 @@
     "dev": "astro dev --host 0.0.0.0",
     "dev:legacy": "node scripts/dev-legacy-watch.mjs",
     "start": "astro dev --host 0.0.0.0",
-    "build": "astro build",
+    "build": "npm run copy-images && astro build",
+    "copy-images": "node scripts/copy-colocated-images.mjs",
     "preview": "astro preview --host 0.0.0.0"
   },
   "keywords": [

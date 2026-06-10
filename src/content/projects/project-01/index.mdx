@@ -6,7 +6,7 @@ type: default
 tags: ['Accessibility', 'Smart-Home', 'IoT']
 showTableOfContents: false
 views: 250
-
+coverImage: ./cover.jpg
 ---
 
 ## Project Overview
@@ -17,13 +17,10 @@ import BlockQuote from '@components/BlockQuote.astro'
 import BreakoutImage from '@components/BreakoutImage.astro'
 import { Image } from 'astro:assets'
 
----
-// 默认full 撑满屏幕
-<BreakoutImage src="/projects/project-image-1.jpg" alt="描述" layout="full" />
+<BreakoutImage src="./cover.jpg" alt="描述" layout="full" />
 
-// contained 网站页面宽度
 <BreakoutImage src="/projects/project-image-1.jpg" alt="描述" layout="contained" />
-// wide 几乎全屏，保留圆角两侧有空隙
+
 <BreakoutImage src="/projects/project-image-1.jpg" layout="wide" decorative={true} />
 
 ## Technical Challenges
