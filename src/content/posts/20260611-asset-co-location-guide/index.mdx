@@ -1,0 +1,253 @@
+---
+title: Asset Co-location Guide
+description: Learn how to manage blog and project assets with the co-location pattern in Palo — keep images beside your content, get automatic Astro Image optimization for smaller page loads, and still use public paths when you need full-resolution originals
+publishDate: 2026-06-11
+author:
+  name: "Pete"
+  image: "/branding/avater.png"
+  bio: "PetePa.com"
+tags: ['Documentation', 'Content', 'Images', 'BreakoutImage']
+coverImage: ./cover.jpg
+coverImagePosition: head
+showBreadcrumbs: true
+customBreadcrumbLabels:
+  "blog": "Blog"
+  "current": ""
+joinLastBreadcrumb: false
+source: "https://github.com/petepapa/palo"
+liveDemo: "https://palo.petepa.com/"
+showDivider: true
+showTableOfContents: true
+views: 0
+---
+
+import BreakoutImage from '@components/BreakoutImage.astro'
+import breakoutFull from './breakout-full.jpg'
+import breakoutWide from './breakout-wide.jpg'
+import breakoutContained from './breakout-contained.jpg'
+
+### Introduction
+
+Palo supports a **content co-location / asset co-location** workflow: keep each post or project in its own folder, place images right next to the markdown file, and let the build pipeline optimize them automatically.
+
+This guide explains when to use co-located assets versus `public/`, how to write image paths, and which components already support both sources.
+
+Palo 支持**内容混用 / 资产共存**工作流：每篇文章或项目放在独立文件夹中，图片与 Markdown 文件放在一起，构建时由 Astro 自动优化。
+
+本指南说明何时使用共存资产、何时使用 `public/`，如何书写图片路径，以及哪些组件已支持双来源。
+
+
+### Why Co-location?
+
+#### Keep related files together
+
+Instead of scattering images across `public/posts/` and hunting for the right filename, everything for one article lives in one place:
+
+```
+src/content/posts/20260611-asset-co-location-guide/
+├── index.mdx
+├── cover.jpg
+├── breakout-full.jpg
+└── diagram.png
+```
+
+#### Smaller images, faster pages
+
+Images under `src/` are processed by Astro's built-in Image component at build time. Palo resolves co-located paths to `ImageMetadata`, then outputs formats like WebP at the display size you need — not the full original file.
+
+Typical benefits:
+- Cover images on list cards are resized to card dimensions (e.g. 800×500)
+- Post headers use a larger but still optimized variant (e.g. 1600×900)
+- Less bandwidth for readers, especially on mobile
+
+#### When `public/` is still the right choice
+
+Use `public/` when you need the **original, unprocessed file** served as-is — for example:
+- Screenshots or diagrams that must stay pixel-perfect at full resolution
+- Assets referenced by external tools or hard-coded URLs
+- Legacy content you do not want to move yet
+
+Palo still supports `public/` everywhere. Co-location is recommended for **new** content, not a forced migration.
+
+
+### Supported Image Sources
+
+Palo accepts images from three locations:
+
+| Source | Path example | Build behavior |
+|--------|--------------|----------------|
+| **Co-located** | `./cover.jpg` | Astro Image optimization |
+| **src/assets** | `@assets/images/foo.jpg` | Astro Image optimization |
+| **public** | `/posts/docs/hero.png` | Served as static file (original size) |
+
+
+### How to Reference Images
+
+#### 1. Frontmatter cover image (co-located)
+
+Place `cover.jpg` beside `index.mdx` and reference it with a relative path:
+
+```yaml
+title: Asset Co-location Guide
+coverImage: ./cover.jpg
+coverImagePosition: head
+```
+
+Wrap the fields above between YAML frontmatter delimiters (three dashes) at the top of your file.
+
+The cover is automatically optimized on the post page, blog list, and homepage LatestPosts.
+
+#### 2. Frontmatter cover image (src/assets)
+
+```yaml
+coverImage: @assets/images/projects/project-image-1.jpg
+```
+
+Equivalent forms also work: `assets/images/...`, `src/assets/images/...`, `/src/assets/images/...`.
+
+#### 3. Frontmatter cover image (public)
+
+```yaml
+coverImage: /posts/docs/cover01.jpg
+```
+
+No Astro resizing — the browser loads the file from `public/` at its original dimensions.
+
+#### 4. Images inside MDX body (co-located)
+
+Import the file, then pass the imported value to a component:
+
+```mdx
+import diagram from './diagram.png'
+
+<BreakoutImage src={diagram} alt="Architecture diagram" layout="contained" />
+```
+
+#### 5. Images inside MDX body (public)
+
+Pass a public URL string directly — useful when you need the original file:
+
+```mdx
+<BreakoutImage
+  src="/posts/post-image-1.jpg"
+  alt="Full-resolution reference screenshot"
+  layout="wide"
+/>
+```
+
+#### 6. Background images (Hero, PaloPageHeader, CreativeSection)
+
+These components use CSS `background-image`. They support `public/` paths and `@assets/...`, but not co-located `./` paths (no content folder context in a page-level prop):
+
+```astro
+<PaloPageHeader
+  title="Blog"
+  backgroundImage="/branding/hero-bg.png"
+/>
+
+<Hero backgroundImage="@assets/images/hero-bg.png" />
+```
+
+
+### BreakoutImage Live Demos
+
+The three demos below use **co-located** images imported from this post's folder. Astro optimizes each one at build time.
+
+#### Full layout (co-located)
+
+```mdx
+import breakoutFull from './breakout-full.jpg'
+
+<BreakoutImage src={breakoutFull} alt="Full width co-located image" layout="full" />
+```
+
+<BreakoutImage src={breakoutFull} alt="Full width co-located image" layout="full" />
+
+#### Wide layout (co-located)
+
+```mdx
+import breakoutWide from './breakout-wide.jpg'
+
+<BreakoutImage src={breakoutWide} alt="Wide co-located image" layout="wide" />
+```
+
+<BreakoutImage src={breakoutWide} alt="Wide co-located image" layout="wide" />
+
+#### Contained layout (co-located)
+
+```mdx
+import breakoutContained from './breakout-contained.jpg'
+
+<BreakoutImage src={breakoutContained} alt="Contained co-located image" layout="contained" />
+```
+
+<BreakoutImage src={breakoutContained} alt="Contained co-located image" layout="contained" />
+
+#### Public path comparison
+
+Same component, but pointing at `public/` — no Astro resize, original dimensions:
+
+```mdx
+<BreakoutImage
+  src="/posts/post-image-4.jpg"
+  alt="Public folder image at original size"
+  layout="contained"
+/>
+```
+
+<BreakoutImage
+  src="/posts/post-image-4.jpg"
+  alt="Public folder image at original size"
+  layout="contained"
+/>
+
+
+### Component & Page Support
+
+#### Components
+
+| Component | public | Co-located / `@assets` | Astro optimization |
+|-----------|:------:|:----------------------:|:------------------:|
+| PostHeader | ✅ | ✅ | ✅ |
+| LatestPosts | ✅ | ✅ | ✅ |
+| PostCard | ✅ | ✅ | ✅ |
+| ProjectCard | ✅ | ✅ | ✅ |
+| ContentImage | ✅ | ✅ | ✅ |
+| BreakoutImage | ✅ | ✅ (import) | ✅ |
+| PageHeader | ✅ | ✅ | ✅ |
+| PaloPageHeader | ✅ | @assets only | partial (CSS) |
+| Hero | ✅ | @assets only | partial (CSS) |
+| CreativeSection | ✅ | @assets only | partial (CSS) |
+| Card (library) | ✅ | ❌ | ❌ |
+
+**Note:** In MDX, co-located images must be **imported** before passing to `BreakoutImage`.
+
+**Note:** Background components use CSS `url()`. `@assets` images get a build-time hashed URL, but there is no responsive `srcset` like the Astro Image component provides.
+
+#### Pages
+
+| Page | public | Co-located / `@assets` | Astro optimization |
+|------|:------:|:----------------------:|:------------------:|
+| Blog post detail | ✅ | ✅ | ✅ |
+| Blog list | ✅ | ✅ | ✅ |
+| Homepage LatestPosts | ✅ | ✅ | ✅ |
+| Portfolio detail | ✅ | ✅ | ✅ |
+| Portfolio list | ✅ | ✅ | ✅ |
+| Portfolio tag / type pages | ✅ | ✅ | ✅ |
+| FeaturedProjects | ✅ | ✅ | ✅ |
+
+
+### Recommended Workflow
+
+1. **New posts and projects** — create a folder under `src/content/posts/` or `src/content/projects/` with `index.mdx` and local images.
+2. **Cover image** — use `./cover.jpg` in frontmatter.
+3. **Inline images in MDX** — `import` co-located files and pass to `BreakoutImage` or other components.
+4. **Shared site assets** — keep reusable images in `src/assets/` and reference with `@assets/...`.
+5. **Full-resolution originals** — keep in `public/` and use `/posts/...` or `/projects/...` paths when pixel-perfect size matters.
+
+
+### Summary
+
+Co-location keeps content maintainable and delivers smaller, faster images through Astro's build pipeline. `public/` remains available when you need untouched originals. Palo routes each path to the right renderer automatically — you only need to pick the source that fits your use case.
+
+资产共存让内容更易维护，并通过 Astro 构建管线输出更小、加载更快的图片。当需要原始尺寸时，`public/` 依然可用。Palo 会根据路径自动选择渲染方式——你只需按场景选择图片来源即可。

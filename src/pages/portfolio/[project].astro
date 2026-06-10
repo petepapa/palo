@@ -37,6 +37,7 @@ interface Props {
 }
 
 const { project } = Astro.props as Props
+const { coverImage } = project
 const { Content } = await render(project)
 
 const {
@@ -67,12 +68,12 @@ const authorInfo = typeof author === 'object'
     }
 ---
 
-<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={getPublicImageUrl(project.coverImage)}>
+<DefaultLayout title={project.data.title} description={project.data.description} url={ensureTrailingSlash(`/portfolio/${project.id}`)} image={getPublicImageUrl(coverImage)}>
   <PostHeader
     title={title}
     subtitle={description}
     author={authorInfo}
-    coverImage={project.coverImage}
+    coverImage={coverImage}
     showBreadcrumbs={showBreadcrumbs}
     source={source}
     liveDemo={liveDemo}
