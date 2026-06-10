@@ -36,10 +36,11 @@ Palo 支持**内容混用 / 资产共存**工作流：每篇文章或项目放�
 
 本指南说明何时使用共存资产、何时使用 `public/`，如何书写图片路径，以及哪些组件已支持双来源。
 
+---
 
 ### Why Co-location?
 
-#### Keep related files together
+#### Keep Related Files Together
 
 Instead of scattering images across `public/posts/` and hunting for the right filename, everything for one article lives in one place:
 
@@ -48,10 +49,12 @@ src/content/posts/20260611-asset-co-location-guide/
 ├── index.mdx
 ├── cover.jpg
 ├── breakout-full.jpg
+├── breakout-wide.jpg
+├── breakout-contained.jpg
 └── diagram.png
 ```
 
-#### Smaller images, faster pages
+#### Smaller Images, Faster Pages
 
 Images under `src/` are processed by Astro's built-in Image component at build time. Palo resolves co-located paths to `ImageMetadata`, then outputs formats like WebP at the display size you need — not the full original file.
 
@@ -60,15 +63,35 @@ Typical benefits:
 - Post headers use a larger but still optimized variant (e.g. 1600×900)
 - Less bandwidth for readers, especially on mobile
 
-#### When `public/` is still the right choice
+**关键优势**：图片文件位于 `src/` 目录下时，会在构建期由 Astro 的内置 Image 组件自动处理，将 co-located 路径解析为 `ImageMetadata`，然后根据显示需要输出 WebP 等优化格式，而不是原始大小的文件。
 
-Use `public/` when you need the **original, unprocessed file** served as-is — for example:
+---
+
+#### Recommended Approach: Co-location as Default
+
+**Content co-location is the recommended file management pattern for Palo.** Every post or project should live in its own folder alongside its images — this is how Palo is designed to work.
+
+Key advantages of the co-location pattern:
+- **Everything in one place** — Markdown and images stay together, making content easier to find and maintain
+- **Automatic optimization** — Images are automatically processed by Astro's Sharp engine (WebP conversion, responsive srcset, CLS-free sizing)
+- **Cleaner URLs** — No need to manually manage `public/posts/...` paths
+- **Portable content** — A post folder is self-contained and can be moved or shared as a single unit
+
+**推荐方式**：内容资源混用是 Palo 推荐的默认文件管理模式。每篇文章或项目应独立成文件夹，图片与 Markdown 放在一起——这正是 Palo 的设计初衷。
+
+---
+
+#### When `public/` is Still the Right Choice
+
+`public/` remains available as a fallback for specific edge cases where you need the **original, unprocessed file** served as-is:
+
 - Screenshots or diagrams that must stay pixel-perfect at full resolution
 - Assets referenced by external tools or hard-coded URLs
-- Legacy content you do not want to move yet
+- Quick one-off images that don't warrant a folder structure
 
-Palo still supports `public/` everywhere. Co-location is recommended for **new** content, not a forced migration.
+**特殊场景**：`public/` 目录仅作为补充方案，用于需要保留原始文件尺寸的特殊场景。混用模式是主流发布方式。
 
+---
 
 ### Supported Image Sources
 
@@ -76,14 +99,15 @@ Palo accepts images from three locations:
 
 | Source | Path example | Build behavior |
 |--------|--------------|----------------|
-| **Co-located** | `./cover.jpg` | Astro Image optimization |
-| **src/assets** | `@assets/images/foo.jpg` | Astro Image optimization |
+| **Co-located** | `./cover.jpg` | Astro Image optimization (WebP, srcset) |
+| **src/assets** | `@assets/images/foo.jpg` | Astro Image optimization (WebP, srcset) |
 | **public** | `/posts/docs/hero.png` | Served as static file (original size) |
 
+---
 
 ### How to Reference Images
 
-#### 1. Frontmatter cover image (co-located)
+#### Frontmatter Cover Image (Co-located)
 
 Place `cover.jpg` beside `index.mdx` and reference it with a relative path:
 
@@ -97,7 +121,11 @@ Wrap the fields above between YAML frontmatter delimiters (three dashes) at the 
 
 The cover is automatically optimized on the post page, blog list, and homepage LatestPosts.
 
-#### 2. Frontmatter cover image (src/assets)
+**使用方式**：将 `cover.jpg` 放在 `index.mdx` 同目录，然后在 frontmatter 中使用相对路径 `./cover.jpg` 即可。Astro 会自动将其交给 Sharp 引擎处理。
+
+---
+
+#### Frontmatter Cover Image (src/assets)
 
 ```yaml
 coverImage: @assets/images/projects/project-image-1.jpg
@@ -105,7 +133,11 @@ coverImage: @assets/images/projects/project-image-1.jpg
 
 Equivalent forms also work: `assets/images/...`, `src/assets/images/...`, `/src/assets/images/...`.
 
-#### 3. Frontmatter cover image (public)
+**使用方式**：也支持使用 `@assets/images/...` 的路径格式，指向 src/assets 目录中的共享资源。
+
+---
+
+#### Frontmatter Cover Image (public)
 
 ```yaml
 coverImage: /posts/docs/cover01.jpg
@@ -113,29 +145,305 @@ coverImage: /posts/docs/cover01.jpg
 
 No Astro resizing — the browser loads the file from `public/` at its original dimensions.
 
-#### 4. Images inside MDX body (co-located)
+**使用方式**：直接使用 `/posts/docs/...` 绝对路径，不会经过 Astro 优化。
 
-Import the file, then pass the imported value to a component:
+---
+
+### Image Syntax in MDX
+
+Palo supports multiple ways to insert images inside MDX body content. Choose the right approach based on your optimization needs.
+
+#### Method A: Astro `<Image />` Component — Import Once, Reuse Anywhere
+
+Import Astro's built-in `Image` component **once at the top of your MDX file**, then reuse it as many times as you need. `src` accepts public paths directly as strings — no per-image imports required. Style with Tailwind classes:
 
 ```mdx
+---
+import { Image } from 'astro:assets'
+---
+
+<!-- ✅ Public path, direct string — one import, unlimited reuse -->
+<Image
+  src="/projects/project-image-2.jpg"
+  alt="User interacting with the smart home system via voice commands"
+  width={1200}
+  height={600}
+  class="h-[250px] w-full rounded-lg object-cover"
+/>
+
+<!-- ✅ Reuse the same Image component later — no extra imports -->
+<Image
+  src="/posts/docs/hero.png"
+  alt="Another section hero"
+  width={1200}
+  height={600}
+  class="h-[250px] w-full rounded-lg object-cover"
+/>
+
+<!-- ✅ Co-located image via import — full Astro optimization -->
 import diagram from './diagram.png'
 
-<BreakoutImage src={diagram} alt="Architecture diagram" layout="contained" />
+<Image
+  src={diagram}
+  alt="Architecture diagram"
+  width={1200}
+  height={600}
+  class="h-[250px] w-full rounded-lg object-cover"
+/>
 ```
 
-#### 5. Images inside MDX body (public)
+**Benefits:**
+- **Import once, use everywhere** — one `import { Image }` covers the whole page
+- **Direct string `src`** — public paths like `/projects/...` work as plain strings, no per-image imports needed
+- Automatic WebP/AVIF conversion
+- Responsive `srcset` generation
+- Layout shift prevention (CLS optimization)
+- Style with Tailwind classes via the `class` prop
+- Build-time optimization by Sharp engine
 
-Pass a public URL string directly — useful when you need the original file:
+**使用说明**：**一次导入，处处复用**。在 MDX 顶部 `import { Image } from 'astro:assets'` 一次，之后在页面任何位置用 `<Image src="/路径" ... />` 直接写路径字符串即可。配合 `class` 使用 Tailwind 控制样式，无需额外 import 每张图片。对于同目录 co-located 图片，先 `import diagram from './diagram.png'` 再传入对象享受完整优化。
+
+---
+
+#### Method B: Markdown Syntax (Basic)
+
+Standard Markdown image syntax works in MDX:
+
+```mdx
+![Alt text](./diagram.png)
+```
+
+**Limitations:**
+- No Astro optimization pipeline
+- No responsive `srcset`
+- Relative paths resolved at render time
+
+**使用说明**：标准 Markdown 语法 `![](./diagram.png)` 可以工作，但不会触发 Astro 的优化管线。
+
+---
+
+#### Method C: HTML `<img>` Tag (Use with Caution)
+
+HTML image tags work, but **co-located relative paths are NOT supported in plain HTML**:
+
+```mdx
+<!-- ❌ This will fail in production build -->
+<img src="./diagram.png" alt="diagram" />
+
+<!-- ✅ Use public paths instead -->
+<img src="/posts/diagram.png" alt="diagram" />
+
+<!-- ✅ Or import the image and use its resolved src -->
+<img src={importedImage.src} alt="diagram" />
+```
+
+**Why co-located `./` paths fail in HTML:**
+
+Astro's `<Image />` and `getImage()` functions require either:
+- An imported `ImageMetadata` object (from `import img from './...'`), OR
+- A public absolute path (starting with `/`)
+
+Plain relative path strings like `"./diagram.png"` cannot be processed by Astro's Sharp engine, which needs compile-time metadata (dimensions, format, byte stream) to perform optimization. Attempting to use them will trigger:
+
+```
+LocalImageUsedWrongly: `Image`'s src parameter must be an imported
+image or an URL, it cannot be a string filepath. Received "./diagram.png".
+```
+
+**When to use HTML `<img>`:**
+- When you explicitly need the original, unprocessed image
+- For legacy content migration from standard Markdown
+- When Astro's optimization is not desired (e.g., already optimized external images)
+
+**使用说明**：原生 HTML `<img>` 标签的 `src="./diagram.png"` 相对路径不会被 Astro 处理，必须使用 public 绝对路径或 import 后的对象。
+
+---
+
+#### Method D: BreakoutImage Component — Simplest Usage with Direct Relative Paths
+
+Import Palo's `BreakoutImage` component **once at the top of your MDX file**, then reuse it throughout your page. **Simplest form: write the relative path directly as `src="./filename"` for co-located images — no image imports needed.** The component automatically routes images through Astro's optimization pipeline:
+
+```mdx
+import BreakoutImage from '@components/BreakoutImage.astro'
+
+<!-- ✅ Simplest usage — co-located image, direct relative path -->
+<BreakoutImage
+  src="./cover.jpg"
+  alt="Product hero shot"
+  layout="full"
+/>
+
+<!-- ✅ Another co-located image — same component, reused -->
+<BreakoutImage
+  src="./diagram.png"
+  alt="Architecture diagram"
+  layout="wide"
+/>
+
+<!-- ✅ Public path also works — direct string -->
+<BreakoutImage
+  src="/projects/project-image-2.jpg"
+  alt="User interacting with the smart home system via voice commands"
+  layout="contained"
+/>
+```
+
+**核心使用说明**：**一次导入组件，同目录图片直接写路径即可。** 在页面顶部 `import BreakoutImage from '@components/BreakoutImage.astro'` 一次，之后 `<BreakoutImage src="./cover.jpg" alt="..." layout="full" />` 直接写同目录文件名。组件内部通过 `import.meta.glob` 自动激活 Vite 优化管线，享受完整 WebP 压缩和响应式优化。通过 `layout` 属性在 `full`、`wide`、`contained` 三种布局间切换。
+
+---
+
+#### BreakoutImage Layout Options
+
+| Layout | Description | Use Case |
+|--------|-------------|----------|
+| `full` (default) | Expands to screen edges, sharp corners | Hero images, visual impact |
+| `wide` | Expands but leaves small gaps, rounded corners | Section headers, focal images |
+| `contained` | Stays within article width | Technical screenshots, diagrams |
+
+**三种布局说明**：
+- **full**：突破容器边缘到屏幕，锐角，适合 hero 图
+- **wide**：部分突破容器，圆角，适合章节头图
+- **contained**：保持在文章宽度内，适合内嵌图片
+
+---
+
+#### BreakoutImage Source Options
+
+`BreakoutImage` accepts any valid `src` — co-located files, public paths, or imported `ImageMetadata` objects. **Simplest form wins: write the co-located file name directly.**
+
+**Option 1: Direct Relative Path (RECOMMENDED — one import, write path directly)**
+
+```mdx
+import BreakoutImage from '@components/BreakoutImage.astro'
+
+<BreakoutImage src="./hero.jpg" alt="Hero section" layout="full" />
+<BreakoutImage src="./diagram.png" alt="Architecture diagram" layout="wide" />
+<BreakoutImage src="./*" alt="Contained co-located image" layout="contained" />
+```
+
+**方式一**（**最推荐**）：**一次导入组件，同目录图片直接写 `src="./文件名"` 即可。** 组件内部通过 `import.meta.glob` 自动定位 co-located 图片并交给 Astro 的 Sharp 引擎处理，享受完整优化管线（WebP、srcset、CLS-free）——无需手动 import 图片。
+
+---
+
+**Option 2: Public Path (Direct String)**
 
 ```mdx
 <BreakoutImage
-  src="/posts/post-image-1.jpg"
-  alt="Full-resolution reference screenshot"
+  src="/projects/project-image-2.jpg"
+  alt="User interacting with the smart home system via voice commands"
+  layout="contained"
+/>
+```
+
+**方式二**：使用 public 目录的绝对路径，保持原始尺寸，不经过 Astro 优化。
+
+---
+
+**Option 3: Import ImageMetadata (Explicit)**
+
+```mdx
+import BreakoutImage from '@components/BreakoutImage.astro'
+import hero from './hero.jpg'
+import diagram from './diagram.png'
+
+<BreakoutImage src={hero} alt="Hero section" layout="full" />
+<BreakoutImage src={diagram} alt="Architecture diagram" layout="wide" />
+```
+
+**方式三**：显式 import 图片对象传入组件，享受与 Astro `<Image />` 组件相同的优化效果，但写法更繁琐。
+
+---
+
+### Inline Images in MDX Body
+
+#### Using BreakoutImage (Full Layout Control)
+
+```mdx
+import BreakoutImage from '@components/BreakoutImage.astro'
+import myImage from './breakout-full.jpg'
+
+<BreakoutImage
+  src={myImage}
+  alt="Full width co-located image"
+  layout="full"
+/>
+```
+
+<BreakoutImage
+  src={breakoutFull}
+  alt="Full width co-located image"
+  layout="full"
+/>
+
+**效果说明**：图片突破文章容器，边缘到屏幕，自动 WebP 压缩 + 响应式 srcset。
+
+---
+
+#### Using BreakoutImage (Wide Layout)
+
+```mdx
+import myWideImage from './breakout-wide.jpg'
+
+<BreakoutImage
+  src={myWideImage}
+  alt="Wide co-located image"
   layout="wide"
 />
 ```
 
-#### 6. Background images (Hero, PaloPageHeader, CreativeSection)
+<BreakoutImage
+  src={breakoutWide}
+  alt="Wide co-located image"
+  layout="wide"
+/>
+
+**效果说明**：图片部分突破容器，保留与屏幕边缘的小间隙，圆角显示。
+
+---
+
+#### Using BreakoutImage (Contained Layout)
+
+```mdx
+import myContainedImage from './breakout-contained.jpg'
+
+<BreakoutImage
+  src={myContainedImage}
+  alt="Contained co-located image"
+  layout="contained"
+/>
+```
+
+<BreakoutImage
+  src={breakoutContained}
+  alt="Contained co-located image"
+  layout="contained"
+/>
+
+**效果说明**：图片保持在文章宽度内，与正文自然融合。
+
+---
+
+#### Using Public Path (No Optimization)
+
+```mdx
+<BreakoutImage
+  src="/posts/post-image-4.jpg"
+  alt="Public folder image at original size"
+  layout="contained"
+/>
+```
+
+<BreakoutImage
+  src="/posts/post-image-4.jpg"
+  alt="Public folder image at original size"
+  layout="contained"
+/>
+
+**效果说明**：使用 public 目录的绝对路径，保持原始尺寸，不经过 Astro 优化。
+
+---
+
+### Background Images (Hero, PaloPageHeader, CreativeSection)
 
 These components use CSS `background-image`. They support `public/` paths and `@assets/...`, but not co-located `./` paths (no content folder context in a page-level prop):
 
@@ -148,59 +456,9 @@ These components use CSS `background-image`. They support `public/` paths and `@
 <Hero backgroundImage="@assets/images/hero-bg.png" />
 ```
 
+**使用说明**：背景图组件使用 CSS `background-image`，不支持内容层级的相对路径。应使用 public 目录路径或 `@assets/...` 路径。
 
-### BreakoutImage Live Demos
-
-The three demos below use **co-located** images imported from this post's folder. Astro optimizes each one at build time.
-
-#### Full layout (co-located)
-
-```mdx
-import breakoutFull from './breakout-full.jpg'
-
-<BreakoutImage src={breakoutFull} alt="Full width co-located image" layout="full" />
-```
-
-<BreakoutImage src={breakoutFull} alt="Full width co-located image" layout="full" />
-
-#### Wide layout (co-located)
-
-```mdx
-import breakoutWide from './breakout-wide.jpg'
-
-<BreakoutImage src={breakoutWide} alt="Wide co-located image" layout="wide" />
-```
-
-<BreakoutImage src={breakoutWide} alt="Wide co-located image" layout="wide" />
-
-#### Contained layout (co-located)
-
-```mdx
-import breakoutContained from './breakout-contained.jpg'
-
-<BreakoutImage src={breakoutContained} alt="Contained co-located image" layout="contained" />
-```
-
-<BreakoutImage src={breakoutContained} alt="Contained co-located image" layout="contained" />
-
-#### Public path comparison
-
-Same component, but pointing at `public/` — no Astro resize, original dimensions:
-
-```mdx
-<BreakoutImage
-  src="/posts/post-image-4.jpg"
-  alt="Public folder image at original size"
-  layout="contained"
-/>
-```
-
-<BreakoutImage
-  src="/posts/post-image-4.jpg"
-  alt="Public folder image at original size"
-  layout="contained"
-/>
-
+---
 
 ### Component & Page Support
 
@@ -213,16 +471,16 @@ Same component, but pointing at `public/` — no Astro resize, original dimensio
 | PostCard | ✅ | ✅ | ✅ |
 | ProjectCard | ✅ | ✅ | ✅ |
 | ContentImage | ✅ | ✅ | ✅ |
-| BreakoutImage | ✅ | ✅ (import) | ✅ |
+| BreakoutImage | ✅ | ✅ (import or relative path with context) | ✅ |
 | PageHeader | ✅ | ✅ | ✅ |
 | PaloPageHeader | ✅ | @assets only | partial (CSS) |
 | Hero | ✅ | @assets only | partial (CSS) |
 | CreativeSection | ✅ | @assets only | partial (CSS) |
 | Card (library) | ✅ | ❌ | ❌ |
 
-**Note:** In MDX, co-located images must be **imported** before passing to `BreakoutImage`.
+**重要提示**：在 MDX 正文中，co-located 图片必须通过 import 或带 context 的相对路径，才能被 BreakoutImage 和其他优化组件正确处理。
 
-**Note:** Background components use CSS `url()`. `@assets` images get a build-time hashed URL, but there is no responsive `srcset` like the Astro Image component provides.
+---
 
 #### Pages
 
@@ -236,18 +494,50 @@ Same component, but pointing at `public/` — no Astro resize, original dimensio
 | Portfolio tag / type pages | ✅ | ✅ | ✅ |
 | FeaturedProjects | ✅ | ✅ | ✅ |
 
+---
 
 ### Recommended Workflow
 
-1. **New posts and projects** — create a folder under `src/content/posts/` or `src/content/projects/` with `index.mdx` and local images.
-2. **Cover image** — use `./cover.jpg` in frontmatter.
-3. **Inline images in MDX** — `import` co-located files and pass to `BreakoutImage` or other components.
-4. **Shared site assets** — keep reusable images in `src/assets/` and reference with `@assets/...`.
-5. **Full-resolution originals** — keep in `public/` and use `/posts/...` or `/projects/...` paths when pixel-perfect size matters.
+**The co-location pattern is the default approach for all new content. Simplest usage wins.**
 
+1. **New posts and projects** — create a folder under `src/content/posts/` or `src/content/projects/` with `index.mdx` and local images. This is the recommended way to work with Palo.
+2. **Cover image** — use `./cover.jpg` in frontmatter (automatic WebP optimization — no extra work needed).
+3. **Inline images in MDX** — use `<BreakoutImage src="./hero.jpg" alt="..." layout="full" />` — write the relative path directly, the component handles optimization automatically.
+4. **Shared site assets** — keep reusable images in `src/assets/` and reference with `@assets/...` (site-wide resources, not per-post).
+5. **Full-resolution originals** — `public/` is a fallback only; use `/posts/...` or `/projects/...` paths when pixel-perfect size is critical.
+
+**推荐工作流**：
+**内容资源混用模式是所有新内容的默认发布方式。最简单的写法就是最好的写法。**
+1. 新建文章/项目时，在 `src/content/posts/` 或 `src/content/projects/` 下创建文件夹，这是 Palo 推荐的工作方式。
+2. 封面图使用 frontmatter 中的 `./cover.jpg`（自动 WebP 优化，无需额外配置）。
+3. MDX 正文中的图片，直接写 `<BreakoutImage src="./hero.jpg" alt="..." layout="full" />` — 同目录图片直接写相对路径即可，组件自动处理优化。
+4. 站点共享资源放在 `src/assets/`，使用 `@assets/...` 引用。
+5. 需保持原始尺寸的特殊场景，使用 `public/` 目录作为备选方案。
+
+---
+
+### Image Syntax Quick Reference
+
+| Syntax | Optimization | Co-located Support | Pattern | Best For |
+|--------|:------------:|:-------------------:|---------|----------|
+| `BreakoutImage` | ✅ WebP + srcset | ✅ (`./filename` works directly) | `import` component once, write `src="./..."` | Hero, full-width images (**RECOMMENDED**) |
+| `{Image}` from `astro:assets` | ✅ WebP + srcset | ✅ (with per-image import) or ✅ public paths as strings | `import` once, reuse with `src="/..."` string | Blog posts, inline images |
+| Markdown `![](./)` | ❌ | ✅ (relative path) | Plain markdown | Quick drafts, legacy |
+| HTML `<img src="">` | ❌ | ❌ (use public) | Direct HTML | External images, originals |
+| Frontmatter `coverImage` | ✅ WebP + srcset | ✅ | YAML `./cover.jpg` | Post/Project headers |
+
+**快速参考**：**一次导入组件（`BreakoutImage` 或 `Image`），多处复用，同目录图片直接写 `src="./文件名"`**。BreakoutImage 提供最强的布局控制与最简单的 co-location 体验，是 Palo 的默认推荐方式。
+
+---
 
 ### Summary
 
-Co-location keeps content maintainable and delivers smaller, faster images through Astro's build pipeline. `public/` remains available when you need untouched originals. Palo routes each path to the right renderer automatically — you only need to pick the source that fits your use case.
+**Content co-location is the recommended default pattern for Palo.** Place your Markdown and images in the same folder, reference images with relative paths like `./cover.jpg`, and Astro automatically handles WebP compression, responsive sizing, and performance optimization — no manual configuration required.
 
-资产共存让内容更易维护，并通过 Astro 构建管线输出更小、加载更快的图片。当需要原始尺寸时，`public/` 依然可用。Palo 会根据路径自动选择渲染方式——你只需按场景选择图片来源即可。
+`public/` is reserved as a fallback for the rare cases where you need unprocessed, full-resolution originals. Palo intelligently routes each path to the appropriate renderer, but co-location is where the platform shines.
+
+**核心总结**：**内容资源混用模式是 Palo 推荐的默认发布方式**。将 Markdown 与图片放在同一目录，使用 `./filename.jpg` 相对路径引用，Astro 自动完成 WebP 压缩、响应式尺寸优化和性能提升——无需手动配置。
+
+`public/` 目录仅作为需要原始尺寸文件的特殊场景备选。Palo 会根据路径自动选择正确的渲染方式，但混用模式才是平台的设计精髓。
+
+混用模式让内容更易维护、文件更小、加载更快，是 Palo 的推荐架构。当需要原始文件时，`public/` 依然可用作为补充。
