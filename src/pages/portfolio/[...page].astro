@@ -6,7 +6,7 @@ import { Heading, Link, Pagination } from 'accessible-astro-components'
 import { getCollection } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { projectImages } from '@utils/projectImages'
+import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
@@ -122,7 +122,7 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
             style={`--project-list-gap: ${projectListGapSize}`}
           >
             {
-              page.data.map((project: any, index: number) => (
+              page.data.map((project: any) => (
                 <li class="project-masonry__item">
                   <ProjectCard
                     project={project}
@@ -130,7 +130,7 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
                       project.data.coverImage,
                       project.id,
                       'projects',
-                      projectImages[(page.start + index) % projectImages.length],
+                      getProjectTypeDefaultImage(project.data.type),
                     )}
                     layout="overlay"
                     headingLevel="h5"
@@ -150,7 +150,7 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
           style={`--project-list-gap: ${projectListGapSize}`}
         >
           {
-            page.data.map((project: any, index: number) => (
+            page.data.map((project: any) => (
               <li class="project-masonry__item">
                 <ProjectCard
                   project={project}
@@ -158,7 +158,7 @@ const uniqueTags = [...new Set(allProjects.map((project) => project.data.tags).f
                     project.data.coverImage,
                     project.id,
                     'projects',
-                    projectImages[(page.start + index) % projectImages.length],
+                    getProjectTypeDefaultImage(project.data.type),
                   )}
                   layout="overlay"
                   headingLevel="h5"

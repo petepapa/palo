@@ -5,7 +5,7 @@ import SocialShares from '@components/SocialShares.astro'
 import { Heading } from 'accessible-astro-components'
 import { getCollection, getEntry } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { projectImages } from '@utils/projectImages'
+import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { 
   resolveCollectionCoverImage, 
   type ResolvedImage,
@@ -43,26 +43,11 @@ import {
 export async function getStaticPaths() {
   const projects = await getCollection('projects')
 
-  return projects.map((project, index) => {
-    const coverImage = resolveCollectionCoverImage(
-      project.data.coverImage as ResolvedImage | undefined,
-      project.id,
-      'projects',
-      projectImages[index % projectImages.length],
-    )
-
-    return {
-      params: { project: project.id },
-      props: { coverImage },
-    }
-  })
+  return projects.map((project) => ({
+    params: { project: project.id },
+    props: {},
+  }))
 }
-
-interface Props {
-  coverImage: ResolvedImage
-}
-
-const { coverImage } = Astro.props as Props
 
 const projectId = Astro.params.project!
 const projectEntry = await getEntry('projects', projectId)
@@ -70,6 +55,13 @@ const projectEntry = await getEntry('projects', projectId)
 if (!projectEntry) {
   throw new Error(`[portfolio/[project].astro] 找不到 content entry：projects/${projectId}`)
 }
+
+const coverImage = resolveCollectionCoverImage(
+  projectEntry.data.coverImage as ResolvedImage | undefined,
+  projectId,
+  'projects',
+  getProjectTypeDefaultImage(projectEntry.data.type),
+)
 
 // 🛡️ 智能渲染：带重试和自愈能力
 let Content: any = () => null

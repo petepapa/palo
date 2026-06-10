@@ -7,7 +7,7 @@ import { getCollection } from 'astro:content'
 import type { PaginateFunction, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { getProjectTypeDefinition, projectTypeIds } from '../../../../projectTypes'
-import { projectImages } from '@utils/projectImages'
+import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
@@ -109,7 +109,7 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
       </p>
       <ul class:list={['mt-3 grid list-none grid-cols-1 p-0 md:grid-cols-2 lg:grid-cols-3', projectListWidthClass, projectListGapClass]}>
         {
-          page.data.map((project, index) => (
+          page.data.map((project) => (
             <li>
               <ProjectCard
                 project={project}
@@ -117,7 +117,7 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
                   project.data.coverImage,
                   project.id,
                   'projects',
-                  projectImages[(page.start + index) % projectImages.length],
+                  getProjectTypeDefaultImage(project.data.type),
                 )}
                 layout="standard"
               />

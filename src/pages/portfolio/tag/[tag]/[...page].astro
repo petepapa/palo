@@ -8,7 +8,7 @@ import type { GetStaticPaths, Page } from 'astro'
 import type { CollectionEntry } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
-import { projectImages } from '@utils/projectImages'
+import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
@@ -130,7 +130,7 @@ const pageHeaderAppearance = {
             style={`--project-list-gap: ${projectListGapSize}`}
           >
             {
-              page.data.map((project, index) => (
+              page.data.map((project) => (
                 <li class="project-masonry__item">
                   <ProjectCard
                     project={project}
@@ -138,7 +138,7 @@ const pageHeaderAppearance = {
                       project.data.coverImage,
                       project.id,
                       'projects',
-                      projectImages[(page.start + index) % projectImages.length],
+                      getProjectTypeDefaultImage(project.data.type),
                     )}
                     layout="overlay"
                   />
@@ -156,7 +156,7 @@ const pageHeaderAppearance = {
           style={`--project-list-gap: ${projectListGapSize}`}
         >
           {
-            page.data.map((project, index) => (
+            page.data.map((project) => (
               <li class="project-masonry__item">
                 <ProjectCard
                   project={project}
@@ -164,7 +164,7 @@ const pageHeaderAppearance = {
                     project.data.coverImage,
                     project.id,
                     'projects',
-                    projectImages[(page.start + index) % projectImages.length],
+                    getProjectTypeDefaultImage(project.data.type),
                   )}
                   layout="overlay"
                 />

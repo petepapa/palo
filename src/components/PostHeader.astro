@@ -101,7 +101,7 @@ const sanitizedSubtitle: string = subtitle
 >
   {isCoverImageTop && coverImage && (
     <div class="post-header__image">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} />
+      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
     </div>
   )}
 
@@ -147,7 +147,7 @@ const sanitizedSubtitle: string = subtitle
 
   {isCoverImageHead && coverImage && (
     <div class="post-header__image post-header__image--head">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} />
+      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
     </div>
   )}
 
@@ -186,7 +186,7 @@ const sanitizedSubtitle: string = subtitle
 
   {isCoverImageBottom && coverImage && (
     <div class="post-header__image post-header__image--bottom">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} />
+      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
     </div>
   )}
 </section>

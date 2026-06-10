@@ -1,24 +1,25 @@
-import projectImage1 from '@assets/images/projects/project-image-1.jpg'
-import projectImage2 from '@assets/images/projects/project-image-2.jpg'
-import projectImage3 from '@assets/images/projects/project-image-3.jpg'
-import projectImage4 from '@assets/images/projects/project-image-4.jpg'
-import projectImage5 from '@assets/images/projects/project-image-5.jpg'
-import projectImage6 from '@assets/images/projects/project-image-6.jpg'
+import type { ImageMetadata } from 'astro'
+import typeDefault from '@assets/images/projects/default.png'
+import typeVideo from '@assets/images/projects/video.png'
+import typeShot from '@assets/images/projects/shot.png'
+import typeAlbum from '@assets/images/projects/album.png'
+import typePoster from '@assets/images/projects/poster.png'
 
-export const projectImages = [
-  projectImage1,
-  projectImage2,
-  projectImage3,
-  projectImage4,
-  projectImage5,
-  projectImage6,
-]
+// Type-specific default cover images
+const typeDefaultImages: Record<string, ImageMetadata> = {
+  default: typeDefault,
+  video: typeVideo,
+  shot: typeShot,
+  album: typeAlbum,
+  poster: typePoster,
+}
 
-export const publicProjectImages = [
-  '/projects/project-image-1.jpg',
-  '/projects/project-image-2.jpg',
-  '/projects/project-image-3.jpg',
-  '/projects/project-image-4.jpg',
-  '/projects/project-image-5.jpg',
-  '/projects/project-image-6.jpg',
-]
+export type ProjectTypeId = keyof typeof typeDefaultImages
+
+/**
+ * Get the type-specific default cover image
+ * Falls back to default.png if the type doesn't have a corresponding image
+ */
+export function getProjectTypeDefaultImage(type: string): ImageMetadata {
+  return typeDefaultImages[type] ?? typeDefault
+}
