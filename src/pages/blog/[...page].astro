@@ -8,7 +8,7 @@ import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 
-type SortBy = 'latest' | 'popular' | 'earliest'
+type SortBy = 'latest' | 'earliest'
 
 interface Post {
   id: string
@@ -17,7 +17,6 @@ interface Post {
   author: string
   publishDate: Date
   coverImage?: string
-  views: number
 }
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
@@ -29,7 +28,6 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   // Current: Latest first (by publishDate) / 当前: 最新优先 (按发布日期)
   // Options: (a, b) => a.data.publishDate.valueOf() - b.data.publishDate.valueOf() - Earliest first / 最早优先
   //          (a, b) => a.data.title.localeCompare(b.data.title) - Alphabetical / 按字母序
-  //          (a, b) => (b.data.views || 0) - (a.data.views || 0) - Most popular / 最受欢迎
   const sortedPosts = [...posts].sort(
     (a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
   )
@@ -42,7 +40,6 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
       id: post.id,
       author,
       coverImage: post.data.coverImage,
-      views: post.data.views || 0,
     }
   })
 

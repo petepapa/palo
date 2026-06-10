@@ -64,10 +64,12 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   // ========== SORTING CONFIGURATION / 排序配置 ==========
   // Modify the sort function below to change project order
   // 修改下方的排序函数来改变项目顺序
-  // Current: Latest first (by ID) / 当前: 最新优先 (按ID)
-  // Options: a.id.localeCompare(b.id) - Earliest first / 最早优先
+  // Current: Latest first (by publishDate) / 当前: 最新优先 (按发布日期)
+  // Options: a.data.publishDate.valueOf() - b.data.publishDate.valueOf() - Earliest first / 最早优先
   //          a.data.title.localeCompare(b.data.title) - Alphabetical / 按字母序
-  const sortedProjects = [...allProjects].sort((a, b) => b.id.localeCompare(a.id))
+  const sortedProjects = [...allProjects].sort(
+    (a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
+  )
 
   const projectsWithImages = sortedProjects
 

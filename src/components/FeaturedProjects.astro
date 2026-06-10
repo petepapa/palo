@@ -11,7 +11,7 @@ import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 
 type FeaturedProjectLayout = 'standard' | 'overlay'
 
-type SortBy = 'latest' | 'popular' | 'earliest'
+type SortBy = 'latest' | 'earliest'
 
 /**
  * FeaturedProjects Component
@@ -49,7 +49,7 @@ interface Props {
    */
   projectListGapClass?: string
   /**
-   * Sort projects by: latest (newest first), popular (most views), earliest (oldest first)
+   * Sort projects by: latest (newest first), earliest (oldest first)
    * @default "latest"
    */
   sortBy?: SortBy
@@ -84,14 +84,11 @@ const projects = await getCollection('projects')
 const sortedProjects = [...projects].sort((a, b) => {
   switch (sortBy) {
     case 'latest':
-      // For projects, we'll use the filename or a default date order
-      return b.id.localeCompare(a.id)
-    case 'popular':
-      return (b.data.views || 0) - (a.data.views || 0)
+      return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
     case 'earliest':
-      return a.id.localeCompare(b.id)
+      return (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0)
     default:
-      return b.id.localeCompare(a.id)
+      return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
   }
 })
 
