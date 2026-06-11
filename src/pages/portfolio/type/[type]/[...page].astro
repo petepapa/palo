@@ -20,16 +20,18 @@ const projectListWidthClass = getProjectListWidthClass(projectListWidth)
 const pageHeaderAppearance = {
   fullscreen: false,
   contentColor: '',
-  backgroundVideo: '',
-  backgroundImage: '',
-  backgroundColor: '',
-  backgroundFixed: false,
-  backgroundOverlayOpacity: 0,
   topNavigationTheme: '',
-  contentVerticalAlign: '',
-  contentHorizontalAlign: '',
+  alignV: '',
+  alignH: '',
   divider: true,
-}
+  bg: {
+    video: '',
+    image: '',
+    color: '',
+    fixed: false,
+    overlayOpacity: 0,
+  },
+} as const
 
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   // 过滤草稿：仅保留已发布的项目

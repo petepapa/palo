@@ -5,16 +5,19 @@ import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHea
 
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
+interface BgProps {
+  image?: string
+  video?: string
+  color?: string
+  fixed?: boolean
+  overlayOpacity?: number
+}
+
 interface Props {
   class?: string
   title: string
   subtitle?: string
   fullscreen?: boolean
-  backgroundImage?: string
-  backgroundVideo?: string
-  backgroundColor?: string
-  backgroundFixed?: boolean
-  backgroundOverlayOpacity?: number
   contentColor?: string
   topNavigationTheme?: string
   /**
@@ -23,9 +26,9 @@ interface Props {
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
   divider?: DividerPlacement
-  contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
-  contentHorizontalAlign?: '' | 'left' | 'center' | 'right'
-  textAlign?: '' | 'left' | 'center' | 'right'
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  alignH?: '' | 'left' | 'center' | 'right'
+  bg?: BgProps
   /**
    * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
    * @default true
@@ -38,27 +41,28 @@ const {
   title,
   subtitle,
   fullscreen = false,
-  backgroundImage = '',
-  backgroundVideo = '',
-  backgroundColor = '',
-  backgroundFixed = false,
-  backgroundOverlayOpacity = 0,
   contentColor = '',
   topNavigationTheme = '',
   divider = true,
-  contentVerticalAlign = '',
-  contentHorizontalAlign = 'left',
-  textAlign = '',
+  alignV = 'center',
+  alignH = 'left',
+  bg = {},
   useContainer = true,
 } = Astro.props
 
-const resolvedContentVerticalAlign =
-  contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
+const bgImage = bg.image ?? ''
+const bgVideo = bg.video ?? ''
+const bgColor = bg.color ?? ''
+const bgFixed = bg.fixed ?? false
+const bgOverlayOpacity = Number(bg.overlayOpacity ?? 0)
+
+const resolvedAlignV = alignV === 'top' || alignV === 'bottom' ? alignV : 'center'
 const pageHeaderContentAlignMap = {
   top: 'start',
   center: 'center',
   bottom: 'end',
 } as const
+
 const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both' | 'bottom' | false => {
   const normalizedValue = typeof value === 'string' ? value.trim().toLowerCase() : value
   if (normalizedValue === false || normalizedValue === 'false') return false
@@ -67,9 +71,8 @@ const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both'
   return 'bottom'
 }
 const dividerPlacement = resolveDividerPlacement(divider)
-const contentHorizontalAlignValue = contentHorizontalAlign || textAlign
-const resolvedContentHorizontalAlign =
-  contentHorizontalAlignValue === 'center' || contentHorizontalAlignValue === 'right' ? contentHorizontalAlignValue : 'left'
+
+const resolvedAlignH = alignH === 'center' || alignH === 'right' ? alignH : 'left'
 const pageHeaderTextAlignMap = {
   left: 'start',
   center: 'center',
@@ -80,25 +83,25 @@ const pageHeaderItemsAlignMap = {
   center: 'center',
   right: 'flex-end',
 } as const
-const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
-const resolvedBackgroundOverlayOpacity =
-  Number.isFinite(normalizedBackgroundOverlayOpacity)
-    ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
-    : 0
-const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
+
+const resolvedBgOverlayOpacity = Number.isFinite(bgOverlayOpacity)
+  ? Math.min(1, Math.max(0, bgOverlayOpacity))
+  : 0
+const resolvedBgVideo = normalizePublicAssetUrl(bgVideo)
+const hasMedia = Boolean(bgImage) || Boolean(bgVideo)
 
 const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderVisuals({
-  backgroundColor,
-  backgroundImage,
+  backgroundColor: bgColor,
+  backgroundImage: bgImage,
   contentColor,
   topNavigationTheme,
 })
 const resolvedPageHeaderStyle = [
   pageHeaderStyle,
-  `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedContentVerticalAlign]}`,
-  `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedContentHorizontalAlign]}`,
-  `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedContentHorizontalAlign]}`,
-  `--page-header-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
+  `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedAlignV]}`,
+  `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedAlignH]}`,
+  `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedAlignH]}`,
+  `--page-header-background-overlay-opacity: ${resolvedBgOverlayOpacity}`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -119,24 +122,24 @@ const sanitizedSubtitle: string = subtitle
     className,
     'palo-page-header',
     fullscreen ? 'section-fullscreen' : 'palo-page-header--standard',
-    backgroundFixed && 'palo-page-header--background-fixed',
+    bgFixed && 'palo-page-header--background-fixed',
     (dividerPlacement === 'top' || dividerPlacement === 'both') && 'palo-page-header--with-divider-top',
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'palo-page-header--with-divider-bottom',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={resolvedPageHeaderStyle || undefined}
 >
-  {backgroundVideo && (
+  {bgVideo && (
     <div class="palo-page-header__background-media" aria-hidden="true">
-      <video class="palo-page-header__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
+      <video class="palo-page-header__background-video" src={resolvedBgVideo} autoplay muted loop playsinline />
     </div>
   )}
 
-  {!backgroundVideo && backgroundImage && (
+  {!bgVideo && bgImage && (
     <div class="palo-page-header__background-media palo-page-header__background-image" aria-hidden="true"></div>
   )}
 
-  {(backgroundVideo || backgroundImage) && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
+  {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
 
   <div class:list={['palo-page-header__content', 'space-content', useContainer && 'container']}>
     <Heading level="h1">{title}</Heading>

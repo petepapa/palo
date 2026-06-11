@@ -7,16 +7,18 @@ import { Notification } from 'accessible-astro-components'
 const pageHeaderAppearance = {
   fullscreen: false, // Fill viewport / 撑满屏幕
   contentColor: '', // Text color; empty = theme / 内容颜色，空=跟随主题
-  backgroundVideo: '', // Video path in /public / 背景视频，放在 /public
-  backgroundImage: '', // Image path in /public / 背景图片，放在 /public
-  backgroundColor: '', // Background color; empty = theme / 背景颜色，空=跟随主题
-  backgroundFixed: false, // Fixed background inside section / 背景在区域内固定
-  backgroundOverlayOpacity: 0, // Overlay opacity 0-1 / 遮罩透明度 0-1
   topNavigationTheme: '', // '' | dark | light / 顶部导航主题
-  contentVerticalAlign: '', // top | center | bottom; empty = center / 垂直位置，空=居中
-  contentHorizontalAlign: '', // left | center | right; empty = left / 水平对齐，空=左对齐
+  alignV: '', // top | center | bottom; empty = center / 垂直位置，空=居中
+  alignH: '', // left | center | right; empty = left / 水平对齐，空=左对齐
   divider: true, // true/empty=bottom; top/both/bottom/false / true或空=下方；上方/上下/下方/false
-}
+  bg: {
+    image: '', // Image path in /public / 背景图片，放在 /public
+    video: '', // Video path in /public / 背景视频，放在 /public
+    color: '', // Background color; empty = theme / 背景颜色，空=跟随主题
+    fixed: false, // Fixed background inside section / 背景在区域内固定
+    overlayOpacity: 0, // Overlay opacity 0-1 / 遮罩透明度 0-1
+  },
+} as const
 ---
 
 <DefaultLayout title="Accessible launcher">

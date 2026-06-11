@@ -1,5 +1,5 @@
 ---
-import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
+import { createPageHeaderVisuals, normalizePublicAssetUrl, resolveVisualImageUrl } from '@utils/pageHeaderVisuals'
 
 /**
  * Hero Component
@@ -9,14 +9,17 @@ import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHea
 
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
+interface BackgroundEngine {
+  image?: string
+  video?: string
+  color?: string
+  fixed?: boolean
+  overlayOpacity?: number
+}
+
 interface Props {
   fullscreen?: boolean
   contentColor?: string
-  backgroundVideo?: string
-  backgroundImage?: string
-  backgroundColor?: string
-  backgroundFixed?: boolean
-  backgroundOverlayOpacity?: number
   topNavigationTheme?: string
   /**
    * 分割线位置 / Divider position.
@@ -24,31 +27,42 @@ interface Props {
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
   divider?: DividerPlacement
-  contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
+  /** Vertical align: top, center, bottom / 内容垂直对齐 */
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  /** Horizontal & Text align: left, center, right / 水平与文字大一统对齐 */
+  alignH?: '' | 'left' | 'center' | 'right'
   /**
    * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
    * @default true
    */
   useContainer?: boolean
   class?: string
+  /** Background Media Engine / 背景多媒体引擎 */
+  bg?: BackgroundEngine
 }
 
 const {
   fullscreen = true,
   contentColor = '',
-  backgroundVideo = '',
-  backgroundImage = '',
-  backgroundColor = '',
-  backgroundFixed = false,
-  backgroundOverlayOpacity = 0,
   topNavigationTheme = '',
   divider = true,
-  contentVerticalAlign = '',
+  alignV = '',
+  alignH = '',
   useContainer = true,
   class: className = '',
+  bg = {},
 } = Astro.props
-const resolvedContentVerticalAlign =
-  contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
+
+const {
+  image: backgroundImage = '',
+  video: backgroundVideo = '',
+  color: backgroundColor = '',
+  fixed: backgroundFixed = false,
+  overlayOpacity: backgroundOverlayOpacity = 0,
+} = bg
+
+const resolvedAlignV =
+  alignV === 'top' || alignV === 'bottom' ? alignV : 'center'
 const heroContentAlignMap = {
   top: 'start',
   center: 'center',
@@ -77,8 +91,9 @@ const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageH
 })
 const heroStyle = [
   pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
-  `--hero-content-align: ${heroContentAlignMap[resolvedContentVerticalAlign]}`,
+  `--hero-content-align: ${heroContentAlignMap[resolvedAlignV]}`,
   `--hero-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
+  alignH ? `--hero-text-align: ${alignH}` : '',
 ]
   .filter(Boolean)
   .join('; ')
@@ -129,7 +144,7 @@ const heroStyle = [
 
     .hero--standard {
       display: grid;
-      place-content: var(--hero-content-align, center) center;
+      place-content: var(--hero-content-align, center) var(--hero-text-align, center);
       padding-block-start: calc(var(--header-height, 0px) + var(--space-xl));
       padding-block-end: var(--space-xl);
     }

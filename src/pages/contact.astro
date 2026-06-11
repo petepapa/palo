@@ -7,23 +7,23 @@ import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 ---
 
-<!-- 页面布局容器 / Page layout container -->
 <DefaultLayout title="Contact">
   <!-- 页面头部区域 / Page header section -->
   <PaloPageHeader
     title="Contact"
     subtitle="Have a question? Get in touch with us!"
-    fullscreen={true}                  // 是否全屏 / Fullscreen mode
-    contentColor=""                      // 内容文字颜色 / Content text color
-    backgroundVideo=""                   // 背景视频URL / Background video URL
-    backgroundImage="123.jpeg"                   // 背景图片 / Background image
-    backgroundColor="green"                   // 背景颜色 / Background color
-    backgroundFixed={true}             // 固定背景 / Fixed background
-    backgroundOverlayOpacity={0}         // 遮罩透明度 / Overlay opacity
-    topNavigationTheme=""                // 导航栏主题 / Navigation theme
-    contentVerticalAlign=""              // 垂直对齐 / Vertical align
-    textAlign=""            // 水平对齐 / Horizontal align
-    divider="true"                   // true/空=下方；"top"/"both"/"bottom"/false / true/empty=bottom
+    fullscreen={true}
+    contentColor=""
+    topNavigationTheme=""
+    alignV=""
+    alignH=""
+    divider="true"
+    bg={{
+      image: "123.jpeg",
+      color: "green",
+      fixed: true,
+      overlayOpacity: 0,
+    }}
   />
 
   <!-- 标题区域 / Heading section -->

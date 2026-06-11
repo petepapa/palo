@@ -9,6 +9,7 @@ const narrow = frontmatter.narrow ?? false
 const pageHeader = frontmatter.pageHeader
 const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
 const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
+const pageHeaderBg = pageHeader?.bg ?? {}
 ---
 
 <DefaultLayout
@@ -25,17 +26,18 @@ const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
         title={pageHeaderTitle}
         subtitle={pageHeaderSubtitle}
         fullscreen={pageHeader.fullscreen ?? false}
-        backgroundImage={pageHeader.backgroundImage ?? ''}
-        backgroundVideo={pageHeader.backgroundVideo ?? ''}
-        backgroundColor={pageHeader.backgroundColor ?? ''}
-        backgroundFixed={pageHeader.backgroundFixed ?? false}
-        backgroundOverlayOpacity={pageHeader.backgroundOverlayOpacity ?? 0}
+        bg={{
+          image: pageHeaderBg.image ?? '',
+          video: pageHeaderBg.video ?? '',
+          color: pageHeaderBg.color ?? '',
+          fixed: pageHeaderBg.fixed ?? false,
+          overlayOpacity: pageHeaderBg.overlayOpacity ?? 0,
+        }}
         contentColor={pageHeader.contentColor ?? ''}
         topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
         divider={pageHeader.divider ?? true}
-        contentVerticalAlign={pageHeader.contentVerticalAlign ?? ''}
-        contentHorizontalAlign={pageHeader.contentHorizontalAlign ?? ''}
-        textAlign={pageHeader.textAlign ?? ''}
+        alignV={pageHeader.alignV ?? ''}
+        alignH={pageHeader.alignH ?? ''}
       />
     )
   }

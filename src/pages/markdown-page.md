@@ -8,15 +8,16 @@ narrow: false
 pageHeader:
   fullscreen: true
   contentColor: '#fff'
-  backgroundImage: ''
-  backgroundVideo: ''
-  backgroundColor: 'red'
-  backgroundFixed: false
-  backgroundOverlayOpacity: 0.45
   topNavigationTheme: 'dark'
   divider: true
-  contentVerticalAlign: bottom
-  textAlign: left
+  alignV: bottom
+  alignH: right
+  bg:
+    image: ''
+    video: ''
+    color: 'red'
+    fixed: false
+    overlayOpacity: 0.45
 ---
 
 

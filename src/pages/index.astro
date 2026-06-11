@@ -18,16 +18,19 @@ import { Card } from 'accessible-astro-components'
   <Hero
     fullscreen={true}
     contentColor=""
-    backgroundVideo=""
-    backgroundImage="/branding/hero-bg.png"
-    backgroundColor=""
-    backgroundFixed={true}
-    backgroundOverlayOpacity={0}
     topNavigationTheme=""
     class="py-8"
-    contentVerticalAlign="center"
+    alignV="center"
+    alignH="left"
     divider="true"
     useContainer={false}
+    bg={{
+      image: "/branding/hero-bg.png",
+      video: "",
+      color: "",
+      fixed: true,
+      overlayOpacity: 0,
+    }}
   >
     {/* 可编辑区域开始 / Editable Content Start */}
     <div class="flex flex-col items-center  text-center gap-6">
@@ -60,15 +63,18 @@ import { Card } from 'accessible-astro-components'
 
   <CreativeSection
     fullscreen={true}
-    contentColor="" 
-    backgroundVideo=""
-    backgroundImage=""
-    backgroundColor=""
-    backgroundFixed={false}
-    backgroundOverlayOpacity={0.5}
+    contentColor=""
     class="py-16 bg-primary text-neutral-100"
-    contentVerticalAlign="center"
-    divider="false" 
+    alignV="center"
+    alignH="left"
+    divider="false"
+    bg={{
+      image: "",
+      video: "",
+      color: "",
+      fixed: false,
+      overlayOpacity: 0.5,
+    }}
   >
     <div class="text-center">
       <p class="text-xl font-semibold">
