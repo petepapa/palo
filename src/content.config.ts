@@ -46,8 +46,6 @@ const posts = defineCollection({
       featuredOrder: z.number().optional().catch(undefined),
       draft: z.boolean().default(false).catch(false),
       share: z.boolean().default(true).catch(true),
-      canonicalURL: z.string().optional().catch(undefined),
-      language: z.string().optional().catch(undefined),
     }),
 })
 
@@ -85,7 +83,6 @@ const projects = defineCollection({
       toc: z.boolean().default(true).catch(true),
       narrow: z.boolean().default(true).catch(true),
       publishDate: safeDateField,
-      featuredImage: imageField,
       featuredOrder: z.number().optional().catch(undefined),
       externalLink: z.string().optional().catch(undefined),
       video: z.string().optional().catch(undefined),
