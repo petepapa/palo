@@ -14,7 +14,6 @@ pageHeader:
   backgroundFixed: false
   backgroundOverlayOpacity: 0.45
   topNavigationTheme: 'dark'
-  paddingBlock: 3xl
   divider: true
   contentVerticalAlign: bottom
   textAlign: left

@@ -287,33 +287,28 @@ Adjust vertical padding using space tokens or custom CSS values.
 <PaloPageHeader
   title="Small Padding"
   subtitle="Compact header"
-  paddingBlock="md"
 />
 
 <PaloPageHeader
   title="Extra Large Padding"
   subtitle="Spacious header"
-  paddingBlock="2xl"
 />
 
 <!-- Using Custom CSS Values -->
 <PaloPageHeader
   title="Custom Spacing"
   subtitle="Precise control"
-  paddingBlock="6rem"
 />
 
 <!-- Using Clamp for Responsive Padding -->
 <PaloPageHeader
   title="Responsive Padding"
   subtitle="Adapts to screen size"
-  paddingBlock="clamp(2rem, 5vw, 6rem)"
 />
 ```
 
 | Parameter | Type | Default | Description | 说明 |
 |-----------|------|---------|-------------|------|
-| `paddingBlock` | string | `''` | Vertical padding (space token or CSS value) | 垂直内边距（space token 或 CSS 值） |
 
 Available space tokens: `5xs`, `4xs`, `3xs`, `2xs`, `xs`, `s`, `sm`, `m`, `md`, `l`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`.
 
@@ -381,7 +376,6 @@ Add your own CSS classes.
   backgroundOverlayOpacity={0.5}
   contentColor="#ffffff"
   topNavigationTheme="dark"
-  paddingBlock="xl"
   divider="bottom"
   contentHorizontalAlign="center"
   textAlign="center"
@@ -397,7 +391,6 @@ Add your own CSS classes.
   backgroundColor="#0f172a"
   contentColor="#ffffff"
   topNavigationTheme="dark"
-  paddingBlock="lg"
   divider="both"
 />
 ```
@@ -429,7 +422,6 @@ Add your own CSS classes.
   contentColor="#ffffff"
   topNavigationTheme="dark"
   useContainer={false}
-  paddingBlock="2xl"
 >
   <div class="mt-8">
     <a href="#get-started" class="btn btn-primary">Get Started</a>

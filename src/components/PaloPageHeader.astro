@@ -3,26 +3,6 @@ import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 
-type PaddingBlock =
-  | ''
-  | '5xs'
-  | '4xs'
-  | '3xs'
-  | '2xs'
-  | 'xs'
-  | 's'
-  | 'sm'
-  | 'm'
-  | 'md'
-  | 'l'
-  | 'lg'
-  | 'xl'
-  | '2xl'
-  | '3xl'
-  | '4xl'
-  | '5xl'
-  | (string & {})
-
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
 interface Props {
@@ -43,14 +23,6 @@ interface Props {
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
   divider?: DividerPlacement
-  /**
-   * 上下内边距 / Vertical padding.
-   * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
-   * 支持 space token: 5xs, 4xs, 3xs, 2xs, xs, s, m, l, xl, 2xl, 3xl, 4xl, 5xl.
-   * 也支持别名 sm/md/lg，以及具体 CSS 值，如 "4rem"、"48px"、"clamp(2rem, 5vw, 6rem)".
-   * Supports space tokens, sm/md/lg aliases, and custom CSS values such as "4rem", "48px", or "clamp(2rem, 5vw, 6rem)".
-   */
-  paddingBlock?: PaddingBlock
   contentVerticalAlign?: '' | 'top' | 'center' | 'bottom'
   contentHorizontalAlign?: '' | 'left' | 'center' | 'right'
   textAlign?: '' | 'left' | 'center' | 'right'
@@ -74,36 +46,12 @@ const {
   contentColor = '',
   topNavigationTheme = '',
   divider = true,
-  paddingBlock,
   contentVerticalAlign = '',
   contentHorizontalAlign = 'left',
   textAlign = '',
   useContainer = true,
 } = Astro.props
 
-const paddingBlockMap: Record<Exclude<PaddingBlock, ''>, string> = {
-  '5xs': 'var(--space-5xs)',
-  '4xs': 'var(--space-4xs)',
-  '3xs': 'var(--space-3xs)',
-  '2xs': 'var(--space-2xs)',
-  xs: 'var(--space-xs)',
-  s: 'var(--space-s)',
-  sm: 'var(--space-s)',
-  m: 'var(--space-m)',
-  md: 'var(--space-m)',
-  l: 'var(--space-l)',
-  lg: 'var(--space-l)',
-  xl: 'var(--space-xl)',
-  '2xl': 'var(--space-2xl)',
-  '3xl': 'var(--space-3xl)',
-  '4xl': 'var(--space-4xl)',
-  '5xl': 'var(--space-5xl)',
-}
-const resolvePaddingBlock = (value?: PaddingBlock): string => {
-  const normalizedValue = typeof value === 'string' ? value.trim() : ''
-  return normalizedValue ? (paddingBlockMap[normalizedValue] ?? normalizedValue) : 'var(--space-xl)'
-}
-const pageHeaderPaddingBlock = resolvePaddingBlock(paddingBlock)
 const resolvedContentVerticalAlign =
   contentVerticalAlign === 'top' || contentVerticalAlign === 'bottom' ? contentVerticalAlign : 'center'
 const pageHeaderContentAlignMap = {
@@ -147,7 +95,6 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
 })
 const resolvedPageHeaderStyle = [
   pageHeaderStyle,
-  `--page-header-padding-block: ${pageHeaderPaddingBlock}`,
   `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedContentVerticalAlign]}`,
   `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedContentHorizontalAlign]}`,
   `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedContentHorizontalAlign]}`,
@@ -219,8 +166,8 @@ const sanitizedSubtitle: string = subtitle
       align-content: var(--page-header-content-align, center);
       justify-content: stretch;
       justify-items: stretch;
-      padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, var(--space-xl)));
-      padding-block-end: var(--page-header-padding-block, var(--space-xl));
+      padding-block-start: calc(var(--header-height, 0px) + var(--space-xl));
+      padding-block-end: var(--space-xl);
     }
 
     .palo-page-header--with-divider-top {
