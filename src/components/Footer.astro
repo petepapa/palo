@@ -100,15 +100,18 @@ const currentYear = new Date().getFullYear()
   <CreativeSection
     fullscreen={false}
     contentColor=""
-    backgroundVideo=""
-    backgroundImage=""
-    backgroundColor=""
-    backgroundFixed={false}
-    backgroundOverlayOpacity={0.5}
     class="bg-primary py-4 sm:py-8 md:py-16"
-    contentVerticalAlign="center"
+    alignV="center"
+    alignH="left"
     divider="false"
     useContainer={false}
+    bg={{
+      image: "",
+      video: "",
+      color: "",
+      fixed: false,
+      overlayOpacity: 0.5,
+    }}
   >
     
     <img src="/branding/logo-text.svg" class="w-full" />
