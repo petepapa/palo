@@ -14,7 +14,7 @@ pageHeader:
   alignH: left
   bg:
     image: ''
-    video: '/bg.mp4'
+    video: '/earth.mp4'
     color: 'red'
     fixed: false
     overlayOpacity: 0.45
