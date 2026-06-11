@@ -14,7 +14,7 @@ interface Props {
 }
 
 const { class: className } = Astro.props
-const showMobileMenuLabel = themeConfig.navigation?.showMobileMenuLabel ?? false
+const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
 ---
 
 <button class:list={[className, 'responsive-toggle']} aria-expanded="false" aria-label="Open menu navigation">

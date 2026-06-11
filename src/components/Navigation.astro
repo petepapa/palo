@@ -18,7 +18,7 @@ const navAlignment =
 const navDropdownDesktopColorMode = themeConfig.navigation?.dropdownDesktopColorMode ?? 'theme'
 const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightScale ?? 1
 const navDropdownMenuLineHeightScale = themeConfig.navigation?.dropdownMenuLineHeightScale ?? 1
-const launcherGradientBorder = site.showLauncher === 'gradientBorder'
+const launcherGradientBorder = site.launcher === 'gradientBorder'
 const navStyle = [
   navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
   `--navigation-main-menu-line-height-scale: ${navMainMenuLineHeightScale}`,
@@ -45,7 +45,7 @@ const navStyle = [
         </nav>
         <ResponsiveToggle />
         {
-          site.showLauncher && (
+          site.launcher && (
             <div class="mobile-launcher">
               <LauncherTrigger
                 launcherId="site-launcher"

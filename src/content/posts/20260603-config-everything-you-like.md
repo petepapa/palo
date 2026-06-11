@@ -52,8 +52,8 @@ site:
   titleSeparator: '|'
   trailingSlash: false
   defaultTheme: auto
-  showDarkModeToggle: true
-  showLauncher: true
+  darkModeToggle: true
+  launcher: true
 ```
 
 | Parameter | Description | 说明 |
@@ -62,8 +62,8 @@ site:
 | `titleSeparator` | Page title separator, e.g. "About | Palo" | 页面标题的分隔符，例如 "关于我们 | Palo" |
 | `trailingSlash` | Controls if URLs end with a slash | 控制 URL 是否以斜杠结尾 |
 | `defaultTheme` | Default theme: `auto`, `light`, or `dark` | 默认主题：`auto`（跟随系统）、`light`（浅色）或 `dark`（深色） |
-| `showDarkModeToggle` | Show/hide dark mode toggle button | 是否显示深色模式切换按钮 |
-| `showLauncher` | Enable Cmd+K / Ctrl+K quick launcher | 启用 Cmd+K / Ctrl+K 快捷启动器 |
+| `darkModeToggle` | Show/hide dark mode toggle button | 是否显示深色模式切换按钮 |
+| `launcher` | Enable Cmd+K / Ctrl+K quick launcher | 启用 Cmd+K / Ctrl+K 快捷启动器 |
 
 ---
 
@@ -139,7 +139,7 @@ navigation:
   minHeight: '6rem'
   headerBackgroundOpacity: 0.45
   headerBackgroundBlur: 10px
-  showMobileMenuLabel: false
+  mobileMenuLabel: false
 ```
 
 | Parameter | Description | 说明 |
@@ -148,7 +148,7 @@ navigation:
 | `minHeight` | Minimum header height | 导航栏最小高度 |
 | `headerBackgroundOpacity` | Background opacity (0-1) | 背景透明度（0 为完全透明，1 为完全不透明） |
 | `headerBackgroundBlur` | Background blur strength in px | 背景模糊程度（像素值） |
-| `showMobileMenuLabel` | Show Menu/Close text on mobile | 是否在汉堡菜单旁显示文字标签 |
+| `mobileMenuLabel` | Show Menu/Close text on mobile | 是否在汉堡菜单旁显示文字标签 |
 
 **Menu Layout / 菜单布局：**
 
@@ -255,42 +255,42 @@ The `border` section lets you uniformly control all border widths.
 
 ```yaml
 border:
-  globalWidth: '0.1rem'
+  global: '0.1rem'
   
   # Component-specific (empty = inherit global)
-  buttonWidth: ''
-  formWidth: '0.075rem'
-  cardWidth: ''
-  accordionWidth: ''
-  tabsWidth: ''
-  badgeWidth: '0.075rem'
-  avatarWidth: ''
-  notificationWidth: ''
-  paginationWidth: '0.1rem'
-  toggleWidth: '0.1rem'
-  mediaWidth: '0'
-  surfaceWidth: '0.1rem'
-  codeBlockWidth: '0'
-  dividerWidth: '0.075rem'
+  button: ''
+  form: '0.075rem'
+  card: ''
+  accordion: ''
+  tabs: ''
+  badge: '0.075rem'
+  avatar: ''
+  notification: ''
+  pagination: '0.1rem'
+  toggle: '0.1rem'
+  media: '0'
+  surface: '0.1rem'
+  codeBlock: '0'
+  divider: '0.075rem'
 ```
 
 | Parameter | Description | 说明 |
 |-----------|-------------|------|
-| `globalWidth` | Site-wide default border width | 全站默认边框粗细 |
-| `buttonWidth` | Buttons and button-like links | 按钮和按钮型链接 |
-| `formWidth` | Inputs, selects, checkboxes | 输入框、选择框、复选框等 |
-| `cardWidth` | Card components | 卡片 |
-| `accordionWidth` | Accordion panels | 折叠面板 |
-| `tabsWidth` | Tab components | 标签页 |
-| `badgeWidth` | Badge components | 徽章 |
-| `avatarWidth` | Avatar images | 头像 |
-| `notificationWidth` | Notification messages | 通知 |
-| `paginationWidth` | Pagination buttons | 分页按钮 |
-| `toggleWidth` | Toggle switches | 切换按钮 |
-| `mediaWidth` | Images | 图片 |
-| `surfaceWidth` | Dropdowns, panels, surfaces | 下拉菜单、面板等容器 |
-| `codeBlockWidth` | Code blocks | 代码块 |
-| `dividerWidth` | Dividers | 分隔线 |
+| `global` | Site-wide default border width | 全站默认边框粗细 |
+| `button` | Buttons and button-like links | 按钮和按钮型链接 |
+| `form` | Inputs, selects, checkboxes | 输入框、选择框、复选框等 |
+| `card` | Card components | 卡片 |
+| `accordion` | Accordion panels | 折叠面板 |
+| `tabs` | Tab components | 标签页 |
+| `badge` | Badge components | 徽章 |
+| `avatar` | Avatar images | 头像 |
+| `notification` | Notification messages | 通知 |
+| `pagination` | Pagination buttons | 分页按钮 |
+| `toggle` | Toggle switches | 切换按钮 |
+| `media` | Images | 图片 |
+| `surface` | Dropdowns, panels, surfaces | 下拉菜单、面板等容器 |
+| `codeBlock` | Code blocks | 代码块 |
+| `divider` | Dividers | 分隔线 |
 
 Leave component-specific values empty to inherit from the global default.
 
@@ -306,38 +306,38 @@ The `radius` section lets you uniformly control all border radius sizes.
 
 ```yaml
 radius:
-  globalSize: '0.75rem'
+  global: '0.75rem'
   
   # Component-specific (empty = inherit global)
-  buttonSize: ''
-  formSize: ''
-  cardSize: '1.5rem'
-  mediaSize: ''
-  tabsSize: '1rem'
-  badgeSize: '0.25rem'
-  notificationSize: ''
-  avatarSize: ''
-  paginationSize: '0.5rem'
-  toggleSize: '0.5rem'
-  surfaceSize: ''
-  codeBlockSize: '0.25rem'
+  button: ''
+  form: ''
+  card: '1.5rem'
+  media: ''
+  tabs: '1rem'
+  badge: '0.25rem'
+  notification: ''
+  avatar: ''
+  pagination: '0.5rem'
+  toggle: '0.5rem'
+  surface: ''
+  codeBlock: '0.25rem'
 ```
 
 | Parameter | Description | 说明 |
 |-----------|-------------|------|
-| `globalSize` | Site-wide default radius | 全站默认圆角大小 |
-| `buttonSize` | Buttons, button-like links | 按钮和按钮型链接 |
-| `formSize` | Form elements | 表单元素 |
-| `cardSize` | Cards, feature blocks | 卡片、特征区块 |
-| `mediaSize` | Images | 图片 |
-| `tabsSize` | Tab components | 标签页 |
-| `badgeSize` | Badge components | 徽章 |
-| `notificationSize` | Notification messages | 通知 |
-| `avatarSize` | Avatar images | 头像 |
-| `paginationSize` | Pagination buttons | 分页按钮 |
-| `toggleSize` | Toggle switches | 切换按钮 |
-| `surfaceSize` | Dropdowns, panels, surfaces | 下拉菜单、面板等容器 |
-| `codeBlockSize` | Code blocks | 代码块 |
+| `global` | Site-wide default radius | 全站默认圆角大小 |
+| `button` | Buttons, button-like links | 按钮和按钮型链接 |
+| `form` | Form elements | 表单元素 |
+| `card` | Cards, feature blocks | 卡片、特征区块 |
+| `media` | Images | 图片 |
+| `tabs` | Tab components | 标签页 |
+| `badge` | Badge components | 徽章 |
+| `notification` | Notification messages | 通知 |
+| `avatar` | Avatar images | 头像 |
+| `pagination` | Pagination buttons | 分页按钮 |
+| `toggle` | Toggle switches | 切换按钮 |
+| `surface` | Dropdowns, panels, surfaces | 下拉菜单、面板等容器 |
+| `codeBlock` | Code blocks | 代码块 |
 
 Similarly, leave component-specific values empty to inherit from the global default.
 
@@ -353,7 +353,7 @@ Similarly, leave component-specific values empty to inherit from the global defa
 site:
   name: 'Alex Chen'
   defaultTheme: 'light'
-  showDarkModeToggle: false
+  darkModeToggle: false
 
 branding:
   colors:
@@ -383,8 +383,8 @@ navigation:
   headerBackgroundBlur: 20px
 
 radius:
-  globalSize: '0'
-  cardSize: '0'
+  global: '0'
+  card: '0'
 ```
 
 #### Corporate Business / 企业商务
@@ -392,7 +392,7 @@ radius:
 ```yaml
 site:
   name: 'TechCorp'
-  showLauncher: false
+  launcher: false
 
 branding:
   colors:

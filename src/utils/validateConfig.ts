@@ -108,11 +108,11 @@ const siteConfigSchema = z
       error: 'site.trailingSlash must be true or false',
     }),
     defaultTheme: defaultThemeEnum,
-    showDarkModeToggle: z.boolean({
-      error: 'site.showDarkModeToggle must be true or false',
+    darkModeToggle: z.boolean({
+      error: 'site.darkModeToggle must be true or false',
     }),
-    showLauncher: z.union([
-      z.boolean({ error: 'site.showLauncher must be true or false' }),
+    launcher: z.union([
+      z.boolean({ error: 'site.launcher must be true or false' }),
       z.enum(['default', 'gradientBorder']),
     ]),
     navigationAlignment: alignmentEnum.optional(),
@@ -194,8 +194,8 @@ const navigationConfigSchema = z
       .max(1, 'navigation.headerBackgroundOpacity must be ≤ 1')
       .optional(),
     headerBackgroundBlur: cssLengthOptional('navigation.headerBackgroundBlur'),
-    showMobileMenuLabel: z
-      .boolean({ error: 'navigation.showMobileMenuLabel must be true or false' })
+    mobileMenuLabel: z
+      .boolean({ error: 'navigation.mobileMenuLabel must be true or false' })
       .optional(),
     desktopMenuAlignment: alignmentEnum.optional(),
     dropdownDesktopColorMode: dropdownDesktopColorModeEnum.optional(),
@@ -224,39 +224,39 @@ const navigationConfigSchema = z
 
 const borderConfigSchema = z
   .object({
-    globalWidth: cssLength('border.globalWidth'),
-    buttonWidth: cssLengthOptional('border.buttonWidth'),
-    cardWidth: cssLengthOptional('border.cardWidth'),
-    accordionWidth: cssLengthOptional('border.accordionWidth'),
-    tabsWidth: cssLengthOptional('border.tabsWidth'),
-    avatarWidth: cssLengthOptional('border.avatarWidth'),
-    badgeWidth: cssLengthOptional('border.badgeWidth'),
-    formWidth: cssLengthOptional('border.formWidth'),
-    notificationWidth: cssLengthOptional('border.notificationWidth'),
-    paginationWidth: cssLengthOptional('border.paginationWidth'),
-    toggleWidth: cssLengthOptional('border.toggleWidth'),
-    mediaWidth: cssLengthOptional('border.mediaWidth'),
-    surfaceWidth: cssLengthOptional('border.surfaceWidth'),
-    codeBlockWidth: cssLengthOptional('border.codeBlockWidth'),
-    dividerWidth: cssLengthOptional('border.dividerWidth'),
+    global: cssLength('border.global'),
+    button: cssLengthOptional('border.button'),
+    card: cssLengthOptional('border.card'),
+    accordion: cssLengthOptional('border.accordion'),
+    tabs: cssLengthOptional('border.tabs'),
+    avatar: cssLengthOptional('border.avatar'),
+    badge: cssLengthOptional('border.badge'),
+    form: cssLengthOptional('border.form'),
+    notification: cssLengthOptional('border.notification'),
+    pagination: cssLengthOptional('border.pagination'),
+    toggle: cssLengthOptional('border.toggle'),
+    media: cssLengthOptional('border.media'),
+    surface: cssLengthOptional('border.surface'),
+    codeBlock: cssLengthOptional('border.codeBlock'),
+    divider: cssLengthOptional('border.divider'),
   })
   .strip()
 
 const radiusConfigSchema = z
   .object({
-    globalSize: cssLength('radius.globalSize'),
-    buttonSize: cssLengthOptional('radius.buttonSize'),
-    cardSize: cssLengthOptional('radius.cardSize'),
-    mediaSize: cssLengthOptional('radius.mediaSize'),
-    tabsSize: cssLengthOptional('radius.tabsSize'),
-    avatarSize: cssLengthOptional('radius.avatarSize'),
-    badgeSize: cssLengthOptional('radius.badgeSize'),
-    formSize: cssLengthOptional('radius.formSize'),
-    notificationSize: cssLengthOptional('radius.notificationSize'),
-    paginationSize: cssLengthOptional('radius.paginationSize'),
-    toggleSize: cssLengthOptional('radius.toggleSize'),
-    surfaceSize: cssLengthOptional('radius.surfaceSize'),
-    codeBlockSize: cssLengthOptional('radius.codeBlockSize'),
+    global: cssLength('radius.global'),
+    button: cssLengthOptional('radius.button'),
+    card: cssLengthOptional('radius.card'),
+    media: cssLengthOptional('radius.media'),
+    tabs: cssLengthOptional('radius.tabs'),
+    avatar: cssLengthOptional('radius.avatar'),
+    badge: cssLengthOptional('radius.badge'),
+    form: cssLengthOptional('radius.form'),
+    notification: cssLengthOptional('radius.notification'),
+    pagination: cssLengthOptional('radius.pagination'),
+    toggle: cssLengthOptional('radius.toggle'),
+    surface: cssLengthOptional('radius.surface'),
+    codeBlock: cssLengthOptional('radius.codeBlock'),
   })
   .strip()
 

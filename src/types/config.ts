@@ -35,7 +35,7 @@ export interface NavigationConfig {
   fixedHeader?: boolean
   headerBackgroundOpacity?: number
   headerBackgroundBlur?: string
-  showMobileMenuLabel?: boolean
+  mobileMenuLabel?: boolean
   desktopMenuAlignment?: 'left' | 'center' | 'right'
   dropdownDesktopColorMode?: 'theme' | 'inverse'
   desktopFontSize?: string
@@ -49,37 +49,37 @@ export interface NavigationConfig {
 }
 
 export interface BorderConfig {
-  globalWidth?: string
-  buttonWidth?: string
-  cardWidth?: string
-  accordionWidth?: string
-  tabsWidth?: string
-  avatarWidth?: string
-  badgeWidth?: string
-  formWidth?: string
-  notificationWidth?: string
-  paginationWidth?: string
-  toggleWidth?: string
-  mediaWidth?: string
-  surfaceWidth?: string
-  codeBlockWidth?: string
-  dividerWidth?: string
+  global?: string
+  button?: string
+  card?: string
+  accordion?: string
+  tabs?: string
+  avatar?: string
+  badge?: string
+  form?: string
+  notification?: string
+  pagination?: string
+  toggle?: string
+  media?: string
+  surface?: string
+  codeBlock?: string
+  divider?: string
 }
 
 export interface RadiusConfig {
-  globalSize?: string
-  buttonSize?: string
-  cardSize?: string
-  mediaSize?: string
-  tabsSize?: string
-  avatarSize?: string
-  badgeSize?: string
-  formSize?: string
-  notificationSize?: string
-  paginationSize?: string
-  toggleSize?: string
-  surfaceSize?: string
-  codeBlockSize?: string
+  global?: string
+  button?: string
+  card?: string
+  media?: string
+  tabs?: string
+  avatar?: string
+  badge?: string
+  form?: string
+  notification?: string
+  pagination?: string
+  toggle?: string
+  surface?: string
+  codeBlock?: string
 }
 
 export interface SocialItem {
@@ -93,8 +93,8 @@ export interface SiteConfig {
   titleSeparator: string
   trailingSlash: boolean
   defaultTheme: 'auto' | 'light' | 'dark'
-  showDarkModeToggle: boolean
-  showLauncher: false | true | 'default' | 'gradientBorder'
+  darkModeToggle: boolean
+  launcher: false | true | 'default' | 'gradientBorder'
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }
