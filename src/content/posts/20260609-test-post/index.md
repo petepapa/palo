@@ -2,7 +2,7 @@
 # Base Metadata / 基础元数据
 title: "Post a Post"
 description: "This is a blank post."
-publishDate: 2026-06-10
+publishDate: 2026-05-10
 
 # Author Profile / 结构化作者信息
 author:
@@ -21,6 +21,7 @@ share: true
 
 # Status & External Links / 状态与外部链接
 draft: false
+featuredOrder: 1
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 ---

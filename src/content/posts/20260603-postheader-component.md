@@ -18,7 +18,6 @@ source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 showDivider: true
 toc: true
-views: 1600
 
 ---
 
