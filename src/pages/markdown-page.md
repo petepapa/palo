@@ -1,6 +1,6 @@
 ---
 layout: ../layouts/MarkdownLayout.astro
-title: bella Markdown Page
+title: Markdown Page
 description: A clean content page powered by standard Markdown.
 toc: true
 narrow: false
@@ -11,10 +11,10 @@ pageHeader:
   topNavigationTheme: 'dark'
   divider: true
   alignV: bottom
-  alignH: right
+  alignH: left
   bg:
     image: ''
-    video: ''
+    video: '/bg.mp4'
     color: 'red'
     fixed: false
     overlayOpacity: 0.45
