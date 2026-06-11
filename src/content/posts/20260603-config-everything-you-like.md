@@ -16,7 +16,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 views: 1842
 

@@ -16,7 +16,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 views: 2100
 
@@ -269,7 +269,7 @@ When `true`, content will be wrapped in Palo's standard `container` class for pr
 
 #### Section Separation Parameters
 
-##### `showDivider`
+##### `divider`
 - **Type**: `boolean | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方'`
 - **Required**: `false`
 - **Default**: `true`
@@ -289,7 +289,7 @@ Options:
 
 **Example**:
 ```astro
-<CreativeSection showDivider="both">
+<CreativeSection divider="both">
   <h1>Section with Dividers on Both Sides</h1>
 </CreativeSection>
 ```
@@ -351,7 +351,7 @@ A section with fixed background and dividers.
   backgroundImage="/images/nature.jpg"
   backgroundFixed
   backgroundOverlayOpacity={0.2}
-  showDivider="both"
+  divider="both"
 >
   <h2>Our Journey</h2>
   <p>From humble beginnings to where we are today</p>

@@ -16,7 +16,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 
 ---
@@ -247,7 +247,7 @@ liveDemo: "https://palo.petepa.com/"
 
 #### Divider Parameters
 
-##### `showDivider`
+##### `divider`
 - **Type**: `boolean | 'top' | 'bottom' | 'both'`
 - **Required**: `false`
 - **Default**: `true`
@@ -280,7 +280,7 @@ title: My Blog Post
 coverImage: /posts/post-image-1.jpg
 coverImagePosition: head
 breadcrumbs: true
-showDivider: true
+divider: true
 ---
 ```
 
@@ -306,7 +306,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 ---
 ```

@@ -43,7 +43,7 @@ interface Props {
    * 默认 true 或留空为下方；可选 top/both/bottom/false，也支持 上方/上下/下方.
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
-  showDivider?: DividerPlacement
+  divider?: DividerPlacement
   /**
    * 内容垂直位置 / Vertical content position
    * 留空等同 center，可选 top / center / bottom / Empty equals center; accepts top / center / bottom
@@ -68,7 +68,7 @@ const {
   backgroundColor = '',
   backgroundFixed = false,
   backgroundOverlayOpacity = 0,
-  showDivider = true,
+  divider = true,
   contentVerticalAlign = '',
   useContainer = true,
   class: className = '',
@@ -88,7 +88,7 @@ const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both'
   if (normalizedValue === 'both' || normalizedValue === '上下') return 'both'
   return 'bottom'
 }
-const dividerPlacement = resolveDividerPlacement(showDivider)
+const dividerPlacement = resolveDividerPlacement(divider)
 const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
 const resolvedBackgroundOverlayOpacity =
   Number.isFinite(normalizedBackgroundOverlayOpacity)

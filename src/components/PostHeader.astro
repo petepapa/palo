@@ -27,7 +27,7 @@ type Props = {
   joinLastBreadcrumb?: boolean
   source?: string
   liveDemo?: string
-  showDivider?: DividerPlacement
+  divider?: DividerPlacement
   coverImagePosition?: CoverImagePosition
 }
 
@@ -42,7 +42,7 @@ const {
   joinLastBreadcrumb = false,
   source,
   liveDemo,
-  showDivider = true,
+  divider = true,
   coverImagePosition = 'head',
 } = Astro.props as Props
 
@@ -71,7 +71,7 @@ const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'h
   return 'top'
 }
 
-const dividerPlacement = resolveDividerPlacement(showDivider)
+const dividerPlacement = resolveDividerPlacement(divider)
 const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
 const shouldShowCoverImage = !!coverImage && !!coverImagePlacement
 const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'

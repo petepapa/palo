@@ -15,7 +15,7 @@ pageHeader:
   backgroundOverlayOpacity: 0.45
   topNavigationTheme: 'dark'
   paddingBlock: 3xl
-  showDivider: true
+  divider: true
   contentVerticalAlign: bottom
   textAlign: left
 ---

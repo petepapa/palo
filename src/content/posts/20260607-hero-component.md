@@ -16,7 +16,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 views: 2300
 
@@ -185,29 +185,29 @@ Add elegant divider lines above or below the hero section.
 
 ```astro
 <!-- Bottom divider (default) / 底部分隔线（默认） -->
-<Hero showDivider={true}>
+<Hero divider={true}>
   <h1>Bottom Divider</h1>
 </Hero>
 
 <!-- Top divider / 顶部分隔线 -->
-<Hero showDivider="top">
+<Hero divider="top">
   <h1>Top Divider</h1>
 </Hero>
 
 <!-- Both top and bottom / 上下都有 -->
-<Hero showDivider="both">
+<Hero divider="both">
   <h1>Both Dividers</h1>
 </Hero>
 
 <!-- No dividers / 无分隔线 -->
-<Hero showDivider={false}>
+<Hero divider={false}>
   <h1>No Dividers</h1>
 </Hero>
 ```
 
 | Parameter | Type | Default | Description | 说明 |
 |-----------|------|---------|-------------|------|
-| `showDivider` | multiple | `true` | Divider placement: `true`/`'bottom'`/`'下方'`, `'top'`/`'上方'`, `'both'`/`'上下'`, `false`/`'false'` | 分隔线位置 |
+| `divider` | multiple | `true` | Divider placement: `true`/`'bottom'`/`'下方'`, `'top'`/`'上方'`, `'both'`/`'上下'`, `false`/`'false'` | 分隔线位置 |
 
 ---
 
@@ -295,7 +295,7 @@ Add your own CSS classes for additional styling.
 <Hero
   fullscreen={false}
   backgroundColor="#f8fafc"
-  showDivider="bottom"
+  divider="bottom"
 >
   <h1>Clean & Simple</h1>
   <p>Welcome to our site</p>
@@ -314,7 +314,7 @@ Add your own CSS classes for additional styling.
   contentColor="#ffffff"
   topNavigationTheme="dark"
   contentVerticalAlign="bottom"
-  showDivider="top"
+  divider="top"
 >
   <h1>Adventure Awaits</h1>
   <p>Explore the world with us</p>
@@ -350,7 +350,7 @@ Add your own CSS classes for additional styling.
   backgroundOverlayOpacity={0.6}
   contentColor="#ffffff"
   topNavigationTheme="dark"
-  showDivider="both"
+  divider="both"
 >
   <h1>Urban Living</h1>
   <p>Scroll to see the parallax effect</p>
@@ -367,7 +367,7 @@ Add your own CSS classes for additional styling.
   backgroundColor="#0f172a"
   contentColor="#ffffff"
   topNavigationTheme="dark"
-  showDivider="bottom"
+  divider="bottom"
   class="py-32"
 >
   <h1>Transform Your Business</h1>

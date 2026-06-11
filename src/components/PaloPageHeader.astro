@@ -42,7 +42,7 @@ interface Props {
    * 默认 true 或留空为下方；可选 top/both/bottom/false，也支持 上方/上下/下方.
    * Defaults to bottom when true or empty; accepts top/both/bottom/false.
    */
-  showDivider?: DividerPlacement
+  divider?: DividerPlacement
   /**
    * 上下内边距 / Vertical padding.
    * 留空默认使用 var(--space-xl) / Empty defaults to var(--space-xl).
@@ -73,7 +73,7 @@ const {
   backgroundOverlayOpacity = 0,
   contentColor = '',
   topNavigationTheme = '',
-  showDivider = true,
+  divider = true,
   paddingBlock,
   contentVerticalAlign = '',
   contentHorizontalAlign = 'left',
@@ -118,7 +118,7 @@ const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both'
   if (normalizedValue === 'both' || normalizedValue === '上下') return 'both'
   return 'bottom'
 }
-const dividerPlacement = resolveDividerPlacement(showDivider)
+const dividerPlacement = resolveDividerPlacement(divider)
 const contentHorizontalAlignValue = contentHorizontalAlign || textAlign
 const resolvedContentHorizontalAlign =
   contentHorizontalAlignValue === 'center' || contentHorizontalAlignValue === 'right' ? contentHorizontalAlignValue : 'left'

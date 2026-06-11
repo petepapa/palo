@@ -16,7 +16,7 @@ customBreadcrumbLabels:
 joinLastBreadcrumb: false
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
-showDivider: true
+divider: true
 toc: true
 views: 1900
 ---
@@ -248,31 +248,31 @@ Add elegant divider lines above or below the header.
 <PaloPageHeader
   title="Blog Post"
   subtitle="With bottom divider"
-  showDivider="bottom"
+  divider="bottom"
 />
 
 <PaloPageHeader
   title="Product Page"
   subtitle="With both dividers"
-  showDivider="both"
+  divider="both"
 />
 
 <PaloPageHeader
   title="Landing Page"
   subtitle="With top divider"
-  showDivider="top"
+  divider="top"
 />
 
 <PaloPageHeader
   title="Simple Page"
   subtitle="No dividers"
-  showDivider={false}
+  divider={false}
 />
 ```
 
 | Parameter | Type | Default | Description | 说明 |
 |-----------|------|---------|-------------|------|
-| `showDivider` | multiple | `true` | Divider placement | 分隔线位置 |
+| `divider` | multiple | `true` | Divider placement | 分隔线位置 |
 
 ---
 
@@ -382,7 +382,7 @@ Add your own CSS classes.
   contentColor="#ffffff"
   topNavigationTheme="dark"
   paddingBlock="xl"
-  showDivider="bottom"
+  divider="bottom"
   contentHorizontalAlign="center"
   textAlign="center"
 />
@@ -398,7 +398,7 @@ Add your own CSS classes.
   contentColor="#ffffff"
   topNavigationTheme="dark"
   paddingBlock="lg"
-  showDivider="both"
+  divider="both"
 />
 ```
 
@@ -415,7 +415,7 @@ Add your own CSS classes.
   topNavigationTheme="dark"
   fullscreen={true}
   contentVerticalAlign="bottom"
-  showDivider="top"
+  divider="top"
 />
 ```
 
