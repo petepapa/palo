@@ -82,8 +82,14 @@ const projects = (await getCollection('projects')).filter(
   (project) => !project.data.draft,
 )
 
-// Sort projects based on sortBy parameter
-const sortedProjects = [...projects].sort((a, b) => {
+// Dual-axis sorting: Featured First (by featuredOrder ASC) + Timeline Fallback (by sortBy)
+const featuredProjectsList = projects.filter((project) => project.data.featuredOrder !== undefined)
+const regularProjectsList = projects.filter((project) => project.data.featuredOrder === undefined)
+
+featuredProjectsList.sort(
+  (a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity),
+)
+regularProjectsList.sort((a, b) => {
   switch (sortBy) {
     case 'latest':
       return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
@@ -93,6 +99,8 @@ const sortedProjects = [...projects].sort((a, b) => {
       return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
   }
 })
+
+const sortedProjects = [...featuredProjectsList, ...regularProjectsList]
 
 // Limit projects and add featured images
 const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({

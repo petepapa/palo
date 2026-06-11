@@ -42,17 +42,27 @@ const coverImageRatio = '8 / 5'
 // Get posts from content collection (过滤草稿)
 const posts = (await getCollection('posts')).filter((post) => !post.data.draft)
 
-// Sort posts based on sortBy parameter
-const sortedPosts = [...posts].sort((a, b) => {
+// Dual-axis sorting: Featured First (by featuredOrder ASC) + Timeline Fallback (by sortBy)
+const featuredPostsList = posts.filter((post) => post.data.featuredOrder !== undefined)
+const regularPostsList = posts.filter((post) => post.data.featuredOrder === undefined)
+
+featuredPostsList.sort(
+  (a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity),
+)
+regularPostsList.sort((a, b) => {
+  const aDate = a.data.publishDate?.valueOf() ?? 0
+  const bDate = b.data.publishDate?.valueOf() ?? 0
   switch (sortBy) {
     case 'latest':
-      return b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+      return bDate - aDate
     case 'earliest':
-      return a.data.publishDate.valueOf() - b.data.publishDate.valueOf()
+      return aDate - bDate
     default:
-      return b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
+      return bDate - aDate
   }
 })
+
+const sortedPosts = [...featuredPostsList, ...regularPostsList]
 
 // Limit posts and map to display data
 const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
