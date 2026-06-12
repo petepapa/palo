@@ -121,6 +121,7 @@ const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered
         <div class="tags-filter mb-8">
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
+            <Link href={ensureTrailingSlash('/portfolio')}>All</Link>
             {
               uniqueTags.map((tag: { label: string; slug: string }) => {
                 const isCurrentTag = tag.slug === currentTag.slug
