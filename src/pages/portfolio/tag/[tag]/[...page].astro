@@ -13,8 +13,48 @@ import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 
+// =========================================================================
+// 🎛️ 中央控制台 / Central Page Configuration
+// =========================================================================
+const pageConfig = {
+  // ── 文案与 SEO / Copywriting & SEO ──
+  metaTitle: '',                          // 选填 SEO title，留空自动生成
+  metaDescription: '',                    // 选填 SEO description，留空自动生成
+
+  // ── 功能开关中心 / Feature Toggles ──
+  showTags: true,                         // 是否启用顶部 Tag 标签筛选功能
+  showStats: true,                        // 是否显示项目统计信息
+
+  // ── 列表布局参数 / List Layout Settings ──
+  layout: 'overlay',                      // 卡片布局风格：'standard' (网格) | 'overlay' (悬浮遮罩)
+  width: 'full' as ProjectListWidth,      // 容器宽度：'container' (网页内宽) | 'full' (全屏全宽)
+  gap: 'gap-5',                           // 项目间距类名 (Tailwind Gap Class)
+  colsClass: 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3', // 瀑布流分列配置
+
+  // ── 细粒度排版微调 / Typography Fine-Tuning ──
+  tagsHeading: 'h5',                      // Tags 区域标题的 HTML 标签级别与字号样式 ('h1' - 'h6')
+  projectHeadingLevel: 'h5',              // 项目卡片标题的 HTML 标签级别
+  projectDescClass: 'text-base',          // 项目卡片摘要文字的 CSS Class
+} as const
+
+// ── PaloPageHeader 结构化参数 ──
+const pageHeader = {
+  fullscreen: false,
+  contentColor: '',
+  topNavigationTheme: '',
+  alignV: 'center',
+  alignH: 'left',
+  divider: 'bottom',
+  bg: {
+    video: '',
+    image: '',
+    color: '',
+    fixed: false,
+    overlayOpacity: 0,
+  },
+} as const
+
 export const getStaticPaths = (async ({ paginate }) => {
-  // 过滤草稿：仅保留已发布的项目
   const projects = (await getCollection('projects')).filter(
     (project) => !project.data.draft,
   )
@@ -26,8 +66,6 @@ export const getStaticPaths = (async ({ paginate }) => {
   }))
 
   const projectsWithImages = projects
-
-  // Generate paginated pages for each tag
   const allPaginatedPages = []
 
   for (const tag of uniqueTags) {
@@ -35,16 +73,10 @@ export const getStaticPaths = (async ({ paginate }) => {
       project.data.tags.map((tag) => slugify(tag)).includes(tag.slug),
     )
 
-    // ========== SORTING CONFIGURATION / 排序配置 ==========
-    // Latest first (by publishDate) / 最新优先 (按发布日期)
     const sortedFilteredProjects = [...filteredProjects].sort(
       (a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
     )
 
-    // ========== PAGINATION CONFIGURATION / 分页配置 ==========
-    // Modify pageSize to change items per page for tag pages
-    // 修改 pageSize 来改变标签页每页显示的项目数量
-    // Current: 10 items per page / 当前: 每页10个项目
     const paginatedPages = paginate(sortedFilteredProjects, {
       pageSize: 10,
       params: { tag: tag.slug },
@@ -67,131 +99,89 @@ interface Props {
 }
 
 const { page, currentTag, uniqueTags } = Astro.props
-const projectListWidth: ProjectListWidth = 'full' // Project list width: container | full / 项目列表宽度：网页宽 | 全屏宽
-const projectListGapClass = 'gap-5' // Project list gap class; controls column and row gaps / 项目列表间隙 class，同时控制左右和上下间隙
-const projectListWidthClass = getProjectListWidthClass(projectListWidth)
-const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
-const isFullWidthList = projectListWidth === 'full'
 
-// PaloPageHeader settings / 页面头部设置
-const pageHeaderAppearance = {
-  fullscreen: false, // Fill viewport / 撑满屏幕
-  contentColor: '', // Text color; empty = theme / 内容颜色，空=跟随主题
-  topNavigationTheme: '', // '' | dark | light / 顶部导航主题
-  alignV: '', // top | center | bottom; empty = center / 垂直位置，空=居中
-  alignH: '', // left | center | right; empty = left / 水平对齐，空=左对齐
-  divider: true, // true/empty=bottom; top/both/bottom/false / true或空=下方；上方/上下/下方/false
-  bg: {
-    video: '', // Video path in /public / 背景视频，放在 /public
-    image: '', // Image path in /public / 背景图片，放在 /public
-    color: '', // Background color; empty = theme / 背景颜色，空=跟随主题
-    fixed: false, // Fixed background inside section / 背景在区域内固定
-    overlayOpacity: 0, // Overlay opacity 0-1 / 遮罩透明度 0-1
-  },
-} as const
+// 派生计算属性
+const projectListWidthClass = getProjectListWidthClass(pageConfig.width)
+const projectListGapSize = resolveTailwindGapClass(pageConfig.gap)
+const isFullWidthList = pageConfig.width === 'full'
+const resolvedMetaTitle = pageConfig.metaTitle || `Portfolio - ${currentTag.label}`
+const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered by ${currentTag.label} tag. Discover our work in ${currentTag.label} and related technologies.`
 ---
 
-<DefaultLayout
-  title={`Portfolio - ${currentTag.label}`}
-  description={`Projects filtered by ${currentTag.label} tag. Discover our work in ${currentTag.label} and related technologies.`}
->
+<DefaultLayout title={resolvedMetaTitle} description={resolvedMetaDescription}>
   <PaloPageHeader
     title={`Portfolio: ${currentTag.label}`}
     subtitle={`Showing ${page.total} project${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/portfolio')}">View all projects</a> or filter by other tags below.`}
-    {...pageHeaderAppearance}
+    {...pageHeader}
   />
+
   <section class="my-12">
     <div class="container">
-      <Heading level="h2" size="h5" class="mb-2">Tags</Heading>
-      <div class="flex flex-wrap gap-4">
-        <Link href={ensureTrailingSlash('/portfolio')}>All projects</Link>
-        {
-          uniqueTags.map((tag: { label: string; slug: string }) => {
-            const isCurrentTag = tag.slug === currentTag.slug
-            return isCurrentTag ? (
-              <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)} disabled class="disabled">
-                {tag.label}
-              </Link>
-            ) : (
-              <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
-            )
-          })
-        }
-      </div>
-      <p class="mt-8 text-sm">
-        <em
-          >Project {page.start + 1} through {page.end + 1} of {page.total} total projects tagged with "{
-            currentTag.label
-          }"</em
-        >
-      </p>
-      {
-        !isFullWidthList && (
-          <ul
-            class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
-            style={`--project-list-gap: ${projectListGapSize}`}
-          >
+      {pageConfig.showTags && uniqueTags.length > 0 && (
+        <div class="tags-filter mb-8">
+          <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
+          <div class="flex flex-wrap gap-4">
             {
-              page.data.map((project) => (
-                <li class="project-masonry__item">
-                  <ProjectCard
-                    project={project}
-                    image={resolveCollectionCoverImage(
-                      project.data.coverImage,
-                      project.id,
-                      'projects',
-                      getProjectTypeDefaultImage(project.data.type),
-                    )}
-                    layout="overlay"
-                  />
-                </li>
-              ))
+              uniqueTags.map((tag: { label: string; slug: string }) => {
+                const isCurrentTag = tag.slug === currentTag.slug
+                return isCurrentTag ? (
+                  <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)} disabled class="disabled">
+                    {tag.label}
+                  </Link>
+                ) : (
+                  <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
+                )
+              })
             }
-          </ul>
-        )
-      }
-    </div>
-    {
-      isFullWidthList && (
-        <ul
-          class:list={['project-masonry mt-3', projectListWidthClass, projectListGapClass]}
-          style={`--project-list-gap: ${projectListGapSize}`}
-        >
-          {
-            page.data.map((project) => (
-              <li class="project-masonry__item">
-                <ProjectCard
-                  project={project}
-                  image={resolveCollectionCoverImage(
-                    project.data.coverImage,
-                    project.id,
-                    'projects',
-                    getProjectTypeDefaultImage(project.data.type),
-                  )}
-                  layout="overlay"
-                />
-              </li>
-            ))
-          }
-        </ul>
-      )
-    }
-    <div class="container">
-      {
-        page && page.lastPage > 1 && (
-          <div class="mt-12 grid place-content-center">
-            <Pagination
-              firstPage={page.url.prev ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}`) : null}
-              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
-              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
-              lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}/${page.lastPage}`) : null}
-              currentPage={`${page.currentPage}`}
-              totalPages={`${page.lastPage}`}
-              ariaLabel={`${currentTag.label} portfolio pagination`}
-            />
           </div>
-        )
-      }
+        </div>
+      )}
+
+      {pageConfig.showStats && (
+        <p class="mb-6 text-sm text-neutral-500 italic">
+          {page.total} total projects tagged with "{currentTag.label}" · Page {page.currentPage} of {page.lastPage}
+        </p>
+      )}
     </div>
+
+    <div class={isFullWidthList ? "w-full" : "container"}>
+      <ul
+        class:list={['project-masonry mt-3', projectListWidthClass, pageConfig.gap, pageConfig.colsClass]}
+        style={`--project-list-gap: ${projectListGapSize}`}
+      >
+        {
+          page.data.map((project) => (
+            <li class="project-masonry__item break-inside-avoid">
+              <ProjectCard
+                project={project}
+                image={resolveCollectionCoverImage(
+                  project.data.coverImage,
+                  project.id,
+                  'projects',
+                  getProjectTypeDefaultImage(project.data.type),
+                )}
+                layout={pageConfig.layout}
+                headingLevel={pageConfig.projectHeadingLevel}
+                descriptionClass={pageConfig.projectDescClass}
+              />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    {page.lastPage > 1 && (
+      <div class="mt-12 flex justify-center">
+        <Pagination
+          firstPage={page.url.prev ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}`) : null}
+          previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+          nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+          lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/tag/${currentTag.slug}/${page.lastPage}`) : null}
+          currentPage={`${page.currentPage}`}
+          totalPages={`${page.lastPage}`}
+          ariaLabel={`${currentTag.label} portfolio pagination`}
+        />
+      </div>
+    )}
   </section>
 </DefaultLayout>
