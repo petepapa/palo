@@ -78,21 +78,6 @@ Slogan 不仅仅是一个文字显示 - 它是一个完整的品牌消息解决�
 <Slogan text="Welcome to Palo" />
 ```
 
-##### `as`
-- **Type**: `'div' | 'p' | 'h1' | 'h2' | 'h3' | ''`
-- **Required**: `false`
-- **Default**: `'div'`
-- **Function**: HTML tag for the text element
-
-Control the semantic HTML element used for the text.
-
-控制用于文字的语义 HTML 元素。
-
-**Example**:
-```astro
-<Slogan text="Page Title" as="h1" />
-```
-
 ##### `variant`
 - **Type**: `'default' | 'inline' | 'marquee'`
 - **Required**: `false`
@@ -256,7 +241,6 @@ A basic slogan with custom text styling.
 ```astro
 <Slogan
   text="Building Beautiful Websites"
-  as="h2"
   class="text-4xl font-bold text-primary"
 />
 ```
@@ -321,7 +305,6 @@ Complete marquee setup as typically used in footer.
 
   <Slogan
     text="Palo Astro Theme"
-    as=""
     variant="marquee"
     speed="normal"
     pause={false}
@@ -356,14 +339,12 @@ The Slogan component is built with accessibility at its core:
 Slogan 组件以无障碍为核心构建：
 
 - **`prefers-reduced-motion` Support**: Marquee animations are disabled when users have motion reduction enabled, showing static text instead
-- **Semantic HTML**: Supports proper heading tags (`h1`-`h3`) for document structure
 - **Keyboard Navigation**: All text remains fully accessible via keyboard
 - **ARIA Labels**: Marquee variants include `aria-label` for screen readers
 - **Hover Pause**: Built-in pause on hover for users who need more time to read
 - **Focus Indicators**: No focus outline removal
 
 - **`prefers-reduced-motion` 支持**：当用户启用动态效果减弱时，跑马灯动画会被禁用，改为显示静态文字
-- **语义化 HTML**：支持适当的标题标签（`h1`-`h3`）以实现文档结构
 - **键盘导航**：所有文字都可以通过键盘完全访问
 - **ARIA 标签**：跑马灯变体包含屏幕阅读器的 `aria-label`
 - **Hover 暂停**：内置的悬停暂停功能，为需要更多阅读时间的用户提供帮助
