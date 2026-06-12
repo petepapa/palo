@@ -3,29 +3,16 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
 import PostCard from '@components/PostCard.astro'
 import { Heading, Link, Pagination } from 'accessible-astro-components'
-import type { PaginateFunction, Page } from 'astro'
+import type { PaginateFunction } from 'astro'
 import { getCollection } from 'astro:content'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { slugify } from '@utils/slugify'
-import { BLOG_PAGE_SIZE } from '@utils/blogConfig'
-
-type SortBy = 'latest' | 'earliest'
-
-interface Post {
-  id: string
-  title: string
-  description: string
-  author: string
-  tags: string[]
-  publishDate: Date
-  coverImage?: string
-}
+import { BLOG_PAGE_SIZE, BLOG_SORT_BY } from '@utils/blogConfig'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration
 // =========================================================================
-// ⚠️ 注意：pageConfig 必须定义在 getStaticPaths 之前，因为 Astro 编译器会提升 export 函数
 const COVER_IMAGE_RATIO = '8 / 5'
 
 const pageConfig = {
@@ -46,11 +33,11 @@ const pageConfig = {
   // ── 细粒度排版微调 / Typography Fine-Tuning ──
   tagsHeading: 'h5',    // Tags 区域标题的 HTML 标签级别与字号样式
   postHeadingLevel: 'h3', // PostCard 标题的 HTML 标签级别
-  postDescClass: 'text-base', // PostCard 摘要文字的 CSS Class
+  postDescClass: 'text-md', // PostCard 摘要文字的 CSS Class
 } as const
 
-// ── PaloPageHeader 结构化参数 ──
-const pageHeaderAppearance = {
+// ── PaloPageHeader 结构化参数 (对齐大一统新规范) ──
+const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
@@ -66,16 +53,25 @@ const pageHeaderAppearance = {
   },
 } as const
 
+// =========================================================================
+// 📦 数据引擎与沙盒分页 / Data Fetching & Sandbox Pagination
+// =========================================================================
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
-  const posts = await getCollection('posts')
+  const posts = (await getCollection('posts')).filter((p) => !p.data.draft)
 
-  const featuredPosts = posts.filter((post) => !post.data.draft && post.data.featuredOrder !== undefined)
-  const regularPosts = posts.filter((post) => !post.data.draft && post.data.featuredOrder === undefined)
+  // 双轴排序引擎：精选置顶 (featuredOrder 升序) + BLOG_SORT_BY 时间轴兜底
+  const featured = posts.filter((p) => p.data.featuredOrder !== undefined)
+  const regular = posts.filter((p) => p.data.featuredOrder === undefined)
 
-  featuredPosts.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
-  regularPosts.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+  featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
 
-  const sortedPosts = [...featuredPosts, ...regularPosts]
+  if (BLOG_SORT_BY === 'latest') {
+    regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+  } else {
+    regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
+  }
+
+  const sortedPosts = [...featured, ...regular]
 
   const postsWithImages = sortedPosts.map((post) => {
     const { author: originalAuthor, ...rest } = post.data
@@ -92,15 +88,12 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
   return paginate(postsWithImages, { pageSize: BLOG_PAGE_SIZE })
 }
 
-interface Props {
-  page: Page<Post>
-}
-
-const { page } = Astro.props as Props
+// 类型由 getStaticPaths 返回值自动推断，无需手写 interface Post
+const { page } = Astro.props
 
 const resolvedMetaTitle = pageConfig.metaTitle || pageConfig.title
 
-// 💡 仅在开启 showTags 时才在服务器端计算 Tags 集合
+// 💡 仅在开启 showTags 时才在服务器端计算 Tags 集合，彻底避免不必要的性能损耗与沙盒隔离隐患
 let uniqueTags: Array<{ label: string; slug: string }> = []
 if (pageConfig.showTags) {
   const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
@@ -115,7 +108,7 @@ if (pageConfig.showTags) {
   <PaloPageHeader
     title={pageConfig.title}
     subtitle={pageConfig.subtitle}
-    {...pageHeaderAppearance}
+    {...pageHeader}
   />
 
   <section class="my-12">

@@ -3,12 +3,12 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
 import PostCard from '@components/PostCard.astro'
 import { Heading, Link, Pagination } from 'accessible-astro-components'
-import type { Page, GetStaticPaths } from 'astro'
+import type { PaginateFunction } from 'astro'
 import { getCollection } from 'astro:content'
 import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
-import { BLOG_PAGE_SIZE } from '@utils/blogConfig'
+import { BLOG_PAGE_SIZE, BLOG_SORT_BY } from '@utils/blogConfig'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration
@@ -34,8 +34,8 @@ const pageConfig = {
   postDescClass: 'text-base', // PostCard 摘要文字的 CSS Class
 } as const
 
-// ── PaloPageHeader 结构化参数 ──
-const pageHeaderAppearance = {
+// ── PaloPageHeader 结构化参数 (对齐大一统新规范) ──
+const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
@@ -51,25 +51,14 @@ const pageHeaderAppearance = {
   },
 } as const
 
-interface Post {
-  id: string
-  title: string
-  description: string
-  author: string
-  tags: string[]
-  publishDate: Date
-  coverImage?: string
-}
-
-export const getStaticPaths = (async ({ paginate }) => {
-  const posts = await getCollection('posts')
+// =========================================================================
+// 📦 数据引擎与沙盒分页 / Data Fetching & Sandbox Pagination
+// =========================================================================
+export const getStaticPaths = (async ({ paginate }: { paginate: PaginateFunction }) => {
+  const posts = (await getCollection('posts')).filter((p) => !p.data.draft)
 
   // 提取所有 tag 用于生成静态路径
-  const allTags = posts
-    .filter((post) => !post.data.draft)
-    .map((post) => post.data.tags)
-    .flat()
-    .filter(Boolean)
+  const allTags = posts.map((p) => p.data.tags).flat().filter(Boolean)
   const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
   const uniqueTags = uniqueTagLabels.map((label) => ({
     label,
@@ -79,13 +68,25 @@ export const getStaticPaths = (async ({ paginate }) => {
   const allPaginatedPages = []
 
   for (const tag of uniqueTags) {
-    const filteredPosts = posts.filter((post) => {
-      if (post.data.draft) return false
-      return post.data.tags.map((t) => slugify(t)).includes(tag.slug)
-    })
+    const filteredPosts = posts.filter((p) =>
+      p.data.tags.map((t) => slugify(t)).includes(tag.slug)
+    )
 
-    // 将 CollectionEntry 转为 Post 接口格式
-    const postsWithImages = filteredPosts.map((post) => {
+    // 双轴排序引擎：精选置顶 (featuredOrder 升序) + BLOG_SORT_BY 时间轴兜底
+    const featured = filteredPosts.filter((p) => p.data.featuredOrder !== undefined)
+    const regular = filteredPosts.filter((p) => p.data.featuredOrder === undefined)
+
+    featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+
+    if (BLOG_SORT_BY === 'latest') {
+      regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+    } else {
+      regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
+    }
+
+    const sortedPosts = [...featured, ...regular]
+
+    const postsWithImages = sortedPosts.map((post) => {
       const { author: originalAuthor, ...rest } = post.data
       const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
       return {
@@ -97,16 +98,11 @@ export const getStaticPaths = (async ({ paginate }) => {
       }
     })
 
-    const sortedPosts = [...postsWithImages].sort(
-      (a, b) => (b.publishDate?.valueOf() || 0) - (a.publishDate?.valueOf() || 0),
-    )
-
-    const paginatedPages = paginate(sortedPosts, {
+    const paginatedPages = paginate(postsWithImages, {
       pageSize: BLOG_PAGE_SIZE,
       params: { tag: tag.slug },
       props: {
         currentTag: tag,
-        uniqueTags,
       },
     })
 
@@ -114,25 +110,30 @@ export const getStaticPaths = (async ({ paginate }) => {
   }
 
   return allPaginatedPages
-}) satisfies GetStaticPaths
+})
 
-interface Props {
-  page: Page<Post>
-  currentTag: { label: string; slug: string }
-  uniqueTags: { label: string; slug: string }[]
-}
-
-const { page, currentTag, uniqueTags } = Astro.props as Props
+// 类型由 getStaticPaths 返回值自动推断，无需手写 interface
+const { page, currentTag } = Astro.props
 
 const resolvedMetaTitle = pageConfig.metaTitle || `Blog - ${currentTag.label}`
 const resolvedMetaDescription = pageConfig.metaDescription || `Articles tagged with "${currentTag.label}". Explore our blog posts about ${currentTag.label}.`
+
+// 💡 仅在开启 showTags 时才在服务器端计算 Tags 集合，彻底避免不必要的性能损耗与沙盒隔离隐患
+let uniqueTags: Array<{ label: string; slug: string }> = []
+if (pageConfig.showTags) {
+  const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
+  uniqueTags = [...new Set(allPosts.map((p) => p.data.tags).flat())]
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b))
+    .map((label) => ({ label, slug: slugify(label) }))
+}
 ---
 
 <DefaultLayout title={resolvedMetaDescription ? `${resolvedMetaTitle} - ${resolvedMetaDescription}` : resolvedMetaTitle} description={resolvedMetaDescription}>
   <PaloPageHeader
     title={`Blog: ${currentTag.label}`}
     subtitle={`Showing ${page.total} post${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/blog')}">View all posts</a> or filter by other tags below.`}
-    {...pageHeaderAppearance}
+    {...pageHeader}
   />
 
   <section class="my-12">
