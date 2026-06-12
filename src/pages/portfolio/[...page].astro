@@ -10,7 +10,7 @@ import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
-import { PORTFOLIO_PAGE_SIZE, PORTFOLIO_SORT_BY } from '@utils/portfolioConfig'
+import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 import type { PaginateFunction, Page } from 'astro'
 
 // =========================================================================
@@ -68,7 +68,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
 
   featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
 
-  if (PORTFOLIO_SORT_BY === 'earliest') {
+  if (SORT_BY.portfolio === 'earliest') {
     regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
   } else {
     regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
@@ -76,7 +76,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
 
   const sortedProjects = [...featured, ...regular]
 
-  return paginate(sortedProjects, { pageSize: PORTFOLIO_PAGE_SIZE })
+  return paginate(sortedProjects, { pageSize: PAGE_SIZE.portfolio })
 }
 
 interface Props {

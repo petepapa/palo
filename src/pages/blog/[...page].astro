@@ -8,7 +8,7 @@ import { getCollection } from 'astro:content'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { slugify } from '@utils/slugify'
-import { BLOG_PAGE_SIZE, BLOG_SORT_BY } from '@utils/blogConfig'
+import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration
@@ -59,13 +59,13 @@ const pageHeader = {
 export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
   const posts = (await getCollection('posts')).filter((p) => !p.data.draft)
 
-  // 双轴排序引擎：精选置顶 (featuredOrder 升序) + BLOG_SORT_BY 时间轴兜底
+  // 双轴排序引擎：精选置顶 (featuredOrder 升序) + SORT_BY.blog 时间轴兜底
   const featured = posts.filter((p) => p.data.featuredOrder !== undefined)
   const regular = posts.filter((p) => p.data.featuredOrder === undefined)
 
   featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
 
-  if (BLOG_SORT_BY === 'latest') {
+  if (SORT_BY.blog === 'latest') {
     regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
   } else {
     regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
@@ -85,7 +85,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     }
   })
 
-  return paginate(postsWithImages, { pageSize: BLOG_PAGE_SIZE })
+  return paginate(postsWithImages, { pageSize: PAGE_SIZE.blog })
 }
 
 // 类型由 getStaticPaths 返回值自动推断，无需手写 interface Post

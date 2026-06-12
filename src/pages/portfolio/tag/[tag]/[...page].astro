@@ -12,6 +12,7 @@ import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
+import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration
@@ -55,30 +56,39 @@ const pageHeader = {
 } as const
 
 export const getStaticPaths = (async ({ paginate }) => {
-  const projects = (await getCollection('projects')).filter(
+  const allProjects = (await getCollection('projects')).filter(
     (project) => !project.data.draft,
   )
-  const allTags = projects.map((project) => project.data.tags).flat()
+  const allTags = allProjects.map((project) => project.data.tags).flat()
   const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
   const uniqueTags = uniqueTagLabels.map((label) => ({
     label,
     slug: slugify(label),
   }))
 
-  const projectsWithImages = projects
   const allPaginatedPages = []
 
   for (const tag of uniqueTags) {
-    const filteredProjects = projectsWithImages.filter((project) =>
+    const filteredProjects = allProjects.filter((project) =>
       project.data.tags.map((tag) => slugify(tag)).includes(tag.slug),
     )
 
-    const sortedFilteredProjects = [...filteredProjects].sort(
-      (a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
-    )
+    // 双轴排序引擎：精选置顶 (featuredOrder 升序) + 时间轴兜底
+    const featured = filteredProjects.filter((p) => p.data.featuredOrder !== undefined)
+    const regular = filteredProjects.filter((p) => p.data.featuredOrder === undefined)
+
+    featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+
+    if (SORT_BY.portfolio === 'earliest') {
+      regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
+    } else {
+      regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+    }
+
+    const sortedFilteredProjects = [...featured, ...regular]
 
     const paginatedPages = paginate(sortedFilteredProjects, {
-      pageSize: 10,
+      pageSize: PAGE_SIZE.portfolio,
       params: { tag: tag.slug },
       props: {
         currentTag: tag,
