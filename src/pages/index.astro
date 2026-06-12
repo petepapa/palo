@@ -117,7 +117,11 @@ import { Card } from 'accessible-astro-components'
 
   {/* LATEST POSTS SECTION ========================================*/}
   <section class="my-64">
-  <LatestPosts limit={3} />
+  <LatestPosts 
+    limit={5} 
+    postHeadingLevel="h3"
+    postDescClass="text-md"
+  />
 </section>
 
 </DefaultLayout>

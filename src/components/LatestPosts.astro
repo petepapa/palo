@@ -33,9 +33,38 @@ interface Props {
    * @default "latest"
    */
   sortBy?: SortBy
+  /**
+   * Heading level for PostCard title
+   * @default "h3"
+   */
+  postHeadingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  /**
+   * CSS class for PostCard description text
+   * @default ""
+   */
+  postDescClass?: string
+  /**
+   * Vertical gap between PostCard items (Tailwind Gap Class)
+   * @default "gap-24"
+   */
+  itemGap?: string
+  /**
+   * CSS gap class between image and content columns inside PostCard
+   * @default "gap-12 md:gap-24"
+   */
+  cardGap?: string
 }
 
-const { class: className, limit = 3, title = 'Latest posts', sortBy = 'latest' } = Astro.props
+const {
+  class: className,
+  limit = 3,
+  title = 'Latest posts',
+  sortBy = 'latest',
+  postHeadingLevel = 'h3',
+  postDescClass = '',
+  itemGap = 'gap-24',
+  cardGap = 'gap-12 md:gap-24',
+} = Astro.props
 
 const coverImageRatio = '8 / 5'
 
@@ -86,7 +115,7 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
 <section class:list={[className, 'my-8']}>
   <div class="container">
     <Heading level="h2" class="mb-6">{title}</Heading>
-    <ul class="my-8 grid grid-cols-1 gap-24">
+    <ul class={['my-8 grid grid-cols-1', itemGap].join(' ')}>
       {
         latestPosts.map((post) => (
           <li>
@@ -96,6 +125,9 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
               url={post.url}
               title={post.title}
               footer={post.author}
+              headingLevel={postHeadingLevel}
+              descriptionClass={postDescClass}
+              cardGap={cardGap}
             >
               {post.description}
             </PostCard>
