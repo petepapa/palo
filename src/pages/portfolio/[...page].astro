@@ -15,7 +15,7 @@ import type { PaginateFunction, Page } from 'astro'
 // ── 🛠️ 构建期硬核参数 (用户访问点 / User Entry Point) ──
 // ⚡ 因 Astro 编译隔离机制，文件顶部的常量无法被 getStaticPaths 函数体读取。
 //    修改下方值时，请同时同步更新 getStaticPaths 函数体内部的同名常量。
-const PORTFOLIO_PAGE_SIZE = 10                    // 🎛️ 翻页单页展示项目数量
+const PORTFOLIO_PAGE_SIZE = 6                    // 🎛️ 翻页单页展示项目数量
 const PORTFOLIO_SORT_BY: 'latest' | 'earliest' = 'latest'   // 🎛️ 常规项目排序方式：'latest' (最新在前) | 'earliest' (最早在前)
 
 // =========================================================================
