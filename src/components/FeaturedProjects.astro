@@ -11,7 +11,7 @@ import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 
 type FeaturedProjectLayout = 'standard' | 'overlay'
 
-type SortBy = 'latest' | 'earliest'
+type SortBy = 'latest' | 'earliest' | 'popular'
 
 /**
  * FeaturedProjects Component
@@ -42,12 +42,12 @@ interface Props {
    * Project list width
    * @default "container"
    */
-  projectListWidth?: ProjectListWidth
+  width?: ProjectListWidth
   /**
    * Project list gap class
    * @default "gap-12"
    */
-  projectListGapClass?: string
+  gap?: string
   /**
    * Sort projects by: latest (newest first), earliest (oldest first)
    * @default "latest"
@@ -60,21 +60,21 @@ const {
   limit = 3,
   title = 'Featured projects',
   layout = 'standard',
-  projectListWidth = 'container',
-  projectListGapClass = 'gap-12',
+  width = 'container',
+  gap = 'gap-12',
   sortBy = 'latest',
 } = Astro.props
-const projectListWidthClass = getProjectListWidthClass(projectListWidth)
-const projectListGapSize = resolveTailwindGapClass(projectListGapClass)
+const projectListWidthClass = getProjectListWidthClass(width)
+const projectListGapSize = resolveTailwindGapClass(gap)
 const isOverlayLayout = layout === 'overlay'
-const isFullWidthList = projectListWidth === 'full'
+const isFullWidthList = width === 'full'
 
 const listBaseClasses = [
   isOverlayLayout
     ? 'featured-projects__masonry'
     : 'grid grid-cols-1 list-none p-0 md:grid-cols-2 lg:grid-cols-3',
   projectListWidthClass,
-  projectListGapClass,
+  gap,
 ]
 
 // Get projects from content collection (过滤草稿)
@@ -92,6 +92,7 @@ featuredProjectsList.sort(
 regularProjectsList.sort((a, b) => {
   switch (sortBy) {
     case 'latest':
+    case 'popular':
       return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
     case 'earliest':
       return (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0)
