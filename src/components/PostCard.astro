@@ -47,6 +47,16 @@ interface Props {
    * Footer content
    */
   footer?: string
+  /**
+   * CSS gap class between image and content columns
+   * @default "gap-12 md:gap-24"
+   */
+  cardGap?: string
+  /**
+   * CSS class for the description text
+   * @default ""
+   */
+  descriptionClass?: string
 }
 
 const {
@@ -58,6 +68,8 @@ const {
   imageRatio = '8 / 5',
   headingLevel = 'h3',
   footer,
+  cardGap = 'gap-12 md:gap-24',
+  descriptionClass = '',
 } = Astro.props
 
 const HeadingTag = headingLevel
@@ -66,7 +78,7 @@ const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
 const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '0'
 ---
 
-<article class:list={['post-card grid grid-cols-1 gap-12 md:gap-24 md:grid-cols-2', className]}>
+<article class:list={['post-card grid grid-cols-1 md:grid-cols-2', cardGap, className]}>
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
     <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" />
   </a>
@@ -74,7 +86,7 @@ const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '
     <HeadingTag class="post-card__title">
       <a href={postUrl}>{title}</a>
     </HeadingTag>
-    <div class="post-card__description">
+    <div class={['post-card__description', descriptionClass].filter(Boolean).join(' ')}>
       <slot />
     </div>
     {footer && <small class="post-card__footer">{footer}</small>}

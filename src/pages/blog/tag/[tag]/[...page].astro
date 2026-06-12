@@ -3,37 +3,22 @@ import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
 import PostCard from '@components/PostCard.astro'
 import { Heading, Link, Pagination } from 'accessible-astro-components'
-import type { PaginateFunction, Page } from 'astro'
+import type { Page, GetStaticPaths } from 'astro'
 import { getCollection } from 'astro:content'
-import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
-import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { slugify } from '@utils/slugify'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 import { BLOG_PAGE_SIZE } from '@utils/blogConfig'
-
-type SortBy = 'latest' | 'earliest'
-
-interface Post {
-  id: string
-  title: string
-  description: string
-  author: string
-  tags: string[]
-  publishDate: Date
-  coverImage?: string
-}
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration
 // =========================================================================
-// ⚠️ 注意：pageConfig 必须定义在 getStaticPaths 之前，因为 Astro 编译器会提升 export 函数
 const COVER_IMAGE_RATIO = '8 / 5'
 
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
-  title: 'Blog',
-  subtitle: 'Latest articles on web development, accessibility, and design best practices.',
   metaTitle: '',        // 选填。留空则自动复用 title
-  metaDescription: 'Insights, tutorials, and thoughts on web development, accessibility, and design.',
+  metaDescription: '',  // 选填 SEO description，留空自动生成
 
   // ── 功能开关中心 / Feature Toggles ──
   showTags: true,       // 是否启用顶部 Tag 标签筛选功能
@@ -66,55 +51,87 @@ const pageHeaderAppearance = {
   },
 } as const
 
-export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+interface Post {
+  id: string
+  title: string
+  description: string
+  author: string
+  tags: string[]
+  publishDate: Date
+  coverImage?: string
+}
+
+export const getStaticPaths = (async ({ paginate }) => {
   const posts = await getCollection('posts')
 
-  const featuredPosts = posts.filter((post) => !post.data.draft && post.data.featuredOrder !== undefined)
-  const regularPosts = posts.filter((post) => !post.data.draft && post.data.featuredOrder === undefined)
+  // 提取所有 tag 用于生成静态路径
+  const allTags = posts
+    .filter((post) => !post.data.draft)
+    .map((post) => post.data.tags)
+    .flat()
+    .filter(Boolean)
+  const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
+  const uniqueTags = uniqueTagLabels.map((label) => ({
+    label,
+    slug: slugify(label),
+  }))
 
-  featuredPosts.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
-  regularPosts.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+  const allPaginatedPages = []
 
-  const sortedPosts = [...featuredPosts, ...regularPosts]
+  for (const tag of uniqueTags) {
+    const filteredPosts = posts.filter((post) => {
+      if (post.data.draft) return false
+      return post.data.tags.map((t) => slugify(t)).includes(tag.slug)
+    })
 
-  const postsWithImages = sortedPosts.map((post) => {
-    const { author: originalAuthor, ...rest } = post.data
-    const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
-    return {
-      ...rest,
-      id: post.id,
-      author,
-      tags: rest.tags ?? [],
-      coverImage: post.data.coverImage,
-    }
-  })
+    // 将 CollectionEntry 转为 Post 接口格式
+    const postsWithImages = filteredPosts.map((post) => {
+      const { author: originalAuthor, ...rest } = post.data
+      const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
+      return {
+        ...rest,
+        id: post.id,
+        author,
+        tags: rest.tags ?? [],
+        coverImage: post.data.coverImage,
+      }
+    })
 
-  return paginate(postsWithImages, { pageSize: BLOG_PAGE_SIZE })
-}
+    const sortedPosts = [...postsWithImages].sort(
+      (a, b) => (b.publishDate?.valueOf() || 0) - (a.publishDate?.valueOf() || 0),
+    )
+
+    const paginatedPages = paginate(sortedPosts, {
+      pageSize: BLOG_PAGE_SIZE,
+      params: { tag: tag.slug },
+      props: {
+        currentTag: tag,
+        uniqueTags,
+      },
+    })
+
+    allPaginatedPages.push(...paginatedPages)
+  }
+
+  return allPaginatedPages
+}) satisfies GetStaticPaths
 
 interface Props {
   page: Page<Post>
+  currentTag: { label: string; slug: string }
+  uniqueTags: { label: string; slug: string }[]
 }
 
-const { page } = Astro.props as Props
+const { page, currentTag, uniqueTags } = Astro.props as Props
 
-const resolvedMetaTitle = pageConfig.metaTitle || pageConfig.title
-
-// 💡 仅在开启 showTags 时才在服务器端计算 Tags 集合
-let uniqueTags: Array<{ label: string; slug: string }> = []
-if (pageConfig.showTags) {
-  const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
-  uniqueTags = [...new Set(allPosts.map((p) => p.data.tags).flat())]
-    .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b))
-    .map((label) => ({ label, slug: slugify(label) }))
-}
+const resolvedMetaTitle = pageConfig.metaTitle || `Blog - ${currentTag.label}`
+const resolvedMetaDescription = pageConfig.metaDescription || `Articles tagged with "${currentTag.label}". Explore our blog posts about ${currentTag.label}.`
 ---
 
-<DefaultLayout title={resolvedMetaTitle} description={pageConfig.metaDescription}>
+<DefaultLayout title={resolvedMetaDescription ? `${resolvedMetaTitle} - ${resolvedMetaDescription}` : resolvedMetaTitle} description={resolvedMetaDescription}>
   <PaloPageHeader
-    title={pageConfig.title}
-    subtitle={pageConfig.subtitle}
+    title={`Blog: ${currentTag.label}`}
+    subtitle={`Showing ${page.total} post${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/blog')}">View all posts</a> or filter by other tags below.`}
     {...pageHeaderAppearance}
   />
 
@@ -125,16 +142,25 @@ if (pageConfig.showTags) {
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
             <Link href={ensureTrailingSlash('/blog')}>All</Link>
-            {uniqueTags.map((tag) => (
-              <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
-            ))}
+            {
+              uniqueTags.map((tag: { label: string; slug: string }) => {
+                const isCurrentTag = tag.slug === currentTag.slug
+                return isCurrentTag ? (
+                  <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)} disabled class="disabled">
+                    {tag.label}
+                  </Link>
+                ) : (
+                  <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
+                )
+              })
+            }
           </div>
         </div>
       )}
 
       {pageConfig.showStats && (
         <p class="mb-6 text-sm text-neutral-500 italic">
-          <em>Post {page.start + 1} through {page.end} of {page.total} total posts · Page {page.currentPage} of {page.lastPage}</em>
+          {page.total} total posts tagged with "{currentTag.label}" · Page {page.currentPage} of {page.lastPage}
         </p>
       )}
 
@@ -169,16 +195,16 @@ if (pageConfig.showTags) {
       </ul>
 
       {
-        page && page.lastPage > 1 && (
+        page.lastPage > 1 && (
           <div class="mt-12 grid place-content-center">
             <Pagination
-              firstPage={page.url.prev ? ensureTrailingSlash('/blog') : null}
+              firstPage={page.url.prev ? ensureTrailingSlash(`/blog/tag/${currentTag.slug}`) : null}
               previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
               nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
-              lastPage={page.url.next ? ensureTrailingSlash(`/blog/${page.lastPage}`) : null}
+              lastPage={page.url.next ? ensureTrailingSlash(`/blog/tag/${currentTag.slug}/${page.lastPage}`) : null}
               currentPage={`${page.currentPage}`}
               totalPages={`${page.lastPage}`}
-              ariaLabel="Blog pagination"
+              ariaLabel={`${currentTag.label} blog pagination`}
             />
           </div>
         )
