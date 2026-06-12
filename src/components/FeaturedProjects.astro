@@ -53,6 +53,21 @@ interface Props {
    * @default "latest"
    */
   sortBy?: SortBy
+  /**
+   * Heading level for ProjectCard title
+   * @default "h5"
+   */
+  projectHeadingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  /**
+   * CSS class for ProjectCard description text
+   * @default "text-base"
+   */
+  projectDescClass?: string
+  /**
+   * Columns class for the grid layout (Tailwind Columns)
+   * @default "columns-1 sm:columns-2 lg:columns-3 xl:columns-3"
+   */
+  colsClass?: string
 }
 
 const {
@@ -63,6 +78,9 @@ const {
   width = 'container',
   gap = 'gap-12',
   sortBy = 'latest',
+  projectHeadingLevel = 'h5',
+  projectDescClass = 'text-base',
+  colsClass = 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3',
 } = Astro.props
 const projectListWidthClass = getProjectListWidthClass(width)
 const projectListGapSize = resolveTailwindGapClass(gap)
@@ -72,7 +90,7 @@ const isFullWidthList = width === 'full'
 const listBaseClasses = [
   isOverlayLayout
     ? 'featured-projects__masonry'
-    : 'grid grid-cols-1 list-none p-0 md:grid-cols-2 lg:grid-cols-3',
+    : colsClass + ' grid list-none p-0',
   projectListWidthClass,
   gap,
 ]
@@ -126,7 +144,13 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
           {
             featuredProjects.map((project) => (
               <li class:list={[isOverlayLayout && 'featured-projects__masonry-item']}>
-                <ProjectCard project={project} image={project.featuredImage} layout={layout} />
+                <ProjectCard
+                  project={project}
+                  image={project.featuredImage}
+                  layout={layout}
+                  headingLevel={projectHeadingLevel}
+                  descriptionClass={projectDescClass}
+                />
               </li>
             ))
           }
@@ -145,7 +169,13 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
           {
             featuredProjects.map((project) => (
               <li class:list={[isOverlayLayout && 'featured-projects__masonry-item']}>
-                <ProjectCard project={project} image={project.featuredImage} layout={layout} />
+                <ProjectCard
+                  project={project}
+                  image={project.featuredImage}
+                  layout={layout}
+                  headingLevel={projectHeadingLevel}
+                  descriptionClass={projectDescClass}
+                />
               </li>
             ))
           }
