@@ -148,16 +148,18 @@ if (pageConfig.showTags) {
       </ul>
     </div>
 
-    <div class="mt-12 flex justify-center">
-      <Pagination
-        firstPage={page.url.prev ? ensureTrailingSlash('/portfolio') : null}
-        previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
-        nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
-        lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/${page.lastPage}`) : null}
-        currentPage={`${page.currentPage}`}
-        totalPages={`${page.lastPage}`}
-        ariaLabel="Portfolio pagination"
-      />
-    </div>
+    {page.lastPage > 1 && (
+      <div class="mt-12 flex justify-center">
+        <Pagination
+          firstPage={page.url.prev ? ensureTrailingSlash('/portfolio') : null}
+          previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+          nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+          lastPage={page.url.next ? ensureTrailingSlash(`/portfolio/${page.lastPage}`) : null}
+          currentPage={`${page.currentPage}`}
+          totalPages={`${page.lastPage}`}
+          ariaLabel="Portfolio pagination"
+        />
+      </div>
+    )}
   </section>
 </DefaultLayout>
