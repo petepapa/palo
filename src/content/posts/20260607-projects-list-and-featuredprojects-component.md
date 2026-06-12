@@ -59,9 +59,12 @@ The main portfolio list page at `/portfolio` displays all projects in a paginate
 - 标签云，快速导航
 - 与网站其他页面一致的样式
 
+
 **Configuration**:
 ```typescript
 // Located in: src/pages/portfolio/[...page].astro
+// pageSize and sort order are controlled from the central config:
+// 📦 src/utils/listConfig.ts → PAGE_SIZE.portfolio, SORT_BY.portfolio
 
 // Editing guide / 编辑引导
 // 1. Edit pageTitle/pageDescription/pageHeading/pageSubtitle for page copy and SEO.
@@ -70,8 +73,10 @@ The main portfolio list page at `/portfolio` displays all projects in a paginate
 //    修改 pageHeaderAppearance 来控制 PaloPageHeader 的视觉表现。
 // 3. Edit projectListWidth, projectListGapClass, and ProjectCard props near the card list to adjust list width, gap, card layout, or heading level.
 //    修改 projectListWidth、projectListGapClass 和卡片列表附近的 ProjectCard 参数，以调整列表宽度、间隙、卡片布局或标题层级。
-// 4. Edit pageSize in getStaticPaths to change the number of projects per page (currently 10).
-//    修改 getStaticPaths 中的 pageSize 来调整每页显示的项目数量（当前为 10）。
+// 4. Edit PAGE_SIZE.portfolio in src/utils/listConfig.ts to change projects per page (currently 6).
+//    修改 src/utils/listConfig.ts 中的 PAGE_SIZE.portfolio 来调整每页显示的项目数量（当前为 6）。
+// 5. Edit SORT_BY.portfolio in src/utils/listConfig.ts to change the default sort order.
+//    修改 src/utils/listConfig.ts 中的 SORT_BY.portfolio 来更改默认排序方式。
 ```
 
 **Customization Options**:
@@ -131,13 +136,16 @@ tags: ['Web Design', 'Accessibility', 'UI/UX']
 - Allows filtering by other tags from the same cloud
 - Maintains consistent pagination and layout
 
+
 **Configuration**:
 ```typescript
 // Located in: src/pages/portfolio/tag/[tag]/[...page].astro
+// pageSize and sort order are controlled from the central config:
+// 📦 src/utils/listConfig.ts → PAGE_SIZE.portfolio, SORT_BY.portfolio
 
-// Modify pageSize to change items per page for tag pages
-const paginatedPages = paginate(filteredProjects, {
-  pageSize: 10,
+// Both tag pages and the main portfolio list share the same central config
+const paginatedPages = paginate(sortedFilteredProjects, {
+  pageSize: PAGE_SIZE.portfolio,  // currently 6
   params: { tag: tag.slug },
   props: {
     currentTag: tag,
@@ -325,42 +333,59 @@ When using `colsClass`, the component applies both the columns utility and a `gr
 
 ---
 
+
 ### Sorting System
 
-Both the portfolio list page and FeaturedProjects component support three sorting options:
+Both the portfolio list page, tag pages, and FeaturedProjects component share the same sorting engine backed by the central `listConfig.ts` configuration.
 
-Portfolio 列表页面和 FeaturedProjects 组件都支持三种排序选项：
+Portfolio 列表页面、标签页面和 FeaturedProjects 组件共享由中央 `listConfig.ts` 配置驱动的同一排序引擎。
 
-#### Latest First (Default)
-Sorts projects by publish date in descending order (newest to oldest).
+#### Dual-Axis Sort Engine / 双轴排序引擎
 
-按发布日期降序排序（最新到最早）。
+The portfolio list uses a dual-axis sort engine: **featured items** (with `featuredOrder`) are sorted in ascending order and pinned to the top, then **regular items** are sorted according to `SORT_BY.portfolio`.
+
+Portfolio 列表使用双轴排序引擎：**精选项目**（设置了 `featuredOrder`）按升序排列并置顶，然后**普通项目**按照 `SORT_BY.portfolio` 排序。
 
 ```typescript
-const sortedProjects = [...projects].sort((a, b) => 
-  b.data.publishDate.valueOf() - a.data.publishDate.valueOf()
-)
+// Engine: featuredOrder asc + SORT_BY.portfolio
+const featured = allProjects.filter((p) => p.data.featuredOrder !== undefined)
+const regular = allProjects.filter((p) => p.data.featuredOrder === undefined)
+
+featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+
+if (SORT_BY.portfolio === 'earliest') {
+  regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
+} else {
+  regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+}
+
+const sortedProjects = [...featured, ...regular]
 ```
 
-#### Most Popular (By Views)
-Sorts projects by view count in descending order.
+This engine is applied consistently across:
+- **Main list**: `src/pages/portfolio/[...page].astro`
+- **Tag pages**: `src/pages/portfolio/tag/[tag]/[...page].astro`
 
-按浏览量降序排序。
+#### Sort Options / 排序选项
+
+**`SORT_BY.portfolio = 'latest'`** (Default)
+Sorts projects by publish date in descending order (newest first). Regular projects are sorted newest-to-oldest.
+
+按发布日期降序排序（最新在前）。普通项目按最新到最旧排序。
+
+**`SORT_BY.portfolio = 'earliest'`**
+Sorts projects by publish date in ascending order (oldest first). Regular projects are sorted oldest-to-newest.
+
+按发布日期升序排序（最早在前）。普通项目按最旧到最新排序。
+
+**`SORT_BY.portfolio = 'popular'`** (Coming from FeaturedProjects)
+When used in FeaturedProjects, `sortBy="popular"` sorts by `views` field in descending order.
+
+在 FeaturedProjects 中使用 `sortBy="popular"` 时，按 `views` 字段降序排序。
 
 ```typescript
 const sortedProjects = [...projects].sort((a, b) => 
   (b.data.views || 0) - (a.data.views || 0)
-)
-```
-
-#### Earliest First
-Sorts projects by publish date in ascending order (oldest to newest).
-
-按发布日期升序排序（最早到最新）。
-
-```typescript
-const sortedProjects = [...projects].sort((a, b) => 
-  a.data.publishDate.valueOf() - b.data.publishDate.valueOf()
 )
 ```
 
@@ -375,6 +400,64 @@ publishDate: 2026-06-07
 views: 1234
 ---
 ```
+
+---
+
+
+### Unified List Configuration (Central Control)
+
+All pagination and sorting settings across Portfolio list, tag pages, and type pages are unified in a single central configuration file, ensuring consistent behavior across the entire Portfolio section.
+
+整个 Portfolio 部分（列表页、标签页、类型页）的分页与排序设置已统一收拢到单一中央配置文件。
+
+**File Location**: `src/utils/listConfig.ts`
+
+```typescript
+type ListSortOrder = 'latest' | 'earliest';
+
+export const PAGE_SIZE = {
+  blog: 6,
+  portfolio: 6,
+} as const;
+
+export const SORT_BY: { readonly blog: ListSortOrder; readonly portfolio: ListSortOrder } = {
+  blog: 'latest',
+  portfolio: 'latest',
+} as const;
+```
+
+#### Portfolio Namespace / Portfolio 命名空间
+
+The Portfolio list and tag pages use `PAGE_SIZE.portfolio` and `SORT_BY.portfolio` from the central config. This includes:
+
+Portfolio 列表页面使用中央配置中的 `PAGE_SIZE.portfolio` 和 `SORT_BY.portfolio`。涵盖以下页面：
+
+| Page | Import | pageSize | Sort |
+|---|---|---|---|
+| `/portfolio/[...page].astro` | `PAGE_SIZE.portfolio` | 6 | `SORT_BY.portfolio` (latest) |
+| `/portfolio/tag/[tag]/[...page].astro` | `PAGE_SIZE.portfolio` | 6 | `SORT_BY.portfolio` (latest) |
+| `/portfolio/type/[type]/[...page].astro` | `PAGE_SIZE.portfolio` | 6 | `SORT_BY.portfolio` (latest) |
+
+#### How to Customize / 自定义方法
+
+To change the number of projects per page or the default sort order for the entire Portfolio section, edit `src/utils/listConfig.ts`:
+
+```typescript
+// Example: 12 projects per page, oldest first
+export const PAGE_SIZE = {
+  blog: 6,
+  portfolio: 12,  // changed
+} as const;
+
+export const SORT_BY = {
+  blog: 'latest',
+  portfolio: 'earliest',  // changed
+} as const;
+```
+
+All Portfolio pages will automatically pick up these changes — no need to edit individual page files.
+
+所有 Portfolio 页面会自动继承这些更改，无需逐个编辑页面文件。
 
 ---
 
@@ -400,11 +483,16 @@ views: 1234
    - Balance page length with user experience
    - Consider typical content density
    - Test on mobile devices
+   - **Use `PAGE_SIZE.portfolio` in `listConfig.ts`** for centralized control
 
 5. **FeaturedProjects Usage**:
    - Select visually striking projects
    - Mix project types for variety
    - Update featured selection periodically
+
+6. **Centralized Sorting**:
+   - Set `SORT_BY.portfolio` once in `listConfig.ts` for consistent ordering across all portfolio pages
+   - Use `featuredOrder` in project frontmatter to pin important projects to the top
 
 ---
 

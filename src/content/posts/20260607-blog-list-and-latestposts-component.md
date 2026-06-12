@@ -512,6 +512,64 @@ Blog 列表和 LatestPosts 组件完全响应式：
 
 ---
 
+---
+
+### Unified List Configuration (Central Control)
+
+All pagination and sorting settings across Blog and Portfolio lists are now unified in a single central configuration file, ensuring consistent behavior and eliminating hard-coded values.
+
+整个站点的 Blog 和 Portfolio 列表的分页与排序设置已统一收拢到单一中央配置文件，消除硬编码，确保行为一致。
+
+**File Location**: `src/utils/listConfig.ts`
+
+```typescript
+type ListSortOrder = 'latest' | 'earliest';
+
+export const PAGE_SIZE = {
+  blog: 6,
+  portfolio: 6,
+} as const;
+
+export const SORT_BY: { readonly blog: ListSortOrder; readonly portfolio: ListSortOrder } = {
+  blog: 'latest',
+  portfolio: 'latest',
+} as const;
+```
+
+#### Blog Namespace / Blog 命名空间
+
+The Blog list pages use `PAGE_SIZE.blog` and `SORT_BY.blog` from the central config. This includes:
+
+Blog 列表页面使用中央配置中的 `PAGE_SIZE.blog` 和 `SORT_BY.blog`。涵盖以下页面：
+
+| Page | Import | pageSize | Sort |
+|---|---|---|---|
+| `/blog/[...page].astro` | `PAGE_SIZE.blog` | 6 | `SORT_BY.blog` (latest) |
+| `/blog/tag/[tag]/[...page].astro` | `PAGE_SIZE.blog` | 6 | `SORT_BY.blog` (latest) |
+
+#### How to Customize / 自定义方法
+
+To change the number of posts per page or the default sort order for the entire Blog section, edit `src/utils/listConfig.ts`:
+
+```typescript
+// Example: 10 posts per page, oldest first
+export const PAGE_SIZE = {
+  blog: 10,
+  portfolio: 6,
+} as const;
+
+export const SORT_BY = {
+  blog: 'earliest',  // changed
+  portfolio: 'latest',
+} as const;
+```
+
+All Blog pages will automatically pick up these changes — no need to edit individual page files.
+
+所有 Blog 页面会自动继承这些更改，无需逐个编辑页面文件。
+
+---
+
 ### Best Practices
 
 1. **Consistent Sorting**: Choose one default sort order for your blog and stick with it for consistency.
