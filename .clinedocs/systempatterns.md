@@ -5,6 +5,21 @@
 - **No Shadows**: Buttons intentionally have no box-shadows.
 - **No Movement**: Buttons do not translate or move on interaction.
 
+## Safari Sub-pixel Antialiasing Barrier
+
+When using fluid `aspect-ratio` values (especially non-integer ratios like `9/16` = `0.5625`) combined with hover `transform: scale()` animations, Safari (WebKit) can exhibit a sub-pixel rendering overflow bug: the container's computed height produces a fractional value (e.g. `.66px`, `.33px`), causing the GPU rasterization slice to misalign with the CSS box boundary by < 1px, leaking background/line color from behind the card.
+
+### Defense Layer (Applied in 3 tiers)
+
+| Tier | Element | Properties Applied |
+|------|---------|-------------------|
+| Outer Wrapper | `.project-card` | `transform: translateZ(0)` + `backface-visibility: hidden` + `perspective: 1000px` + `background-clip: padding-box` |
+| Media Container | `.project-card__media` | `clip-path: inset(0)` + `isolation: isolate` |
+| Image Layer | `.project-card__image` | `transform: translateZ(0) scale(1)` + `perspective: 1000px` + explicit `-webkit-transform` |
+| Column Item | `.project-masonry__item` | `transform: translateZ(0)` + `perspective: 1000px` |
+
+These styles force WebKit to push all card layers into a GPU compositing layer, eliminating the fractional-pixel gap during hover transitions.
+
 ## Patch Management
 
 This project uses `patch-package` to apply fixes directly to `accessible-astro-components` in `node_modules/`. The patch file is at `patches/accessible-astro-components+5.2.0.patch`.

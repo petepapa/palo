@@ -25,6 +25,10 @@
     padding-block: 0 var(--project-list-gap, var(--space-m, 1.5rem));
     padding-inline: 0;
     backface-visibility: hidden;
+
+    /* 🛡️ Safari sub-pixel barrier for column items: GPU composite to prevent fractional-height bleed */
+    transform: translateZ(0);
+    perspective: 1000px;
   }
 
   .project-masonry__item > .project-card {

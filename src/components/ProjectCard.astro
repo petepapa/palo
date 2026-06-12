@@ -68,6 +68,12 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       text-decoration: none;
       max-inline-size: 100%;
 
+      /* 🛡️ Safari sub-pixel anti-aliasing barrier: force GPU composite layer to eliminate fractional-pixel gaps on hover */
+      transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+      background-clip: padding-box;
+
       &:where(:hover, :focus-visible) {
         color: inherit;
       }
@@ -81,6 +87,10 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       inline-size: 100%;
+
+      /* 🛡️ Safari sub-pixel barrier: clip-path forces WebKit to rasterize at exact pixel boundaries */
+      clip-path: inset(0);
+      isolation: isolate;
     }
 
     .project-card__image {
@@ -92,9 +102,13 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       block-size: 100%;
       object-fit: cover;
       border-radius: inherit;
-      transform: translateZ(0);
+
+      /* 🛡️ Safari sub-pixel barrier: GPU compositing + perspective to force stable layer boundaries */
+      transform: translateZ(0) scale(1);
       backface-visibility: hidden;
+      perspective: 1000px;
       will-change: transform;
+      -webkit-transform: translateZ(0) scale(1);
     }
 
     .project-card__title {
