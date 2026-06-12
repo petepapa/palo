@@ -6,7 +6,6 @@
  */
 interface Props {
   text: string;
-  as?: 'div' | 'p' | 'h1' | 'h2' | 'h3' | '';
   variant?: 'default' | 'inline' | 'marquee';
   class?: string;
   wrapperClass?: string;
@@ -17,7 +16,6 @@ interface Props {
 
 const {
   text,
-  as = 'div',
   variant = 'default',
   class: className = '',
   wrapperClass: wrapperClassName = '',
@@ -25,8 +23,6 @@ const {
   direction = 'left',
   pause = true
 } = Astro.props;
-
-const Tag = as || 'div';
 
 const speedMap = { slow: 40, normal: 80, fast: 160 };
 const pxPerSec = speedMap[speed as keyof typeof speedMap] ?? speedMap.normal;
@@ -51,31 +47,44 @@ const uid = Math.random().toString(36).substr(2, 9);
     class={`palo-slogan-inline-wrapper ${wrapperClassName}`}
     data-inline-id={uid}
   >
-    <Tag class={`palo-slogan-inline ${className}`} data-slogan-text={text}>
+    <span class={`palo-slogan-inline ${className}`} data-slogan-text={text}>
       {text}
-    </Tag>
+    </span>
   </div>
 ) : (
-  <Tag class={`palo-slogan-default ${className}`}>
+  <div class={`palo-slogan-default ${className}`}>
     {text}
-  </Tag>
+  </div>
 )}
 
 <script>
-  /* ===== Inline fit-to-width ===== */
+  // @ts-nocheck
+  /* ===================================================================
+   * Slogan — Unified Lifecycle & Performance (Optimized)
+   * =================================================================== */
+
   (function () {
-    var probe = null;
+    'use strict';
+
+    // 1️⃣ 清理原生的类型强转，采用标准纯 JS 声明，杜绝 IDE 报错
+    var inlineResizeObserver = null;
+    var marqueeResizeObserver = null;
+    var sharedProbe = null;
 
     function getProbe() {
-      if (!probe) {
-        probe = document.createElement('span');
-        probe.style.cssText = 'position:fixed;visibility:hidden;white-space:nowrap;pointer-events:none;z-index:-1';
-        document.body.appendChild(probe);
+      if (!sharedProbe) {
+        sharedProbe = document.createElement('span');
+        sharedProbe.style.cssText =
+          'position:fixed;visibility:hidden;white-space:nowrap;pointer-events:none;z-index:-1';
+        document.body.appendChild(sharedProbe);
       }
-      return probe;
+      return sharedProbe;
     }
 
-    function fitOne(wrapper) {
+    /* ------------------------------------------------------------------ */
+    /* Inline — fit-to-width                                             */
+    /* ------------------------------------------------------------------ */
+    function fitInline(wrapper) {
       var textEl = wrapper.querySelector('.palo-slogan-inline');
       if (!textEl) return;
 
@@ -100,150 +109,177 @@ const uid = Math.random().toString(36).substr(2, 9);
       textEl.style.fontSize = ((containerWidth - 1) * 200 / measuredWidth) + 'px';
     }
 
-    function fitAll() {
-      document.querySelectorAll('[data-inline-id]').forEach(fitOne);
+    function fitAllInline() {
+      var wrappers = document.querySelectorAll('[data-inline-id]');
+      for (var i = 0; i < wrappers.length; i++) {
+        fitInline(wrappers[i]);
+      }
     }
 
-    function start() {
-      document.fonts.ready.then(function () {
-        requestAnimationFrame(fitAll);
-      });
-    }
-
-    if (document.readyState === 'complete') {
-      start();
-    } else {
-      document.addEventListener('readystatechange', function () {
-        if (document.readyState === 'complete') start();
-      });
-    }
-
-    /** @type {number} */
-    var inlineTimer;
-    window.addEventListener('resize', function () {
-      if (inlineTimer) cancelAnimationFrame(inlineTimer);
-      inlineTimer = requestAnimationFrame(fitAll);
-    });
-  })();
-
-  /* ===== Marquee seamless loop ===== */
-  (function () {
-    // 存储事件监听器引用，方便后续清理
-    var eventListeners = new Map();
-
+    /* ------------------------------------------------------------------ */
+    /* Marquee — seamless 3-group clone                                  */
+    /* ------------------------------------------------------------------ */
     function setupMarquee(wrapper) {
       var track = wrapper.querySelector('.palo-marquee-track');
       if (!track) return;
 
-      // 清理旧的事件监听器
-      var oldListeners = eventListeners.get(wrapper);
-      if (oldListeners) {
-        wrapper.removeEventListener('mouseenter', oldListeners.onEnter);
-        wrapper.removeEventListener('mouseleave', oldListeners.onLeave);
-        eventListeners.delete(wrapper);
-      }
-
-      // 保留第一个原始 item，移除其余所有
-      var items = track.querySelectorAll('.palo-marquee-item');
-      for (var i = items.length - 1; i > 0; i--) {
-        items[i].remove();
-      }
-      var firstItem = track.querySelector('.palo-marquee-item');
-      if (!firstItem) return;
-
       var pxPerSec = parseFloat(wrapper.dataset.pxPerSec || '80') || 80;
       var isRight = wrapper.dataset.direction === 'right';
 
-      // 等 fonts ready + 一帧确保 item 完全渲染
-      requestAnimationFrame(function () {
-        // 直接用 getBoundingClientRect 获取实际渲染宽度（含 margin）
-        var rect = firstItem.getBoundingClientRect();
-        // 计算完整的外盒宽度：margin-box
-        var cs = window.getComputedStyle(firstItem);
-        var ml = parseFloat(cs.marginLeft) || 0;
-        var mr = parseFloat(cs.marginRight) || 0;
-        var itemW = rect.width + ml + mr;
-        if (itemW <= 0) return;
+      var allItems = track.querySelectorAll(':scope > .palo-marquee-item');
+      for (var i = allItems.length - 1; i > 0; i--) {
+        allItems[i].remove();
+      }
 
-        var wrapperW = wrapper.offsetWidth;
-        // 至少需要覆盖 wrapper 宽度的 items
-        var groupCount = Math.max(1, Math.ceil(wrapperW / itemW) + 1);
+      var firstItem = track.querySelector(':scope > .palo-marquee-item');
+      if (!firstItem) return;
 
-        // 克隆第一组
-        for (var j = 1; j < groupCount; j++) {
-          var clone = firstItem.cloneNode(true);
-          clone.setAttribute('aria-hidden', 'true');
-          track.appendChild(clone);
-        }
-
-        // 将整组再克隆一遍（双倍内容）
-        var allCurrent = track.querySelectorAll('.palo-marquee-item');
-        for (var k = 0; k < allCurrent.length; k++) {
-          var dup = allCurrent[k].cloneNode(true);
-          dup.setAttribute('aria-hidden', 'true');
-          track.appendChild(dup);
-        }
-
-        // 一组内容的宽度 = groupCount * itemW
-        var groupWidth = groupCount * itemW;
-        var duration = groupWidth / pxPerSec;
-
-        // 重置 transform，清除旧动画
-        track.style.transform = '';
-        track.style.animation = 'none';
-        track.style.animationPlayState = 'running';
-        void track.offsetWidth; // force reflow
-
-        // 使用静态的 keyframes 名称
-        track.style.setProperty('--_mgw', groupWidth + 'px');
-        track.style.animation = (isRight ? 'marquee-seamless-right' : 'marquee-seamless-left') + ' ' + duration + 's linear infinite';
-
-        // 添加 hover 暂停功能
-        if (wrapper.classList.contains('palo-marquee-pause')) {
-          var onEnter = function() {
-            track.style.animationPlayState = 'paused';
-          };
-          var onLeave = function() {
-            track.style.animationPlayState = 'running';
-          };
-          wrapper.addEventListener('mouseenter', onEnter);
-          wrapper.addEventListener('mouseleave', onLeave);
-          eventListeners.set(wrapper, { onEnter: onEnter, onLeave: onLeave });
-        }
-      });
-    }
-
-    function initAll() {
-      document.querySelectorAll('[data-marquee-id]').forEach(function (wrapper) {
-        setupMarquee(wrapper);
-      });
-    }
-
-    function startMarquee() {
       document.fonts.ready.then(function () {
-        requestAnimationFrame(initAll);
+        requestAnimationFrame(function () {
+          var rect = firstItem.getBoundingClientRect();
+          var cs = window.getComputedStyle(firstItem);
+          var ml = parseFloat(cs.marginLeft) || 0;
+          var mr = parseFloat(cs.marginRight) || 0;
+          var itemW = rect.width + ml + mr;
+          if (itemW <= 0) return;
+
+          var wrapperW = wrapper.offsetWidth;
+          var itemsPerGroup = Math.max(1, Math.ceil(wrapperW / itemW) + 1);
+
+          var existing = track.querySelectorAll(':scope > .palo-marquee-item');
+          for (var j = existing.length - 1; j > 0; j--) {
+            existing[j].remove();
+          }
+
+          for (var k = 1; k < itemsPerGroup; k++) {
+            var clone = firstItem.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            track.appendChild(clone);
+          }
+
+          var middleItems = track.querySelectorAll(':scope > .palo-marquee-item');
+          var beforeFragment = document.createDocumentFragment();
+          for (var m = 0; m < middleItems.length; m++) {
+            var dupBefore = middleItems[m].cloneNode(true);
+            dupBefore.setAttribute('aria-hidden', 'true');
+            beforeFragment.appendChild(dupBefore);
+          }
+          track.insertBefore(beforeFragment, track.firstChild);
+
+          var afterFragment = document.createDocumentFragment();
+          for (var n = 0; n < middleItems.length; n++) {
+            var dupAfter = middleItems[n].cloneNode(true);
+            dupAfter.setAttribute('aria-hidden', 'true');
+            afterFragment.appendChild(dupAfter);
+          }
+          track.appendChild(afterFragment);
+
+          var groupWidth = itemsPerGroup * itemW;
+          var duration = groupWidth / pxPerSec;
+
+          track.style.animation = 'none';
+          track.style.transform = 'translateX(' + (-groupWidth) + 'px)';
+          void track.offsetWidth;
+
+          track.style.setProperty('--_mgw', groupWidth + 'px');
+          track.style.removeProperty('animation');
+
+          var keyframesName = isRight ? 'marquee-seamless-right-3g' : 'marquee-seamless-left-3g';
+          track.style.animation = keyframesName + ' ' + duration + 's linear infinite';
+          track.style.setProperty('--_mg-dur', duration + 's');
+
+          if (wrapper.classList.contains('palo-marquee-pause')) {
+            var onEnter = function () { track.style.animationPlayState = 'paused'; };
+            var onLeave = function () { track.style.animationPlayState = 'running'; };
+            var prevEnter = wrapper._marqueePauseEnter;
+            var prevLeave = wrapper._marqueePauseLeave;
+            if (prevEnter) wrapper.removeEventListener('mouseenter', prevEnter);
+            if (prevLeave) wrapper.removeEventListener('mouseleave', prevLeave);
+            wrapper.addEventListener('mouseenter', onEnter);
+            wrapper.addEventListener('mouseleave', onLeave);
+            wrapper._marqueePauseEnter = onEnter;
+            wrapper._marqueePauseLeave = onLeave;
+          }
+        });
       });
     }
 
-    // 立即执行
-    startMarquee();
+    function initAllMarquee() {
+      var wrappers = document.querySelectorAll('[data-marquee-id]');
+      for (var i = 0; i < wrappers.length; i++) {
+        setupMarquee(wrappers[i]);
+      }
+    }
 
-    // 监听 Astro 页面导航事件
-    document.addEventListener('astro:page-load', function () {
-      startMarquee();
-    });
+    /* ------------------------------------------------------------------ */
+    /* ResizeObservers                                                   */
+    /* ------------------------------------------------------------------ */
+    function createInlineObserver() {
+      if (inlineResizeObserver) { inlineResizeObserver.disconnect(); }
+      var inlineWidthMap = new Map();
 
-    // 同时也监听 astro:after-swap 作为备选
-    document.addEventListener('astro:after-swap', function () {
-      startMarquee();
-    });
+      inlineResizeObserver = new ResizeObserver(function (entries) {
+        var shouldRecalc = false;
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+          var w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+          var prev = inlineWidthMap.get(entry.target);
+          if (prev !== w) {
+            inlineWidthMap.set(entry.target, w);
+            shouldRecalc = true;
+          }
+        }
+        if (shouldRecalc) { requestAnimationFrame(fitAllInline); }
+      });
 
-    /** @type {number} */
-    var marqueeTimer;
-    window.addEventListener('resize', function () {
-      if (marqueeTimer) clearTimeout(marqueeTimer);
-      marqueeTimer = setTimeout(initAll, 150);
-    });
+      var wrappers = document.querySelectorAll('[data-inline-id]');
+      for (var i = 0; i < wrappers.length; i++) { inlineResizeObserver.observe(wrappers[i]); }
+    }
+
+    function createMarqueeObserver() {
+      if (marqueeResizeObserver) { marqueeResizeObserver.disconnect(); }
+      var marqueeWidthMap = new Map();
+
+      marqueeResizeObserver = new ResizeObserver(function (entries) {
+        var shouldRecalc = false;
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+          var w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+          var prev = marqueeWidthMap.get(entry.target);
+          if (prev !== w) {
+            marqueeWidthMap.set(entry.target, w);
+            shouldRecalc = true;
+          }
+        }
+        if (shouldRecalc) { requestAnimationFrame(initAllMarquee); }
+      });
+
+      var wrappers = document.querySelectorAll('[data-marquee-id]');
+      for (var i = 0; i < wrappers.length; i++) { marqueeResizeObserver.observe(wrappers[i]); }
+    }
+
+    function teardownAll() {
+      if (inlineResizeObserver) { inlineResizeObserver.disconnect(); inlineResizeObserver = null; }
+      if (marqueeResizeObserver) { marqueeResizeObserver.disconnect(); marqueeResizeObserver = null; }
+    }
+
+    function bootstrap() {
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(function () {
+          fitAllInline();
+          createInlineObserver();
+          initAllMarquee();
+          createMarqueeObserver();
+        });
+      });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Lifecycle bindings (Fixed Double-Firing Loop)                     */
+    /* ------------------------------------------------------------------ */
+    // 💡 彻底移除 DOMContentLoaded 监听，全权交给 Astro 生命周期，阻断开屏二次高频执行
+    document.addEventListener('astro:page-load', bootstrap);
+    document.addEventListener('astro:before-swap', teardownAll);
   })();
 </script>
 
@@ -288,15 +324,18 @@ const uid = Math.random().toString(36).substr(2, 9);
     line-height: 1;
   }
 
-  /* 核心关键帧动画 */
-  @keyframes marquee-seamless-left {
-    from { transform: translateX(0); }
-    to   { transform: translateX(calc(-1 * var(--_mgw))); }
+  /* 3-Group seamless keyframes:
+     Start at -1x groupWidth (before group fully visible on the left),
+     end at -2x groupWidth (after group fully visible on the left).
+     The middle group is always on screen. */
+  @keyframes marquee-seamless-left-3g {
+    from { transform: translateX(calc(-1 * var(--_mgw))); }
+    to   { transform: translateX(calc(-2 * var(--_mgw))); }
   }
 
-  @keyframes marquee-seamless-right {
-    from { transform: translateX(calc(-1 * var(--_mgw))); }
-    to   { transform: translateX(0); }
+  @keyframes marquee-seamless-right-3g {
+    from { transform: translateX(calc(-2 * var(--_mgw))); }
+    to   { transform: translateX(calc(-1 * var(--_mgw))); }
   }
 
   .palo-marquee-pause:hover .palo-marquee-track {
