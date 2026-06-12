@@ -217,6 +217,9 @@ FeaturedProjects 组件专为放在首页或着陆页而设计。它以可自定
   projectListWidth="full"
   projectListGapClass="gap-5"
   sortBy="latest"
+  colsClass="columns-1 sm:columns-2 lg:columns-3 xl:columns-3"
+  projectHeadingLevel="h5"
+  projectDescClass="text-base"
 />
 ```
 
@@ -265,6 +268,39 @@ FeaturedProjects 组件专为放在首页或着陆页而设计。它以可自定
 - `'popular'`: Sort by views, most viewed first
 - `'earliest'`: Sort by publish date, oldest first
 
+#### `colsClass`
+- **Type**: `string`
+- **Default**: `'columns-1 sm:columns-2 lg:columns-3 xl:columns-3'`
+- **Function**: Columns class for the masonry grid layout (uses Tailwind Columns). Replaces the default responsive grid breakpoints.
+
+瀑布流分列配置（使用 Tailwind Columns）。替换默认的响应式网格断点。
+
+```astro
+<FeaturedProjects colsClass="columns-1 sm:columns-2 xl:columns-4" />
+```
+
+#### `projectHeadingLevel`
+- **Type**: `'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'`
+- **Default**: `'h5'`
+- **Function**: Heading level for ProjectCard titles (controls the HTML tag wrapping each project's title)
+
+ProjectCard 标题的 HTML 标签级别（控制每个项目标题的 HTML 标签）。
+
+```astro
+<FeaturedProjects projectHeadingLevel="h4" />
+```
+
+#### `projectDescClass`
+- **Type**: `string`
+- **Default**: `'text-base'`
+- **Function**: CSS class for ProjectCard description text (e.g. `'text-sm'`, `'text-base'`, `'text-lg'`)
+
+ProjectCard 摘要文字的 CSS Class（例如 `'text-sm'`、`'text-base'`、`'text-lg'`）。
+
+```astro
+<FeaturedProjects projectDescClass="text-sm" />
+```
+
 **Usage Examples**:
 
 ```astro
@@ -281,16 +317,11 @@ FeaturedProjects 组件专为放在首页或着陆页而设计。它以可自定
 <FeaturedProjects limit={4} layout="contained" projectListWidth="container" />
 ```
 
-**Project Card Component Props**:
+**Card Columns Note**:
 
-The FeaturedProjects component internally uses ProjectCard with these default props:
+When using `colsClass`, the component applies both the columns utility and a `grid` class for proper card rendering. The `colsClass` replaces the previously hard-coded `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` classes, giving you full control over the responsive breakpoints.
 
-```typescript
-headingLevel="h5"
-descriptionClass="text-base"
-```
-
-You can customize these in the component source if needed.
+使用 `colsClass` 时，组件同时应用 columns 工具类和 `grid` 类以确保卡片正确渲染。`colsClass` 替换了之前硬编码的 `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3` 类，让你完全控制响应式断点。
 
 ---
 

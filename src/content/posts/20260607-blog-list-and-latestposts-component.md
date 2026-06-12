@@ -272,6 +272,50 @@ LatestPosts 组件是一个可重用组件，专为在首页、侧边栏或其�
 <LatestPosts limit={5} headingLevel="h4" />
 ```
 
+#### `postHeadingLevel`
+- **Type**: `'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'`
+- **Default**: `'h3'`
+- **Function**: Heading level for PostCard titles (controls the HTML tag wrapping each post's title link)
+
+PostCard 标题的 HTML 标签级别（控制每篇文章标题链接的 HTML 标签）。
+
+```astro
+<LatestPosts limit={5} postHeadingLevel="h4" />
+```
+
+#### `postDescClass`
+- **Type**: `string`
+- **Default**: `''`
+- **Function**: CSS class for PostCard description text (e.g. `'text-sm'`, `'text-base'`, `'text-lg'`)
+
+PostCard 摘要文字的 CSS Class（例如 `'text-sm'`、`'text-base'`、`'text-lg'`）。
+
+```astro
+<LatestPosts limit={5} postDescClass="text-sm" />
+```
+
+#### `itemGap`
+- **Type**: `string`
+- **Default**: `'gap-24'`
+- **Function**: Vertical gap between PostCard items (uses Tailwind Gap Class)
+
+PostCard 之间的垂直间距（使用 Tailwind Gap Class）。
+
+```astro
+<LatestPosts limit={5} itemGap="gap-16" />
+```
+
+#### `cardGap`
+- **Type**: `string`
+- **Default**: `'gap-12 md:gap-24'`
+- **Function**: CSS gap class between image and content columns inside each PostCard (透传给 PostCard 的 `cardGap`)
+
+PostCard 内部图片与文字区块之间的间距。
+
+```astro
+<LatestPosts limit={5} cardGap="gap-8 md:gap-16" />
+```
+
 #### `showAuthor`
 - **Type**: `boolean`
 - **Default**: `true`
