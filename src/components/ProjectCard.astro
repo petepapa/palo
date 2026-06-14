@@ -68,15 +68,11 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       text-decoration: none;
       max-inline-size: 100%;
 
-      /* 🛡️ [v5] Safari sub-pixel barrier: force GPU composite layer on root element.
-         Matches the pattern used in FeaturedProjects' .featured-projects__masonry-item
-         (which has backface-visibility:hidden and works correctly).
-         GPU compositing aligns the entire card as one rendered surface,
-         eliminating sub-pixel gap between the image composite layer and the clip-mask. */
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
+      /* 🛡️ Safari sub-pixel anti-aliasing barrier: force GPU composite layer to eliminate fractional-pixel gaps on hover */
       transform: translateZ(0);
-      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+      perspective: 1000px;
+      background-clip: padding-box;
 
       &:where(:hover, :focus-visible) {
         color: inherit;
