@@ -42,14 +42,17 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
     <ContentImage src={image} alt="" width={1200} height={900} class="project-card__image" />
   </span>
   <span class="project-card__content">
-    <HeadingTag class="project-card__title">{project.data.title}</HeadingTag>
+    <HeadingTag class:list={['project-card__title', layout === 'standard' && 'break-all']}>{project.data.title}</HeadingTag>
     <span class:list={['project-card__description', descriptionClass]}>{project.data.description}</span>
     {
       layout === 'standard' && project.data.tags.length > 0 && (
         <span class="project-card__tags" aria-label="Project tags">
-          {project.data.tags.map((tag) => (
+          {project.data.tags.slice(0, 3).map((tag) => (
             <span class="project-card__tag">{tag}</span>
           ))}
+          {project.data.tags.length > 3 && (
+            <span class="project-card__tag project-card__tag--more">+{project.data.tags.length - 3}</span>
+          )}
         </span>
       )
     }
@@ -119,14 +122,14 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       border-radius: inherit;
     }
 
-    .project-card__title {
-      margin: 0;
-      transition: color 300ms ease;
-      color: inherit;
-      font-size: var(--text-lg, 1.125rem);
-      line-height: var(--text-lg--line-height, 1.25);
-      letter-spacing: 0;
-    }
+      .project-card__title {
+        margin: 0;
+        transition: color 300ms ease;
+        color: inherit;
+        font-size: var(--text-lg, 1.125rem);
+        line-height: var(--text-lg--line-height, 1.25);
+        letter-spacing: 0;
+      }
 
     .project-card__description {
       display: -webkit-box;
@@ -161,6 +164,13 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         color: var(--color-on-surface-variant, var(--color-neutral-500));
         font-size: var(--text-xs, 0.75rem);
         line-height: 1.2;
+      }
+
+      .project-card__title {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        -webkit-line-clamp: 1;
       }
 
       &:where(:hover, :focus-visible) {

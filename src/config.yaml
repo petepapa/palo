@@ -228,7 +228,7 @@ portfolio:
 
   tagPage:                # 💡 对应路由 [/portfolio/tag/*] 按技术标签筛选的列表页
     layout: "overlay" 
-    width: "full" 
+    width: "container" 
     gap: "gap-5" 
     columns: {} 
 
