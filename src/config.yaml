@@ -256,7 +256,7 @@ blog:
     cardGap: "gap-12 md:gap-24" # 卡片内部响应式间距体系
     tagsHeading: "h5"
     postHeadingLevel: "h3"
-    postDescClass: "text-base" # 🛠️ 深度优化：已修正非标准类名 text-md，统一规范为标准 text-base
+    postDescClass: "text-md" # 🛠️ 深度优化：已修正非标准类名 text-md，统一规范为标准 text-base
 
   # ── 3. 📄 场景平级覆盖 (Scene Overrides) ──
   listPage:               # 💡 对应主路由 [/blog] 博客总文章列表页
