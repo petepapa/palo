@@ -80,17 +80,20 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
     }
 
     .project-card__media {
+      --_media-bg: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+
       display: block;
       position: relative;
       overflow: hidden;
       aspect-ratio: var(--project-card-aspect-ratio, 8 / 5);
       border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
-      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+      background-color: var(--_media-bg);
       inline-size: 100%;
 
-      /* 🛡️ Safari sub-pixel barrier: clip-path forces WebKit to rasterize at exact pixel boundaries */
-      clip-path: inset(0);
-      isolation: isolate;
+      /* 🛡️ [v1] Inset box-shadow on clip-mask container.
+         CPU-rasterized shadow aligns perfectly with overflow:hidden + border-radius boundary,
+         covering any sub-pixel gap between composited child image layer and clip mask. */
+      box-shadow: inset 0 0 0 1px var(--_media-bg);
     }
 
     .project-card__image {
