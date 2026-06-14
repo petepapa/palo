@@ -9,6 +9,15 @@ import config from '@config'
 
 type SortBy = 'latest' | 'earliest'
 
+// Tailwind safelist: justify-start justify-center justify-end
+type ButtonAlign = 'left' | 'center' | 'right'
+
+const buttonAlignMap: Record<ButtonAlign, string> = {
+  left: 'justify-start',
+  center: 'justify-center',
+  right: 'justify-end',
+}
+
 /**
  * LatestPosts Component
  *
@@ -54,6 +63,11 @@ interface Props {
    * @default "gap-12 md:gap-24"
    */
   cardGap?: string
+  /**
+   * "查看更多"按钮对齐方式
+   * @default "right"
+   */
+  buttonAlign?: ButtonAlign
 }
 
 // 📖 从 config.yaml 读取 Blog LatestComponent & defaults 全局默认值
@@ -70,7 +84,11 @@ const {
   postDescClass = blogLayoutDefaults.postDescClass ?? '',
   itemGap = blogLayoutDefaults.itemGap ?? 'gap-24',
   cardGap = blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
+  buttonAlign = (latestDefaults.buttonAlign as ButtonAlign) ?? 'right',
 } = Astro.props
+
+// 通过映射表获得实际的 Tailwind 类名，解决动态拼接导致的编译丢失问题
+const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
 
 const coverImageRatio = '8 / 5'
 
@@ -141,7 +159,7 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
         ))
       }
     </ul>
-    <div class="mt-12 flex justify-end">
+    <div class={['mt-12 flex', justifyClass].join(' ')}>
       <Link href={ensureTrailingSlash('/blog')} isButton animateOnHover animationType="nudge">
         Read all posts
         <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />

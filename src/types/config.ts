@@ -229,6 +229,7 @@ export interface PortfolioTagPageConfig {}
 
 export interface PortfolioFeaturedComponentConfig {
   limit: number
+  buttonAlign?: 'left' | 'center' | 'right'
 }
 
 export interface PortfolioConfig {
@@ -261,6 +262,7 @@ export interface BlogDefaults {
 
 export interface BlogLatestComponentConfig {
   limit: number
+  buttonAlign?: 'left' | 'center' | 'right'
 }
 
 export interface BlogConfig {

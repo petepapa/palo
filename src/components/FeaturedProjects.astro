@@ -15,6 +15,15 @@ type FeaturedProjectLayout = 'standard' | 'overlay'
 
 type SortBy = 'latest' | 'earliest' | 'popular'
 
+// Tailwind safelist: justify-start justify-center justify-end
+type ButtonAlign = 'left' | 'center' | 'right'
+
+const buttonAlignMap: Record<ButtonAlign, string> = {
+  left: 'justify-start',
+  center: 'justify-center',
+  right: 'justify-end',
+}
+
 /**
  * FeaturedProjects Component
  *
@@ -70,6 +79,11 @@ interface Props {
    * @default "columns-1 sm:columns-2 lg:columns-3 xl:columns-3"
    */
   colsClass?: string
+  /**
+   * "查看更多"按钮对齐方式
+   * @default "right"
+   */
+  buttonAlign?: ButtonAlign
 }
 
 // 📖 从 config.yaml 读取 Portfolio FeaturedComponent 全局默认值
@@ -93,7 +107,11 @@ const {
   projectHeadingLevel = projectDefaults.projectHeadingLevel ?? 'h5',
   projectDescClass = projectDefaults.projectDescClass ?? 'text-base',
   colsClass = defaultColumns,
+  buttonAlign = (featuredDefaults.buttonAlign as ButtonAlign) ?? 'right',
 } = Astro.props
+
+// 通过映射表获得实际的 Tailwind 类名，解决动态拼接导致的编译丢失问题
+const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
 const projectListWidthClass = getProjectListWidthClass(width)
 const projectListGapSize = resolveTailwindGapClass(gap)
 const isOverlayLayout = layout === 'overlay'
@@ -168,7 +186,7 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
             ))
           }
         </ul>
-        <div class="container mt-12 flex justify-end">
+        <div class={['container mt-12 flex', justifyClass].join(' ')}>
           <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
             View all projects
             <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
@@ -193,7 +211,7 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
             ))
           }
         </ul>
-        <div class="mt-12 flex justify-end">
+        <div class={['mt-12 flex', justifyClass].join(' ')}>
           <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
             View all projects
             <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />

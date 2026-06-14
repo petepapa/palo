@@ -234,6 +234,7 @@ portfolio:
 
   featuredComponent:      # 💡 智能组件：全站通用的「精选推荐作品」组件
     limit: 10             # 限制该组件最多只渲染前 10 个精选项目
+    buttonAlign: right    # "查看更多"按钮位置：right | center | left
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -265,3 +266,4 @@ blog:
 
   latestComponent:        # 💡 智能组件：首页或侧边栏通用的「最新文章」推荐组件
     limit: 5              # 限制展示最新的 5 篇文章
+    buttonAlign: right    # "查看更多"按钮位置：right | center | left
