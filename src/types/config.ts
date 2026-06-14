@@ -161,6 +161,119 @@ export interface TypographyConfig {
   navigationActiveStyle: 'wavy' | 'underline' | 'bold'
 }
 
+// ================================================================
+// 🧩 组件默认配置 / Component Defaults
+// ================================================================
+
+export interface PaloPageHeaderConfig {
+  headingLevel?: string
+  descClass?: string
+  divider?: 'bottom' | 'top' | 'none'
+}
+
+export interface PostHeaderConfig {
+  headingLevel?: string
+  descClass?: string
+  coverImagePosition?: 'head' | 'background' | 'side'
+  showBreadcrumbs?: boolean
+  showShare?: boolean
+  divider?: 'bottom' | 'top' | 'none'
+}
+
+export interface ComponentsConfig {
+  paloPageHeader?: PaloPageHeaderConfig
+  postHeader?: PostHeaderConfig
+}
+
+// ================================================================
+// 📁 Portfolio / Projects 配置
+// ================================================================
+
+export interface PortfolioColumns {
+  initial: number
+  sm: number
+  lg: number
+  xl: number
+}
+
+export interface PortfolioPaginationConfig {
+  pageSize: number
+  sortBy: 'latest' | 'oldest' | 'alphabetical'
+}
+
+export interface PortfolioDefaults {
+  showTags: boolean
+  showStats: boolean
+  layout: 'overlay' | 'standard'
+  width: 'full' | 'container'
+  gap: string
+  columns: PortfolioColumns
+  tagsHeading: string
+  projectHeadingLevel: string
+  projectDescClass: string
+}
+
+export interface PortfolioListPageConfig {
+  title?: string
+  subtitle?: string
+}
+
+export interface PortfolioTypePageConfig {
+  layout?: string
+  width?: string
+  gap?: string
+  columns?: PortfolioColumns
+}
+
+export interface PortfolioTagPageConfig {}
+
+export interface PortfolioFeaturedComponentConfig {
+  limit: number
+}
+
+export interface PortfolioConfig {
+  pagination?: PortfolioPaginationConfig
+  defaults?: PortfolioDefaults
+  listPage?: PortfolioListPageConfig
+  typePage?: PortfolioTypePageConfig
+  tagPage?: PortfolioTagPageConfig
+  featuredComponent?: PortfolioFeaturedComponentConfig
+}
+
+// ================================================================
+// 📝 Blog / Posts 配置
+// ================================================================
+
+export interface BlogPaginationConfig {
+  pageSize: number
+  sortBy: 'latest' | 'earliest'
+}
+
+export interface BlogDefaults {
+  showTags: boolean
+  showStats: boolean
+  itemGap: string
+  cardGap: string
+  tagsHeading: string
+  postHeadingLevel: string
+  postDescClass: string
+}
+
+export interface BlogLatestComponentConfig {
+  limit: number
+}
+
+export interface BlogConfig {
+  pagination?: BlogPaginationConfig
+  defaults?: BlogDefaults
+  listPage?: Record<string, never>
+  latestComponent?: BlogLatestComponentConfig
+}
+
+// ================================================================
+// 🏛️ 根配置 / Root Config
+// ================================================================
+
 export interface PaloConfig {
   site: SiteConfig
   navigation?: NavigationConfig
@@ -170,4 +283,26 @@ export interface PaloConfig {
   branding: BrandingConfig
   layout: LayoutConfig
   typography: TypographyConfig
+  components?: ComponentsConfig
+  portfolio?: PortfolioConfig
+  blog?: BlogConfig
 }
+
+/**
+ * Helper: convert responsive columns object to Tailwind CSS column class string
+ *
+ * Uses standard class syntax (columns-{n}) to match the safety list declared in
+ * tailwind.css (columns-5~12 with all responsive prefixes). Values 1-4 are
+ * natively supported by Tailwind v4, values 5+ are covered by the safety list.
+ *
+ * e.g. { initial: 1, sm: 2, lg: 5, xl: 5 } => "columns-1 sm:columns-2 lg:columns-5 xl:columns-5"
+ */
+export function buildColumnsClass(columns: PortfolioColumns): string {
+  const parts: string[] = []
+  if (columns.initial !== undefined) parts.push(`columns-${columns.initial}`)
+  if (columns.sm !== undefined) parts.push(`sm:columns-${columns.sm}`)
+  if (columns.lg !== undefined) parts.push(`lg:columns-${columns.lg}`)
+  if (columns.xl !== undefined) parts.push(`xl:columns-${columns.xl}`)
+  return parts.join(' ')
+}
+

@@ -305,6 +305,145 @@ const typographyConfigSchema = z
   .strip()
 
 // ---------------------------------------------------------------------------
+// Component defaults schemas
+// ---------------------------------------------------------------------------
+
+const paloPageHeaderConfigSchema = z
+  .object({
+    headingLevel: z.string().optional(),
+    descClass: z.string().optional(),
+    divider: z.enum(['bottom', 'top', 'none']).optional(),
+  })
+  .strip()
+
+const postHeaderConfigSchema = z
+  .object({
+    headingLevel: z.string().optional(),
+    descClass: z.string().optional(),
+    coverImagePosition: z.enum(['head', 'background', 'side']).optional(),
+    showBreadcrumbs: z.boolean().optional(),
+    showShare: z.boolean().optional(),
+    divider: z.enum(['bottom', 'top', 'none']).optional(),
+  })
+  .strip()
+
+const componentsConfigSchema = z
+  .object({
+    paloPageHeader: paloPageHeaderConfigSchema.optional(),
+    postHeader: postHeaderConfigSchema.optional(),
+  })
+  .strip()
+
+// ---------------------------------------------------------------------------
+// Portfolio / Projects schemas
+// ---------------------------------------------------------------------------
+
+const portfolioColumnsSchema = z
+  .object({
+    initial: z.number().int().min(1).max(12).optional(),
+    sm: z.number().int().min(1).max(12).optional(),
+    lg: z.number().int().min(1).max(12).optional(),
+    xl: z.number().int().min(1).max(12).optional(),
+  })
+  .strip()
+
+const portfolioPaginationSchema = z
+  .object({
+    pageSize: z.number().int().min(1).optional(),
+    sortBy: z.enum(['latest', 'oldest', 'alphabetical']).optional(),
+  })
+  .strip()
+
+const portfolioDefaultsSchema = z
+  .object({
+    showTags: z.boolean().optional(),
+    showStats: z.boolean().optional(),
+    layout: z.enum(['overlay', 'standard']).optional(),
+    width: z.enum(['full', 'container']).optional(),
+    gap: z.string().optional(),
+    columns: portfolioColumnsSchema.optional(),
+    tagsHeading: z.string().optional(),
+    projectHeadingLevel: z.string().optional(),
+    projectDescClass: z.string().optional(),
+  })
+  .strip()
+
+const portfolioTypePageSchema = z
+  .object({
+    layout: z.string().optional(),
+    width: z.string().optional(),
+    gap: z.string().optional(),
+    columns: portfolioColumnsSchema.optional(),
+  })
+  .strip()
+
+const portfolioListPageSchema = z
+  .object({
+    title: z.string().optional(),
+    subtitle: z.string().optional(),
+  })
+  .strip()
+
+const portfolioTagPageSchema = z
+  .object({})
+  .strip()
+
+const portfolioFeaturedComponentSchema = z
+  .object({
+    limit: z.number().int().min(1).optional(),
+  })
+  .strip()
+
+const portfolioConfigSchema = z
+  .object({
+    pagination: portfolioPaginationSchema.optional(),
+    defaults: portfolioDefaultsSchema.optional(),
+    listPage: portfolioListPageSchema.optional(),
+    typePage: portfolioTypePageSchema.optional(),
+    tagPage: portfolioTagPageSchema.optional(),
+    featuredComponent: portfolioFeaturedComponentSchema.optional(),
+  })
+  .strip()
+
+// ---------------------------------------------------------------------------
+// Blog / Posts schemas
+// ---------------------------------------------------------------------------
+
+const blogPaginationSchema = z
+  .object({
+    pageSize: z.number().int().min(1).optional(),
+    sortBy: z.enum(['latest', 'earliest']).optional(),
+  })
+  .strip()
+
+const blogDefaultsSchema = z
+  .object({
+    showTags: z.boolean().optional(),
+    showStats: z.boolean().optional(),
+    itemGap: z.string().optional(),
+    cardGap: z.string().optional(),
+    tagsHeading: z.string().optional(),
+    postHeadingLevel: z.string().optional(),
+    postDescClass: z.string().optional(),
+  })
+  .strip()
+
+const blogLatestComponentSchema = z
+  .object({
+    limit: z.number().int().min(1).optional(),
+  })
+  .strip()
+
+const blogConfigSchema = z
+  .object({
+    pagination: blogPaginationSchema.optional(),
+    defaults: blogDefaultsSchema.optional(),
+    listPage: z.object({}).strip().optional(),
+    latestComponent: blogLatestComponentSchema.optional(),
+  })
+  .strip()
+
+// ---------------------------------------------------------------------------
 // Top-level schema
 // ---------------------------------------------------------------------------
 
@@ -318,6 +457,9 @@ export const paloConfigSchema = z
     navigation: navigationConfigSchema.optional(),
     border: borderConfigSchema.optional(),
     radius: radiusConfigSchema.optional(),
+    components: componentsConfigSchema.optional(),
+    portfolio: portfolioConfigSchema.optional(),
+    blog: blogConfigSchema.optional(),
   })
   .strip()
 

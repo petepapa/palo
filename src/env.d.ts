@@ -16,4 +16,14 @@ declare module '*.yaml' {
   export default config
 }
 
+/**
+ * Vite alias for the config.yaml file at project root.
+ * Resolves the TypeScript IDE error for '@config' imports.
+ */
+declare module '@config' {
+  import type { PaloConfig } from './types/config'
+  const config: PaloConfig
+  export default config
+}
+
 declare const __PALO_TRAILING_SLASH__: boolean

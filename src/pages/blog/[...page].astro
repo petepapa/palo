@@ -9,41 +9,48 @@ import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/content
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { slugify } from '@utils/slugify'
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
+import config from '@config'
 
 // =========================================================================
-// 🎛️ 中央控制台 / Central Page Configuration
+// 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
+//   三级降级链路：listPage → defaults → 硬编码兜底
 // =========================================================================
 const COVER_IMAGE_RATIO = '8 / 5'
 
+const blogRoot = config.blog
+const blogDefaults = blogRoot?.defaults ?? {}
+const blogListPage = blogRoot?.listPage ?? {}
+
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
-  title: 'Blog',
-  subtitle: 'Latest articles on web development, accessibility, and design best practices.',
+  title: blogListPage.title ?? 'Blog',
+  subtitle: blogListPage.subtitle ?? 'Latest articles on web development, accessibility, and design best practices.',
   metaTitle: '',        // 选填。留空则自动复用 title
   metaDescription: 'Insights, tutorials, and thoughts on web development, accessibility, and design.',
 
-  // ── 功能开关中心 / Feature Toggles ──
-  showTags: true,       // 是否启用顶部 Tag 标签筛选功能
-  showStats: true,      // 是否显示文章统计信息
+  // ── 功能开关中心 / Feature Toggles (listPage → defaults) ──
+  showTags: blogListPage.showTags ?? blogDefaults.showTags ?? true,
+  showStats: blogListPage.showStats ?? blogDefaults.showStats ?? true,
 
-  // ── 列表排版参数 / List Layout Settings ──
-  itemGap: 'gap-24',    // PostCard 之间的垂直间距 (Tailwind Gap Class)
-  cardGap: 'gap-12 md:gap-24', // PostCard 内部图片与文字区块之间的间距 (透传给 PostCard)
+  // ── 列表排版参数 / List Layout Settings (listPage → defaults) ──
+  itemGap: blogListPage.itemGap ?? blogDefaults.itemGap ?? 'gap-24',
+  cardGap: blogListPage.cardGap ?? blogDefaults.cardGap ?? 'gap-12 md:gap-24',
 
-  // ── 细粒度排版微调 / Typography Fine-Tuning ──
-  tagsHeading: 'h5',    // Tags 区域标题的 HTML 标签级别与字号样式
-  postHeadingLevel: 'h3', // PostCard 标题的 HTML 标签级别
-  postDescClass: 'text-md', // PostCard 摘要文字的 CSS Class
+  // ── 细粒度排版微调 / Typography Fine-Tuning (listPage → defaults) ──
+  tagsHeading: blogListPage.tagsHeading ?? blogDefaults.tagsHeading ?? 'h5',
+  postHeadingLevel: blogListPage.postHeadingLevel ?? blogDefaults.postHeadingLevel ?? 'h3',
+  postDescClass: blogListPage.postDescClass ?? blogDefaults.postDescClass ?? 'text-base',
 } as const
 
-// ── PaloPageHeader 结构化参数 (对齐大一统新规范) ──
+// ── PaloPageHeader 结构化参数 (从 config.yaml 读取全局默认值) ──
+const pageHeaderDefaults = config.components?.paloPageHeader ?? {}
 const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
-  alignV: '',
-  alignH: '',
-  divider: true,
+  alignV: pageHeaderDefaults.alignV ?? 'center',
+  alignH: pageHeaderDefaults.alignH ?? 'left',
+  divider: pageHeaderDefaults.divider ?? 'bottom',
   bg: {
     video: '',
     image: '',

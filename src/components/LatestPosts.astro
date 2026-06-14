@@ -5,6 +5,7 @@ import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
+import config from '@config'
 
 type SortBy = 'latest' | 'earliest'
 
@@ -55,15 +56,20 @@ interface Props {
   cardGap?: string
 }
 
+// 📖 从 config.yaml 读取 Blog LatestComponent & defaults 全局默认值
+const blogCfg = config.blog
+const latestDefaults = blogCfg?.latestComponent ?? {}
+const blogLayoutDefaults = blogCfg?.defaults ?? {}
+
 const {
   class: className,
-  limit = 3,
+  limit = latestDefaults.limit ?? 3,
   title = 'Latest posts',
   sortBy = 'latest',
-  postHeadingLevel = 'h3',
-  postDescClass = '',
-  itemGap = 'gap-24',
-  cardGap = 'gap-12 md:gap-24',
+  postHeadingLevel = blogLayoutDefaults.postHeadingLevel ?? 'h3',
+  postDescClass = blogLayoutDefaults.postDescClass ?? '',
+  itemGap = blogLayoutDefaults.itemGap ?? 'gap-24',
+  cardGap = blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
 } = Astro.props
 
 const coverImageRatio = '8 / 5'

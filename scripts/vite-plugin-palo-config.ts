@@ -36,6 +36,14 @@ export function paloConfigHmr(): Plugin {
           const config = yaml.load(rawYaml)
           validateConfig(config)
 
+          // 🔥 Invalidate the config.yaml module in Vite's module graph
+          // Without this, Astro will re-render using the stale cached config
+          const configModuleId = path.resolve(server.config.root, 'src/config.yaml')
+          const mod = server.moduleGraph.getModuleById(configModuleId)
+          if (mod) {
+            server.moduleGraph.invalidateModule(mod)
+          }
+
           // ✅ Config is valid — trigger a full page reload
           server.ws.send({ type: 'full-reload' })
           console.log('[palo-config-hmr] ✅ config.yaml valid — reloading')

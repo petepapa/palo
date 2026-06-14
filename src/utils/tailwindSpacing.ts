@@ -49,5 +49,17 @@ export function resolveTailwindGapClass(gapClass: string, fallback = 'var(--spac
     return fallback
   }
 
-  return spacingScale[scaleKey] ?? fallback
+  // 1) 已知 Tailwind spacing scale
+  if (spacingScale[scaleKey] !== undefined) {
+    return spacingScale[scaleKey]
+  }
+
+  // 2) 纯数字 → 按 Tailwind 规则计算：1 = 0.25rem
+  const numeric = Number(scaleKey)
+  if (!Number.isNaN(numeric) && numeric >= 0) {
+    return `${numeric * 0.25}rem`
+  }
+
+  // 3) 未知 token → fallback
+  return fallback
 }

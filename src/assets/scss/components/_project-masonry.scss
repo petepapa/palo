@@ -1,7 +1,7 @@
 @layer components {
   /* Multi-column masonry for overlay project cards */
+  /* column-count is driven by Tailwind responsive classes (columns-*), not hardcoded here */
   .project-masonry {
-    columns: 1;
     column-fill: balance;
     column-gap: var(--project-list-gap, var(--space-m, 1.5rem));
     list-style: none;
@@ -34,17 +34,5 @@
   .project-masonry__item > .project-card {
     inline-size: 100%;
     max-inline-size: 100%;
-  }
-
-  @media (min-width: 640px) {
-    .project-masonry {
-      columns: 2;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .project-masonry {
-      columns: 3;
-    }
   }
 }

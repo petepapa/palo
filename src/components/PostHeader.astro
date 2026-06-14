@@ -5,6 +5,7 @@ import { Avatar, Breadcrumbs, BreadcrumbsItem, Button, Heading } from 'accessibl
 import { Icon } from 'astro-icon/components'
 import sanitizeHtml from 'sanitize-html'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import config from '@config'
 
 type Author = {
   name: string
@@ -29,22 +30,58 @@ type Props = {
   liveDemo?: string
   divider?: DividerPlacement
   coverImagePosition?: CoverImagePosition
+  headingLevel?: string
+  descClass?: string
 }
 
-const {
-  class: className,
-  title,
-  subtitle,
-  coverImage,
-  author,
-  breadcrumbs = true,
-  customBreadcrumbLabels,
-  joinLastBreadcrumb = false,
-  source,
-  liveDemo,
-  divider = true,
-  coverImagePosition = 'head',
-} = Astro.props as Props
+// 📖 从 config.yaml 读取 PostHeader 全局默认值
+const postHeaderDefaults = config.components?.postHeader ?? {}
+
+// ⚡ 空字符串拦截 + Zod catch sentinel 检测：
+// 当 Astro 传入空 string 或 Zod Schema 因 frontmatter 无效而 catch 回退时，
+// 视为未设置 → 回退至 config.yaml 默认值
+function resolveStringProp<T>(prop: any, configDefault: T, fallback: T): T {
+  return (prop === '' || prop === undefined || prop === null) ? (configDefault ?? fallback) : (prop as T)
+}
+
+/**
+ * Zod catch sentinel 检测：
+ * Content Collection 的 Zod Schema 会对无效字段做 .catch(sentinel)。
+ * 如果传入值 === Zod 默认值，但 config.yaml 有不同配置，则优先使用 config.yaml，
+ * 因为用户大概率没有在 frontmatter 中显式设置该值。
+ */
+function preferConfigOverZodCatch<T>(prop: T, configDefault: T | undefined, zodDefault: T): T {
+  // 如果 prop 等于 Zod 默认值（即可能是 catch 回退），且 config.yaml 有显式配置且不同
+  if (prop === zodDefault && configDefault !== undefined && configDefault !== zodDefault) {
+    return configDefault
+  }
+  return prop
+}
+
+const _props = Astro.props as Props
+
+const className = _props.class
+const title = _props.title
+const subtitle = _props.subtitle
+const coverImage = _props.coverImage
+const author = _props.author
+const customBreadcrumbLabels = _props.customBreadcrumbLabels
+const joinLastBreadcrumb = _props.joinLastBreadcrumb ?? false
+const source = _props.source
+const liveDemo = _props.liveDemo
+
+// ── 识别 Zod catch sentinel —— 若前值 = Zod 默认值，优先采用 config.yaml ──
+const rawBreadcrumbs = _props.breadcrumbs ?? postHeaderDefaults.showBreadcrumbs ?? true
+const breadcrumbs = preferConfigOverZodCatch(rawBreadcrumbs, postHeaderDefaults.showBreadcrumbs, true)
+
+const rawDivider = resolveStringProp(_props.divider, postHeaderDefaults.divider, true) as boolean | 'top' | 'both' | 'bottom'
+const divider = preferConfigOverZodCatch(rawDivider, postHeaderDefaults.divider, true)
+
+const rawCoverImagePosition = resolveStringProp(_props.coverImagePosition, postHeaderDefaults.coverImagePosition, 'head') as boolean | 'top' | 'head' | 'bottom'
+const coverImagePosition = preferConfigOverZodCatch(rawCoverImagePosition, postHeaderDefaults.coverImagePosition, 'head')
+
+const headingLevel = _props.headingLevel || postHeaderDefaults.headingLevel || 'h2'
+const descClass = _props.descClass || postHeaderDefaults.descClass || 'text-lg'
 
 const formatSegment = (segment: string): string => {
   if (customBreadcrumbLabels?.[segment]) {
@@ -155,8 +192,8 @@ const sanitizedSubtitle: string = subtitle
 
   <div class="py-10">
     <div class="space-content container">
-      <Heading level="h2">{title}</Heading>
-      {sanitizedSubtitle && <p class="text-lg mt-4" set:html={sanitizedSubtitle} />}
+      <Heading level={headingLevel}>{title}</Heading>
+      {sanitizedSubtitle && <p class={descClass} class:list={['mt-4']} set:html={sanitizedSubtitle} />}
       
       <div class="post-header__meta">
         <div class="post-header__author">

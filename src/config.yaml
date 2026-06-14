@@ -134,7 +134,7 @@ border:
   media: '0'                  # 图片/媒体描边
   surface: '0.1rem'           # 下拉菜单、面板等容器
   codeBlock: '0'              # 代码块描边
-  divider: '0.075rem'         # 分隔线线宽
+  divider: '1.075rem'         # 分隔线线宽
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -158,3 +158,106 @@ radius:
   toggle: '0.5rem'            # Toggle 切换按钮
   surface: ''                 # 下拉菜单、工具面板等容器
   codeBlock: '0.25rem'        # 代码块圆角
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  通用组件默认值 / Common Components Defaults                  ║
+# ║  PaloPageHeader · PostHeader 等全局默认参数                   ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+components:
+  paloPageHeader:
+    headingLevel: "h1"
+    descClass: "text-lg"
+    alignV: "center"  # 默认垂直居中 (center | top | bottom)
+    alignH: "left"    # 默认水平靠左 (left | center | right)
+    divider: "bottom" # bottom | top | none
+
+  postHeader:
+    headingLevel: "h2"
+    descClass: "text-lg"
+    coverImagePosition: "head" # head | background | side
+    divider: "bottom"
+    showBreadcrumbs: true
+    showShare: true
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Portfolio / Projects 相关默认值                              ║
+# ║  列表页 · Type页 · Featured 组件等自动继承的布局参数            ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+portfolio:
+  pagination:
+    pageSize: 10
+    sortBy: "latest" # latest | oldest | alphabetical
+
+  # 🧬 纯粹的视觉基因基座：抽取公共的网格和排版布局参数，
+  #   供列表页、Type页、Featured组件复用和继承。
+  defaults:
+    showTags: true
+    showStats: true
+    layout: "overlay" # overlay | standard
+    width: "full"     # full | container
+    gap: "gap-5"
+    # 将 Tailwind 栅格列拆解为响应式对象，防止由于动态拼接导致编译时 CSS 类丢失
+    columns:
+      initial: 1
+      sm: 2
+      lg: 3
+      xl: 3
+    tagsHeading: "h5"
+    projectHeadingLevel: "h5"
+    projectDescClass: "text-base"
+
+  # 以下特定页面/组件若无特别声明，默认继承并覆盖上面的 defaults
+  listPage:
+    title: "All Projects"
+    subtitle: "A visual summary of every project, arranged as an overlay masonry gallery."
+    projectHeadingLevel: "h1" # test
+
+  typePage:
+    layout: "standard"
+    width: "container"
+    gap: "gap-6"
+    columns: {}  # 为空则继承 defaults.columns
+
+  tagPage: 
+    layout: "overlay" 
+    width: "container" 
+    gap: "gap-5" 
+    columns: {} 
+
+  featuredComponent:
+    limit: 10
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Blog / Posts 相关默认值                                     ║
+# ║  列表页 · 最新文章组件等自动继承的布局参数                      ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+blog:
+  pagination:
+    pageSize: 10
+    sortBy: "latest"
+
+  # 🧬 纯粹的视觉基因基座：抽取公共的博客网格参数，
+  #   供列表页和最新文章组件复用。
+  defaults:
+    showTags: true
+    showStats: true
+    itemGap: "gap-24"
+    cardGap: "gap-12 md:gap-24"
+    tagsHeading: "h5"
+    postHeadingLevel: "h3"
+    postDescClass: "text-md" # 确保符合 Tailwind 标准规范（标准无 text-md，已规范为 text-base）
+
+  listPage: 
+    title: "Blog"
+    subtitle: "Latest articles on web development, accessibility, and design best practices.
+
+"
+
+  latestComponent:
+    limit: 5

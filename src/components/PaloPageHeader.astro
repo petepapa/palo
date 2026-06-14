@@ -2,6 +2,7 @@
 import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
+import config from '@config'
 
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
@@ -28,6 +29,8 @@ interface Props {
   divider?: DividerPlacement
   alignV?: '' | 'top' | 'center' | 'bottom'
   alignH?: '' | 'left' | 'center' | 'right'
+  headingLevel?: string
+  descClass?: string
   bg?: BgProps
   /**
    * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
@@ -36,19 +39,31 @@ interface Props {
   useContainer?: boolean
 }
 
-const {
-  class: className,
-  title,
-  subtitle,
-  fullscreen = false,
-  contentColor = '',
-  topNavigationTheme = '',
-  divider = true,
-  alignV = 'center',
-  alignH = 'left',
-  bg = {},
-  useContainer = true,
-} = Astro.props
+// 📖 从 config.yaml 读取组件全局默认值
+const componentDefaults = config.components?.paloPageHeader ?? {}
+
+// 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config 默认值
+const _props = Astro.props as Props
+
+const className = _props.class
+const title = _props.title
+const subtitle = _props.subtitle
+const fullscreen = _props.fullscreen ?? false
+const contentColor = _props.contentColor || ''
+const topNavigationTheme = _props.topNavigationTheme || ''
+
+// ⚡ 空字符串拦截：当 Astro 传入空 string 时视为未设置，回退至 config.yaml 默认值
+function resolveStringProp<T>(prop: any, configDefault: T, fallback: T): T {
+  return (prop === '' || prop === undefined || prop === null) ? (configDefault ?? fallback) : (prop as T)
+}
+
+const divider = resolveStringProp(_props.divider, componentDefaults.divider, true)
+const alignV: string = resolveStringProp(_props.alignV, componentDefaults.alignV, 'center')
+const alignH: string = resolveStringProp(_props.alignH, componentDefaults.alignH, 'left')
+const headingLevel = _props.headingLevel || componentDefaults.headingLevel || 'h1'
+const descClass = _props.descClass || componentDefaults.descClass || 'text-lg'
+const bg = _props.bg ?? {}
+const useContainer = _props.useContainer ?? true
 
 const bgImage = bg.image ?? ''
 const bgVideo = bg.video ?? ''
@@ -142,8 +157,8 @@ const sanitizedSubtitle: string = subtitle
   {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
 
   <div class:list={['palo-page-header__content', 'space-content', useContainer && 'container']}>
-    <Heading level="h1">{title}</Heading>
-    {sanitizedSubtitle && <p class="text-lg" set:html={sanitizedSubtitle} />}
+    <Heading level={headingLevel}>{title}</Heading>
+    {sanitizedSubtitle && <p class={descClass} set:html={sanitizedSubtitle} />}
   </div>
 </section>
 

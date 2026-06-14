@@ -9,39 +9,44 @@ import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
+import config from '@config'
 
 // =========================================================================
-// 🎛️ 中央控制台 / Central Page Configuration
+// 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
 // =========================================================================
 const COVER_IMAGE_RATIO = '8 / 5'
 
+const blogDefaults = config.blog
+const blogLayoutDefaults = blogDefaults?.defaults ?? {}
+
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
-  metaTitle: '',        // 选填。留空则自动复用 title
-  metaDescription: '',  // 选填 SEO description，留空自动生成
+  metaTitle: '',
+  metaDescription: '',
 
-  // ── 功能开关中心 / Feature Toggles ──
-  showTags: true,       // 是否启用顶部 Tag 标签筛选功能
-  showStats: true,      // 是否显示文章统计信息
+  // ── 功能开关中心 / Feature Toggles (从 config.yaml 读取) ──
+  showTags: blogLayoutDefaults.showTags ?? true,
+  showStats: blogLayoutDefaults.showStats ?? true,
 
   // ── 列表排版参数 / List Layout Settings ──
-  itemGap: 'gap-24',    // PostCard 之间的垂直间距 (Tailwind Gap Class)
-  cardGap: 'gap-12 md:gap-24', // PostCard 内部图片与文字区块之间的间距 (透传给 PostCard)
+  itemGap: blogLayoutDefaults.itemGap ?? 'gap-24',
+  cardGap: blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
 
   // ── 细粒度排版微调 / Typography Fine-Tuning ──
-  tagsHeading: 'h5',    // Tags 区域标题的 HTML 标签级别与字号样式
-  postHeadingLevel: 'h3', // PostCard 标题的 HTML 标签级别
-  postDescClass: 'text-base', // PostCard 摘要文字的 CSS Class
+  tagsHeading: blogLayoutDefaults.tagsHeading ?? 'h5',
+  postHeadingLevel: blogLayoutDefaults.postHeadingLevel ?? 'h3',
+  postDescClass: blogLayoutDefaults.postDescClass ?? 'text-base',
 } as const
 
-// ── PaloPageHeader 结构化参数 (对齐大一统新规范) ──
+// ── PaloPageHeader 结构化参数 (从 config.yaml 读取全局默认值) ──
+const pageHeaderDefaults = config.components?.paloPageHeader ?? {}
 const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
-  alignV: '',
-  alignH: '',
-  divider: true,
+  alignV: pageHeaderDefaults.alignV ?? 'center',
+  alignH: pageHeaderDefaults.alignH ?? 'left',
+  divider: pageHeaderDefaults.divider ?? 'bottom',
   bg: {
     video: '',
     image: '',

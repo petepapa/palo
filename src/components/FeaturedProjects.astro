@@ -8,6 +8,8 @@ import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import config from '@config'
+import { buildColumnsClass } from '../types/config'
 
 type FeaturedProjectLayout = 'standard' | 'overlay'
 
@@ -70,17 +72,27 @@ interface Props {
   colsClass?: string
 }
 
+// 📖 从 config.yaml 读取 Portfolio FeaturedComponent 全局默认值
+const portfolioCfg = config.portfolio
+const featuredDefaults = portfolioCfg?.featuredComponent ?? {}
+const projectDefaults = portfolioCfg?.defaults ?? {}
+
+// 构建默认 columns 类名
+const defaultColumns = projectDefaults.columns
+  ? buildColumnsClass(projectDefaults.columns)
+  : 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3'
+
 const {
   class: className,
-  limit = 3,
+  limit = featuredDefaults.limit ?? 3,
   title = 'Featured projects',
-  layout = 'standard',
-  width = 'container',
-  gap = 'gap-12',
+  layout = projectDefaults.layout ?? 'standard',
+  width = projectDefaults.width ?? 'container',
+  gap = projectDefaults.gap ?? 'gap-5',
   sortBy = 'latest',
-  projectHeadingLevel = 'h5',
-  projectDescClass = 'text-base',
-  colsClass = 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3',
+  projectHeadingLevel = projectDefaults.projectHeadingLevel ?? 'h5',
+  projectDescClass = projectDefaults.projectDescClass ?? 'text-base',
+  colsClass = defaultColumns,
 } = Astro.props
 const projectListWidthClass = getProjectListWidthClass(width)
 const projectListGapSize = resolveTailwindGapClass(gap)
@@ -88,9 +100,10 @@ const isOverlayLayout = layout === 'overlay'
 const isFullWidthList = width === 'full'
 
 const listBaseClasses = [
+  colsClass,
   isOverlayLayout
     ? 'featured-projects__masonry'
-    : colsClass + ' grid list-none p-0',
+    : 'project-masonry list-none',
   projectListWidthClass,
   gap,
 ]
@@ -143,7 +156,7 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
         <ul class:list={listBaseClasses} style={`--featured-projects-gap: ${projectListGapSize}`}>
           {
             featuredProjects.map((project) => (
-              <li class:list={[isOverlayLayout && 'featured-projects__masonry-item']}>
+              <li class:list={[isOverlayLayout ? 'featured-projects__masonry-item' : 'project-masonry__item break-inside-avoid']}>
                 <ProjectCard
                   project={project}
                   image={project.featuredImage}
@@ -168,7 +181,7 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
         <ul class:list={listBaseClasses} style={`--featured-projects-gap: ${projectListGapSize}`}>
           {
             featuredProjects.map((project) => (
-              <li class:list={[isOverlayLayout && 'featured-projects__masonry-item']}>
+              <li class:list={[isOverlayLayout ? 'featured-projects__masonry-item' : 'project-masonry__item break-inside-avoid']}>
                 <ProjectCard
                   project={project}
                   image={project.featuredImage}
@@ -194,7 +207,7 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
 <style lang="scss">
   @layer components {
     .featured-projects__masonry {
-      column-count: 1;
+      /* column-count is driven by Tailwind responsive classes (columns-*), not hardcoded here */
       column-gap: var(--featured-projects-gap, var(--space-m, 1.5rem));
       column-fill: balance;
       list-style: none;
@@ -221,18 +234,6 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
     .featured-projects__masonry-item > .project-card {
       inline-size: 100%;
       max-inline-size: 100%;
-    }
-
-    @media (min-width: 640px) {
-      .featured-projects__masonry {
-        column-count: 2;
-      }
-    }
-
-    @media (min-width: 1024px) {
-      .featured-projects__masonry {
-        column-count: 3;
-      }
     }
   }
 </style>

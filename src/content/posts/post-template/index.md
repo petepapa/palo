@@ -12,12 +12,12 @@ author:
 
 # Visual Assets & Layouts / 视觉资产与排版样式
 # coverImage: ./cover.jpg      # Optional: Uncomment and provide path if needed / 可选：需要封面时再取消注释
-coverImagePosition: "head"
+coverImagePosition: ""
 
 # Feature Toggles / 极简功能开关 (Removed 'show' prefix)
-breadcrumbs: true
 toc: true
-share: true
+breadcrumbs: 
+share: 
 
 # Status & External Links / 状态与外部链接
 draft: false

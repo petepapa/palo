@@ -13,39 +13,59 @@ import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import { PAGE_SIZE } from '@utils/listConfig'
+import config from '@config'
+import { buildColumnsClass } from '../../../../types/config'
 
 // =========================================================================
-// 🎛️ 中央控制台 / Central Page Configuration
+// 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
 // =========================================================================
+const portfolioDefaults = config.portfolio?.defaults ?? {}
+const portfolioTypePage = config.portfolio?.typePage ?? {}
+
+// 列参数：typePage.columns 覆盖 defaults.columns（仅当 typePage.columns 非空时）
+const resolvedColumns = portfolioTypePage.columns &&
+  Object.keys(portfolioTypePage.columns).length > 0
+  ? portfolioTypePage.columns
+  : portfolioDefaults.columns
+
+const defaultColumns = resolvedColumns
+  ? buildColumnsClass(resolvedColumns)
+  : 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3'
+
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
-  metaTitle: '',                          // 选填 SEO title，留空自动生成
-  metaDescription: '',                    // 选填 SEO description，留空自动生成
+  metaTitle: '',
+  metaDescription: '',
 
-  // ── 功能开关中心 / Feature Toggles ──
-  showTags: true,                         // 是否启用顶部 Tag 标签筛选功能
-  showStats: true,                        // 是否显示项目统计信息
+  // ── 功能开关中心 / Feature Toggles (源自 defaults) ──
+  showTags: portfolioDefaults.showTags ?? true,
+  showStats: portfolioDefaults.showStats ?? true,
 
-  // ── 列表布局参数 / List Layout Settings ──
-  layout: 'standard',                     // 卡片布局风格：'standard' (网格) | 'overlay' (悬浮遮罩)
-  width: 'container' as ProjectListWidth, // 容器宽度：'container' (网页内宽) | 'full' (全屏全宽)
-  gap: 'gap-8',                           // 项目间距类名 (Tailwind Gap Class)
-  colsClass: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3', // 网格列配置
+  // ── 列表布局参数 / List Layout Settings (typePage 覆盖 defaults) ──
+  layout: portfolioTypePage.layout ?? portfolioDefaults.layout ?? 'standard',
+  width: (portfolioTypePage.width ?? portfolioDefaults.width ?? 'container') as ProjectListWidth,
+  gap: portfolioTypePage.gap ?? portfolioDefaults.gap ?? 'gap-6',
+  colsClass: defaultColumns,
 
   // ── 细粒度排版微调 / Typography Fine-Tuning ──
-  tagsHeading: 'h5',                      // ✨ 完美合并：一键决定 Tags 标题的 HTML 标签级别与字号样式 ('h1' - 'h6')
-  projectHeadingLevel: 'h5',              // 项目卡片标题的 HTML 标签级别
-  projectDescClass: 'text-base',          // 项目卡片摘要文字的 CSS Class
+  tagsHeading: portfolioDefaults.tagsHeading ?? 'h5',
+  projectHeadingLevel: portfolioDefaults.projectHeadingLevel ?? 'h5',
+  projectDescClass: portfolioDefaults.projectDescClass ?? 'text-base',
 } as const
 
-// ── PaloPageHeader 结构化参数 ──
+// 派生计算属性
+const isFullWidthList = pageConfig.width === 'full'
+
+// ── PaloPageHeader 结构化参数 (从 config.yaml 读取全局默认值) ──
+const pageHeaderDefaults = config.components?.paloPageHeader ?? {}
 const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
-  alignV: 'center',
-  alignH: 'left',
-  divider: 'bottom',
+  alignV: pageHeaderDefaults.alignV ?? 'center',
+  alignH: pageHeaderDefaults.alignH ?? 'left',
+  divider: pageHeaderDefaults.divider ?? 'bottom',
   bg: {
     video: '',
     image: '',
@@ -78,7 +98,7 @@ export async function getStaticPaths({ paginate }: { paginate: PaginateFunction 
     )
 
     const paginatedPages = paginate(sortedFilteredProjects, {
-      pageSize: 10,
+      pageSize: PAGE_SIZE.portfolio,
       params: { type: typeId },
       props: {
         currentType,
@@ -136,14 +156,14 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
       )}
     </div>
 
-    <div class="container">
+    <div class:list={[isFullWidthList ? "w-full" : "container"]}>
       <ul
-        class:list={['mt-3 grid list-none p-0', projectListWidthClass, pageConfig.gap, pageConfig.colsClass]}
+        class:list={['project-masonry mt-3', projectListWidthClass, pageConfig.gap, pageConfig.colsClass]}
         style={`--project-list-gap: ${projectListGapSize}`}
       >
         {
           page.data.map((project) => (
-            <li>
+            <li class="project-masonry__item break-inside-avoid">
               <ProjectCard
                 project={project}
                 image={resolveCollectionCoverImage(

@@ -30,3 +30,76 @@
 }
 
 /* text-* 类已在 _utility.scss 中定义，避免重复定义导致响应式前缀失效 */
+
+/* ============================================
+   Safety List: columns-{count}
+   Tailwind v4 原生只提供 columns-1/2/3/4 的响应式变体。
+   动态拼接的类名（如 columns-${n}）因 content scanner 限制无法被 JIT 编译。
+   此处显式声明 columns-5~12 及其所有响应式前缀，确保任意数字均可使用。
+   ============================================ */
+@layer utilities {
+  /* ── CSS 多列 safety list (columns-* 布局使用) ── */
+  .columns-5 { columns: 5; }
+  .columns-6 { columns: 6; }
+  .columns-7 { columns: 7; }
+  .columns-8 { columns: 8; }
+  .columns-9 { columns: 9; }
+  .columns-10 { columns: 10; }
+  .columns-11 { columns: 11; }
+  .columns-12 { columns: 12; }
+
+  @media (min-width: 40rem) {
+    .sm\:columns-5 { columns: 5; }
+    .sm\:columns-6 { columns: 6; }
+    .sm\:columns-7 { columns: 7; }
+    .sm\:columns-8 { columns: 8; }
+    .sm\:columns-9 { columns: 9; }
+    .sm\:columns-10 { columns: 10; }
+    .sm\:columns-11 { columns: 11; }
+    .sm\:columns-12 { columns: 12; }
+  }
+
+  @media (min-width: 48rem) {
+    .md\:columns-5 { columns: 5; }
+    .md\:columns-6 { columns: 6; }
+    .md\:columns-7 { columns: 7; }
+    .md\:columns-8 { columns: 8; }
+    .md\:columns-9 { columns: 9; }
+    .md\:columns-10 { columns: 10; }
+    .md\:columns-11 { columns: 11; }
+    .md\:columns-12 { columns: 12; }
+  }
+
+  @media (min-width: 64rem) {
+    .lg\:columns-5 { columns: 5; }
+    .lg\:columns-6 { columns: 6; }
+    .lg\:columns-7 { columns: 7; }
+    .lg\:columns-8 { columns: 8; }
+    .lg\:columns-9 { columns: 9; }
+    .lg\:columns-10 { columns: 10; }
+    .lg\:columns-11 { columns: 11; }
+    .lg\:columns-12 { columns: 12; }
+  }
+
+  @media (min-width: 80rem) {
+    .xl\:columns-5 { columns: 5; }
+    .xl\:columns-6 { columns: 6; }
+    .xl\:columns-7 { columns: 7; }
+    .xl\:columns-8 { columns: 8; }
+    .xl\:columns-9 { columns: 9; }
+    .xl\:columns-10 { columns: 10; }
+    .xl\:columns-11 { columns: 11; }
+    .xl\:columns-12 { columns: 12; }
+  }
+
+  @media (min-width: 96rem) {
+    .\32xl\:columns-5 { columns: 5; }
+    .\32xl\:columns-6 { columns: 6; }
+    .\32xl\:columns-7 { columns: 7; }
+    .\32xl\:columns-8 { columns: 8; }
+    .\32xl\:columns-9 { columns: 9; }
+    .\32xl\:columns-10 { columns: 10; }
+    .\32xl\:columns-11 { columns: 11; }
+    .\32xl\:columns-12 { columns: 12; }
+  }
+}

@@ -112,16 +112,12 @@ import { Card } from 'accessible-astro-components'
   
 
   <section class="my-64">
-  <FeaturedProjects limit={10} layout="overlay" width="full" gap="gap-5" sortBy="popular" />
+  <FeaturedProjects />
   </section>
 
   {/* LATEST POSTS SECTION ========================================*/}
   <section class="my-64">
-  <LatestPosts 
-    limit={5} 
-    postHeadingLevel="h3"
-    postDescClass="text-md"
-  />
+  <LatestPosts />
 </section>
 
 </DefaultLayout>

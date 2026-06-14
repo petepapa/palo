@@ -12,41 +12,57 @@ import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 import type { PaginateFunction, Page } from 'astro'
+import config from '@config'
+import { buildColumnsClass } from '../../types/config'
+
+const portfolioDefaults = config.portfolio?.defaults ?? {}
+const portfolioListPage = config.portfolio?.listPage ?? {}
+
+// 构建默认 columns 类名（listPage.columns 为空对象 {} 或无值时继承 defaults.columns）
+const listPageColumns = portfolioListPage.columns
+const effectiveColumns = listPageColumns !== undefined && Object.keys(listPageColumns).length > 0
+  ? listPageColumns
+  : portfolioDefaults.columns
+const defaultColumns = effectiveColumns
+  ? buildColumnsClass(effectiveColumns)
+  : 'columns-[1] sm:columns-[2] lg:columns-[3] xl:columns-[3]'
 
 // =========================================================================
-// 🎛️ 中央控制台 / Central Page Configuration
+// 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
+//   三级降级链路：listPage → defaults → 硬编码兜底
 // =========================================================================
 const pageConfig = {
-  // ── 文案与 SEO / Copywriting & SEO (支持 Fallback 机制) ──
-  title: 'All Projects',
-  subtitle: 'A visual summary of every project, arranged as an overlay masonry gallery.',
-  metaTitle: '',        // 选填。留空则自动复用上方 title 做页签标题 / Empty = fallback to title
+  // ── 文案与 SEO / Copywriting & SEO ──
+  title: portfolioListPage.title ?? 'All Projects',
+  subtitle: portfolioListPage.subtitle ?? '',
+  metaTitle: '',
   metaDescription: 'A complete visual index of portfolio projects, arranged as an overlay masonry gallery.',
 
-  // ── 功能开关中心 / Feature Toggles ──
-  showTags: true,       // 是否启用顶部 Tag 标签筛选功能
-  showStats: true,      // 是否显示总页面数量和项目统计信息
+  // ── 功能开关中心 / Feature Toggles (listPage → defaults) ──
+  showTags: portfolioListPage.showTags ?? portfolioDefaults.showTags ?? true,
+  showStats: portfolioListPage.showStats ?? portfolioDefaults.showStats ?? true,
 
-  // ── 列表布局参数 / List Layout Settings ──
-  layout: 'overlay',    // 卡片布局风格：'standard' (网格) | 'overlay' (悬浮遮罩)
-  width: 'full' as ProjectListWidth, // 容器宽度：'container' (网页内宽) | 'full' (全屏全宽)
-  gap: 'gap-5',         // 项目间距类名 (Tailwind Gap Class)
-  colsClass: 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3', // 瀑布流分列配置 (Tailwind Columns)
+  // ── 列表布局参数 / List Layout Settings (listPage → defaults) ──
+  layout: portfolioListPage.layout ?? portfolioDefaults.layout ?? 'overlay',
+  width: (portfolioListPage.width ?? portfolioDefaults.width ?? 'full') as ProjectListWidth,
+  gap: portfolioListPage.gap ?? portfolioDefaults.gap ?? 'gap-5',
+  colsClass: defaultColumns,
 
-  // ── 细粒度排版微调 / Typography Fine-Tuning ──
-  tagsHeading: 'h5',            // ✨ 完美合并：一键决定 Tags 标题的 HTML 标签级别与字号样式 ('h1' - 'h6')
-  projectHeadingLevel: 'h5',    // 项目卡片标题的 HTML 标签级别
-  projectDescClass: 'text-base', // 项目卡片摘要文字的 CSS Class
+  // ── 细粒度排版微调 / Typography Fine-Tuning (listPage → defaults) ──
+  tagsHeading: portfolioListPage.tagsHeading ?? portfolioDefaults.tagsHeading ?? 'h5',
+  projectHeadingLevel: portfolioListPage.projectHeadingLevel ?? portfolioDefaults.projectHeadingLevel ?? 'h5',
+  projectDescClass: portfolioListPage.projectDescClass ?? portfolioDefaults.projectDescClass ?? 'text-base',
 } as const
 
-// ── PaloPageHeader 结构化参数 (对齐大一统新规范) ──
+// ── PaloPageHeader 结构化参数 (从 config.yaml 读取全局默认值) ──
+const pageHeaderDefaults = config.components?.paloPageHeader ?? {}
 const pageHeader = {
   fullscreen: false,
   contentColor: '',
   topNavigationTheme: '',
-  alignV: 'center',
-  alignH: 'left',
-  divider: 'bottom',
+  alignV: pageHeaderDefaults.alignV ?? 'center',
+  alignH: pageHeaderDefaults.alignH ?? 'left',
+  divider: pageHeaderDefaults.divider ?? 'bottom',
   bg: {
     video: '',
     image: '',

@@ -14,6 +14,11 @@ import {
   isImageLoadingError,
   isSchemaValidationError
 } from '@utils/contentImages'
+import config from '@config'
+
+// ───── 从 config.yaml 读取全局默认值 ─────
+const postHeaderDefaults = config.components?.postHeader ?? {}
+const showShareDefault = postHeaderDefaults.showShare ?? true
 
 /**
  * 动态路由：/blog/[post]
@@ -140,7 +145,7 @@ const authorInfo = typeof author === 'object'
           <div class={`prose space-content ${!postEntry.data.toc ? 'narrow' : ''}`}>
             {fallbackHtml ? <div set:html={fallbackHtml} /> : <Content />}
           </div>
-          {postEntry.data.share !== false && (
+          {showShareDefault && postEntry.data.share !== false && (
             <div class={`space-content mt-12 ${!postEntry.data.toc ? 'narrow' : ''}`}>
               <Heading level="h5">Share this post</Heading>
               <p>Like this post? Share it with your network!</p>
