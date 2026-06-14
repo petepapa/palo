@@ -134,7 +134,7 @@ border:
   media: '0'                  # 图片/媒体描边
   surface: '0.1rem'           # 下拉菜单、面板等容器
   codeBlock: '0'              # 代码块描边
-  divider: '1.075rem'         # 分隔线线宽
+  divider: '0.075rem'         # 分隔线线宽
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -189,7 +189,7 @@ components:
 
 portfolio:
   pagination:
-    pageSize: 10
+    pageSize: 5
     sortBy: "latest" # latest | oldest | alphabetical
 
   # 🧬 纯粹的视觉基因基座：抽取公共的网格和排版布局参数，
