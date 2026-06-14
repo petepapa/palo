@@ -131,13 +131,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         letter-spacing: 0;
       }
 
-    .project-card__description {
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      -webkit-line-clamp: 2;
-    }
-
     .project-card--standard {
       .project-card__content {
         display: grid;
@@ -147,6 +140,11 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       }
 
       .project-card__description {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        -webkit-line-clamp: 2;
+        min-height: calc(var(--text-base--line-height, 1.75) * 2em);
         color: inherit;
       }
 
