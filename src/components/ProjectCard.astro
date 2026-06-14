@@ -88,10 +88,9 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       inline-size: 100%;
 
-      /* [v3] Transparent outline extends 1px beyond border-radius boundary, covering sub-pixel gaps.
-         outline is NOT affected by overflow:hidden (it renders outside),
-         so it seals the gap between the composited image layer and the clip mask. */
-      outline: 1px solid transparent;
+      /* 🛡️ Safari sub-pixel barrier: clip-path forces WebKit to rasterize at exact pixel boundaries */
+      clip-path: inset(0);
+      isolation: isolate;
     }
 
     .project-card__image {
@@ -104,12 +103,10 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       object-fit: cover;
       border-radius: inherit;
 
-      /* 🛡️ Safari sub-pixel barrier: GPU compositing + perspective to force stable layer boundaries */
-      transform: translateZ(0) scale(1);
-      backface-visibility: hidden;
-      perspective: 1000px;
-      will-change: transform;
-      -webkit-transform: translateZ(0) scale(1);
+      /* [v4] NO GPU compositing hints on image itself.
+         Without will-change/translateZ/perspective, the image stays in the same raster layer
+         as .project-card__media, so there is NO composite layer boundary to produce sub-pixel gaps.
+         The hover scale(1.04) animation still works, but on the parent clip-mask's layer. */
     }
 
     .project-card__title {
