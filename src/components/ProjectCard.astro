@@ -80,20 +80,17 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
     }
 
     .project-card__media {
-      --_media-bg: light-dark(var(--color-neutral-100), var(--color-neutral-900));
-
       display: block;
       position: relative;
       overflow: hidden;
       aspect-ratio: var(--project-card-aspect-ratio, 8 / 5);
       border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
-      background-color: var(--_media-bg);
+      background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       inline-size: 100%;
 
-      /* 🛡️ [v1] Inset box-shadow on clip-mask container.
-         CPU-rasterized shadow aligns perfectly with overflow:hidden + border-radius boundary,
-         covering any sub-pixel gap between composited child image layer and clip mask. */
-      box-shadow: inset 0 0 0 1px var(--_media-bg);
+      /* 🛡️ Safari sub-pixel barrier: clip-path forces WebKit to rasterize at exact pixel boundaries */
+      clip-path: inset(0);
+      isolation: isolate;
     }
 
     .project-card__image {
@@ -190,7 +187,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       .project-card__content {
         display: flex;
         position: absolute;
-        inset: 0;
         flex-direction: column;
         justify-content: flex-end;
         opacity: 0;
@@ -202,6 +198,12 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
         background: linear-gradient(to top, rgb(0 0 0 / 0.9), rgb(0 0 0 / 0.45), transparent);
         padding: clamp(1rem, 4vw, 1.5rem);
         color: white;
+
+        /* [v2] Stretch bottom edge 1px down to seal sub-pixel gap.
+           The parent .project-card has overflow:hidden and border-radius,
+           so the extra 1px is clipped silently at the card boundary. */
+        inset: auto 0 -1px 0;
+        top: 0;
       }
 
       .project-card__title {
