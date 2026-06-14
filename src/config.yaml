@@ -162,102 +162,106 @@ radius:
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  通用组件默认值 / Common Components Defaults                  ║
-# ║  PaloPageHeader · PostHeader 等全局默认参数                   ║
+# ║  配置独立聚合页头与内容详情页头（当页面 Frontmatter 未设置时）    ║
 # ╚══════════════════════════════════════════════════════════════╝
 
 components:
+  # 🌐 网站菜单对应的各大主页/列表页头部总控 (应用于 Portfolio 主页、Blog 主页、About 页、Tags 汇总页等)
   paloPageHeader:
-    headingLevel: "h1"
-    descClass: "text-lg"
-    alignV: "center"  # 默认垂直居中 (center | top | bottom)
-    alignH: "left"    # 默认水平靠左 (left | center | right)
-    divider: "bottom" # bottom | top | none
+    headingLevel: "h1"    # 标题标签层级 (h1 ~ h6)
+    descClass: "text-lg"  # 描述文字的 Tailwind 类名
+    alignV: "center"      # 垂直对齐方式: center (居中) | top (靠顶) | bottom (靠底)
+    alignH: "left"        # 水平对齐方式: left (靠左) | center (居中) | right (靠右)
+    divider: "bottom"     # 装饰分割线位置: bottom | top | none
 
+  # 📄 所有内容详情页头部总控 (穿透应用于所有的 Single Post 文章页与 Single Project 作品详情页)
   postHeader:
-    headingLevel: "h2"
-    descClass: "text-lg"
-    coverImagePosition: "head" # head | background | side
-    divider: "bottom"
-    showBreadcrumbs: true
-    showShare: true
+    headingLevel: "h2"    # 详情页大标题标签层级 (h2 ~ h6)
+    descClass: "text-lg"  # 详情页摘要/引言的 Tailwind 类名
+    coverImagePosition: "head" # 封面图渲染位置: head (顶部通栏) | background (大背景) | side (侧边)
+    divider: "bottom"     # 标题下方的分割线: bottom | none
+    showBreadcrumbs: true # 是否默认显示面包屑导航 (True/False)
+    showShare: true       # 是否默认显示社交分享按钮组 (True/False)
 
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  Portfolio / Projects 相关默认值                              ║
-# ║  列表页 · Type页 · Featured 组件等自动继承的布局参数            ║
+# ║  作品集模块的视觉基因基座与场景平级覆盖控制                     ║
 # ╚══════════════════════════════════════════════════════════════╝
 
 portfolio:
+  # ── 1. 数据与分页 (Data & Pagination) ──
   pagination:
-    pageSize: 5
-    sortBy: "latest" # latest | oldest | alphabetical
+    pageSize: 10           # 每页默认加载的项目数量
+    sortBy: "latest"      # 排序规则: latest (最新) | oldest (最早) | alphabetical (字母表)
 
-  # 🧬 纯粹的视觉基因基座：抽取公共的网格和排版布局参数，
-  #   供列表页、Type页、Featured组件复用和继承。
+  # ── 2. 🧬 视觉基因基座 (Visual Framework Base) ──
+  # 改变此区块的参数，全站所有作品列表、分类、标签页及推荐组件的样式将一键同步。
   defaults:
-    showTags: true
-    showStats: true
-    layout: "overlay" # overlay | standard
-    width: "full"     # full | container
-    gap: "gap-5"
-    # 将 Tailwind 栅格列拆解为响应式对象，防止由于动态拼接导致编译时 CSS 类丢失
+    showTags: true        # 是否在卡片上显示标签徽章
+    showStats: true       # 是否显示项目统计/度量信息
+    layout: "overlay"     # 默认卡片布局: overlay (文字浮在图片上) | standard (文字在图片下方)
+    width: "full"         # 容器最大宽度: full (全宽屏幕) | container (限制在1536px盒模型内)
+    gap: "gap-5"          # 网格之间的间距 (支持标准 Tailwind gap 类名)
+    # 瀑布流/网格的响应式列数拆解，防止由于动态拼接导致编译时 Tailwind CSS 丢失
     columns:
-      initial: 1
-      sm: 2
-      lg: 3
-      xl: 3
-    tagsHeading: "h5"
-    projectHeadingLevel: "h5"
-    projectDescClass: "text-base"
+      initial: 1          # 手机端默认列数 (Width < 640px)
+      sm: 2               # 平板端列数 (smBreakpoint)
+      lg: 3               # 桌面端列数 (lgBreakpoint)
+      xl: 3               # 大屏超宽端列数 (xlBreakpoint)
+    tagsHeading: "h5"          # 标签区块的隐藏层级
+    projectHeadingLevel: "h5"  # 项目卡片标题的字号标签
+    projectDescClass: "text-base" # 项目卡片简介的 Tailwind 类名
 
-  # 以下特定页面/组件若无特别声明，默认继承并覆盖上面的 defaults
-  listPage:
+  # ── 3. 📄 场景平级覆盖 (Scene Overrides) ──
+  # 各具体场景若无特别声明，将完美继承上方的 defaults 基座样式
+
+  listPage:               # 💡 对应主路由 [/portfolio] 作品集总列表页
     title: "All Projects"
     subtitle: "A visual summary of every project, arranged as an overlay masonry gallery."
-    projectHeadingLevel: "h1" # test
 
-  typePage:
-    layout: "standard"
-    width: "container"
+  typePage:               # 💡 对应路由 [/portfolio/type/*] 按项目类型筛选的列表页
+    layout: "standard"    # 覆盖：类型页倾向于清晰的 standard 图文版式
+    width: "container"    # 覆盖：收紧页面视口宽度
     gap: "gap-6"
-    columns: {}  # 为空则继承 defaults.columns
+    columns: {}           # 留空：保持响应式列数完全继承 defaults.columns
 
-  tagPage: 
+  tagPage:                # 💡 对应路由 [/portfolio/tag/*] 按技术标签筛选的列表页
     layout: "overlay" 
     width: "container" 
     gap: "gap-5" 
     columns: {} 
 
-  featuredComponent:
-    limit: 10
+  featuredComponent:      # 💡 智能组件：全站通用的「精选推荐作品」组件
+    limit: 10             # 限制该组件最多只渲染前 10 个精选项目
 
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  Blog / Posts 相关默认值                                     ║
-# ║  列表页 · 最新文章组件等自动继承的布局参数                      ║
+# ║  博客文章模块的视觉基因基座与场景平级覆盖控制                   ║
 # ╚══════════════════════════════════════════════════════════════╝
 
 blog:
+  # ── 1. 数据与分页 (Data & Pagination) ──
   pagination:
-    pageSize: 10
+    pageSize: 10          # 每页默认加载的文章数量
     sortBy: "latest"
 
-  # 🧬 纯粹的视觉基因基座：抽取公共的博客网格参数，
-  #   供列表页和最新文章组件复用。
+  # ── 2. 🧬 视觉基因基座 (Visual Framework Base) ──
+  # 改变此区块的参数，全站文章列表页、标签页及最新文章组件将一键同步。
   defaults:
     showTags: true
     showStats: true
-    itemGap: "gap-24"
-    cardGap: "gap-12 md:gap-24"
+    itemGap: "gap-24"          # 列表条目之间的纵向大间距
+    cardGap: "gap-12 md:gap-24" # 卡片内部响应式间距体系
     tagsHeading: "h5"
     postHeadingLevel: "h3"
-    postDescClass: "text-md" # 确保符合 Tailwind 标准规范（标准无 text-md，已规范为 text-base）
+    postDescClass: "text-base" # 🛠️ 深度优化：已修正非标准类名 text-md，统一规范为标准 text-base
 
-  listPage: 
+  # ── 3. 📄 场景平级覆盖 (Scene Overrides) ──
+  listPage:               # 💡 对应主路由 [/blog] 博客总文章列表页
     title: "Blog"
-    subtitle: "Latest articles on web development, accessibility, and design best practices.
+    subtitle: "Latest articles on web development, accessibility, and design best practices." # 🛠️ 修复：收拢了不规范的多行尾巴
 
-"
-
-  latestComponent:
-    limit: 5
+  latestComponent:        # 💡 智能组件：首页或侧边栏通用的「最新文章」推荐组件
+    limit: 5              # 限制展示最新的 5 篇文章
