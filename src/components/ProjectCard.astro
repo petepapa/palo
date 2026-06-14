@@ -68,11 +68,15 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       text-decoration: none;
       max-inline-size: 100%;
 
-      /* 🛡️ Safari sub-pixel anti-aliasing barrier: force GPU composite layer to eliminate fractional-pixel gaps on hover */
-      transform: translateZ(0);
+      /* 🛡️ [v5] Safari sub-pixel barrier: force GPU composite layer on root element.
+         Matches the pattern used in FeaturedProjects' .featured-projects__masonry-item
+         (which has backface-visibility:hidden and works correctly).
+         GPU compositing aligns the entire card as one rendered surface,
+         eliminating sub-pixel gap between the image composite layer and the clip-mask. */
       backface-visibility: hidden;
-      perspective: 1000px;
-      background-clip: padding-box;
+      -webkit-backface-visibility: hidden;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
 
       &:where(:hover, :focus-visible) {
         color: inherit;
@@ -103,10 +107,12 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       object-fit: cover;
       border-radius: inherit;
 
-      /* [v4] NO GPU compositing hints on image itself.
-         Without will-change/translateZ/perspective, the image stays in the same raster layer
-         as .project-card__media, so there is NO composite layer boundary to produce sub-pixel gaps.
-         The hover scale(1.04) animation still works, but on the parent clip-mask's layer. */
+      /* 🛡️ Safari sub-pixel barrier: GPU compositing + perspective to force stable layer boundaries */
+      transform: translateZ(0) scale(1);
+      backface-visibility: hidden;
+      perspective: 1000px;
+      will-change: transform;
+      -webkit-transform: translateZ(0) scale(1);
     }
 
     .project-card__title {
