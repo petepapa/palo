@@ -87,10 +87,25 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       border-radius: var(--radius-card, var(--radius-global, var(--radius-l)));
       background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
       inline-size: 100%;
-
-      /* 🛡️ Safari sub-pixel barrier: clip-path forces WebKit to rasterize at exact pixel boundaries */
       clip-path: inset(0);
       isolation: isolate;
+
+      /* 🛡️ WebKit sub-pixel gap physical barrier: a 1px pseudo element at the bottom edge
+         paints in the same CPU raster pass as overflow:hidden + border-radius clip mask,
+         physically filling any sub-pixel gaps between GPU-composited image/content layers
+         and the clip boundary. This pseudo element has no GPU composite layer of its own,
+         so it aligns perfectly with the parent's clip mask. */
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: 2;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+        pointer-events: none;
+      }
     }
 
     .project-card__image {
@@ -102,13 +117,6 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       block-size: 100%;
       object-fit: cover;
       border-radius: inherit;
-
-      /* 🛡️ Safari sub-pixel barrier: GPU compositing + perspective to force stable layer boundaries */
-      transform: translateZ(0) scale(1);
-      backface-visibility: hidden;
-      perspective: 1000px;
-      will-change: transform;
-      -webkit-transform: translateZ(0) scale(1);
     }
 
     .project-card__title {
@@ -187,7 +195,10 @@ const aspectStyle = `--project-card-aspect-ratio: ${projectType.aspectRatio}`
       .project-card__content {
         display: flex;
         position: absolute;
-        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         flex-direction: column;
         justify-content: flex-end;
         opacity: 0;
