@@ -27,6 +27,7 @@ const pageConfig = {
   subtitle: blogListPage.subtitle ?? 'Latest articles on web development, accessibility, and design best practices.',
   metaTitle: '',        // 选填。留空则自动复用 title
   metaDescription: 'Insights, tutorials, and thoughts on web development, accessibility, and design.',
+  allLabel: blogListPage.allLabel ?? 'All Posts',
 
   // ── 功能开关中心 / Feature Toggles (listPage → defaults) ──
   showTags: blogListPage.showTags ?? blogDefaults.showTags ?? true,
@@ -124,7 +125,7 @@ if (pageConfig.showTags) {
         <div class="tags-filter mb-8">
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
-            <Link href={ensureTrailingSlash('/blog')}>All</Link>
+            <Link href={ensureTrailingSlash('/blog')}>{pageConfig.allLabel}</Link>
             {uniqueTags.map((tag) => (
               <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
             ))}

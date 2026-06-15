@@ -16,13 +16,15 @@ import config from '@config'
 // =========================================================================
 const COVER_IMAGE_RATIO = '8 / 5'
 
-const blogDefaults = config.blog
-const blogLayoutDefaults = blogDefaults?.defaults ?? {}
+const blogRoot = config.blog
+const blogLayoutDefaults = blogRoot?.defaults ?? {}
+const blogListPage = blogRoot?.listPage ?? {}
 
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
   metaTitle: '',
   metaDescription: '',
+  allLabel: blogListPage.allLabel ?? 'All Posts',
 
   // ── 功能开关中心 / Feature Toggles (从 config.yaml 读取) ──
   showTags: blogLayoutDefaults.showTags ?? true,
@@ -147,7 +149,7 @@ if (pageConfig.showTags) {
         <div class="tags-filter mb-8">
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
-            <Link href={ensureTrailingSlash('/blog')}>All</Link>
+            <Link href={ensureTrailingSlash('/blog')}>{pageConfig.allLabel}</Link>
             {
               uniqueTags.map((tag: { label: string; slug: string }) => {
                 const isCurrentTag = tag.slug === currentTag.slug

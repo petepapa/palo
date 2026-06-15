@@ -219,6 +219,7 @@ portfolio:
   listPage:               # 💡 对应主路由 [/portfolio] 作品集总列表页
     title: "All Projects"
     subtitle: "A visual summary of every project, arranged as an overlay masonry gallery."
+    allLabel: 'All Projects'  # 标签筛选中"全部"按钮文字
 
   typePage:               # 💡 对应路由 [/portfolio/type/*] 按项目类型筛选的列表页
     layout: "standard"    # 覆盖：类型页倾向于清晰的 standard 图文版式
@@ -263,6 +264,7 @@ blog:
   listPage:               # 💡 对应主路由 [/blog] 博客总文章列表页
     title: "Blog"
     subtitle: "Latest articles on web development, accessibility, and design best practices." # 🛠️ 修复：收拢了不规范的多行尾巴
+    allLabel: 'All Posts'     # 标签筛选中"全部"按钮文字
 
   latestComponent:        # 💡 智能组件：首页或侧边栏通用的「最新文章」推荐组件
     limit: 5              # 限制展示最新的 5 篇文章

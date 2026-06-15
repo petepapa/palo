@@ -37,6 +37,7 @@ const pageConfig = {
   subtitle: portfolioListPage.subtitle ?? '',
   metaTitle: '',
   metaDescription: 'A complete visual index of portfolio projects, arranged as an overlay masonry gallery.',
+  allLabel: portfolioListPage.allLabel ?? 'All Projects',
 
   // ── 功能开关中心 / Feature Toggles (listPage → defaults) ──
   showTags: portfolioListPage.showTags ?? portfolioDefaults.showTags ?? true,
@@ -126,7 +127,7 @@ if (pageConfig.showTags) {
         <div class="tags-filter mb-8">
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
-            <Link href={ensureTrailingSlash('/portfolio')}>All</Link>
+            <Link href={ensureTrailingSlash('/portfolio')}>{pageConfig.allLabel}</Link>
             {uniqueTags.map((tag) => (
               <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
             ))}

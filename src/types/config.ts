@@ -216,6 +216,7 @@ export interface PortfolioDefaults {
 export interface PortfolioListPageConfig {
   title?: string
   subtitle?: string
+  allLabel?: string
 }
 
 export interface PortfolioTypePageConfig {
@@ -265,10 +266,16 @@ export interface BlogLatestComponentConfig {
   buttonAlign?: 'left' | 'center' | 'right'
 }
 
+export interface BlogListPageConfig {
+  title?: string
+  subtitle?: string
+  allLabel?: string
+}
+
 export interface BlogConfig {
   pagination?: BlogPaginationConfig
   defaults?: BlogDefaults
-  listPage?: Record<string, never>
+  listPage?: BlogListPageConfig
   latestComponent?: BlogLatestComponentConfig
 }
 
