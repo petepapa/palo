@@ -173,17 +173,17 @@ const uid = Math.random().toString(36).substr(2, 9);
           }
 
           // 6️⃣ 不强制 track 宽度，使用 CSS width: max-content 自动适应
-          // translateX(-50%) 相对 track 自身宽度，两个 Group 正好 -50% = 一个 Group 宽度
+          // translateX(-50%) 相对 track 自身宽度，精度由浏览器保证
           var duration = groupWidth / pxPerSec;
 
-          // 7️⃣ 重置动画起点，防止累积偏移
+          // 7️⃣ 重置动画起点（使用 translate3d 强制 GPU 合成）
           track.style.animation = 'none';
-          track.style.transform = isRight ? 'translateX(-50%)' : 'translateX(0)';
+          track.style.transform = isRight ? 'translate3d(-50%,0,0)' : 'translate3d(0,0,0)';
           void track.offsetWidth;
 
           track.style.removeProperty('animation');
 
-          // 8️⃣ 使用 -50% 关键帧：CSS % 相对于元素自身宽度，-50% 正好 = -1 * groupWidth
+          // 8️⃣ 使用 -50% 关键帧 + translate3d 强制 GPU 合成，消除循环边界渲染 artifacts
           var keyframesName = isRight ? 'marquee-seamless-right-2g' : 'marquee-seamless-left-2g';
           track.style.animation = keyframesName + ' ' + duration + 's linear infinite';
           track.style.setProperty('--_mg-dur', duration + 's');
@@ -316,6 +316,8 @@ const uid = Math.random().toString(36).substr(2, 9);
     flex-wrap: nowrap;
     width: max-content;
     will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
   }
 
   .palo-marquee-item {
@@ -323,20 +325,21 @@ const uid = Math.random().toString(36).substr(2, 9);
     margin-inline: 0.25ch;
     white-space: nowrap;
     line-height: 1;
+    backface-visibility: hidden;
   }
 
-  /* 2-Group seamless keyframes (zero-flicker):
-     - Track 宽度由 CSS width: max-content 自动适应
-     - -50% 相对 track 自身宽度，正好 = 1 个 Group 宽度
-     - 第 2 组在第 1 组移出时补位，无缝循环 */
+  /* 2-Group seamless keyframes (zero-flicker + GPU composited):
+     - Track 使用 CSS width: max-content 自适应
+     - -50% 相对于 track 自身宽度，正好 = 1 个 Group 宽度
+     - translate3d 强制 GPU 合成，消除 iteration 边界 1 帧空白 */
   @keyframes marquee-seamless-left-2g {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
   }
 
   @keyframes marquee-seamless-right-2g {
-    from { transform: translateX(-50%); }
-    to   { transform: translateX(0); }
+    from { transform: translate3d(-50%, 0, 0); }
+    to   { transform: translate3d(0, 0, 0); }
   }
 
   .palo-marquee-pause:hover .palo-marquee-track {
