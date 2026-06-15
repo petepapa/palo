@@ -255,7 +255,7 @@ blog:
     showTags: true
     showStats: true
     itemGap: "gap-24"          # 列表条目之间的纵向大间距
-    cardGap: "gap-12 md:gap-24" # 卡片内部响应式间距体系
+    cardGap: "gap-8 md:gap-16" # 卡片内部响应式间距体系
     tagsHeading: "h5"
     postHeadingLevel: "h3"
     postDescClass: "text-md" # 🛠️ 深度优化：已修正非标准类名 text-md，统一规范为标准 text-base

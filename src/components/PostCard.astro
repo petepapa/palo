@@ -2,6 +2,7 @@
 import ContentImage from '@components/ContentImage.astro'
 import type { ImageMetadata } from 'astro'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { parseResponsiveGap } from '@utils/tailwindSpacing'
 import themeConfig from '@config'
 
 /**
@@ -76,9 +77,19 @@ const HeadingTag = headingLevel
 const postUrl = ensureTrailingSlash(url)
 const imageRatioStyle = `--post-card-image-ratio: ${imageRatio}`
 const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '0'
+const gapTokens = parseResponsiveGap(cardGap, '3rem')
+const gapBase = gapTokens.base ?? '3rem'
+const gapMdValue = gapTokens.md ?? gapBase
 ---
 
-<article class:list={['post-card grid grid-cols-1 md:grid-cols-2', cardGap, className]}>
+<!--
+  直接使用 inline style 设置 gap base 值，确保最高优先级。
+  md 断点覆盖通过 is:global 样式实现，避免 Astro scoped CSS 特异性问题。
+-->
+<article
+  class:list={['post-card grid grid-cols-1 md:grid-cols-2', className]}
+  style={`--card-gap: ${gapBase}; --card-gap-md: ${gapMdValue}`}
+>
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
     <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" />
   </a>
@@ -94,12 +105,21 @@ const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '
 </article>
 
 <style lang="scss">
-  @layer components {
+  .post-card {
+    color: inherit;
+    border: none;
+    border-radius: 0;
+  }
+
+  .post-card {
+    gap: var(--card-gap);
+  }
+
+  @media (min-width: 768px) {
     .post-card {
-      color: inherit;
-      border: none;
-      border-radius: 0;
+      gap: var(--card-gap-md);
     }
+  }
 
     .post-card__media {
       display: block;
@@ -152,11 +172,10 @@ const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '
       color: var(--color-neutral-700);
     }
     
-    @media (prefers-reduced-motion: reduce) {
-      .post-card__image,
-      .post-card__title {
-        transition: none;
-      }
+  @media (prefers-reduced-motion: reduce) {
+    .post-card__image,
+    .post-card__title {
+      transition: none;
     }
   }
 </style>

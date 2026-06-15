@@ -63,3 +63,61 @@ export function resolveTailwindGapClass(gapClass: string, fallback = 'var(--spac
   // 3) 未知 token → fallback
   return fallback
 }
+
+/**
+ * Parse a responsive Tailwind gap class string (e.g. "gap-10 md:gap-24") into a flat
+ * record mapping each breakpoint (or 'base') to its resolved CSS value.
+ *
+ * @example
+ *   parseResponsiveGap('gap-10 md:gap-24')
+ *   // → { base: '2.5rem', md: '6rem' }
+ *
+ *   parseResponsiveGap('gap-5')
+ *   // → { base: '1.25rem' }
+ *
+ *   parseResponsiveGap('gap-6 lg:gap-10 xl:gap-16')
+ *   // → { base: '1.5rem', lg: '2.5rem', xl: '4rem' }
+ */
+export function parseResponsiveGap(
+  input: string,
+  fallback = 'var(--space-m, 1.5rem)',
+): Record<string, string> {
+  const tokens = input.split(/\s+/)
+  const result: Record<string, string> = {}
+
+  for (const token of tokens) {
+    const match = token.match(/^(?:([a-z]+):)?gap-(.+)$/)
+    if (!match) continue
+    const [, breakpoint, scale] = match
+    const key = breakpoint ?? 'base'
+    const resolved = resolveTailwindGapClass(`gap-${scale}`, fallback)
+    // First-found wins; later override for when 'base' appears after responsive tokens
+    result[key] = resolved
+  }
+
+  return result
+}
+
+/**
+ * Convert a responsive gap string (e.g. "gap-10 md:gap-24") into inline style
+ * object with CSS custom properties, suitable for use on a grid/flex container.
+ *
+ * @example
+ *   gapToStyleProperties('gap-10 md:gap-24')
+ *   // → { '--gap': '2.5rem', '--gap-md': '6rem' }
+ */
+export function gapToStyleProperties(
+  input: string,
+  cssVarBase = '--gap',
+  fallback = 'var(--space-m, 1.5rem)',
+): Record<string, string> {
+  const gaps = parseResponsiveGap(input, fallback)
+  const styles: Record<string, string> = {}
+
+  for (const [bp, value] of Object.entries(gaps)) {
+    const key = bp === 'base' ? cssVarBase : `${cssVarBase}-${bp}`
+    styles[key] = value
+  }
+
+  return styles
+}

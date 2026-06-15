@@ -9,6 +9,7 @@ import { slugify } from '@utils/slugify'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import config from '@config'
 
 // =========================================================================
@@ -32,6 +33,7 @@ const pageConfig = {
 
   // ── 列表排版参数 / List Layout Settings ──
   itemGap: blogLayoutDefaults.itemGap ?? 'gap-24',
+  itemGapSize: resolveTailwindGapClass(blogLayoutDefaults.itemGap ?? 'gap-24'),
   cardGap: blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
 
   // ── 细粒度排版微调 / Typography Fine-Tuning ──
@@ -172,7 +174,7 @@ if (pageConfig.showTags) {
         </p>
       )}
 
-      <ul class={['my-8 grid grid-cols-1', pageConfig.itemGap].join(' ')}>
+      <ul class="my-8 grid grid-cols-1" style={`gap: ${pageConfig.itemGapSize}`}>
         {
           page.data.map((post) => {
             const featuredImage = resolveCollectionCoverImage(

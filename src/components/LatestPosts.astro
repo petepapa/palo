@@ -5,6 +5,7 @@ import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import config from '@config'
 
 type SortBy = 'latest' | 'earliest'
@@ -87,6 +88,8 @@ const {
   buttonAlign = (latestDefaults.buttonAlign as ButtonAlign) ?? 'right',
 } = Astro.props
 
+const itemGapSize = resolveTailwindGapClass(itemGap)
+
 // 通过映射表获得实际的 Tailwind 类名，解决动态拼接导致的编译丢失问题
 const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
 
@@ -139,7 +142,7 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
 <section class:list={[className, 'my-8']}>
   <div class="container">
     <Heading level="h2" class="mb-6">{title}</Heading>
-    <ul class={['my-8 grid grid-cols-1', itemGap].join(' ')}>
+    <ul class="my-8 grid grid-cols-1" style={`gap: ${itemGapSize}`}>
       {
         latestPosts.map((post) => (
           <li>
