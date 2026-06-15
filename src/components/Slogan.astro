@@ -117,7 +117,7 @@ const uid = Math.random().toString(36).substr(2, 9);
     }
 
     /* ------------------------------------------------------------------ */
-    /* Marquee — seamless 3-group clone                                  */
+    /* Marquee — seamless 2-group clone (zero-flicker)                   */
     /* ------------------------------------------------------------------ */
     function setupMarquee(wrapper) {
       var track = wrapper.querySelector('.palo-marquee-track');
@@ -126,6 +126,7 @@ const uid = Math.random().toString(36).substr(2, 9);
       var pxPerSec = parseFloat(wrapper.dataset.pxPerSec || '80') || 80;
       var isRight = wrapper.dataset.direction === 'right';
 
+      // 1️⃣ 只保留第一个 item，后续克隆全部移除
       var allItems = track.querySelectorAll(':scope > .palo-marquee-item');
       for (var i = allItems.length - 1; i > 0; i--) {
         allItems[i].remove();
@@ -146,48 +147,48 @@ const uid = Math.random().toString(36).substr(2, 9);
           var wrapperW = wrapper.offsetWidth;
           var itemsPerGroup = Math.max(1, Math.ceil(wrapperW / itemW) + 1);
 
+          // 2️⃣ 只保留第一个 item，重新构建
           var existing = track.querySelectorAll(':scope > .palo-marquee-item');
           for (var j = existing.length - 1; j > 0; j--) {
             existing[j].remove();
           }
 
+          // 3️⃣ 构建 Group 1：铺满可视区
           for (var k = 1; k < itemsPerGroup; k++) {
             var clone = firstItem.cloneNode(true);
             clone.setAttribute('aria-hidden', 'true');
             track.appendChild(clone);
           }
 
-          var middleItems = track.querySelectorAll(':scope > .palo-marquee-item');
-          var beforeFragment = document.createDocumentFragment();
-          for (var m = 0; m < middleItems.length; m++) {
-            var dupBefore = middleItems[m].cloneNode(true);
-            dupBefore.setAttribute('aria-hidden', 'true');
-            beforeFragment.appendChild(dupBefore);
-          }
-          track.insertBefore(beforeFragment, track.firstChild);
+          // 4️⃣ 准确测量 Group 1 的实际渲染宽度（scrollWidth 包含 margin，比 offsetWidth 更精确）
+          var groupWidth = track.scrollWidth;
+          if (groupWidth <= 0) return;
 
-          var afterFragment = document.createDocumentFragment();
-          for (var n = 0; n < middleItems.length; n++) {
-            var dupAfter = middleItems[n].cloneNode(true);
-            dupAfter.setAttribute('aria-hidden', 'true');
-            afterFragment.appendChild(dupAfter);
+          // 5️⃣ 克隆整个 Group 1 作为 Group 2（无缝衔接用）
+          var group1Items = track.querySelectorAll(':scope > .palo-marquee-item');
+          for (var m = 0; m < group1Items.length; m++) {
+            var dup = group1Items[m].cloneNode(true);
+            dup.setAttribute('aria-hidden', 'true');
+            track.appendChild(dup);
           }
-          track.appendChild(afterFragment);
 
-          var groupWidth = itemsPerGroup * itemW;
+          // 6️⃣ 不强制 track 宽度，使用 CSS width: max-content 自动适应
+          // translateX(-50%) 相对 track 自身宽度，两个 Group 正好 -50% = 一个 Group 宽度
           var duration = groupWidth / pxPerSec;
 
+          // 7️⃣ 重置动画起点，防止累积偏移
           track.style.animation = 'none';
-          track.style.transform = 'translateX(' + (-groupWidth) + 'px)';
+          track.style.transform = isRight ? 'translateX(-50%)' : 'translateX(0)';
           void track.offsetWidth;
 
-          track.style.setProperty('--_mgw', groupWidth + 'px');
           track.style.removeProperty('animation');
 
-          var keyframesName = isRight ? 'marquee-seamless-right-3g' : 'marquee-seamless-left-3g';
+          // 8️⃣ 使用 -50% 关键帧：CSS % 相对于元素自身宽度，-50% 正好 = -1 * groupWidth
+          var keyframesName = isRight ? 'marquee-seamless-right-2g' : 'marquee-seamless-left-2g';
           track.style.animation = keyframesName + ' ' + duration + 's linear infinite';
           track.style.setProperty('--_mg-dur', duration + 's');
 
+          // 9️⃣ Hover 暂停
           if (wrapper.classList.contains('palo-marquee-pause')) {
             var onEnter = function () { track.style.animationPlayState = 'paused'; };
             var onLeave = function () { track.style.animationPlayState = 'running'; };
@@ -324,18 +325,18 @@ const uid = Math.random().toString(36).substr(2, 9);
     line-height: 1;
   }
 
-  /* 3-Group seamless keyframes:
-     Start at -1x groupWidth (before group fully visible on the left),
-     end at -2x groupWidth (after group fully visible on the left).
-     The middle group is always on screen. */
-  @keyframes marquee-seamless-left-3g {
-    from { transform: translateX(calc(-1 * var(--_mgw))); }
-    to   { transform: translateX(calc(-2 * var(--_mgw))); }
+  /* 2-Group seamless keyframes (zero-flicker):
+     - Track 宽度由 CSS width: max-content 自动适应
+     - -50% 相对 track 自身宽度，正好 = 1 个 Group 宽度
+     - 第 2 组在第 1 组移出时补位，无缝循环 */
+  @keyframes marquee-seamless-left-2g {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
 
-  @keyframes marquee-seamless-right-3g {
-    from { transform: translateX(calc(-2 * var(--_mgw))); }
-    to   { transform: translateX(calc(-1 * var(--_mgw))); }
+  @keyframes marquee-seamless-right-2g {
+    from { transform: translateX(-50%); }
+    to   { transform: translateX(0); }
   }
 
   .palo-marquee-pause:hover .palo-marquee-track {
