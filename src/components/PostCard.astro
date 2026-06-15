@@ -129,8 +129,17 @@ const gapMdValue = gapTokens.md ?? gapBase
       border-radius: var(--post-card-radius, 0);
     }
 
-    .post-card__media :where(img),
-    .post-card__image {
+    .post-card__media :where(img) {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      border-radius: var(--post-card-radius, 0);
+      transition: transform var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease),
+        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease);
+    }
+
+    :global(.post-card__image) {
       display: block;
       inline-size: 100%;
       block-size: 100%;
@@ -162,8 +171,11 @@ const gapMdValue = gapTokens.md ?? gapBase
     }
 
     .post-card__media:where(:hover, :focus-visible) {
-      .post-card__image,
       :where(img) {
+        transform: scale(1.04);
+      }
+
+      :global(.post-card__image) {
         transform: scale(1.04);
       }
     }
@@ -173,7 +185,7 @@ const gapMdValue = gapTokens.md ?? gapBase
     }
     
   @media (prefers-reduced-motion: reduce) {
-    .post-card__image,
+    :global(.post-card__image),
     .post-card__title {
       transition: none;
     }
