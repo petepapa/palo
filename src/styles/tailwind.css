@@ -39,6 +39,11 @@
    ============================================ */
 @layer utilities {
   /* ── CSS 多列 safety list (columns-* 布局使用) ── */
+  /* Tailwind v4 原生提供 columns-1~4 基础类，但响应式变体仍需 safelist 确保动态拼接可用 */
+  .columns-1 { columns: 1; }
+  .columns-2 { columns: 2; }
+  .columns-3 { columns: 3; }
+  .columns-4 { columns: 4; }
   .columns-5 { columns: 5; }
   .columns-6 { columns: 6; }
   .columns-7 { columns: 7; }
@@ -49,6 +54,10 @@
   .columns-12 { columns: 12; }
 
   @media (min-width: 40rem) {
+    .sm\:columns-1 { columns: 1; }
+    .sm\:columns-2 { columns: 2; }
+    .sm\:columns-3 { columns: 3; }
+    .sm\:columns-4 { columns: 4; }
     .sm\:columns-5 { columns: 5; }
     .sm\:columns-6 { columns: 6; }
     .sm\:columns-7 { columns: 7; }
@@ -60,6 +69,10 @@
   }
 
   @media (min-width: 48rem) {
+    .md\:columns-1 { columns: 1; }
+    .md\:columns-2 { columns: 2; }
+    .md\:columns-3 { columns: 3; }
+    .md\:columns-4 { columns: 4; }
     .md\:columns-5 { columns: 5; }
     .md\:columns-6 { columns: 6; }
     .md\:columns-7 { columns: 7; }
@@ -71,6 +84,10 @@
   }
 
   @media (min-width: 64rem) {
+    .lg\:columns-1 { columns: 1; }
+    .lg\:columns-2 { columns: 2; }
+    .lg\:columns-3 { columns: 3; }
+    .lg\:columns-4 { columns: 4; }
     .lg\:columns-5 { columns: 5; }
     .lg\:columns-6 { columns: 6; }
     .lg\:columns-7 { columns: 7; }
@@ -82,6 +99,10 @@
   }
 
   @media (min-width: 80rem) {
+    .xl\:columns-1 { columns: 1; }
+    .xl\:columns-2 { columns: 2; }
+    .xl\:columns-3 { columns: 3; }
+    .xl\:columns-4 { columns: 4; }
     .xl\:columns-5 { columns: 5; }
     .xl\:columns-6 { columns: 6; }
     .xl\:columns-7 { columns: 7; }
@@ -93,6 +114,10 @@
   }
 
   @media (min-width: 96rem) {
+    .\32xl\:columns-1 { columns: 1; }
+    .\32xl\:columns-2 { columns: 2; }
+    .\32xl\:columns-3 { columns: 3; }
+    .\32xl\:columns-4 { columns: 4; }
     .\32xl\:columns-5 { columns: 5; }
     .\32xl\:columns-6 { columns: 6; }
     .\32xl\:columns-7 { columns: 7; }
