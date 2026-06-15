@@ -3,6 +3,7 @@
  * BreakoutImage Component
  *
  * @description A component for displaying a landscape image that can break out of the container
+ *              with progressive streaming: main-color placeholder → native onload fade-in
  *
  * @example
  * // Default: full width (breaks out of container)
@@ -20,8 +21,8 @@
  * // Using ImageMetadata object (from import)
  * <BreakoutImage src={myImage} alt="My image" layout="wide" />
  */
-import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
+import { getDominantColor } from '@utils/imageColor'
 
 type Props = {
   /**
@@ -71,6 +72,10 @@ if (layout) {
 
 const altText = decorative ? '' : alt
 
+// ── 提取图片主色调 ──
+const dominantColor = await getDominantColor(src)
+const containerBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
+
 // Define container spacing classes based on layout
 const containerClasses = {
   full: '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]',
@@ -82,16 +87,61 @@ const containerClasses = {
 const radiusClass = resolvedLayout === 'full'
   ? 'rounded-none'
   : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
+
+// Resolve string src for native <img> - handle both string paths and ImageMetadata objects
+let resolvedSrc: string | undefined
+if (typeof src === 'string') {
+  resolvedSrc = src
+} else if (typeof src === 'object' && src !== null && 'src' in src) {
+  resolvedSrc = (src as ImageMetadata).src
+}
+const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
 ---
 
-<div class:list={['relative', 'my-8', 'breakout-image-container', containerClasses]}>
-  <Image
-    src={src}
+<div
+  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses]}
+  style={`${containerBgStyle} ${aspectRatioStyle}`}
+>
+  <img
+    src={resolvedSrc}
     alt={altText}
     width={1400}
     height={700}
-    class:list={['h-auto w-full object-cover', radiusClass]}
+    class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
     loading="lazy"
+    decoding="async"
+    onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
   />
+  <noscript>
+    <style>
+      .breakout-image-container img {
+        opacity: 1 !important;
+      }
+    </style>
+  </noscript>
   <div class:list={['absolute inset-0 shadow-inner pointer-events-none', radiusClass]}></div>
 </div>
+
+<script>
+  const checkBreakoutImages = () => {
+    document.querySelectorAll('.breakout-image-container img').forEach((img) => {
+      if (img instanceof HTMLImageElement && img.complete) {
+        if ('decode' in img) {
+          img.decode()
+            .then(() => img.classList.remove('opacity-0'))
+            .catch(() => img.classList.remove('opacity-0'));
+        } else {
+          img.classList.remove('opacity-0');
+        }
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkBreakoutImages);
+  } else {
+    checkBreakoutImages();
+  }
+
+  document.addEventListener('astro:page-load', checkBreakoutImages);
+</script>

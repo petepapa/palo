@@ -11,6 +11,9 @@ interface Props {
   class?: string
   loading?: 'lazy' | 'eager'
   decoding?: 'async' | 'auto' | 'sync'
+  fadeIn?: boolean
+  bgColor?: string
+  aspectRatio?: string
 }
 
 const {
@@ -21,29 +24,112 @@ const {
   class: className,
   loading = 'lazy',
   decoding = 'async',
+  fadeIn = false,
+  bgColor = '',
+  aspectRatio,
 } = Astro.props
+
+const containerClass = fadeIn ? 'progressive-img-container' : undefined
+const containerStyle: Record<string, string> = {}
+
+if (bgColor) {
+  containerStyle.backgroundColor = bgColor
+}
+
+// 自动锁死宽高比以实现 0 CLS
+const finalAspectRatio = aspectRatio || (width && height ? `${width} / ${height}` : undefined)
+if (finalAspectRatio) {
+  containerStyle.aspectRatio = finalAspectRatio
+}
 ---
 
 {
-  typeof src === 'string' ? (
-    <img
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      class={className}
-      loading={loading}
-      decoding={decoding}
-    />
+  fadeIn ? (
+    <div class:list={[containerClass, className]} style={containerStyle}>
+      {typeof src === 'string' ? (
+        <img
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          class="progressive-img-inner"
+          loading={loading}
+          decoding={decoding}
+          onload="if ('decode' in this) { this.decode().then(() => this.setAttribute('data-loaded', 'true')).catch(() => this.setAttribute('data-loaded', 'true')) } else { this.setAttribute('data-loaded', 'true') }"
+        />
+      ) : isImageMetadata(src) ? (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          class="progressive-img-inner"
+          loading={loading}
+          decoding={decoding}
+          onload="if ('decode' in this) { this.decode().then(() => this.setAttribute('data-loaded', 'true')).catch(() => this.setAttribute('data-loaded', 'true')) } else { this.setAttribute('data-loaded', 'true') }"
+        />
+      ) : null}
+      <noscript>
+        <style>
+          .progressive-img-inner {
+            opacity: 1 !important;
+          }
+        </style>
+      </noscript>
+    </div>
+  ) : typeof src === 'string' ? (
+    <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} />
   ) : isImageMetadata(src) ? (
-    <Image
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      class={className}
-      loading={loading}
-      decoding={decoding}
-    />
+    <Image src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} />
   ) : null
 }
+
+<script>
+  const checkProgressiveImages = () => {
+    document.querySelectorAll('.progressive-img-inner').forEach((img) => {
+      if (img instanceof HTMLImageElement && img.complete) {
+        if ('decode' in img) {
+          img.decode()
+            .then(() => img.setAttribute('data-loaded', 'true'))
+            .catch(() => img.setAttribute('data-loaded', 'true'));
+        } else {
+          img.setAttribute('data-loaded', 'true');
+        }
+      }
+    });
+  };
+
+  // 页面加载后立即扫描，消除缓存图片及快速加载图片的未加载状态
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', checkProgressiveImages);
+  } else {
+    checkProgressiveImages();
+  }
+
+  // 兼容 View Transitions 或动态更新场景
+  document.addEventListener('astro:page-load', checkProgressiveImages);
+</script>
+
+<style is:global>
+  .progressive-img-container {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  .progressive-img-inner {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.45s ease-out !important;
+  }
+
+  .progressive-img-inner[data-loaded="true"] {
+    opacity: 1 !important;
+  }
+</style>

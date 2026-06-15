@@ -756,6 +756,77 @@ ${bodyLineHeights}
     <Header />
     <main id="main-content" transition:animate="fade">
       <slot />
+
+      <!-- ⚡ Markdown 正文原生图片流式优雅淡入与主色占位拦截器 -->
+      <style is:inline>
+        .prose img:not(.progressive-img-inner),
+        .markdown-content img:not(.progressive-img-inner),
+        article img:not(.progressive-img-inner) {
+          display: block !important;
+          width: 100% !important;
+          /* 🟢 核心补齐：在图片尚未解析出真实宽高前，强制用 16:9 比例或最小高度撑开物理空间，防止 0x0 塌陷 */
+          aspect-ratio: 16 / 9;
+          min-height: 200px;
+          background-color: #1a1a1e !important; /* 优雅的极简刚性暗灰底色 */
+          opacity: 0;
+          transition: opacity 0.5s ease-out !important;
+        }
+
+        .prose img:not(.progressive-img-inner).is-markdown-loaded,
+        .markdown-content img:not(.progressive-img-inner).is-markdown-loaded,
+        article img:not(.progressive-img-inner).is-markdown-loaded {
+          opacity: 1 !important;
+          aspect-ratio: auto !important; /* 亮起瞬间释放比例限制，完美兼容长图与方图 */
+          min-height: 0 !important;
+        }
+      </style>
+
+      <noscript>
+        <style>
+          .prose img:not(.progressive-img-inner),
+          .markdown-content img:not(.progressive-img-inner),
+          article img:not(.progressive-img-inner) {
+            opacity: 1 !important;
+          }
+        </style>
+      </noscript>
+
+      <script is:inline>
+        const initMarkdownImagesFadeIn = () => {
+          const containers = document.querySelectorAll('.prose, .markdown-content, article');
+          containers.forEach(container => {
+            container.querySelectorAll('img').forEach(img => {
+              // 排除已经被 ContentImage 组件处理好的图片，避免双重淡入冲突
+              if (img.classList.contains('progressive-img-inner')) return;
+
+              const triggerFadeIn = () => {
+                if ('decode' in img) {
+                  img.decode()
+                    .then(() => img.classList.add('is-markdown-loaded'))
+                    .catch(() => img.classList.add('is-markdown-loaded'));
+                } else {
+                  img.classList.add('is-markdown-loaded');
+                }
+              };
+
+              if (img.complete) {
+                triggerFadeIn();
+              } else {
+                img.addEventListener('load', triggerFadeIn);
+                img.addEventListener('error', triggerFadeIn);
+              }
+            });
+          });
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMarkdownImagesFadeIn);
+        } else {
+          initMarkdownImagesFadeIn();
+        }
+
+        document.addEventListener('astro:page-load', initMarkdownImagesFadeIn);
+      </script>
     </main>
     <Footer />
     <script is:inline>

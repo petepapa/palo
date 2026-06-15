@@ -6,6 +6,8 @@ import { Icon } from 'astro-icon/components'
 import sanitizeHtml from 'sanitize-html'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import config from '@config'
+import { getDominantColor } from '@utils/imageColor'
+import defaultCover from '../assets/images/posts/default.png'
 
 type Author = {
   name: string
@@ -64,6 +66,10 @@ const className = _props.class
 const title = _props.title
 const subtitle = _props.subtitle
 const coverImage = _props.coverImage
+
+// ── 合并并统一提取封面图/默认图的主色调 ──
+const finalImage = coverImage || defaultCover
+const dominantColor = await getDominantColor(finalImage)
 const author = _props.author
 const customBreadcrumbLabels = _props.customBreadcrumbLabels
 const joinLastBreadcrumb = _props.joinLastBreadcrumb ?? false
@@ -110,7 +116,7 @@ const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'h
 
 const dividerPlacement = resolveDividerPlacement(divider)
 const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
-const shouldShowCoverImage = !!coverImage && !!coverImagePlacement
+const shouldShowCoverImage = !!finalImage && !!coverImagePlacement
 const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
 const isCoverImageHead = shouldShowCoverImage && coverImagePlacement === 'head'
 const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'
@@ -126,6 +132,8 @@ const sanitizedSubtitle: string = subtitle
       },
     })
   : ''
+
+const coverImageBgStyle = `background-color: ${dominantColor} !important;`
 ---
 
 <section
@@ -136,9 +144,9 @@ const sanitizedSubtitle: string = subtitle
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'post-header--with-divider-bottom',
   ]}
 >
-  {isCoverImageTop && coverImage && (
-    <div class="post-header__image">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
+  {isCoverImageTop && (
+    <div class="post-header__image" style={coverImageBgStyle}>
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
     </div>
   )}
 
@@ -182,9 +190,9 @@ const sanitizedSubtitle: string = subtitle
     </div>
   )}
 
-  {isCoverImageHead && coverImage && (
-    <div class="post-header__image post-header__image--head">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
+  {isCoverImageHead && (
+    <div class="post-header__image post-header__image--head" style={coverImageBgStyle}>
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
     </div>
   )}
 
@@ -221,9 +229,9 @@ const sanitizedSubtitle: string = subtitle
     </div>
   </div>
 
-  {isCoverImageBottom && coverImage && (
-    <div class="post-header__image post-header__image--bottom">
-      <ContentImage src={coverImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="sync" />
+  {isCoverImageBottom && (
+    <div class="post-header__image post-header__image--bottom" style={coverImageBgStyle}>
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
     </div>
   )}
 </section>

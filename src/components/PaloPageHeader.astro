@@ -3,6 +3,7 @@ import { Heading } from 'accessible-astro-components'
 import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 import config from '@config'
+import { getDominantColor } from '@utils/imageColor'
 
 type DividerPlacement = boolean | '' | 'top' | 'both' | 'bottom' | '上方' | '上下' | '下方' | 'true' | 'false'
 
@@ -111,8 +112,14 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
   contentColor,
   topNavigationTheme,
 })
+
+// ── 提取背景图主色调 ──
+const dominantColor = bgImage ? await getDominantColor(bgImage) : ''
+const bgImageBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
+
 const resolvedPageHeaderStyle = [
   pageHeaderStyle,
+  bgImageBgStyle,
   `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedAlignV]}`,
   `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedAlignH]}`,
   `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedAlignH]}`,
@@ -151,7 +158,7 @@ const sanitizedSubtitle: string = subtitle
   )}
 
   {!bgVideo && bgImage && (
-    <div class="palo-page-header__background-media palo-page-header__background-image" aria-hidden="true"></div>
+    <div class="palo-page-header__background-media palo-page-header__background-image" aria-hidden="true" style={bgImageBgStyle}></div>
   )}
 
   {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}

@@ -45,9 +45,9 @@ const pageHeaderBg = pageHeader?.bg ?? {}
     <div class="container">
       <div class={`article-content ${toc ? 'article-content--with-toc' : ''}`}>
         <div class="article-content__main">
-          <div class={`prose space-content ${narrow ? 'narrow' : ''}`}>
-            <slot />
-          </div>
+    <div class={`prose space-content ${narrow ? 'narrow' : ''}`}>
+      <slot />
+    </div>
         </div>
         {toc && (
           <div class="article-content__toc">
@@ -420,6 +420,8 @@ const pageHeaderBg = pageHeader?.bg ?? {}
     paloInitMermaidThemeWatcher()
   }
 </script>
+
+
 
 <style lang="scss" is:global>
   @use 'scss/base/breakpoint' as *;

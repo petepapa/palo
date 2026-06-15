@@ -4,6 +4,7 @@ import type { ImageMetadata } from 'astro'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { parseResponsiveGap } from '@utils/tailwindSpacing'
 import themeConfig from '@config'
+import { getDominantColor } from '@utils/imageColor'
 
 /**
  * PostCard Component
@@ -80,8 +81,11 @@ const cardRadius = themeConfig?.radius?.card ?? themeConfig?.radius?.global ?? '
 const gapTokens = parseResponsiveGap(cardGap, '3rem')
 const gapBase = gapTokens.base ?? '3rem'
 const gapMdValue = gapTokens.md ?? gapBase
----
 
+// ── 提取图片主色调 ──
+const dominantColor = await getDominantColor(image)
+const mediaBgStyle = `background-color: ${dominantColor}; ${imageRatioStyle}`
+---
 <!--
   直接使用 inline style 设置 gap base 值，确保最高优先级。
   md 断点覆盖通过 is:global 样式实现，避免 Astro scoped CSS 特异性问题。
@@ -90,8 +94,8 @@ const gapMdValue = gapTokens.md ?? gapBase
   class:list={['post-card grid grid-cols-1 md:grid-cols-2', className]}
   style={`--card-gap: ${gapBase}; --card-gap-md: ${gapMdValue}`}
 >
-  <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${imageRatioStyle}; --post-card-radius: ${cardRadius}`}>
-    <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" />
+  <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${mediaBgStyle}; --post-card-radius: ${cardRadius}`}>
+    <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" fadeIn={true} bgColor={dominantColor} />
   </a>
   <div class="post-card__content space-content flex flex-col justify-center">
     <HeadingTag class="post-card__title">
