@@ -164,16 +164,25 @@
     }
 
     // ──────────────────────────────────────────────
-    // 7. IMAGES
+    // 7. IMAGES – Plain/Markdown images in prose
     // ──────────────────────────────────────────────
     img {
+      // Core: natural responsive sizing, no forced dimensions
       max-inline-size: 100%;
       block-size: auto;
+      display: block;
+      margin-inline: auto;
+
+      // Visual: rounded corners, subtle border, light shadow
       border-radius: var(--radius-media, var(--radius-global, var(--radius-l))) !important;
       border: var(--border-width-media, var(--border-width-global, 3px)) solid var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-700)));
       box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
-      margin-inline: auto;
-      display: block;
+
+      // Safe background: no dark placeholder
+      background-color: transparent;
+      background: none;
+
+      // Hover subtle lift
       transition: transform 0.3s ease;
 
       &:hover {
@@ -181,6 +190,26 @@
       }
     }
 
+    // ── Component isolation ─────────────────────
+    // Prevent BreakoutImage, ContentImage, etc.
+    // from inheriting prose img decoration.
+    .breakout-image-container img,
+    .progressive-img-container img {
+      max-inline-size: revert;
+      block-size: revert;
+      display: revert;
+      margin-inline: revert;
+      border-radius: revert;
+      border: revert;
+      box-shadow: revert;
+      background-color: revert;
+      background: revert;
+      transition: revert;
+
+      &:hover {
+        transform: revert;
+      }
+    }
     // ──────────────────────────────────────────────
     // 8. HORIZONTAL RULES
     // ──────────────────────────────────────────────

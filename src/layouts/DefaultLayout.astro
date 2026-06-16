@@ -757,17 +757,11 @@ ${bodyLineHeights}
     <main id="main-content" transition:animate="fade">
       <slot />
 
-      <!-- ⚡ Markdown 正文原生图片流式优雅淡入与主色占位拦截器 -->
+      <!-- ⚡ Markdown 正文原生图片：纯淡入动画，无黑底占位，无强制宽高 -->
       <style is:inline>
         .prose img:not(.progressive-img-inner),
         .markdown-content img:not(.progressive-img-inner),
         article img:not(.progressive-img-inner) {
-          display: block !important;
-          width: 100% !important;
-          /* 🟢 核心补齐：在图片尚未解析出真实宽高前，强制用 16:9 比例或最小高度撑开物理空间，防止 0x0 塌陷 */
-          aspect-ratio: 16 / 9;
-          min-height: 200px;
-          background-color: #1a1a1e !important; /* 优雅的极简刚性暗灰底色 */
           opacity: 0;
           transition: opacity 0.5s ease-out !important;
         }
@@ -776,8 +770,13 @@ ${bodyLineHeights}
         .markdown-content img:not(.progressive-img-inner).is-markdown-loaded,
         article img:not(.progressive-img-inner).is-markdown-loaded {
           opacity: 1 !important;
-          aspect-ratio: auto !important; /* 亮起瞬间释放比例限制，完美兼容长图与方图 */
-          min-height: 0 !important;
+        }
+
+        /* 组件隔离：BreakoutImage/ContentImage 不受上述 prose 淡入影响 */
+        .breakout-image-container img,
+        .progressive-img-container img {
+          opacity: initial !important;
+          transition: initial !important;
         }
       </style>
 
