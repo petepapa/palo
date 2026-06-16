@@ -6,6 +6,30 @@ import defaultPostImage from '@assets/images/posts/default.png'
 export type ResolvedImage = ImageMetadata | string
 export type ContentCollection = 'posts' | 'projects'
 
+// ═══════════════════════════════════════════════════════════════
+// 🔬 Eager Glob 引擎：构建时一次性导入全站内容图片
+//    将 Vite 编译期 import 产物缓存为 ImageMetadata 映射表，
+//    使 resolveContentImage 能返还完整对象而非退化字符串。
+// ═══════════════════════════════════════════════════════════════
+const postImages = import.meta.glob<ImageMetadata>(
+  '/src/content/posts/**/*.{jpg,jpeg,png,gif,webp,avif}',
+  { eager: true, import: 'default' }
+)
+const projectImages = import.meta.glob<ImageMetadata>(
+  '/src/content/projects/**/*.{jpg,jpeg,png,gif,webp,avif}',
+  { eager: true, import: 'default' }
+)
+const assetsImages = import.meta.glob<ImageMetadata>(
+  '/src/assets/**/*.{jpg,jpeg,png,gif,webp,avif}',
+  { eager: true, import: 'default' }
+)
+
+const allGlobImages: Record<string, ImageMetadata> = {
+  ...postImages,
+  ...projectImages,
+  ...assetsImages,
+}
+
 export function isImageMetadata(value: unknown): value is ImageMetadata {
   return (
     typeof value === 'object' &&
@@ -70,6 +94,45 @@ export function resolveRelativeImagePath(
   return relativePath
 }
 
+/**
+ * 从 eager glob 缓存中查找图片对应的 ImageMetadata 对象。
+ *
+ * 支持两种路径模式：
+ *   1. @assets/... 别名 → 映射到 /src/assets/... 文件系统路径
+ *   2. ./cover.jpg 相对路径 → 映射到 /src/content/{collection}/{contentDir}/cover.jpg
+ *
+ * 返回 null 表示 glob 未命中（如纯 public/ 图片），调用方应回退到字符串路径。
+ */
+function resolveImageFromGlob(
+  imagePath: string,
+  contentId?: string,
+  collection?: ContentCollection
+): ImageMetadata | null {
+  // 分支 A: @assets 别名 → 文件系统路径
+  if (imagePath.startsWith('@assets/')) {
+    const fsPath = '/src/assets/' + imagePath.slice('@assets/'.length)
+    return allGlobImages[fsPath] ?? null
+  }
+
+  // 分支 B: 相对路径（./ 或 ../）→ co-located 图片
+  if (isRelativeContentImage(imagePath) && contentId && collection) {
+    const normalizedImagePath = imagePath.replace(/^\.\//, '')
+    const basePath = collection === 'posts' ? 'posts' : 'projects'
+
+    const contentDir = contentId.includes('/')
+      ? contentId.substring(0, contentId.lastIndexOf('/'))
+      : contentId.replace(/\.(md|mdx)$/, '')
+
+    const fsPath = contentDir
+      ? `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
+      : `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
+
+    return allGlobImages[fsPath] ?? null
+  }
+
+  return null
+}
+
 export function resolveContentImage(
   imagePath: string | ImageMetadata | undefined | null,
   options: {
@@ -89,25 +152,32 @@ export function resolveContentImage(
   }
 
   if (typeof imagePath === 'string') {
+    // ── Phase 1: Glob 优先解析 → ImageMetadata（触发 C++ Sharp 管道）──
+    const globMetadata = resolveImageFromGlob(imagePath, contentId, collection)
+    if (globMetadata) {
+      return globMetadata
+    }
+
+    // ── Phase 2: public/ 路径 → 字符串（静态托管，不经 Sharp）──
     if (isPublicImagePath(imagePath)) {
       return imagePath
     }
 
+    // ── Phase 3: 相对路径兜底 → 构造 public 路径（当 glob 未命中时）──
     if (isRelativeContentImage(imagePath) && contentId && collection) {
-      // 处理 Astro co-located 图片
       // 将相对路径（如 ./cover.jpg）转换为内容集合路径
       const normalizedImagePath = imagePath.replace(/^\.\//, '')
       const basePath = collection === 'posts' ? '/posts' : '/projects'
-      
+
       // 如果 contentId 已经包含文件夹路径（如 project-01/index.md），需要提取目录部分
-      const contentDir = contentId.includes('/') 
+      const contentDir = contentId.includes('/')
         ? contentId.substring(0, contentId.lastIndexOf('/'))
         : ''
-      
+
       const resolvedPath = contentDir
         ? `${basePath}/${contentDir}/${normalizedImagePath}`
         : `${basePath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
-      
+
       return resolvedPath
     }
 
@@ -287,8 +357,16 @@ export function getFallbackContentHtml(contentId: string, error: Error, isDev: b
   `
 }
 
-function escapeHtml(text: string): string {
-  const div = document.createElement('div')
-  div.textContent = text
-  return div.innerHTML
+function escapeHtml(str: string): string {
+  if (typeof str !== 'string') return '';
+  return str.replace(/[&<>"']/g, (match) => {
+    const escapeMap: Record<string, string> = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    };
+    return escapeMap[match] || match;
+  });
 }

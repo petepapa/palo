@@ -21,8 +21,40 @@
  * // Using ImageMetadata object (from import)
  * <BreakoutImage src={myImage} alt="My image" layout="wide" />
  */
+import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
 import { getDominantColor } from '@utils/imageColor'
+import { isImageMetadata, isRelativeContentImage } from '@utils/contentImages'
+
+// ═══════════════════════════════════════════════════════════════════
+// 🔬 Eager Glob 引擎：构建时一次性导入全站内容图片，
+//    使 BreakoutImage 能解析 MDX 中传入的纯相对路径（如 ./cover.jpg）
+//    并通过 filename → ImageMetadata 索引快速命中。
+// ═══════════════════════════════════════════════════════════════════
+const contentImageGlob = import.meta.glob<ImageMetadata>(
+  '/src/content/**/*.{jpg,jpeg,png,gif,webp,avif}',
+  { eager: true, import: 'default' }
+)
+
+const imageByFilename: Record<string, ImageMetadata> = {}
+for (const [filePath, metadata] of Object.entries(contentImageGlob)) {
+  const filename = filePath.split('/').pop()!
+  imageByFilename[filename] = metadata
+}
+
+/**
+ * 解析 MDX 中传入的图片 src。
+ * - 若已是 ImageMetadata 对象 → 原样返回
+ * - 若为相对路径（./ 或 ../）→ 在 glob 缓存中以文件名查找对应的 ImageMetadata
+ * - 其他字符串（如绝对路径）→ 原样返回
+ */
+function resolveImageSrc(rawSrc: string | ImageMetadata): string | ImageMetadata {
+  if (typeof rawSrc !== 'string') return rawSrc
+  if (!isRelativeContentImage(rawSrc)) return rawSrc
+
+  const filename = rawSrc.replace(/^\.\//, '').split('/').pop()!
+  return imageByFilename[filename] ?? rawSrc
+}
 
 type Props = {
   /**
@@ -62,6 +94,9 @@ type Props = {
 
 const { src, layout, fullWidth, decorative = false, alt = '' } = Astro.props
 
+// ── 解析 src：将 MDX 中传入的相对路径（如 ./cover.jpg）转换为 ImageMetadata ──
+const resolvedSrc = resolveImageSrc(src)
+
 // Determine layout style, supporting backward compatibility with fullWidth
 let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
 if (layout) {
@@ -73,7 +108,7 @@ if (layout) {
 const altText = decorative ? '' : alt
 
 // ── 提取图片主色调 ──
-const dominantColor = await getDominantColor(src)
+const dominantColor = await getDominantColor(resolvedSrc)
 const containerBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
 
 // Define container spacing classes based on layout
@@ -88,13 +123,6 @@ const radiusClass = resolvedLayout === 'full'
   ? 'rounded-none'
   : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
 
-// Resolve string src for native <img> - handle both string paths and ImageMetadata objects
-let resolvedSrc: string | undefined
-if (typeof src === 'string') {
-  resolvedSrc = src
-} else if (typeof src === 'object' && src !== null && 'src' in src) {
-  resolvedSrc = (src as ImageMetadata).src
-}
 const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
 ---
 
@@ -102,16 +130,30 @@ const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
   class:list={['relative', 'my-8', 'breakout-image-container', containerClasses]}
   style={`${containerBgStyle} ${aspectRatioStyle}`}
 >
-  <img
-    src={resolvedSrc}
-    alt={altText}
-    width={1400}
-    height={700}
-    class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
-    loading="lazy"
-    decoding="async"
-    onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
-  />
+  {isImageMetadata(resolvedSrc) ? (
+    <Image
+      src={resolvedSrc}
+      alt={altText}
+      width={1400}
+      height={700}
+      widths={[560, 840, 1120, 1400, 1680]}
+      class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      loading="lazy"
+      decoding="async"
+      onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
+    />
+  ) : (
+    <img
+      src={resolvedSrc}
+      alt={altText}
+      width={1400}
+      height={700}
+      class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      loading="lazy"
+      decoding="async"
+      onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
+    />
+  )}
   <noscript>
     <style>
       .breakout-image-container img {

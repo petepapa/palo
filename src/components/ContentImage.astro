@@ -41,6 +41,19 @@ const finalAspectRatio = aspectRatio || (width && height ? `${width} / ${height}
 if (finalAspectRatio) {
   containerStyle.aspectRatio = finalAspectRatio
 }
+
+// ── 自动计算 5 对响应式 srcset 宽度 ──
+const responsiveWidths = (() => {
+  if (!width) return undefined
+  const base = width
+  return [
+    Math.round(base * 0.4),
+    Math.round(base * 0.6),
+    Math.round(base * 0.8),
+    base,
+    Math.round(base * 1.2),
+  ].filter((w, i, arr) => w > 0 && arr.indexOf(w) === i)
+})()
 ---
 
 {
@@ -63,6 +76,7 @@ if (finalAspectRatio) {
           alt={alt}
           width={width}
           height={height}
+          widths={responsiveWidths}
           class="progressive-img-inner"
           loading={loading}
           decoding={decoding}
@@ -80,7 +94,16 @@ if (finalAspectRatio) {
   ) : typeof src === 'string' ? (
     <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} />
   ) : isImageMetadata(src) ? (
-    <Image src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} />
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      widths={responsiveWidths}
+      class={className}
+      loading={loading}
+      decoding={decoding}
+    />
   ) : null
 }
 
