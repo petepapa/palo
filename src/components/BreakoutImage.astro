@@ -23,8 +23,8 @@
  */
 import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
-import { getDominantColor } from '@utils/imageColor'
 import { isImageMetadata, isRelativeContentImage } from '@utils/contentImages'
+import { getDominantColor } from '@utils/imageColor'
 
 // ═══════════════════════════════════════════════════════════════════
 // 🔬 Eager Glob 引擎：构建时一次性导入全站内容图片，
@@ -107,9 +107,9 @@ if (layout) {
 
 const altText = decorative ? '' : alt
 
-// ── 提取图片主色调 ──
+// ── 提取主色调，作为图片加载前的纯色占位背景 ──
 const dominantColor = await getDominantColor(resolvedSrc)
-const containerBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
+const containerBgStyle = `background-color: ${dominantColor};`
 
 // Define container spacing classes based on layout
 const containerClasses = {
@@ -127,7 +127,7 @@ const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
 ---
 
 <div
-  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses]}
+  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden']}
   style={`${containerBgStyle} ${aspectRatioStyle}`}
 >
   {isImageMetadata(resolvedSrc) ? (

@@ -125,6 +125,10 @@ const {
   typography,
 } = themeConfig
 
+const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
+const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+const mainPaddingTop = fixedHeader ? navMinHeight : '0'
+
 const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
 
 // ──────────────────────────────────────────────
@@ -754,7 +758,7 @@ ${bodyLineHeights}
   </head>
   <body>
     <Header />
-    <main id="main-content" transition:animate="fade">
+    <main id="main-content" transition:animate="fade" style={`padding-top: ${mainPaddingTop} !important;`}>
       <slot />
 
       <!-- ⚡ Markdown 正文原生图片：纯淡入动画，无黑底占位，无强制宽高 -->

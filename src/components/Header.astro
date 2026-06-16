@@ -16,11 +16,13 @@ const headerBgOpacity = themeConfig.navigation?.headerBackgroundOpacity ?? layou
 // Blur strength for the fixed header background
 const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.headerBackgroundBlur ?? '12px'
 const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
+const headerPosition = fixedHeader ? 'fixed' : 'absolute'
 ---
 
 <header
   class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
-  style={`--header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
+  style={`position: ${headerPosition}; top: 0; left: 0; right: 0; width: 100%; min-height: ${navMinHeight}; z-index: 50; --header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
 >
   <SkipLink />
   <!-- Initialize preference components -->
@@ -34,6 +36,106 @@ const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
     site.launcher && <LauncherConfig />
   }
 </header>
+
+<!-- ════════════════════════════════════════════════════════
+     Critical CSS: 导航栏骨架刚体样式
+     确保在外部 CSS/JS 加载前，顶栏已经完美站住位置，
+     不发生 FOUC / 布局塌陷。
+     ════════════════════════════════════════════════════════ -->
+<style is:inline>
+  /* ── 1. 导航栏容器骨架 ── */
+  header {
+    /* position 由内联 style 属性直接控制，此处不重复设置 */
+
+    /* 刚性高度：在 JS 注入 is-fixed 前预先占用空间 */
+    min-height: var(--nav-min-height, 6rem);
+  }
+
+  /* ── 2. 固定模式：JS 加载后 is-fixed 类追加，但这里预先埋好选择器 ── */
+  header.is-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  /* ── 3. 使用 color-mix 预置背景，避免透明闪烁 ── */
+  header {
+    background-color: color-mix(
+      in oklab,
+      var(--background-color, #000) calc(var(--header-bg-opacity, 0.45) * 100%),
+      transparent
+    );
+  }
+
+  /* ── 4. 导航栏内部布局骨架：nav-bar 最小高度 ── */
+  #main-navigation .nav-bar {
+    min-block-size: var(--nav-min-height, 6rem);
+  }
+
+  /* ── 5. 确保 Logo 区域在图片加载前已有刚性尺寸 ── */
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .logo-link .logo-image {
+    /* 不设置 display——交由 Logo.astro 的 layered CSS 控制明暗切换 */
+    width: auto;
+    height: 40px;
+    block-size: 40px;
+    max-inline-size: 100%;
+    background-color: transparent;
+  }
+
+  /* ── 6. 文本 Logo 备用样式 ── */
+  .logo-link .logo-text {
+    font-size: 40px;
+    line-height: 1;
+    text-transform: none;
+    white-space: nowrap;
+  }
+
+  /* ── 7. wrapper 弹性布局骨架 - 防止导航菜单项换行塌陷 ── */
+  #main-navigation > .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  #main-navigation .nav-bar {
+    display: flex;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-m, 1rem);
+    min-block-size: var(--nav-min-height, 6rem);
+  }
+
+  #main-navigation .wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m, 1rem);
+  }
+
+  /* ── 8. 响应式汉堡按钮 ── */
+  .responsive-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs, 0.25rem);
+  }
+
+  .responsive-toggle svg {
+    width: 26px;
+    height: 21px;
+    flex-shrink: 0;
+  }
+
+</style>
 
 <style lang="scss" is:global>
   header {
