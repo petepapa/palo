@@ -53,7 +53,8 @@
   .section-fullscreen {
     display: grid;
     place-items: center;
-    min-block-size: 100svh;
+    min-height: 100vh !important;
+    min-block-size: 100dvh;
     padding-block: var(--space-xl);
   }
 
@@ -72,9 +73,11 @@
     padding-block-end: var(--page-header-padding-block, var(--space-xl));
   }
 
-  body.has-fixed-header main > :where(.hero, .palo-page-header):first-child {
-    margin-block-start: calc(var(--header-height, 0px) * -1);
-  }
+  /* ═══════════════════════════════════════════════════════════════
+     hasHero 条件样式分流已由 DefaultLayout.astro 在 0ms 接管。
+     main 的 padding-top 在 Hero 页面已为 0，无需负 margin 向上补偿。
+     保留此注释供考古参考。
+     ═══════════════════════════════════════════════════════════════ */
 
   .flex-center {
     display: flex;
