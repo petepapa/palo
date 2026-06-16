@@ -649,7 +649,7 @@ const pageHeaderAppearance = {
             {
               components.map((component) => (
                 <li class="my-1">
-                  <a class="text-sm" href={`#${component.id}`}>
+                  <a class="text-base" href={`#${component.id}`}>
                     {component.name}
                   </a>
                 </li>
@@ -820,17 +820,13 @@ const pageHeaderAppearance = {
 
       .components-navigation a {
         display: inline-block;
+        word-break: break-word;
+        overflow-wrap: break-word;
         transform-origin: left center;
         transition:
           transform 0.22s var(--cubic-bezier),
           font-size 0.22s var(--cubic-bezier),
           color 0.22s var(--cubic-bezier);
-      }
-
-      .active {
-        transform: scale(1.08) !important;
-        font-weight: var(--font-weight-heading, 500) !important;
-        font-size: 1.25rem !important;
       }
 
       ul:not([class]) li {
