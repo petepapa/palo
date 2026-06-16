@@ -41,6 +41,11 @@ interface Props {
    * Set to false to use the title as-is without appending site name
    */
   useTitleTemplate?: boolean
+  /**
+   * Whether the page has an immersive Hero / fullscreen PageHeader overlay.
+   * When true, &lt;main&gt; receives 0 padding-top so the hero sits flush at top: 0.
+   */
+  hasHero?: boolean
 }
 
 const {
@@ -127,7 +132,8 @@ const {
 
 const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
 const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
-const mainPaddingTop = fixedHeader ? navMinHeight : '0'
+const hasHero = Astro.props.hasHero ?? false
+const mainPaddingTop = fixedHeader && !hasHero ? navMinHeight : '0'
 
 const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
 

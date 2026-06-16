@@ -379,7 +379,7 @@ const navStyle = [
     // Mobile-first: show mobile menu by default
     .mobile-menu {
       position: absolute;
-      z-index: 10;
+      z-index: 110 !important;
       inset-block-start: 100%;
       inset-inline: 0;
       flex: 1 1 100%;
@@ -913,13 +913,22 @@ const navStyle = [
     height: 20px !important;
   }
 
-  /* 桌面下拉菜单加固：确保激活态容器和子项不被全局样式误伤 */
+  /* 桌面下拉菜单终极加固：确保激活态容器和子项不被全局样式误伤 */
   .desktop-menu .has-dropdown > button.show ~ ul {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
     height: auto !important;
     min-height: min-content !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .desktop-menu .has-dropdown ul li {
+    display: list-item !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .desktop-menu .has-dropdown ul a,
@@ -927,6 +936,7 @@ const navStyle = [
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+    white-space: nowrap !important;
   }
 }
 </style>
