@@ -228,6 +228,19 @@ const sanitizedSubtitle: string = subtitle
       block-size: 100vh;
     }
 
+    // 修复：非固定全屏模式外层容器物理高度像素对冲
+    // 当 fullscreen=true 且 fixed=false 时，min-height:100vh 在部分浏览器中存在
+    // 亚像素四舍五入误差，导致外层容器比实际视口矮约 0.5–1px。
+    // 通过在外层容器上强制 +1px 高度并用负 margin 咬合后续元素，
+    // 从物理层面消灭底部穿帮线。内层 overflow: hidden 无影响。
+    .palo-page-header.section-fullscreen:not(.palo-page-header--background-fixed) {
+      height: calc(100vh + 1px) !important;
+      min-height: calc(100dvh + 1px) !important;
+      margin-block-end: -1px !important;
+      position: relative;
+      z-index: 1;
+    }
+
     .palo-page-header__background-video {
       inline-size: 100%;
       block-size: 100%;
