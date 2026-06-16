@@ -121,7 +121,7 @@ const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
 const isCoverImageHead = shouldShowCoverImage && coverImagePlacement === 'head'
 const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'
 
-const coverImageClass = 'w-full h-[min(60vh,520px)] object-cover'
+const coverImageClass = 'w-full h-full object-cover'
 
 const sanitizedSubtitle: string = subtitle
   ? sanitizeHtml(subtitle, {
@@ -277,8 +277,8 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
         margin-right: -50vw;
         width: 100vw;
         max-width: 100vw;
-        height: 60vh;
-        max-height: 520px;
+        height: 60vh !important;
+        min-height: 60dvh !important;
         overflow: hidden;
       }
 
