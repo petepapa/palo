@@ -144,7 +144,7 @@ Create a dropdown with multiple related pages:
 },
 ```
 
-#### Example 3: Adding External Links with a a a a a a a a a a a a a a a
+#### Example 3: Adding External Links with Icons
 
 Add social media or external platform links:
 
