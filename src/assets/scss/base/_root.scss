@@ -3,16 +3,18 @@
   color-scheme: light;
   interpolate-size: allow-keywords;
 
-  --color-primary-100: oklch(from var(--brand-primary) 90% c h);
-  --color-primary-200: oklch(from var(--brand-primary) 80% c h);
-  --color-primary-300: oklch(from var(--brand-primary) 70% c h);
-  --color-primary-400: oklch(from var(--brand-primary) 60% c h);
-  --color-primary-500: oklch(from var(--brand-primary) 50% c h);
-  --color-secondary-100: oklch(from var(--brand-secondary) 90% c h);
-  --color-secondary-200: oklch(from var(--brand-secondary) 80% c h);
-  --color-secondary-300: oklch(from var(--brand-secondary) 70% c h);
-  --color-secondary-400: oklch(from var(--brand-secondary) 60% c h);
-  --color-secondary-500: oklch(from var(--brand-secondary) 50% c h);
+  // ── Palo 色彩弧线自适应补偿算法 ──
+  // 高明度(100-200)：降低饱和度消除荧光感 / 锚点(300)：完全还原用户原始色 / 低明度(400-500)：提升饱和度防止色彩塌陷
+  --color-primary-100: oklch(from var(--brand-primary) 0.93 calc(c * 0.35) h);
+  --color-primary-200: oklch(from var(--brand-primary) 0.85 calc(c * 0.65) h);
+  --color-primary-300: var(--brand-primary);
+  --color-primary-400: oklch(from var(--brand-primary) 0.55 calc(c * 1.20) h);
+  --color-primary-500: oklch(from var(--brand-primary) 0.35 calc(c * 1.45) h);
+  --color-secondary-100: oklch(from var(--brand-secondary) 0.93 calc(c * 0.35) h);
+  --color-secondary-200: oklch(from var(--brand-secondary) 0.85 calc(c * 0.65) h);
+  --color-secondary-300: var(--brand-secondary);
+  --color-secondary-400: oklch(from var(--brand-secondary) 0.55 calc(c * 1.20) h);
+  --color-secondary-500: oklch(from var(--brand-secondary) 0.35 calc(c * 1.45) h);
   --color-outline-100: oklch(from var(--brand-outline) 80% c h);
   --color-outline-200: oklch(from var(--brand-outline) 50% c h);
 
@@ -27,32 +29,32 @@
   --color-neutral-900: oklch(from var(--brand-neutral) 15% c h);
 
   /* Semantic color tones - info */
-  --color-info-100: oklch(from var(--brand-info) 95% c h);
-  --color-info-200: oklch(from var(--brand-info) 85% c h);
-  --color-info-300: oklch(from var(--brand-info) 70% c h);
-  --color-info-400: oklch(from var(--brand-info) 55% c h);
-  --color-info-500: oklch(from var(--brand-info) 45% c h);
+  --color-info-100: oklch(from var(--brand-info) 0.93 calc(c * 0.35) h);
+  --color-info-200: oklch(from var(--brand-info) 0.85 calc(c * 0.65) h);
+  --color-info-300: var(--brand-info);
+  --color-info-400: oklch(from var(--brand-info) 0.55 calc(c * 1.20) h);
+  --color-info-500: oklch(from var(--brand-info) 0.35 calc(c * 1.45) h);
 
   /* Semantic color tones - success */
-  --color-success-100: oklch(from var(--brand-success) 95% c h);
-  --color-success-200: oklch(from var(--brand-success) 85% c h);
-  --color-success-300: oklch(from var(--brand-success) 70% c h);
-  --color-success-400: oklch(from var(--brand-success) 55% c h);
-  --color-success-500: oklch(from var(--brand-success) 45% c h);
+  --color-success-100: oklch(from var(--brand-success) 0.93 calc(c * 0.35) h);
+  --color-success-200: oklch(from var(--brand-success) 0.85 calc(c * 0.65) h);
+  --color-success-300: var(--brand-success);
+  --color-success-400: oklch(from var(--brand-success) 0.55 calc(c * 1.20) h);
+  --color-success-500: oklch(from var(--brand-success) 0.35 calc(c * 1.45) h);
 
   /* Semantic color tones - warning */
-  --color-warning-100: oklch(from var(--brand-warning) 95% c h);
-  --color-warning-200: oklch(from var(--brand-warning) 85% c h);
-  --color-warning-300: oklch(from var(--brand-warning) 70% c h);
-  --color-warning-400: oklch(from var(--brand-warning) 55% c h);
-  --color-warning-500: oklch(from var(--brand-warning) 45% c h);
+  --color-warning-100: oklch(from var(--brand-warning) 0.93 calc(c * 0.35) h);
+  --color-warning-200: oklch(from var(--brand-warning) 0.85 calc(c * 0.65) h);
+  --color-warning-300: var(--brand-warning);
+  --color-warning-400: oklch(from var(--brand-warning) 0.55 calc(c * 1.20) h);
+  --color-warning-500: oklch(from var(--brand-warning) 0.35 calc(c * 1.45) h);
 
   /* Semantic color tones - error */
-  --color-error-100: oklch(from var(--brand-error) 95% c h);
-  --color-error-200: oklch(from var(--brand-error) 85% c h);
-  --color-error-300: oklch(from var(--brand-error) 70% c h);
-  --color-error-400: oklch(from var(--brand-error) 55% c h);
-  --color-error-500: oklch(from var(--brand-error) 45% c h);
+  --color-error-100: oklch(from var(--brand-error) 0.93 calc(c * 0.35) h);
+  --color-error-200: oklch(from var(--brand-error) 0.85 calc(c * 0.65) h);
+  --color-error-300: var(--brand-error);
+  --color-error-400: oklch(from var(--brand-error) 0.55 calc(c * 1.20) h);
+  --color-error-500: oklch(from var(--brand-error) 0.35 calc(c * 1.45) h);
 
   --color-primary-bg: var(--brand-primary);
   --color-primary-border: var(--brand-primary);

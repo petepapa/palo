@@ -28,6 +28,14 @@ const colorGroups: ColorGroup[] = [
   { name: 'Neutral', prefix: 'neutral', values: [100, 200, 300, 400, 500, 600, 700, 800, 900] },
 ]
 
+// Semantic color variants (info, success, warning, error)
+const semanticColorGroups: ColorGroup[] = [
+  { name: 'Info', prefix: 'info', values: [100, 200, 300, 400, 500] },
+  { name: 'Success', prefix: 'success', values: [100, 200, 300, 400, 500] },
+  { name: 'Warning', prefix: 'warning', values: [100, 200, 300, 400, 500] },
+  { name: 'Error', prefix: 'error', values: [100, 200, 300, 400, 500] },
+]
+
 // Define themes to test
 const themes: Theme[] = [
   {
@@ -126,6 +134,58 @@ const themes: Theme[] = [
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          </TabsPanel>
+        ))
+      }
+    </Tabs>
+  </div>
+
+  <!-- Semantic Colors Section -->
+  <div class="tabs-wrapper">
+    <Tabs>
+      <TabsList>
+        {
+          themes.map((theme, index) => (
+            <TabsTab id={`semantic-${theme.id}`} controls={`semantic-${theme.id}-panel`} selected={index === 0}>
+              {theme.name}
+            </TabsTab>
+          ))
+        }
+      </TabsList>
+
+      {
+        themes.map((theme, index) => (
+          <TabsPanel id={`semantic-${theme.id}-panel`} labelledby={`semantic-${theme.id}`} selected={index === 0}>
+            <div class="theme-section">
+              <div class="theme-header">
+                <Heading level="h2">{theme.name}</Heading>
+                <p>{theme.description}</p>
+              </div>
+              <div class="color-categories color-categories--semantic">
+                {
+                  semanticColorGroups.map((group) => (
+                    <div class="color-category">
+                      <Heading level="h3">{group.name} Colors</Heading>
+                      <div class="colors">
+                        {group.values.map((value) => (
+                          <div
+                            class="color-item"
+                            data-color-var={`--color-${group.prefix}-${value}`}
+                            data-theme-text-color={theme.textColor}
+                            style={`background-color: var(--color-${group.prefix}-${value})`}
+                          >
+                            <span class="color-name">
+                              {group.prefix} {value}
+                            </span>
+                            <span class="contrast-score" aria-live="polite" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                }
               </div>
             </div>
           </TabsPanel>
@@ -291,6 +351,16 @@ const themes: Theme[] = [
 
       @include breakpoint(l) {
         grid-template-columns: repeat(3, 1fr);
+      }
+
+      &.color-categories--semantic {
+        @include breakpoint(m) {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include breakpoint(l) {
+          grid-template-columns: repeat(4, 1fr);
+        }
       }
     }
 

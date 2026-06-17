@@ -41,8 +41,8 @@ branding:
   # ── 颜色 / Colors ────────────────────────────────────────────
   colors:
     primary: '#ff4b00'    # 主品牌色
-    secondary: '#632a1b'  # 副品牌色
-    neutral: '#75878a'    # 中性色（文字、边框、背景）
+    secondary: '#75878a'  # 副品牌色
+    neutral: '#632a1b'    # 中性色（文字、边框、背景）
     outline: '#ffffff'    # 无障碍焦点轮廓色
 
     # 状态色（按钮、徽章、通知等）
