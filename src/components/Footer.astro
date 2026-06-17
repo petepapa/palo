@@ -3,6 +3,7 @@ import CreativeSection from './CreativeSection.astro'
 import Logo from './Logo.astro'
 import Slogan from './Slogan.astro'
 import { Heading, Link } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import config from '@config'
 
@@ -88,15 +89,14 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     </div>
   </section>
   <section class="py-8">
-    <div class="container flex flex-col gap-4 md:flex-row md:justify-between">
+    <div class="container flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
       <p class="copyright">
         &copy; {currentYear} {siteName}. All Rights Reserved.
       </p>
-      <p>
-        Made with ❤️ by <Link href="https://github.com/markteekman">Mark Teekman</Link>. Part of <Link
-          href="https://www.incluud.dev">Incluud</Link
-        >.
-      </p>
+      <a href="#top" id="back-to-top" class="back-to-top-link inline-flex items-center gap-1 text-sm">
+        <span>Back to Top</span>
+        <Icon name="ph:arrow-up" size="1.25em" />
+      </a>
     </div>
   </section>
 
@@ -143,7 +143,32 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       border-top: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
   }
+
 </style>
+
+<script>
+  const initBackToTop = () => {
+    const link = document.getElementById('back-to-top')
+    if (!link || link.dataset.paloBound === 'true') return
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      window.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? 'instant' : 'smooth',
+      })
+      history.pushState(null, '', window.location.pathname)
+    })
+
+    link.dataset.paloBound = 'true'
+  }
+
+  document.addEventListener('astro:page-load', initBackToTop)
+  document.addEventListener('astro:after-swap', initBackToTop)
+  initBackToTop()
+</script>
 
 
 
