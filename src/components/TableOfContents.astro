@@ -1,5 +1,6 @@
 ---
 import { Heading } from 'accessible-astro-components'
+import config from '@config'
 
 /**
  * TableOfContents — 页面内容导航共享组件
@@ -8,12 +9,13 @@ import { Heading } from 'accessible-astro-components'
  * 生成导航链接，支持 IntersectionObserver 高亮和平滑滚动。
  * 用于 blog、portfolio、MarkdownLayout 页面。
  */
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 ---
 
 <div class="article-content__toc">
   <div class="article-toc space-content">
     <Heading level="h3" size="h4">On this page</Heading>
-    <nav aria-label="On this page">
+    <nav aria-label="On this page" class="palo-nav-list" data-active-style={navListActiveStyle}>
       <ul class="list-none flex flex-col gap-2">
         <!-- 导航项通过 JS 动态生成 -->
       </ul>
@@ -195,16 +197,13 @@ import { Heading } from 'accessible-astro-components'
       word-wrap: break-word;
     }
 
+    /* 文本装饰与激活态由 .palo-nav-list 统一管控，此处仅保留布局与层级字号 */
+
     .article-toc a {
       display: inline-block;
       max-width: 100%;
       word-break: break-word;
       overflow-wrap: break-word;
-      transform-origin: left center;
-      transition:
-        transform 0.22s var(--cubic-bezier),
-        font-size 0.22s var(--cubic-bezier),
-        color 0.22s var(--cubic-bezier);
     }
 
     /* 层级字体：h2 > h3 > h4，移动端和 PC 端统一 */

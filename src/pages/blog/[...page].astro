@@ -21,6 +21,7 @@ const COVER_IMAGE_RATIO = '8 / 5'
 const blogRoot = config.blog
 const blogDefaults = blogRoot?.defaults ?? {}
 const blogListPage = blogRoot?.listPage ?? {}
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
@@ -124,10 +125,10 @@ if (pageConfig.showTags) {
   <section class="my-12">
     <div class="container">
       {pageConfig.showTags && uniqueTags.length > 0 && (
-        <div class="tags-filter mb-8">
+        <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
-            <Link href={ensureTrailingSlash('/blog')}>{pageConfig.allLabel}</Link>
+            <Link href={ensureTrailingSlash('/blog')} aria-current="page">{pageConfig.allLabel}</Link>
             {uniqueTags.map((tag) => (
               <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
             ))}

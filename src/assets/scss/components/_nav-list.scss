@@ -1,0 +1,86 @@
+// ═══════════════════════════════════════════════════════════════
+// .palo-nav-list — 二级导航列表统一样式命名空间
+//
+// 覆盖对象：Tags 标签栏、TOC 页面目录导航、Footer 导航链接
+//
+// 设计契约：
+//   1. 默认无下划线 — 避免视觉噪点
+//   2. Hover/Focus 显示下划线 — 可发现性
+//   3. Active 激活态由 data-active-style 属性控制
+//
+// 🚨 隔离保障：所有规则限定在 .palo-nav-list 内，
+//   正文中的普通 a 标签（不在 .palo-nav-list 容器中）完全不受影响。
+// ═══════════════════════════════════════════════════════════════
+
+@use '../base/mixins' as *;
+
+@layer components {
+  .palo-nav-list {
+    // ── 1. 默认：清空下划线，字重跟随正文 ──────────────────────────
+    a {
+      text-decoration: none;
+      font-weight: var(--font-weight-body, 400);
+      transition: none;
+    }
+
+    // ── 2. Hover / Focus：展示下划线 ──────────────────────────────
+    a:hover,
+    a:focus-visible {
+      text-decoration: underline;
+      text-decoration-thickness: from-font;
+      text-underline-offset: 4px;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 3. Active 激活态 — 通过 data-active-style 属性派发
+    //    所有激活态切换均为瞬时（0ms），无缓动动画
+    // ═══════════════════════════════════════════════════════════
+
+    // ── bold 模式：激活项加粗（accent 字重）─────────────────────
+    &[data-active-style='bold'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: none;
+        font-weight: var(--font-weight-accent, 500);
+      }
+    }
+
+    // ── underline 模式：激活项下划线 ─────────────────────────────
+    &[data-active-style='underline'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        font-weight: inherit;
+      }
+    }
+
+    // ── both 模式：accent 加粗 + 下划线 ────────────────────────
+    &[data-active-style='both'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: underline;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 4px;
+        font-weight: var(--font-weight-accent, 500);
+      }
+    }
+
+    // ── none 模式：无激活样式（仅保留默认 hover 行为）─────────────
+    &[data-active-style='none'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: none;
+        font-weight: inherit;
+      }
+    }
+
+    // ── 4. disabled 状态处理 ────────────────────────────────────
+    a[disabled],
+    a.disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+  }
+}

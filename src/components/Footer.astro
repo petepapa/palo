@@ -4,6 +4,7 @@ import Logo from './Logo.astro'
 import Slogan from './Slogan.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import config from '@config'
 
 /**
  * Footer Component
@@ -11,6 +12,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
  * @description A component that displays the footer of the website
  */
 const currentYear = new Date().getFullYear()
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 ---
 <footer>
   <section class="py-20 mt-24">
@@ -18,7 +20,7 @@ const currentYear = new Date().getFullYear()
     <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Features</Heading>
-        <ul class="flex flex-col gap-2">
+        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
           <li><Link href={ensureTrailingSlash('/accessibility-statement')}>Accessibility statement</Link></li>
           <li><Link href={ensureTrailingSlash('/accessible-components')}>Accessible components</Link></li>
           <li><Link href={ensureTrailingSlash('/color-contrast-checker')}>Color contrast checker</Link></li>
@@ -30,7 +32,7 @@ const currentYear = new Date().getFullYear()
       </div>
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Incluud projects</Heading>
-        <ul class="flex flex-col gap-2">
+        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
           <li>
             <Link isExternal href="https://accessible-astro-starter.incluud.dev">Accessible Astro Starter</Link>
           </li>
@@ -52,7 +54,7 @@ const currentYear = new Date().getFullYear()
       </div>
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Developer tools</Heading>
-        <ul class="flex flex-col gap-2">
+        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
           <li>
             <Link isExternal href="https://chrispederick.com/work/web-developer/">Web Developer Extension</Link>
           </li>

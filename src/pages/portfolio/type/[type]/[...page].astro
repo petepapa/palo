@@ -22,6 +22,7 @@ import { buildColumnsClass } from '../../../../types/config'
 // =========================================================================
 const portfolioDefaults = config.portfolio?.defaults ?? {}
 const portfolioTypePage = config.portfolio?.typePage ?? {}
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
 // 列参数：typePage.columns 覆盖 defaults.columns（仅当 typePage.columns 非空时）
 const resolvedColumns = portfolioTypePage.columns &&
@@ -136,7 +137,7 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
   <section class="my-12">
     <div class="container">
       {pageConfig.showTags && uniqueTags.length > 0 && (
-        <div class="tags-filter mb-8">
+        <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
             <Link href={ensureTrailingSlash('/portfolio')}>All</Link>

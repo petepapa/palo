@@ -17,6 +17,7 @@ import { buildColumnsClass } from '../../types/config'
 
 const portfolioDefaults = config.portfolio?.defaults ?? {}
 const portfolioListPage = config.portfolio?.listPage ?? {}
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
 // 构建默认 columns 类名（listPage.columns 为空对象 {} 或无值时继承 defaults.columns）
 const listPageColumns = portfolioListPage.columns
@@ -124,10 +125,10 @@ if (pageConfig.showTags) {
   <section class="my-12">
     <div class="container">
       {pageConfig.showTags && uniqueTags.length > 0 && (
-        <div class="tags-filter mb-8">
+        <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
-            <Link href={ensureTrailingSlash('/portfolio')}>{pageConfig.allLabel}</Link>
+            <Link href={ensureTrailingSlash('/portfolio')} aria-current="page">{pageConfig.allLabel}</Link>
             {uniqueTags.map((tag) => (
               <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)}>{tag.label}</Link>
             ))}

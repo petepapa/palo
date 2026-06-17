@@ -88,6 +88,10 @@ navigation:
   # ── 高亮样式 / Active Style ───────────────────────────────────
   activeStyle: 'bold'             # 'wavy' 波浪线 | 'underline' 直线 | 'bold' 加粗
 
+  # ── 二级导航列表（Tags、TOC、Footer 等）/ Nav List ──────────────
+  navList:
+    activeStyle: 'bold'           # 'bold' 加粗 | 'underline' 下划线 | 'both' 双重 | 'none' 无
+
 
 # ╔══════════════════════════════════════════════════════════════╗
 # ║  布局 / Layout                                               ║

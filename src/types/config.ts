@@ -31,6 +31,12 @@ export interface NavigationItemDropdown {
 
 export type NavigationItem = NavigationItemLink | NavigationItemDropdown
 
+export type NavListActiveStyle = 'bold' | 'underline' | 'both' | 'none'
+
+export interface NavListConfig {
+  activeStyle?: NavListActiveStyle
+}
+
 export interface NavigationConfig {
   fixedHeader?: boolean
   headerBackgroundOpacity?: number
@@ -46,6 +52,7 @@ export interface NavigationConfig {
   dropdownMenuLineHeightScale?: number
   minHeight?: string
   activeStyle?: 'wavy' | 'underline' | 'bold'
+  navList?: NavListConfig
 }
 
 export interface BorderConfig {

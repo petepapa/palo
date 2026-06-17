@@ -92,6 +92,10 @@ const activeStyleEnum = z
   .enum(['wavy', 'underline', 'bold'])
   .describe('active link style')
 
+const navListActiveStyleEnum = z
+  .enum(['bold', 'underline', 'both', 'none'])
+  .describe('secondary nav list active style')
+
 const defaultThemeEnum = z
   .enum(['auto', 'light', 'dark'])
   .describe('default theme mode')
@@ -219,6 +223,12 @@ const navigationConfigSchema = z
       .optional(),
     minHeight: cssLengthOptional('navigation.minHeight'),
     activeStyle: activeStyleEnum.optional(),
+    navList: z
+      .object({
+        activeStyle: navListActiveStyleEnum.optional(),
+      })
+      .strip()
+      .optional(),
   })
   .strip()
 

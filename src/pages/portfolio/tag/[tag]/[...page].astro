@@ -23,6 +23,7 @@ import { buildColumnsClass } from '../../../../types/config'
 const portfolioDefaults = config.portfolio?.defaults ?? {}
 const portfolioTagPage = config.portfolio?.tagPage ?? {}
 const portfolioListPage = config.portfolio?.listPage ?? {}
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
 // 构建 columns 类名（tagPage.columns 为空对象 {} 或无值时继承 defaults.columns）
 const tagPageColumns = portfolioTagPage.columns
@@ -146,7 +147,7 @@ const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered
   <section class="my-12">
     <div class="container">
       {pageConfig.showTags && uniqueTags.length > 0 && (
-        <div class="tags-filter mb-8">
+        <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
           <div class="flex flex-wrap gap-4">
             <Link href={ensureTrailingSlash('/portfolio')}>{pageConfig.allLabel}</Link>
@@ -154,7 +155,7 @@ const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered
               uniqueTags.map((tag: { label: string; slug: string }) => {
                 const isCurrentTag = tag.slug === currentTag.slug
                 return isCurrentTag ? (
-                  <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)} disabled class="disabled">
+                  <Link href={ensureTrailingSlash('/portfolio/tag/' + tag.slug)} aria-current="page">
                     {tag.label}
                   </Link>
                 ) : (

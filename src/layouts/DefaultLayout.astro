@@ -829,6 +829,11 @@ ${bodyLineHeights}
           color: var(--link-color);
         }
 
+        /* ── Tags 标签栏 & 页脚导航：CSS 到达前屏蔽浏览器默认下划线 ── */
+        .palo-nav-list a {
+          text-decoration: none;
+        }
+
         @media (min-width: 768px) {
           .article-content--with-toc {
             grid-template-columns: minmax(0, 1fr) 280px;
