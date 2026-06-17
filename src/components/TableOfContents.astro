@@ -76,7 +76,12 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let activeScrollFrame = null
+    let scrollLocked = false
+    let lockTimer = null
+    let debounceTimer = null
+    const DEBOUNCE_MS = 120
 
+    // ── 高亮切换（刚性瞬时，无动画） ────────────────────────────
     const setActiveLink = (activeLink) => {
       navLinks.forEach((link) => {
         const isActive = link === activeLink
@@ -89,11 +94,29 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       })
     }
 
+    // ── 防抖版高亮：滚动停止 DEBOUNCE_MS 后才执行唯一一次判定 ──
+    const setActiveLinkDebounced = (activeLink) => {
+      if (scrollLocked) return
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        setActiveLink(activeLink)
+      }, DEBOUNCE_MS)
+    }
+
+    // ── 解锁滚动监听（动画结束后延迟释放） ──────────────────────
+    const unlockAfterScroll = () => {
+      clearTimeout(lockTimer)
+      lockTimer = setTimeout(() => {
+        scrollLocked = false
+      }, 150)
+    }
+
     const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
 
     const smoothScrollToHeading = (heading) => {
       if (prefersReducedMotion) {
         heading.scrollIntoView({ block: 'start' })
+        unlockAfterScroll()
         return
       }
 
@@ -114,6 +137,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
       if (Math.abs(distance) < 2) {
         rootStyle.scrollBehavior = previousScrollBehavior
+        unlockAfterScroll()
         return
       }
 
@@ -128,6 +152,8 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         } else {
           rootStyle.scrollBehavior = previousScrollBehavior
           activeScrollFrame = null
+          // 平滑滚动结束 → 解锁 observer
+          unlockAfterScroll()
         }
       }
 
@@ -135,6 +161,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       step(startTime)
     }
 
+    // ── IntersectionObserver：触发时走防抖通道 ────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         const visibleEntries = entries
@@ -146,7 +173,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
         const link = document.querySelector(`.article-toc nav a[href="#${topEntry.target.id}"]`)
         if (link instanceof HTMLAnchorElement) {
-          setActiveLink(link)
+          setActiveLinkDebounced(link)
         }
       },
       { rootMargin: '-12% 0px -55% 0px', threshold: [0.1, 0.25, 0.5, 0.75, 1] },
@@ -163,9 +190,14 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 
       if (link.dataset.paloBound === 'true') return
 
+      // ── 点击跳转：立即高亮 + 加锁，途中忽略 observer ─────────
       link.addEventListener('click', (event) => {
         event.preventDefault()
+        // 立刻单点高亮目标项
         setActiveLink(link)
+        // 加锁：平滑滚动期间禁止 observer 干扰
+        scrollLocked = true
+        clearTimeout(lockTimer)
         history.replaceState(null, '', `#${id}`)
         smoothScrollToHeading(heading)
       })
