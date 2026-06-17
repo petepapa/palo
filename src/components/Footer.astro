@@ -12,6 +12,7 @@ import config from '@config'
  * @description A component that displays the footer of the website
  */
 const currentYear = new Date().getFullYear()
+const siteName = config.site.name
 const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 ---
 <footer>
@@ -88,8 +89,8 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
   </section>
   <section class="py-8">
     <div class="container flex flex-col gap-4 md:flex-row md:justify-between">
-      <p>
-        &copy; {currentYear} - Starter Theme for <Link href="https://astro.build/">Astro</Link>.
+      <p class="copyright">
+        &copy; {currentYear} {siteName}. All Rights Reserved.
       </p>
       <p>
         Made with ❤️ by <Link href="https://github.com/markteekman">Mark Teekman</Link>. Part of <Link
