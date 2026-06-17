@@ -95,6 +95,100 @@ const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
       }
     }
 
+    // ── Pull-to-close 手势：触底上滑关闭菜单 ──
+    const initPullToClose = () => {
+      if (!mobileNavigation) return
+
+      let startY = 0
+      let currentY = 0
+      let isAtBottom = false
+      let pullDistance = 0
+      let startTime = 0
+
+      mobileNavigation.addEventListener('touchstart', (e: TouchEvent) => {
+        if (!mobileNavigation.classList.contains('show')) return
+
+        const { scrollTop, clientHeight, scrollHeight } = mobileNavigation
+        // 容忍 1px 浮点误差
+        isAtBottom = scrollHeight - scrollTop - clientHeight <= 1
+
+        if (isAtBottom) {
+          startY = e.touches[0].pageY
+          startTime = Date.now()
+          // 取消回弹过渡，确保跟手
+          mobileNavigation.style.transition = 'none'
+        }
+      }, { passive: true })
+
+      mobileNavigation.addEventListener('touchmove', (e: TouchEvent) => {
+        if (!mobileNavigation.classList.contains('show')) return
+
+        const { scrollTop, clientHeight, scrollHeight } = mobileNavigation
+        const atBottom = scrollHeight - scrollTop - clientHeight <= 1
+
+        // 未触底：重置状态，正常滚动
+        if (!atBottom) {
+          isAtBottom = false
+          pullDistance = 0
+          return
+        }
+
+        // 刚触底的瞬间：以此为新的拖拽起点
+        if (!isAtBottom) {
+          isAtBottom = true
+          startY = e.touches[0].pageY
+          startTime = Date.now()
+          mobileNavigation.style.transition = 'none'
+          return
+        }
+
+        currentY = e.touches[0].pageY
+        const diffY = startY - currentY // 向上滑动为正值
+
+        if (diffY > 0) {
+          // 阻止浏览器原生橡皮筋效果
+          if (e.cancelable) e.preventDefault()
+          // 阻尼系数 0.3
+          pullDistance = diffY * 0.3
+          mobileNavigation.style.transform = `translateY(${-pullDistance}px)`
+        }
+      }, { passive: false })
+
+      mobileNavigation.addEventListener('touchend', (e: TouchEvent) => {
+        if (!isAtBottom || pullDistance === 0 || !mobileNavigation.classList.contains('show')) {
+          isAtBottom = false
+          pullDistance = 0
+          return
+        }
+
+        const timeDiff = Date.now() - startTime
+        const finalCurrentY = e.changedTouches[0].pageY
+        const finalDiffY = startY - finalCurrentY
+        // 计算上滑速度 (px/ms)
+        const speedY = timeDiff > 0 ? finalDiffY / timeDiff : 0
+
+        // 恢复过渡动画
+        mobileNavigation.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+
+        // 阈值判定：拖拽距离 > 80px 或 爆发速度 > 0.5 px/ms
+        if (pullDistance > 80 || speedY > 0.5) {
+          // 触发关闭：清除 transform，让全局 CSS 接管 height 过渡
+          mobileNavigation.style.transition = ''
+          mobileNavigation.style.transform = ''
+          closeMobileMenu()
+        } else {
+          // 未达阈值，回弹归位
+          mobileNavigation.style.transform = 'translateY(0)'
+        }
+
+        // 重置状态
+        isAtBottom = false
+        pullDistance = 0
+      })
+    }
+
+    initPullToClose()
+
     // execution
     responsiveToggle.addEventListener('click', () => {
       if (mobileNavigation.classList.contains('show')) {
