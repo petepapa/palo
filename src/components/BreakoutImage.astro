@@ -123,19 +123,16 @@ const radiusClass = resolvedLayout === 'full'
   ? 'rounded-none'
   : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
 
-const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
 ---
 
 <div
   class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass]}
-  style={`${containerBgStyle} ${aspectRatioStyle}`}
+  style={containerBgStyle}
 >
   {isImageMetadata(resolvedSrc) ? (
     <Image
       src={resolvedSrc}
       alt={altText}
-      width={1400}
-      height={700}
       widths={[560, 840, 1120, 1400, 1680]}
       class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
@@ -146,8 +143,6 @@ const aspectRatioStyle = 'aspect-ratio: 1400 / 700;'
     <img
       src={resolvedSrc}
       alt={altText}
-      width={1400}
-      height={700}
       class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
