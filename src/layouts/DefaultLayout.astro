@@ -761,6 +761,145 @@ ${bodyLineHeights}
 
     <!-- Enable Astro View Transitions for all browsers -->
     <ClientRouter />
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Critical CSS Anti-FOUC Shield
+         在慢速网络（3G/4G）下，浏览器在外部 CSS bundle 到达前会先用
+         默认样式渲染 HTML（白底黑字、蓝链接、无约束布局）。
+         此内联块涵盖首屏必需规则，确保第一帧即有正确的颜色和骨架。
+         ═══════════════════════════════════════════════════════════════ -->
+    <style is:global>
+      @layer base {
+        /* ── Body & link colors —— 防止白底/蓝链闪烁 ── */
+        body {
+          background-color: var(--background-color);
+          color: var(--foreground-color);
+          font-family: var(--font-body);
+        }
+
+        a {
+          color: var(--link-color);
+        }
+      }
+
+      @layer components {
+        /* ── 核心容器布局骨架 —— 防止内容区坍塌 ── */
+        .container {
+          margin-inline: auto;
+          padding-inline: var(--grid-gutter);
+          width: min(100%, var(--grid-max-width));
+          max-width: var(--grid-max-width);
+        }
+
+        /* ── 文章详情页 Grid 布局 —— 防止 TOC 无约束平铺 ── */
+        .article-content {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: var(--space-l);
+        }
+
+        .article-content__main {
+          min-width: 0;
+        }
+
+        /* ── TOC 容器初始约束 —— 防止未样式化列表铺满全屏 ── */
+        .article-content__toc {
+          display: block;
+          grid-row: 1;
+        }
+
+        .article-toc {
+          max-width: 100%;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+        }
+
+        .article-toc ul {
+          list-style: none;
+          padding-inline-start: 0;
+        }
+
+        .article-toc a {
+          display: inline-block;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          text-decoration: none;
+          color: var(--link-color);
+        }
+
+        @media (min-width: 768px) {
+          .article-content--with-toc {
+            grid-template-columns: minmax(0, 1fr) 280px;
+          }
+
+          .article-content__toc {
+            grid-row: auto;
+            position: sticky;
+            align-self: start;
+            top: calc(var(--header-height, 0px) + var(--space-l, 2rem));
+            max-height: calc(100vh - calc(var(--header-height, 0px) + var(--space-l, 2rem)));
+            overflow-y: auto;
+          }
+        }
+
+        /* ── 图片渐进加载骨架 —— 主色调占位 + 淡入刚性容器 ── */
+        .progressive-img-container {
+          position: relative;
+          display: block;
+          overflow: hidden;
+          inline-size: 100%;
+          block-size: 100%;
+        }
+
+        .progressive-img-inner {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+        }
+
+        /* ── PostHeader 封面图骨架 —— 防止图片区域坍塌 ── */
+        .post-header__image {
+          position: relative;
+          left: 50%;
+          right: 50%;
+          margin-left: -50vw;
+          margin-right: -50vw;
+          width: 100vw;
+          max-width: 100vw;
+          height: 60vh;
+          min-height: 60dvh;
+          overflow: hidden;
+        }
+
+        /* ── Breakout 图片容器初始 rigid 约束 ── */
+        .breakout-image-container {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .breakout-image-container img {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+
+        /* ── 窄文栏居中 ── */
+        .narrow {
+          margin-inline: auto;
+          max-width: 65ch;
+        }
+
+        /* ── prose 正文区域基础样式 ── */
+        .prose {
+          color: var(--foreground-color);
+        }
+      }
+    </style>
   </head>
   <body>
     <Header />
