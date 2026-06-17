@@ -213,6 +213,24 @@ const authorInfo = typeof author === 'object'
       }
     }
 
+    /* ── Mobile layout="full": true 100vw viewport breakout with zero border-radius ── */
+    @include breakpoint('m', 'max') {
+      .breakout-image-container[data-layout="full"] {
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw !important;
+        margin-right: -50vw !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+
+        img,
+        div.absolute {
+          border-radius: 0 !important;
+        }
+      }
+    }
+
     .article-content__toc {
       grid-row: 1;
 

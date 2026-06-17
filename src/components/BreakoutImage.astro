@@ -143,6 +143,7 @@ const radiusClass = resolvedLayout === 'full'
 <div
   class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass]}
   style={containerInlineStyle || undefined}
+  data-layout={resolvedLayout}
   data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
 >
   {isImageMetadata(resolvedSrc) ? (
