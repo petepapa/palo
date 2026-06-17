@@ -17,12 +17,14 @@ const navAlignment =
   themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
 const navDropdownDesktopColorMode = themeConfig.navigation?.dropdownDesktopColorMode ?? 'theme'
 const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightScale ?? 1
-const navDropdownMenuLineHeightScale = themeConfig.navigation?.dropdownMenuLineHeightScale ?? 1
+const navDesktopDropdownLineHeightScale = themeConfig.navigation?.desktopDropdownLineHeightScale ?? 1
+const navMobileDropdownLineHeightScale = themeConfig.navigation?.mobileDropdownLineHeightScale ?? 1
 const launcherGradientBorder = site.launcher === 'gradientBorder'
 const navStyle = [
   navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
   `--navigation-main-menu-line-height-scale: ${navMainMenuLineHeightScale}`,
-  `--navigation-dropdown-menu-line-height-scale: ${navDropdownMenuLineHeightScale}`,
+  `--navigation-desktop-dropdown-menu-line-height-scale: ${navDesktopDropdownLineHeightScale}`,
+  `--navigation-mobile-dropdown-menu-line-height-scale: ${navMobileDropdownLineHeightScale}`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -644,8 +646,8 @@ const navStyle = [
         display: block;
         font-size: var(--navigation-dropdown-desktop-font-size, var(--navigation-desktop-font-size, 1rem));
         inline-size: 100%;
-        line-height: calc(1.5 * var(--navigation-dropdown-menu-line-height-scale, 1));
-        padding-block: calc(0.25em * var(--navigation-dropdown-menu-line-height-scale, 1));
+        line-height: calc(1.5 * var(--navigation-desktop-dropdown-menu-line-height-scale, 1));
+        padding-block: calc(0.25em * var(--navigation-desktop-dropdown-menu-line-height-scale, 1));
         text-align: start;
       }
 
@@ -703,13 +705,13 @@ const navStyle = [
         0.25em * var(--navigation-main-menu-line-height-scale, 1)
       );
       --mobile-menu-dropdown-item-line-height: calc(
-        1.5 * var(--navigation-dropdown-menu-line-height-scale, 1)
+        1.5 * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
       );
       --mobile-menu-dropdown-item-padding-block: calc(
-        0.25em * var(--navigation-dropdown-menu-line-height-scale, 1)
+        0.25em * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
       );
       --mobile-menu-dropdown-offset: calc(
-        0.5em * var(--navigation-dropdown-menu-line-height-scale, 1)
+        0.5em * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
       );
       --mobile-menu-icon-group-gap: calc(1em * var(--navigation-main-menu-line-height-scale, 1));
 

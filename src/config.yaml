@@ -83,7 +83,8 @@ navigation:
   mobileFontSize: 'xl'            # 手机端展开菜单
   dropdownMobileFontSize: 'lg'    # 手机端下拉子菜单
   mainMenuLineHeightScale: 1.25      # 主菜单竖排行高倍数
-  dropdownMenuLineHeightScale: 0.85  # 下拉菜单竖排行高倍数
+  desktopDropdownLineHeightScale: 0.85  # PC端下拉菜单竖排行高倍数 (仅控制桌面端浮层间隙)
+  mobileDropdownLineHeightScale: 1      # 移动端下拉菜单竖排行高倍数 (仅控制折叠展开项间隙)
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
   activeStyle: 'bold'             # 'wavy' 波浪线 | 'underline' 直线 | 'bold' 加粗
