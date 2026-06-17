@@ -19,6 +19,12 @@
     // ── 0. 排版计算令牌 ─────────────────────────────────────────
     //    垂直间隙 = 1em × 正文行高 × 用户缩放系数
     --palo-nav-vertical-space: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1));
+    //    ⚠️  不在此处重新声明 --palo-nav-horizontal-space，直接从 :root 继承避免自引用
+
+    // ── 0b. 仅容器自身归零（子元素清洗下放到横竖排各自作用域）───
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
 
     // ── 1. 默认：清空下划线，字重跟随正文 ──────────────────────────
     a {
@@ -29,19 +35,47 @@
 
     // ── 2. 横排容器（Tags 标签栏）────────────────────────────────
     //    Row gap = verticalScale 联动行高  |  Column gap = horizontalSpace
+    //    🔥 双轴参数完整保留；子元素清洗仅在横排作用域内生效
+    &.is-horizontal,
     .is-horizontal {
-      display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
       gap: var(--palo-nav-vertical-space) var(--palo-nav-horizontal-space) !important;
+
+      li,
+      a,
+      [class*='nav-item'] {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: var(--line-height-body, 1.5) !important;
+      }
     }
 
     // ── 3. 竖排容器（TOC 目录 / Footer 垂直列）──────────────────
-    .is-vertical,
-    &.is-vertical {
-      display: flex;
-      flex-direction: column;
-      gap: var(--palo-nav-vertical-space);
+    //    🔥 竖排的绝对归零仅在此作用域，绝不波及横排
+    &.is-vertical,
+    .is-vertical {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: var(--palo-nav-vertical-space) 0 !important;
+
+      li,
+      a,
+      [class*='nav-item'],
+      [class*='article-toc__item'],
+      span {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        line-height: var(--line-height-body, 1.5) !important;
+      }
+
+      a {
+        display: inline-flex;
+        align-items: center;
+      }
     }
 
     // ── 4. TOC 专属：释放轻量工业阻尼过渡动画 ──────────────────────
@@ -110,6 +144,26 @@
     a.disabled {
       cursor: default;
       opacity: 0.6;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🔥 TOC 全局降维打击：对抗 .article-toc__item--h2/h3/h4 等高权重类名
+  //    确保 verticalScale:0 时，TOC 项间无任何残留物理间隙
+  // ═══════════════════════════════════════════════════════════════
+  [class*='article-toc'] {
+    // 🔥 排除 .is-horizontal，防止污染 Tags 横排的双轴 gap
+    ul:not(.is-horizontal),
+    ol:not(.is-horizontal) {
+      gap: var(--palo-nav-vertical-space, 0px) 0 !important;
+    }
+
+    li,
+    a {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
     }
   }
 }
