@@ -35,6 +35,8 @@ export type NavListActiveStyle = 'bold' | 'underline' | 'both' | 'none'
 
 export interface NavListConfig {
   activeStyle?: NavListActiveStyle
+  horizontalGap?: string
+  verticalScale?: number
 }
 
 export interface NavigationConfig {

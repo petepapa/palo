@@ -91,6 +91,8 @@ navigation:
   # ── 二级导航列表（Tags、TOC、Footer 等）/ Nav List ──────────────
   navList:
     activeStyle: 'both'           # 'bold' 加粗 | 'underline' 下划线 | 'both' 双重 | 'none' 无
+    horizontalGap: 'gap-4'        # Tags 标签栏横排间距（标准 Tailwind gap 类名）
+    verticalScale: 0.5              # TOC / Footer 列表项纵向间距系数（行高倍数，默认 1 倍行高）
 
 
 # ╔══════════════════════════════════════════════════════════════╗

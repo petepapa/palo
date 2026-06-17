@@ -226,6 +226,12 @@ const navigationConfigSchema = z
     navList: z
       .object({
         activeStyle: navListActiveStyleEnum.optional(),
+        horizontalGap: z.string().optional(),
+        verticalScale: z
+          .number()
+          .min(0, 'navigation.navList.verticalScale must be ≥ 0')
+          .max(5, 'navigation.navList.verticalScale must be ≤ 5')
+          .optional(),
       })
       .strip()
       .optional(),

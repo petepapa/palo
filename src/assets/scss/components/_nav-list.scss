@@ -16,6 +16,10 @@
 
 @layer components {
   .palo-nav-list {
+    // ── 0. 排版计算令牌 ─────────────────────────────────────────
+    //    垂直间隙 = 1em × 正文行高 × 用户缩放系数
+    --palo-nav-vertical-space: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1));
+
     // ── 1. 默认：清空下划线，字重跟随正文 ──────────────────────────
     a {
       text-decoration: none;
@@ -23,7 +27,24 @@
       transition: none;
     }
 
-    // ── TOC 专属：释放轻量工业阻尼过渡动画 ──────────────────────
+    // ── 2. 横排容器（Tags 标签栏）────────────────────────────────
+    //    Row gap = verticalScale 联动行高  |  Column gap = horizontalSpace
+    .is-horizontal {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--palo-nav-vertical-space) var(--palo-nav-horizontal-space) !important;
+    }
+
+    // ── 3. 竖排容器（TOC 目录 / Footer 垂直列）──────────────────
+    .is-vertical,
+    &.is-vertical {
+      display: flex;
+      flex-direction: column;
+      gap: var(--palo-nav-vertical-space);
+    }
+
+    // ── 4. TOC 专属：释放轻量工业阻尼过渡动画 ──────────────────────
     &[data-context='toc'] a {
       transition:
         color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
@@ -31,7 +52,7 @@
         font-weight 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    // ── 2. Hover / Focus：展示下划线 ──────────────────────────────
+    // ── 5. Hover / Focus：展示下划线 ──────────────────────────────
     a:hover,
     a:focus-visible {
       text-decoration: underline;
@@ -40,7 +61,7 @@
     }
 
     // ═══════════════════════════════════════════════════════════
-    // 3. Active 激活态 — 通过 data-active-style 属性派发
+    // 6. Active 激活态 — 通过 data-active-style 属性派发
     //    所有激活态切换均为瞬时（0ms），无缓动动画
     // ═══════════════════════════════════════════════════════════
 
@@ -84,7 +105,7 @@
       }
     }
 
-    // ── 4. disabled 状态处理 ────────────────────────────────────
+    // ── 7. disabled 状态处理 ────────────────────────────────────
     a[disabled],
     a.disabled {
       cursor: default;

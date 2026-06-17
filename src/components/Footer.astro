@@ -20,7 +20,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Features</Heading>
-        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
           <li><Link href={ensureTrailingSlash('/accessibility-statement')}>Accessibility statement</Link></li>
           <li><Link href={ensureTrailingSlash('/accessible-components')}>Accessible components</Link></li>
           <li><Link href={ensureTrailingSlash('/color-contrast-checker')}>Color contrast checker</Link></li>
@@ -32,7 +32,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       </div>
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Incluud projects</Heading>
-        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
           <li>
             <Link isExternal href="https://accessible-astro-starter.incluud.dev">Accessible Astro Starter</Link>
           </li>
@@ -54,7 +54,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       </div>
       <div class="flex flex-col gap-4">
         <Heading level="h3" size="h6">Developer tools</Heading>
-        <ul class="flex flex-col gap-2 palo-nav-list" data-active-style={navListActiveStyle}>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
           <li>
             <Link isExternal href="https://chrispederick.com/work/web-developer/">Web Developer Extension</Link>
           </li>

@@ -132,6 +132,24 @@ const {
 
 const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
 const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+
+// ── .palo-nav-list 间距配置（CSS 变量驱动，不依赖动态 Tailwind 类名拼接） ──
+const navListHorizontalGapClass = themeConfig.navigation?.navList?.horizontalGap ?? 'gap-4'
+const navListVerticalScale = themeConfig.navigation?.navList?.verticalScale ?? 1
+
+/** Tailwind gap 类名 → rem 值映射，防止 Purge 误删 */
+const tailwindGapToRem = (gapClass: string): string => {
+  const map: Record<string, string> = {
+    'gap-0': '0', 'gap-px': '1px',
+    'gap-1': '0.25rem', 'gap-2': '0.5rem', 'gap-3': '0.75rem',
+    'gap-4': '1rem', 'gap-5': '1.25rem', 'gap-6': '1.5rem',
+    'gap-7': '1.75rem', 'gap-8': '2rem', 'gap-9': '2.25rem',
+    'gap-10': '2.5rem', 'gap-12': '3rem', 'gap-16': '4rem',
+    'gap-20': '5rem', 'gap-24': '6rem',
+  }
+  return map[gapClass] ?? '1rem'
+}
+const navListHorizontalGapRem = tailwindGapToRem(navListHorizontalGapClass)
 const hasHero = Astro.props.hasHero ?? false
 const mainPaddingTop = fixedHeader && !hasHero ? navMinHeight : '0'
 
@@ -669,6 +687,9 @@ const themeVariablesCss = `
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};
   --navigation-dropdown-mobile-font-size: ${navigationDropdownMobileFontSize};
+  --palo-nav-horizontal-space: ${navListHorizontalGapRem};
+  --palo-nav-vertical-scale: ${navListVerticalScale};
+  --line-height-body: calc(1.6 * var(--line-height-scale));
   --logo-size: ${logoSize};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
   --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem) !important;

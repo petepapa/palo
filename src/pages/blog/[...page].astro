@@ -127,7 +127,7 @@ if (pageConfig.showTags) {
       {pageConfig.showTags && uniqueTags.length > 0 && (
         <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
           <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
-          <div class="flex flex-wrap gap-4">
+          <div class="is-horizontal">
             <Link href={ensureTrailingSlash('/blog')} aria-current="page">{pageConfig.allLabel}</Link>
             {uniqueTags.map((tag) => (
               <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
