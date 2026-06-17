@@ -105,6 +105,8 @@ export interface SiteConfig {
   defaultTheme: 'auto' | 'light' | 'dark'
   darkModeToggle: boolean
   launcher: false | true | 'default' | 'gradientBorder'
+  backToTop?: boolean
+  backToTopText?: string
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }

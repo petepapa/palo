@@ -14,6 +14,8 @@ import config from '@config'
  */
 const currentYear = new Date().getFullYear()
 const siteName = config.site.name
+const backToTopEnabled = config.site.backToTop !== false
+const backToTopText = config.site.backToTopText ?? 'Back to Top'
 const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
 ---
 <footer>
@@ -93,10 +95,12 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       <p class="copyright">
         &copy; {currentYear} {siteName}. All Rights Reserved.
       </p>
-      <a href="#top" id="back-to-top" class="back-to-top-link inline-flex items-center gap-1 text-sm">
-        <span>Back to Top</span>
-        <Icon name="ph:arrow-up" size="1.25em" />
-      </a>
+      {backToTopEnabled && (
+        <a href="#top" id="back-to-top" class="back-to-top-link inline-flex items-center gap-1 text-sm" aria-label={!backToTopText ? 'Back to top' : undefined}>
+          {backToTopText && <span>{backToTopText}</span>}
+          <Icon name="ph:arrow-up" size="1.25em" />
+        </a>
+      )}
     </div>
   </section>
 

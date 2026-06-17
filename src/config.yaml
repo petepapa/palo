@@ -10,6 +10,8 @@ site:
   defaultTheme: auto          # 默认主题：auto 跟随系统 / light 浅色 / dark 深色
   darkModeToggle: true       # 启用深色模式切换 / Enable dark mode toggle
   launcher: true             # 启用快捷启动器 (Cmd+K / Ctrl+K)。可选值：false / true / default / gradientBorder
+  backToTop: true            # 启用页脚"回到顶部"链接 / Enable "Back to Top" link in footer
+  backToTopText: 'Back to Top'  # "回到顶部"链接文本 / Custom text for the back-to-top link
 
 
 # ╔══════════════════════════════════════════════════════════════╗
