@@ -58,4 +58,9 @@
   .separator {
     flex-shrink: 0 !important;
   }
+
+  // 最后一项中的分隔符必须绝对隐藏（安全网）
+  li:last-child .separator {
+    display: none !important;
+  }
 }
