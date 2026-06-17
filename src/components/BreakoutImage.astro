@@ -107,9 +107,24 @@ if (layout) {
 
 const altText = decorative ? '' : alt
 
+// ── 计算容器的纵横比 ──
+const hasImageSize = isImageMetadata(resolvedSrc)
+
+// 对于无法获取尺寸的 public 图片，使用 data-fallback-ratio 属性 + CSS 控制 8:5 比例
+//   → 加载完成后通过 onload 释放，恢复原图真实比例
+// 对于 ImageMetadata（有真实尺寸），直接写入行内 aspect-ratio（永不改变）
+const isFallbackRatio = !hasImageSize
+
+const realAspectRatioInline = hasImageSize
+  ? `aspect-ratio: ${resolvedSrc.width} / ${resolvedSrc.height}`
+  : ''
+
 // ── 提取主色调，作为图片加载前的纯色占位背景 ──
 const dominantColor = await getDominantColor(resolvedSrc)
-const containerBgStyle = `background-color: ${dominantColor};`
+const containerInlineStyle = [
+  `background-color: ${dominantColor}`,
+  realAspectRatioInline,
+].filter(Boolean).join('; ')
 
 // Define container spacing classes based on layout
 const containerClasses = {
@@ -127,7 +142,8 @@ const radiusClass = resolvedLayout === 'full'
 
 <div
   class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass]}
-  style={containerBgStyle}
+  style={containerInlineStyle || undefined}
+  data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
 >
   {isImageMetadata(resolvedSrc) ? (
     <Image
@@ -143,16 +159,29 @@ const radiusClass = resolvedLayout === 'full'
     <img
       src={resolvedSrc}
       alt={altText}
-      class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      class:list={['absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
-      onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
+      onload="var i=this;function r(){i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}};if('decode' in i){i.decode().then(r).catch(r)}else{r()}"
     />
   )}
+  <style is:global>
+    .breakout-image-container[data-fallback-ratio="true"] {
+      aspect-ratio: 8 / 5;
+    }
+  </style>
   <noscript>
     <style>
+      .breakout-image-container[data-fallback-ratio="true"] {
+        aspect-ratio: auto !important;
+      }
       .breakout-image-container img {
         opacity: 1 !important;
+      }
+      .breakout-image-container[data-fallback-ratio="true"] img {
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
       }
     </style>
   </noscript>
@@ -163,12 +192,19 @@ const radiusClass = resolvedLayout === 'full'
   const checkBreakoutImages = () => {
     document.querySelectorAll('.breakout-image-container img').forEach((img) => {
       if (img instanceof HTMLImageElement && img.complete) {
-        if ('decode' in img) {
-          img.decode()
-            .then(() => img.classList.remove('opacity-0'))
-            .catch(() => img.classList.remove('opacity-0'));
-        } else {
+        const reveal = () => {
           img.classList.remove('opacity-0');
+          const container = img.closest('.breakout-image-container');
+          if (container && container.hasAttribute('data-fallback-ratio')) {
+            container.removeAttribute('data-fallback-ratio');
+            img.classList.remove('absolute', 'inset-0', 'h-full');
+            img.classList.add('block');
+          }
+        };
+        if ('decode' in img) {
+          img.decode().then(reveal).catch(reveal);
+        } else {
+          reveal();
         }
       }
     });
