@@ -90,7 +90,7 @@ navigation:
 
   # ── 二级导航列表（Tags、TOC、Footer 等）/ Nav List ──────────────
   navList:
-    activeStyle: 'bold'           # 'bold' 加粗 | 'underline' 下划线 | 'both' 双重 | 'none' 无
+    activeStyle: 'both'           # 'bold' 加粗 | 'underline' 下划线 | 'both' 双重 | 'none' 无
 
 
 # ╔══════════════════════════════════════════════════════════════╗
