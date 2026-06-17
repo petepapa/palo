@@ -21,9 +21,7 @@
     --palo-nav-vertical-space: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1));
     //    ⚠️  不在此处重新声明 --palo-nav-horizontal-space，直接从 :root 继承避免自引用
 
-    // ── 0b. 仅容器自身归零（子元素清洗下放到横竖排各自作用域）───
-    margin: 0 !important;
-    padding: 0 !important;
+    // ── 0b. 容器内政仅清 list-style，外交边界绝不插手 ─────────
     list-style: none !important;
 
     // ── 1. 默认：清空下划线，字重跟随正文 ──────────────────────────
@@ -158,8 +156,9 @@
       gap: var(--palo-nav-vertical-space, 0px) 0 !important;
     }
 
+    // 仅对列表项内部进行极端物理归零，不碰容器边界
     li,
-    a {
+    li > a {
       margin-top: 0 !important;
       margin-bottom: 0 !important;
       padding-top: 0 !important;
