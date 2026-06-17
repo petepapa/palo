@@ -69,6 +69,11 @@ interface Props {
    * @default "right"
    */
   buttonAlign?: ButtonAlign
+  /**
+   * "查看更多"按钮文本
+   * @default "Read all posts"
+   */
+  buttonText?: string
 }
 
 // 📖 从 config.yaml 读取 Blog LatestComponent & defaults 全局默认值
@@ -79,13 +84,14 @@ const blogLayoutDefaults = blogCfg?.defaults ?? {}
 const {
   class: className,
   limit = latestDefaults.limit ?? 3,
-  title = 'Latest posts',
+  title = latestDefaults.title ?? 'Latest posts',
   sortBy = 'latest',
   postHeadingLevel = blogLayoutDefaults.postHeadingLevel ?? 'h3',
   postDescClass = blogLayoutDefaults.postDescClass ?? '',
   itemGap = blogLayoutDefaults.itemGap ?? 'gap-24',
   cardGap = blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
   buttonAlign = (latestDefaults.buttonAlign as ButtonAlign) ?? 'right',
+  buttonText = latestDefaults.buttonText ?? 'Read all posts',
 } = Astro.props
 
 const itemGapSize = resolveTailwindGapClass(itemGap)
@@ -164,7 +170,7 @@ const latestPosts = sortedPosts.slice(0, limit).map((post, index) => {
     </ul>
     <div class={['mt-12 flex', justifyClass].join(' ')}>
       <Link href={ensureTrailingSlash('/blog')} isButton animateOnHover animationType="nudge">
-        Read all posts
+        {buttonText}
         <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
       </Link>
     </div>

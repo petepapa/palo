@@ -412,6 +412,9 @@ const portfolioTagPageSchema = z
 const portfolioFeaturedComponentSchema = z
   .object({
     limit: z.number().int().min(1).optional(),
+    buttonAlign: z.enum(['left', 'center', 'right']).optional(),
+    title: z.string().optional(),
+    buttonText: z.string().optional(),
   })
   .strip()
 
@@ -452,6 +455,9 @@ const blogDefaultsSchema = z
 const blogLatestComponentSchema = z
   .object({
     limit: z.number().int().min(1).optional(),
+    buttonAlign: z.enum(['left', 'center', 'right']).optional(),
+    title: z.string().optional(),
+    buttonText: z.string().optional(),
   })
   .strip()
 
