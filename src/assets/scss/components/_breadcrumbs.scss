@@ -1,0 +1,61 @@
+// ─────────────────────────────────────────────────────
+// 面包屑（Breadcrumbs）移动端长标题截断样式
+// 覆盖 accessible-astro-components 中 flex-wrap: wrap 行为，
+// 确保面包屑全线保持在同一水平行，超宽文本自动缩略为 ...
+//
+// 压力分配规则：
+// • 非最后一级祖先节点 → flex-shrink: 0（绝对不缩，保持完整显示）
+// • 最后一级当前标题   → flex: 1 1 0%（承担全部挤压，超出截断为 ...）
+// ─────────────────────────────────────────────────────
+
+.breadcrumbs {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: hidden;
+
+  // 覆盖 :where(.breadcrumbs ol) 中的 flex-wrap: wrap
+  ol {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    white-space: nowrap !important;
+
+    // 非最后一级的祖先节点：坚决不缩小，保持完整显示
+    &:not(:last-child) {
+      flex-shrink: 0 !important;
+    }
+
+    // 最后一级（当前页标题）：承担全部挤压压力
+    &:last-child {
+      flex: 1 1 0%;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      // 内部文本容器同步截断
+      span,
+      a {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap !important;
+      }
+    }
+  }
+
+  // 分隔符保持固定，不参与收缩
+  .separator {
+    flex-shrink: 0 !important;
+  }
+}
