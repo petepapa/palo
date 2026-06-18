@@ -3,28 +3,23 @@
   color-scheme: light;
   interpolate-size: allow-keywords;
 
-  // ── Palo 色彩弧线自适应补偿算法（独立语义精准校正·双轨制） ──
-  // 高明度(100-200)：降低饱和度消除荧光感
-  // 锚点(300)：完全还原用户原始色
-  // 低明度(400-500)：双轨分治 — 轨道A 平滑通用 / 轨道B 精准校正
+  // ── Primary 轴线（恢复纯明度阶梯） ──
+  --color-primary-100: oklch(from var(--brand-primary) 90% c h);
+  --color-primary-200: oklch(from var(--brand-primary) 80% c h);
+  --color-primary-300: oklch(from var(--brand-primary) 70% c h);
+  --color-primary-400: oklch(from var(--brand-primary) 60% c h);
+  --color-primary-500: oklch(from var(--brand-primary) 50% c h);
 
-  // ════════════════════════════════════════════════════════════════
-  // 轨道 A：用户自定品牌色（完全解耦色相，平滑温和通用递进）
-  // ════════════════════════════════════════════════════════════════
-  --color-primary-100: oklch(from var(--brand-primary) 0.93 calc(c * 0.35) h);
-  --color-primary-200: oklch(from var(--brand-primary) 0.85 calc(c * 0.65) h);
-  --color-primary-300: var(--brand-primary);
-  --color-primary-400: oklch(from var(--brand-primary) 0.55 calc(c * 1.15) h);
-  --color-primary-500: oklch(from var(--brand-primary) 0.38 calc(c * 1.25) h);
-  --color-secondary-100: oklch(from var(--brand-secondary) 0.93 calc(c * 0.35) h);
-  --color-secondary-200: oklch(from var(--brand-secondary) 0.85 calc(c * 0.65) h);
-  --color-secondary-300: var(--brand-secondary);
-  --color-secondary-400: oklch(from var(--brand-secondary) 0.55 calc(c * 1.10) h);
-  --color-secondary-500: oklch(from var(--brand-secondary) 0.38 calc(c * 1.20) h);
+  // ── Secondary 轴线（恢复纯明度阶梯） ──
+  --color-secondary-100: oklch(from var(--brand-secondary) 90% c h);
+  --color-secondary-200: oklch(from var(--brand-secondary) 80% c h);
+  --color-secondary-300: oklch(from var(--brand-secondary) 70% c h);
+  --color-secondary-400: oklch(from var(--brand-secondary) 60% c h);
+  --color-secondary-500: oklch(from var(--brand-secondary) 50% c h);
   --color-outline-100: oklch(from var(--brand-outline) 80% c h);
   --color-outline-200: oklch(from var(--brand-outline) 50% c h);
 
-  // neutral 灰度色板（独立于双轨制，保持纯明度阶梯）
+  // ── Neutral 中性轴线（恢复原版灰度定义：100级强行转纯白，其余透传） ──
   --color-neutral-100: oklch(from var(--brand-neutral) 100% 0 0);
   --color-neutral-200: oklch(from var(--brand-neutral) 95% c h);
   --color-neutral-300: oklch(from var(--brand-neutral) 90% c h);
