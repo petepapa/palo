@@ -120,6 +120,7 @@ const seoTitle = isHomeWithoutExplicitTitle
 const seoTitleTemplate =
   isHomeWithoutExplicitTitle && hasMetadataTitle ? undefined : !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
 const defaultTheme = themeConfig.site.defaultTheme ?? 'auto'
+const darkModeToggle = themeConfig.site.darkModeToggle
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -725,10 +726,19 @@ ${bodyLineHeights}
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <script is:inline define:vars={{ defaultTheme }}>
+    <script is:inline define:vars={{ defaultTheme, darkModeToggle }}>
       try {
         const storedTheme = localStorage.getItem('darkMode')
-        if (!storedTheme) {
+        // Locked theme: when defaultTheme is explicitly set (not auto) and toggle is off,
+        // force the configured theme and clear any stale localStorage value.
+        if (defaultTheme !== 'auto' && !darkModeToggle) {
+          const useDarkTheme = defaultTheme === 'dark'
+          document.documentElement.classList.toggle('darkmode', useDarkTheme)
+          document.documentElement.style.colorScheme = useDarkTheme ? 'dark' : 'light'
+          if (storedTheme) {
+            localStorage.removeItem('darkMode')
+          }
+        } else if (!storedTheme) {
           const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
           const useDarkTheme = defaultTheme === 'dark' || (defaultTheme === 'auto' && prefersDark)
           document.documentElement.classList.toggle('darkmode', useDarkTheme)
