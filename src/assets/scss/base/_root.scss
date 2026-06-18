@@ -38,8 +38,8 @@
   --color-info-100: oklch(from var(--brand-info) 0.93 calc(c * 0.35) h);
   --color-info-200: oklch(from var(--brand-info) 0.85 calc(c * 0.65) h);
   --color-info-300: var(--brand-info);
-  --color-info-400: oklch(from var(--brand-info) 0.55 calc(c * 1.25) h);
-  --color-info-500: oklch(from var(--brand-info) 0.40 calc(c * 1.35) h);
+  --color-info-400: oklch(from var(--brand-info) 0.48 calc(c * 1.35) h); // 明度压到 0.48，拉高饱和，彻底与 300 剥离
+  --color-info-500: oklch(from var(--brand-info) 0.36 calc(c * 1.40) h); // 明度下潜到 0.36，锁死深邃霓虹蓝
 
   // ── ERROR (极纯暗品红，释放明度防脏) ──
   --color-error-100: oklch(from var(--brand-error) 0.93 calc(c * 0.35) h);
