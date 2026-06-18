@@ -1,4 +1,4 @@
-import { defineConfig, envField } from 'astro/config'
+import { defineConfig } from 'astro/config'
 import { fileURLToPath } from 'url'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -121,14 +121,4 @@ export default defineConfig({
   },
   integrations,
   vite: enhanceConfigForWorkspace(viteConfig),
-  env: {
-    schema: {
-      BLOG_API_URL: envField.string({
-        context: 'server',
-        access: 'secret',
-        optional: true,
-        default: 'https://jsonplaceholder.typicode.com/posts',
-      }),
-    },
-  },
 })
