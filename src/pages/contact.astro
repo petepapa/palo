@@ -325,19 +325,11 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           return
         }
 
-        // ── Success ──
-        form.reset()
-        form
-          .querySelectorAll<HTMLInputElement>('input[type="radio"], input[type="checkbox"]')
-          .forEach((el) => {
-            el.checked = false
-          })
-        form.querySelectorAll('[data-floating-active]').forEach((el) => {
-          el.removeAttribute('data-floating-active')
-        })
-
+        // ── Success → redirect to /thank-you ──
         setButtonState('success')
-        setTimeout(() => setButtonState('idle'), 2500)
+        setTimeout(() => {
+          window.location.href = '/thank-you'
+        }, 600)
       } catch {
         if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection and try again.')
         setButtonState('error')
