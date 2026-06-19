@@ -471,6 +471,22 @@ const blogConfigSchema = z
   .strip()
 
 // ---------------------------------------------------------------------------
+// Contact form schema
+// ---------------------------------------------------------------------------
+
+const contactConfigSchema = z
+  .object({
+    receiveEmail: z.string().email('contact.receiveEmail must be a valid email address'),
+    resendFromEmail: z
+      .string()
+      .email('contact.resendFromEmail must be a valid email address or ""')
+      .or(z.literal(''))
+      .optional(),
+    resendApiKey: z.string().optional(),
+  })
+  .strip()
+
+// ---------------------------------------------------------------------------
 // Top-level schema
 // ---------------------------------------------------------------------------
 
@@ -487,6 +503,7 @@ export const paloConfigSchema = z
     components: componentsConfigSchema.optional(),
     portfolio: portfolioConfigSchema.optional(),
     blog: blogConfigSchema.optional(),
+    contact: contactConfigSchema.optional(),
   })
   .strip()
 

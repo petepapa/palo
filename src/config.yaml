@@ -282,3 +282,13 @@ blog:
     buttonAlign: right    # "查看更多"按钮位置：right | center | left
     title: "Latest Posts"              # 🔥 大标题自定义
     buttonText: "View All Posts"      # 🔥 "查看更多"按钮文本自定义
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  联系表单 / Contact Form                                      ║
+# ║  Resend 邮件服务配置，修改后即时生效，无需改代码                ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+contact:
+  receiveEmail: "hello@petepa.com"      # 接收表单通知的个人邮箱
+  resendFromEmail: ""                   # Resend 验证过的发件邮箱（留空则使用 receiveEmail）
+  resendApiKey: ""                      # 本地测试用（线上留空，走 Vercel 环境变量 RESEND_API_KEY）

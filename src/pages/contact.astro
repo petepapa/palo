@@ -9,6 +9,7 @@ import {
   Textarea,
   Checkbox,
   Fieldset,
+  Radio,
   Heading,
   Link,
 } from 'accessible-astro-components'
@@ -47,7 +48,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     <div class="grid grid-cols-1 gap-20 md:grid-cols-2">
       <!-- 左侧：联系表单 / Left: Contact form -->
       <div id="contact-form" class="space-content">
-        <Form name="contact" action="/thank-you" method="post">
+        <Form id="contact-form-element" name="contact" action="/thank-you" method="post">
           <!-- 姓名输入框 / Name input -->
           <Input
             name="firstname"
@@ -59,13 +60,22 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           <!-- 邮箱输入框 / Email input -->
           <Input name="email" label="EMAIL ADDRESS" type="email" required autocomplete="email" />
 
-          <!-- 项目意向多选 / Project intent checkboxes -->
-          <Fieldset name="help-topic" legend="WHAT DO YOU NEED HELP WITH?">
-            <Checkbox name="web-design" value="web" label="Web & Product Design" />
-            <Checkbox name="motion" value="motion" label="Motion Graphics / Video" />
-            <Checkbox name="branding" value="branding" label="Branding & Identity Systems" />
-            <Checkbox name="music" value="music" label="Music / Audio Project" />
-            <Checkbox name="chat" value="chat" label="Just wanting to chat music &amp; code!" />
+          <!-- 模块 A：身份识别 (单选) / Identity radio group -->
+          <Fieldset name="identity" legend="WHO ARE YOU?">
+            <Radio name="identity" value="creator" label="Content Creator" />
+            <Radio name="identity" value="designer" label="Designer / Artist" />
+            <Radio name="identity" value="musician" label="Musician / Band Leader" />
+            <Radio name="identity" value="dev" label="Passionate Dev" />
+            <Radio name="identity" value="kindred" label="Just a kindred spirit" />
+          </Fieldset>
+
+          <!-- 模块 B：协作内容 (多选) / Collaboration checkbox group -->
+          <Fieldset name="collaboration" legend="WHAT'S ON YOUR MIND?">
+            <Checkbox name="visual" value="visual" label="Visual Identity &amp; Branding" />
+            <Checkbox name="web" value="web" label="Interactive Web Experiences" />
+            <Checkbox name="motion" value="motion" label="Motion Typography &amp; Video" />
+            <Checkbox name="audiovisual" value="audiovisual" label="Audio-Visual / Music Project" />
+            <Checkbox name="chat" value="chat" label="Coffee &amp; Late-night chat" />
           </Fieldset>
 
           <!-- 项目/想法多行文本框 / Project or idea textarea -->
@@ -193,4 +203,149 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
   #contact-form .textarea-group small .icon {
     translate: 0 var(--font-cap-height-offset, -0.05em);
   }
+
+  /* ── 7. 选择区域紧凑双列布局 ── */
+  /*
+   * 覆盖组件默认的纵向 flex 排列，改为双列 grid。
+   * 1fr 1fr 让 Radio / Checkbox 选项形成简洁的双列视觉节奏，
+   * 字体缩小到 13px 保持克制，不让表单纵向撑得过长。
+   */
+  #contact-form fieldset.fieldset > .fieldset-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--space-2xs);
+    row-gap: var(--space-3xs);
+    font-size: 0.8125rem;
+  }
+
+  /* ── 8. 提交按钮靠右对齐 ── */
+  #contact-form .form > .button {
+    display: flex;
+    margin-inline-start: auto;
+    width: fit-content;
+  }
 </style>
+
+<script>
+  function initContactForm() {
+    const form = document.getElementById('contact-form-element') as HTMLFormElement | null
+    if (!form) return
+
+    // Prevent double-binding (Astro view transitions)
+    if (form.dataset.paloContactBound === 'true') return
+    form.dataset.paloContactBound = 'true'
+
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    const originalBtnText = submitBtn?.textContent || 'SUBMIT'
+
+    // Helper: set button state
+    function setButtonState(state: 'idle' | 'sending' | 'success' | 'error') {
+      if (!submitBtn) return
+      submitBtn.disabled = state !== 'idle'
+      switch (state) {
+        case 'sending':
+          submitBtn.textContent = 'SENDING...'
+          break
+        case 'success':
+          submitBtn.textContent = 'SUCCESS'
+          break
+        case 'error':
+          submitBtn.textContent = 'ERROR — TRY AGAIN'
+          break
+        default:
+          submitBtn.textContent = originalBtnText
+      }
+    }
+
+    // Helper: show inline error on a field
+    function showFieldError(input: HTMLInputElement | HTMLTextAreaElement, message: string) {
+      input.setAttribute('aria-invalid', 'true')
+      const group = input.closest('.input-group, .textarea-group')
+      const msgEl = group?.querySelector<HTMLElement>('.message')
+      if (msgEl) msgEl.textContent = message
+    }
+
+    // Helper: collect form data
+    function collectFormData(): Record<string, unknown> {
+      const nameEl = form!.querySelector<HTMLInputElement>('input[name="firstname"]')
+      const emailEl = form!.querySelector<HTMLInputElement>('input[name="email"]')
+      const msgEl = form!.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
+
+      const identityRadio = form!.querySelector<HTMLInputElement>(
+        'input[name="identity"]:checked',
+      )
+
+      const topicCheckboxes = form!.querySelectorAll<HTMLInputElement>(
+        'input[name="visual"], input[name="web"], input[name="motion"], input[name="audiovisual"], input[name="chat"]',
+      )
+
+      const topics = Array.from(topicCheckboxes)
+        .filter((cb) => cb.checked)
+        .map((cb) => cb.value)
+
+      return {
+        name: nameEl?.value.trim() || '',
+        email: emailEl?.value.trim() || '',
+        identity: identityRadio?.value || '',
+        topics,
+        message: msgEl?.value.trim() || '',
+      }
+    }
+
+    // ── Override form.submit: js-validate runs client-validation first,
+    //     then calls form.submit() only when all fields pass ──
+    form.submit = async () => {
+      const data = collectFormData()
+      setButtonState('sending')
+
+      const nameEl = form.querySelector<HTMLInputElement>('input[name="firstname"]')
+      const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
+      const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
+
+      try {
+        const res = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}))
+          if (errBody.fields) {
+            ;(errBody.fields as string[]).forEach((field: string) => {
+              if (field === 'name' && nameEl) showFieldError(nameEl, 'This field is required')
+              if (field === 'email' && emailEl) showFieldError(emailEl, 'This field is required')
+              if (field === 'message' && msgEl) showFieldError(msgEl, 'This field is required')
+            })
+          } else {
+            if (msgEl) showFieldError(msgEl, 'Something went wrong. Please try again.')
+          }
+          setButtonState('error')
+          setTimeout(() => setButtonState('idle'), 2500)
+          return
+        }
+
+        // ── Success ──
+        form.reset()
+        form
+          .querySelectorAll<HTMLInputElement>('input[type="radio"], input[type="checkbox"]')
+          .forEach((el) => {
+            el.checked = false
+          })
+        form.querySelectorAll('[data-floating-active]').forEach((el) => {
+          el.removeAttribute('data-floating-active')
+        })
+
+        setButtonState('success')
+        setTimeout(() => setButtonState('idle'), 2500)
+      } catch {
+        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection and try again.')
+        setButtonState('error')
+        setTimeout(() => setButtonState('idle'), 2500)
+      }
+    }
+  }
+
+  document.addEventListener('astro:page-load', initContactForm)
+  initContactForm()
+</script>

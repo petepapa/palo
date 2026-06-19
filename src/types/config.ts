@@ -296,6 +296,19 @@ export interface BlogConfig {
 }
 
 // ================================================================
+// ✉️ 联系表单 / Contact Form
+// ================================================================
+
+export interface ContactConfig {
+  /** 接收表单通知的个人邮箱 */
+  receiveEmail: string
+  /** Resend 验证过的发件域名邮箱（留空则使用 receiveEmail） */
+  resendFromEmail?: string
+  /** Resend API key（线上留空，走 Vercel 环境变量 RESEND_API_KEY） */
+  resendApiKey?: string
+}
+
+// ================================================================
 // 🏛️ 根配置 / Root Config
 // ================================================================
 
@@ -311,6 +324,7 @@ export interface PaloConfig {
   components?: ComponentsConfig
   portfolio?: PortfolioConfig
   blog?: BlogConfig
+  contact?: ContactConfig
 }
 
 /**
