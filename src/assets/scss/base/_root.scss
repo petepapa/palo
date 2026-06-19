@@ -35,29 +35,29 @@
   // ════════════════════════════════════════════════════════════════
 
   // ── INFO (标准深霓虹蓝) ──
-  --color-info-100: oklch(from var(--brand-info) 0.93 calc(c * 0.35) h);
-  --color-info-200: oklch(from var(--brand-info) 0.85 calc(c * 0.65) h);
+  --color-info-100: oklch(from var(--brand-info) 0.82 calc(c * 0.35) h);
+  --color-info-200: oklch(from var(--brand-info) 0.70 calc(c * 0.65) h);
   --color-info-300: var(--brand-info);
   --color-info-400: oklch(from var(--brand-info) 0.48 calc(c * 1.35) h); // 明度压到 0.48，拉高饱和，彻底与 300 剥离
   --color-info-500: oklch(from var(--brand-info) 0.36 calc(c * 1.40) h); // 明度下潜到 0.36，锁死深邃霓虹蓝
 
   // ── ERROR (极纯暗品红，释放明度防脏) ──
-  --color-error-100: oklch(from var(--brand-error) 0.93 calc(c * 0.35) h);
-  --color-error-200: oklch(from var(--brand-error) 0.85 calc(c * 0.65) h);
+  --color-error-100: oklch(from var(--brand-error) 0.84 calc(c * 0.20) 17.49);
+  --color-error-200: oklch(from var(--brand-error) 0.73 calc(c * 0.45) 15.49);
   --color-error-300: var(--brand-error);
   --color-error-400: oklch(from var(--brand-error) 0.55 calc(c * 1.25) h);
   --color-error-500: oklch(from var(--brand-error) 0.40 calc(c * 1.35) h);
 
   // ── WARNING (释放明度留饱和空间，色相回弹对冲红移，死锁重工业金黄) ──
-  --color-warning-100: oklch(from var(--brand-warning) 0.93 calc(c * 0.35) h);
-  --color-warning-200: oklch(from var(--brand-warning) 0.85 calc(c * 0.65) h);
+  --color-warning-100: oklch(from var(--brand-warning) 0.92 calc(c * 0.18) 63.80);
+  --color-warning-200: oklch(from var(--brand-warning) 0.85 calc(c * 0.42) 65.80);
   --color-warning-300: var(--brand-warning);
   --color-warning-400: oklch(from var(--brand-warning) 0.58 calc(c * 1.30) calc(h + 8));
   --color-warning-500: oklch(from var(--brand-warning) 0.45 calc(c * 1.40) calc(h + 18));
 
   // ── SUCCESS (释放明度锁死高纯翡翠翠绿) ──
-  --color-success-100: oklch(from var(--brand-success) 0.93 calc(c * 0.35) h);
-  --color-success-200: oklch(from var(--brand-success) 0.85 calc(c * 0.65) h);
+  --color-success-100: oklch(from var(--brand-success) 0.86 calc(c * 0.20) 145.94);
+  --color-success-200: oklch(from var(--brand-success) 0.78 calc(c * 0.45) 144.44);
   --color-success-300: var(--brand-success);
   --color-success-400: oklch(from var(--brand-success) 0.55 calc(c * 1.25) calc(h - 2));
   --color-success-500: oklch(from var(--brand-success) 0.42 calc(c * 1.35) calc(h - 4));
