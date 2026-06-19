@@ -2,7 +2,16 @@
 // 导入页面布局和组件 / Import page layout and components
 import DefaultLayout from '@layouts/DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
-import { Form, Input, Button, Textarea, Checkbox, Fieldset, Heading, Link, Radio } from 'accessible-astro-components'
+import {
+  Form,
+  Input,
+  Button,
+  Textarea,
+  Checkbox,
+  Fieldset,
+  Heading,
+  Link,
+} from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 ---
@@ -10,7 +19,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 <DefaultLayout title="Contact" hasHero={true}>
   <!-- 页面头部区域 / Page header section -->
   <PaloPageHeader
-    title="Contact"
+    title="LET'S TALK"
     subtitle="Have a question? Get in touch with us!"
     fullscreen={true}
     contentColor=""
@@ -29,105 +38,73 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
   <!-- 标题区域 / Heading section -->
   <section class="my-16">
     <div class="container">
-      <Heading level="h2">Let's talk</Heading>
+      <Heading level="h2">LET'S TALK</Heading>
     </div>
   </section>
 
   <!-- 联系表单和信息区域 / Contact form and info section -->
   <section class="container">
-    <div class="grid grid-cols-1 gap-32 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-20 md:grid-cols-2">
       <!-- 左侧：联系表单 / Left: Contact form -->
-      <div class="space-content">
+      <div id="contact-form" class="space-content">
         <Form name="contact" action="/thank-you" method="post">
-          <!-- 自定义验证消息的输入框 / Input field with custom validation message -->
+          <!-- 姓名输入框 / Name input -->
           <Input
             name="firstname"
-            label="First name"
+            label="YOUR NAME"
             required
-            data-validation="We need your first name to address you correctly"
             autocomplete="given-name"
           />
 
           <!-- 邮箱输入框 / Email input -->
-          <Input name="email" label="Email address" type="email" required autocomplete="email" />
+          <Input name="email" label="EMAIL ADDRESS" type="email" required autocomplete="email" />
 
-          <!-- 使用正则表达式的自定义验证 / Custom validation with pattern -->
-          <Input name="phone" label="Phone number" type="tel" required data-validation-pattern="^[0-9]{10}$" />
+          <!-- 项目意向多选 / Project intent checkboxes -->
+          <Fieldset name="help-topic" legend="WHAT DO YOU NEED HELP WITH?">
+            <Checkbox name="web-design" value="web" label="Web & Product Design" />
+            <Checkbox name="motion" value="motion" label="Motion Graphics / Video" />
+            <Checkbox name="branding" value="branding" label="Branding & Identity Systems" />
+            <Checkbox name="music" value="music" label="Music / Audio Project" />
+            <Checkbox name="chat" value="chat" label="Just wanting to chat music &amp; code!" />
+          </Fieldset>
 
-          <!-- 多行文本框 / Textarea -->
-          <Textarea name="message" label="Message" required />
-
-          <!-- 带验证的复选框组 / Checkbox group with validation -->
-          <Fieldset
-            name="interests"
-            legend="What are you interested in?"
+          <!-- 项目/想法多行文本框 / Project or idea textarea -->
+          <Textarea
+            name="message"
+            label="YOUR PROJECT OR IDEA"
             required
-            data-validation="Please select at least one area of interest"
-          >
-            <Checkbox name="accessibility" value="a11y" label="Accessibility and inclusive design" />
-            <Checkbox name="wcag-compliance" value="wcag" label="WCAG compliance and testing" />
-            <Checkbox name="screen-reader" value="sr" label="Screen reader optimization" />
-            <Checkbox name="keyboard-nav" value="keyboard" label="Keyboard navigation" />
-          </Fieldset>
-
-          <!-- 单选按钮组 / Radio group -->
-          <Fieldset name="experience" legend="Your experience level" required>
-            <Radio name="experience" value="beginner" label="Beginner" />
-            <Radio name="experience" value="intermediate" label="Intermediate" />
-            <Radio name="experience" value="advanced" label="Advanced" />
-          </Fieldset>
+            placeholder="Tell me about your product goals, budget scope, or timeline..."
+          />
 
           <!-- 提交按钮 / Submit button -->
-          <Button htmlType="submit" type="primary">Send Message</Button>
+          <Button htmlType="submit" type="primary">SUBMIT</Button>
         </Form>
       </div>
 
       <!-- 右侧：联系信息 / Right: Contact info -->
       <div class="space-content">
-        <Heading level="h3">Contact us</Heading>
+        <Heading level="h3">Contact</Heading>
         <p class="text-xl">
-          Experience the power of Accessible Astro Starter's Form components! This contact form showcases our
-          comprehensive form validation system with built-in accessibility features and WCAG 2.2 compliance.
+          Whether it's web, motion, or a full branding system, I build things that work and feel
+          right. Have an idea, a complex product challenge, or just want to talk music and code? Drop
+          a line.
         </p>
-        <p>
-          Our Form component includes automatic validation, proper error handling, semantic HTML structure, and screen
-          reader support. Test out the various input types, validation patterns, and interactive elements to see how
-          accessibility and usability work together seamlessly.
-        </p>
-
-        <!-- 电话号码 / Phone number -->
-        <div class="gap-2xs flex items-center">
-          <Icon aria-hidden="true" name="ph:phone" size={20} class="flex-shrink-0" />
-          <p>
-            <span class="font-bold">Phone:</span>
-            <Link href="tel:+12345678900">+1 (234) 567-8900</Link>
-          </p>
-        </div>
 
         <!-- 邮箱地址 / Email address -->
         <div class="gap-2xs flex items-center">
           <Icon aria-hidden="true" name="ph:envelope" size={20} class="flex-shrink-0" />
           <p>
             <span class="font-bold">Email:</span>
-            <Link href="mailto:hello@accessibleastro.dev">hello@accessibleastro.dev</Link>
+            <Link href="mailto:hello@petepa.com">hello@petepa.com</Link>
           </p>
         </div>
 
-        <!-- 地址信息 / Address info -->
-        <div class="gap-2xs flex items-center">
-          <Icon aria-hidden="true" name="ph:map-pin" size={20} class="flex-shrink-0" />
-          <p>
-            <span class="font-bold">Address:</span>
-            123 Accessibility Lane, Web Standards City
-          </p>
-        </div>
-
-        <!-- 营业时间 / Business hours -->
+        <!-- 工作节奏 / Work rhythm -->
         <div class="gap-2xs flex items-center">
           <Icon aria-hidden="true" name="ph:clock" size={20} class="flex-shrink-0" />
           <p>
-            <span class="font-bold">Business Hours:</span>
-            Monday - Friday, 9:00 AM - 5:00 PM EST
+            <span class="font-bold">Work rhythm:</span>
+            Asynchronous by default. Usually fueled by music and dark mode.
           </p>
         </div>
 
@@ -156,3 +133,64 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     </div>
   </section>
 </DefaultLayout>
+
+<style is:global>
+  /* ── 1. 净化标签：隐藏组件自动渲染的 (required) 标记 ── */
+  #contact-form .input-group label > span:last-child,
+  #contact-form .textarea-group label > span:last-child {
+    display: none;
+  }
+
+  /* ── 2. 物理移除顶部红色 Notification 横幅 ── */
+  #contact-form .notification {
+    display: none !important;
+  }
+
+  /* ── 3. 修复 Textarea 标题与 Placeholder 重合 ── */
+  #contact-form .textarea-group textarea::placeholder {
+    color: transparent;
+    transition: color 0.2s ease;
+  }
+  #contact-form .textarea-group textarea:focus::placeholder {
+    color: color-mix(in oklab, var(--foreground-color) 50%, transparent);
+  }
+
+  /* ── 4. 浮标 label 锚定 input 中心（不依赖容器高度） ── */
+  /*
+   * _form.scss 中 .input-group label { top: 50% } 参照的是
+   * .input-group 容器。报错时 small 变为 display:flex 撑高容器，
+   * 50% 下移 → label 偏离 input 几何中心。
+   *
+   * 修复：在 label 未浮起（非聚焦、无值）时，将 top 改为基于
+   * input 固定高度计算，不再依赖容器百分比。聚焦/有值时由
+   * _form.scss 的 [data-floating-active] / :has(:focus) 接管。
+   */
+  #contact-form .input-group:not([data-floating-active='true']):not(:has(input:focus)) label {
+    inset-block-start: calc(
+      (2.75em + var(--border-width-form, var(--border-width-global, 3px)) * 2 + var(--form-control-radius, var(--radius-s))) / 2
+    );
+  }
+
+  /* ── 5. 报错消息：收紧间距 + 向右圆角位移补偿 ── */
+  /*
+   * - margin-block-start 收紧到极小值，让消息紧贴红框底部
+   * - padding-inline-start 向右偏移，避开 input 边框圆角造成的视觉挤压
+   * - 仅作用于 <small>，不影响 input/internal 任何元素
+   */
+  #contact-form .input-group small,
+  #contact-form .textarea-group small {
+    margin-block-start: 0.1875rem;   /* ≈ mt-0.5，紧贴 input 底部红线 */
+    margin-block-end: 0.25rem;       /* 与下一字段的呼吸间距 */
+    padding-inline-start: 0.5rem;    /* 避开圆角挤压（≈ pl-2） */
+  }
+
+  /* ── 6. 校验图标字体垂直偏移补偿（仅图标 span） ── */
+  /*
+   * 复用 Checkbox 方框的对齐逻辑，只 translate 图标，
+   * 不与 input/父容器产生任何耦合。
+   */
+  #contact-form .input-group small .icon,
+  #contact-form .textarea-group small .icon {
+    translate: 0 var(--font-cap-height-offset, -0.05em);
+  }
+</style>
