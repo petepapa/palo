@@ -196,124 +196,148 @@ const themes: Theme[] = [
 </div>
 
 <script>
-  // Initialize accessibility testing
   function initializeContrastChecker(): void {
-    // Set up WCAG levels for testing
-    const wcagLevels: Array<{ name: string; ratio: number; className: string }> = [
+    const wcagLevels = [
       { name: 'AAA', ratio: 7.0, className: 'excellent' },
       { name: 'AA', ratio: 4.5, className: 'good' },
       { name: 'AA Large', ratio: 3.0, className: 'fair' },
       { name: 'Fail', ratio: 0, className: 'poor' },
     ]
 
-    // Calculate relative luminance for RGB color
     function getLuminance(r: number, g: number, b: number): number {
-      const sRGB: number[] = [r, g, b].map((val) => {
+      const sRGB = [r, g, b].map((val) => {
         val = val / 255
         return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4)
       })
       return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
     }
 
-    // Calculate contrast ratio between two colors
     function getContrastRatio(rgb1: number[], rgb2: number[]): number {
-      const lum1: number = getLuminance(rgb1[0], rgb1[1], rgb1[2])
-      const lum2: number = getLuminance(rgb2[0], rgb2[1], rgb2[2])
-      const lighter: number = Math.max(lum1, lum2)
-      const darker: number = Math.min(lum1, lum2)
-      return (lighter + 0.05) / (darker + 0.05)
+      const lum1 = getLuminance(rgb1[0], rgb1[1], rgb1[2])
+      const lum2 = getLuminance(rgb2[0], rgb2[1], rgb2[2])
+      return (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05)
     }
 
-    // Extract RGB values from a color string
-    function extractRGB(colorStr: string): number[] {
-      const canvas: HTMLCanvasElement = document.createElement('canvas')
-      const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d')
-      if (!ctx) return [0, 0, 0] // Handle null context
-
-      ctx.fillStyle = colorStr
-
-      // Fill a tiny rectangle with the color
-      ctx.fillRect(0, 0, 1, 1)
-
-      // Get the pixel data
-      const data: Uint8ClampedArray = ctx.getImageData(0, 0, 1, 1).data
-      return [data[0], data[1], data[2]]
+    /** 从任意 CSS 颜色字符串中提取 sRGB [r,g,b]，层进式兜底 */
+    function extractSRGB(colorStr: string): [number, number, number] | null {
+      if (!colorStr) return null
+      const s = colorStr.trim()
+      // rgb() / rgba() — 逗号分隔
+      let m = s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
+      if (m) return [Number(m[1]), Number(m[2]), Number(m[3])]
+      // rgb() / rgba() — 空格分隔
+      m = s.match(/rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)/)
+      if (m) return [Number(m[1]), Number(m[2]), Number(m[3])]
+      // hex
+      m = s.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/)
+      if (m) return [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)]
+      m = s.match(/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/)
+      if (m) return [parseInt(m[1]+m[1],16), parseInt(m[2]+m[2],16), parseInt(m[3]+m[3],16)]
+      return null
     }
 
-    // Find which WCAG level a contrast ratio meets
-    function getWCAGLevel(ratio: number): {
-      name: string
-      className: string
-      passes: boolean
-      ratio: string
-    } {
-      for (const level of wcagLevels) {
-        if (ratio >= level.ratio) {
-          const isPass = level.name !== 'Fail'
+    /** 将 CSS 变量表达式（如 "var(--color-info-100)"）强行解析为 sRGB 三通道 */
+    function resolveCSSVarToRGB(cssVarExpr: string): [number, number, number] {
+      // 方法1：注入临时 div 的 backgroundColor，尝试直接读取 computed value
+      const div = document.createElement('div')
+      div.style.cssText = 'position:fixed;top:-9999px;left:-9999px;display:block;'
+      div.style.backgroundColor = cssVarExpr
+      document.body.appendChild(div)
+      div.getBoundingClientRect() // 强制 layout，确保变量求值
 
-          return {
-            name: level.name,
-            className: level.className,
-            passes: isPass,
-            ratio: ratio.toFixed(2),
+      const raw = window.getComputedStyle(div).backgroundColor
+      const direct = extractSRGB(raw)
+      if (direct) {
+        document.body.removeChild(div)
+        return direct
+      }
+
+      // 方法2：部分浏览器对 color 属性的计算值一定会转为 sRGB
+      div.style.color = cssVarExpr
+      const viaColor = extractSRGB(window.getComputedStyle(div).color)
+      if (viaColor) {
+        document.body.removeChild(div)
+        return viaColor
+      }
+
+      // 方法3：canvas 2D fillStyle 兜底（仅支持 sRGB，但可触发浏览器转换）
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = 1; canvas.height = 1
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.fillStyle = raw || cssVarExpr
+          ctx.fillRect(0, 0, 1, 1)
+          const px = ctx.getImageData(0, 0, 1, 1).data
+          if (px[3] > 0) {  // alpha > 0 说明有颜色写入
+            document.body.removeChild(div)
+            return [px[0], px[1], px[2]]
           }
         }
-      }
-      return {
-        name: 'Fail',
-        className: 'poor',
-        passes: false,
-        ratio: ratio.toFixed(2),
-      }
+      } catch (_) { /* canvas 不可用 */ }
+
+      // 终极兜底：记录错误，返回中灰作为明显异常信号
+      console.error(
+        '[ContrastChecker] 无法将 CSS 变量解析为 RGB：',
+        { expr: cssVarExpr, rawComputed: raw, div }
+      )
+      document.body.removeChild(div)
+      return [128, 128, 128]
     }
 
-    // Get accurate computed color by rendering it
-    function getComputedColorValue(element: Element, property: string): string {
-      // Get the computed style
-      const style: CSSStyleDeclaration = window.getComputedStyle(element)
-      return style.getPropertyValue(property)
+    function getWCAGLevel(ratio: number) {
+      for (const level of wcagLevels) {
+        if (ratio >= level.ratio) return { name: level.name, className: level.className, ratio: ratio.toFixed(2) }
+      }
+      return { name: 'Fail', className: 'poor', ratio: ratio.toFixed(2) }
     }
 
-    // Process all color items
     function processColorItems(): void {
-      const colorItems: NodeListOf<Element> = document.querySelectorAll('.color-item')
+      const colorItems = document.querySelectorAll('.color-item')
 
       colorItems.forEach((item) => {
-        // Get the background color
-        const bgColor: string = getComputedColorValue(item, 'background-color')
-        const bgRGB: number[] = extractRGB(bgColor)
+        if (!(item instanceof HTMLElement)) return
 
-        // Get the text color for this theme section
-        const themeTextColor: string = item.getAttribute('data-theme-text-color') || '#1A1A1A'
-        const textRGB: number[] = extractRGB(themeTextColor)
+        const colorVar = item.getAttribute('data-color-var')
+        if (!colorVar) {
+          console.warn('[ContrastChecker] 缺少 data-color-var', item)
+          return
+        }
 
-        // Calculate contrast ratio
-        const contrastRatio: number = getContrastRatio(bgRGB, textRGB)
+        const bgRGB = resolveCSSVarToRGB(`var(${colorVar})`)
+
+        const isDarkPanel = item.closest('[id*="dark-mode"]') !== null || 
+                            item.getAttribute('data-theme-text-color') === '#FFFFFF'
+
+        const targetTextColor = isDarkPanel ? '#FFFFFF' : '#1A1A1A'
+        const nameElement = item.querySelector('.color-name') as HTMLElement
+        if (nameElement) nameElement.style.color = targetTextColor
+
+        const textRGB: [number, number, number] = isDarkPanel ? [255, 255, 255] : [26, 26, 26]
+        const contrastRatio = getContrastRatio(bgRGB, textRGB)
         const result = getWCAGLevel(contrastRatio)
 
-        // Update the contrast score
-        const scoreElement: Element | null = item.querySelector('.contrast-score')
+        const scoreElement = item.querySelector('.contrast-score')
         if (scoreElement) {
           scoreElement.textContent = `${result.ratio} ${result.name}`
           scoreElement.className = `contrast-score ${result.className}`
         }
-
-        // Set the text color for the color name
-        const nameElement: Element | null = item.querySelector('.color-name')
-        if (nameElement && nameElement instanceof HTMLElement) {
-          nameElement.style.color = themeTextColor
-        }
       })
     }
 
-    // Run contrast check when page loads
+    // 事件挂载
     document.addEventListener('astro:page-load', processColorItems)
-
-    // Run contrast check when theme changes
     document.addEventListener('astro:after-swap', processColorItems)
+    
+    // 监控一切可能引发 Tab 切换或主题切换的全局点击
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.closest('[role="tab"]') || target.closest('.darkmode-toggle') || target.closest('[data-action="toggle-dark-mode"]')) {
+        setTimeout(processColorItems, 100)
+      }
+    })
   }
 
-  // Initialize the contrast checker
   initializeContrastChecker()
 </script>
 
@@ -387,32 +411,30 @@ const themes: Theme[] = [
     }
 
     .contrast-score {
-      backdrop-filter: blur(4px);
       border-radius: var(--radius-xs);
-      background-color: rgba(255, 255, 255, 0.25);
       padding: var(--space-2xs) var(--space-3xs);
       font-weight: var(--font-weight-heading, 500);
       font-size: var(--font-size--1);
     }
 
     .excellent {
-      background-color: rgb(9, 126, 87);
-      color: white;
+      background-color: #047857;
+      color: #fff;
     }
 
     .good {
-      background-color: rgb(41, 168, 126);
-      color: black;
+      background-color: #059669;
+      color: #fff;
     }
 
     .fair {
-      background-color: rgb(219, 141, 31);
-      color: black;
+      background-color: #d97706;
+      color: #fff;
     }
 
     .poor {
-      background-color: rgb(221, 39, 54);
-      color: white;
+      background-color: #dc2626;
+      color: #fff;
     }
   }
 </style>
