@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════
+// 强制运行时渲染 —— 禁止 Vercel 构建阶段静态化该路由
+// ═══════════════════════════════════════════════════════════════
+export const prerender = false
+
 import type { APIRoute } from 'astro'
 import { Resend } from 'resend'
 import config from '@config'
@@ -37,11 +42,23 @@ export const POST: APIRoute = async ({ request }) => {
       })
     }
 
-    // ── Initialize Resend ──
-    // Priority: config.yaml → Vercel env (RESEND_API_KEY)
+    // ── Resolve credentials at runtime (every request) ──
+    //
+    // Priority chain:
+    //   1. config.yaml  contact.resendApiKey   (local dev override)
+    //   2. process.env  RESEND_API_KEY          (Vercel runtime, never baked at build)
+    //   3. import.meta.env  RESEND_API_KEY       (Astro/Vite fallback)
+    //
+    // All reads happen inside the handler so Vercel has no chance to
+    // inline empty strings during the static-build phase.
     const contact: ContactConfig | undefined = (config as any).contact
-    const apiKey = contact?.resendApiKey || import.meta.env.RESEND_API_KEY
-    if (!apiKey) {
+    const yamlKey = contact?.resendApiKey || ''
+    const finalApiKey =
+      yamlKey ||
+      (typeof process !== 'undefined' && (process.env as any)?.RESEND_API_KEY) ||
+      (import.meta.env as any).RESEND_API_KEY
+
+    if (!finalApiKey) {
       return new Response(
         JSON.stringify({ error: 'Server misconfigured: missing API key' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } },
@@ -51,7 +68,7 @@ export const POST: APIRoute = async ({ request }) => {
     const receiveEmail = contact?.receiveEmail || 'hello@petepa.com'
     const fromEmail = contact?.resendFromEmail || receiveEmail
 
-    const resend = new Resend(apiKey)
+    const resend = new Resend(finalApiKey)
 
     // ── Build email body ──
     const identityLabel = identity ? IDENTITY_LABELS[identity] || identity : 'Not specified'
