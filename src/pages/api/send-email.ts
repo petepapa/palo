@@ -133,7 +133,7 @@ export const POST: APIRoute = async ({ request }) => {
     '<p><strong>Topics of Interest:</strong></p>',
     `<pre style="margin-left: 1rem; color: #374151;">${sanitize(topicsList || '  • None specified')}</pre>`,
     '<p><strong>Message:</strong></p>',
-    `<blockquote style="margin-left: 1rem; padding-left: 1rem; border-left: 3px solid #d1d5db; color: #374151;">${sanitize(message as string)}</blockquote>`,
+    `<blockquote style="margin-left: 1rem; padding-left: 1rem; border-left: 3px solid #d1d5db; color: #374151; white-space: pre-wrap;">${sanitize(message as string)}</blockquote>`,
     '<hr style="border: 1px solid #e5e7eb; margin-top: 1rem;">',
     '<p style="color: #9ca3af; font-size: 0.875rem;">Sent via Palo Contact Form</p>',
     '</div>',
