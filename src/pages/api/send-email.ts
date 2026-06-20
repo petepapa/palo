@@ -66,10 +66,11 @@ export const POST: APIRoute = async ({ request }) => {
   if (!message || typeof message !== 'string' || !(message as string).trim()) missing.push('message')
 
   if (missing.length > 0) {
-    return new Response(JSON.stringify({ error: 'Missing required fields', fields: missing }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return debugResp('request_fields_validation', {
+      error: `字段校验失败！缺失或无效的字段: [${missing.join(', ')}]`,
+      received_body_keys: Object.keys(body),
+      received_body_json: body,
+    }, 400)
   }
 
   // ═══════════════════════════════════════════════════════════════
