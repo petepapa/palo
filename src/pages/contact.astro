@@ -235,6 +235,100 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     if (form.dataset.paloContactBound === 'true') return
     form.dataset.paloContactBound = 'true'
 
+    // ── Live validation: reward early, punish late ──
+
+    const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+    /**
+     * Semantic-aware live error sync.
+     *
+     * Guards:
+     *  - No prior error → skip entirely (don't punish preemptively).
+     *  - Prior error exists → decide based on current input state:
+     *
+     *    ┌──────────┬───────────────────┬────────────────────────────────┐
+     *    │  Input   │  Action           │  Message                       │
+     *    ├──────────┼───────────────────┼────────────────────────────────┤
+     *    │ empty    │  persist error    │  emptyMsg  (e.g. "required")   │
+     *    │ filled,  │  persist error    │  invalidMsg (e.g. "invalid")   │
+     *    │ invalid  │                   │                                │
+     *    │ valid    │  clear error      │  (removed)                     │
+     *    └──────────┴───────────────────┴────────────────────────────────┘
+     */
+    function syncFieldError(
+      el: HTMLInputElement | HTMLTextAreaElement,
+      regExp: RegExp | null,
+      emptyMsg: string,
+      invalidMsg: string,
+    ) {
+      // Auto-lock: first time we see aria-invalid, permanently tag this field
+      if (el.getAttribute('aria-invalid') === 'true') {
+        el.dataset.hadError = 'true'
+      }
+
+      // Use the permanent lock, not the transient aria-invalid attribute
+      if (el.dataset.hadError !== 'true') return
+
+      const value = el.value
+      const group = el.closest('.input-group, .textarea-group')
+      const msgEl = group?.querySelector<HTMLElement>('.message')
+      if (!msgEl) return
+
+      if (value.trim() === '') {
+        el.setAttribute('aria-invalid', 'true')
+        msgEl.textContent = emptyMsg
+      } else if (regExp && !regExp.test(value)) {
+        el.setAttribute('aria-invalid', 'true')
+        msgEl.textContent = invalidMsg
+      } else {
+        el.setAttribute('aria-invalid', 'false')
+        msgEl.textContent = ''
+      }
+    }
+
+    /** Clear fieldset-level error when at least one option is selected. */
+    function clearFieldsetError(fieldset: HTMLFieldSetElement) {
+      fieldset.setAttribute('aria-invalid', 'false')
+      const msgEl = fieldset.querySelector<HTMLElement>('.message')
+      if (msgEl) msgEl.textContent = ''
+    }
+
+    // ── Input / Textarea: smart sync on every keystroke ──
+    const nameEl = form.querySelector<HTMLInputElement>('input[name="firstname"]')
+    const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
+    const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
+
+    nameEl?.addEventListener('input', () => {
+      syncFieldError(nameEl, null, 'Please enter your name', '')
+    })
+    emailEl?.addEventListener('input', () => {
+      syncFieldError(emailEl, EMAIL_RE, 'Please enter your email address', 'Please enter a valid email address')
+    })
+    msgEl?.addEventListener('input', () => {
+      syncFieldError(msgEl, null, 'Please tell me about your project or idea', '')
+    })
+
+    // ── Radio group: clear fieldset error once any option is selected ──
+    const identityFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="identity"]')
+    const identityRadios = form.querySelectorAll<HTMLInputElement>('input[name="identity"]')
+    identityRadios.forEach((radio) => {
+      radio.addEventListener('change', () => {
+        const checked = form.querySelector<HTMLInputElement>('input[name="identity"]:checked')
+        if (checked && identityFieldset) clearFieldsetError(identityFieldset)
+      })
+    })
+
+    // ── Checkbox group: clear fieldset error on any toggle ──
+    const collabFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="collaboration"]')
+    const collabCheckboxes = form.querySelectorAll<HTMLInputElement>(
+      'input[name="visual"], input[name="web"], input[name="motion"], input[name="audiovisual"], input[name="chat"]',
+    )
+    collabCheckboxes.forEach((cb) => {
+      cb.addEventListener('change', () => {
+        if (collabFieldset) clearFieldsetError(collabFieldset)
+      })
+    })
+
     const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
     const originalBtnText = submitBtn?.textContent || 'SUBMIT'
 
@@ -260,6 +354,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     // Helper: show inline error on a field
     function showFieldError(input: HTMLInputElement | HTMLTextAreaElement, message: string) {
       input.setAttribute('aria-invalid', 'true')
+      input.dataset.hadError = 'true' // permanent lock
       const group = input.closest('.input-group, .textarea-group')
       const msgEl = group?.querySelector<HTMLElement>('.message')
       if (msgEl) msgEl.textContent = message
