@@ -6,7 +6,7 @@ export const prerender = false
 // ── DEBUG MODE ──────────────────────────────────────────────
 // 部署到 Vercel 后如果依然报错，打开下面这行（取消注释）即可
 // 开启前端 debug 返回，上线前请注释回去。
-const DEBUG = true
+const DEBUG = false
 // ─────────────────────────────────────────────────────────────
 
 import type { APIRoute } from 'astro'

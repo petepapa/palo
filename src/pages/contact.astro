@@ -307,32 +307,26 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           body: JSON.stringify(data),
         })
 
-        // ⚠️ 暴力抓取原始文本（不用 .json()，避免非 JSON 响应二次崩溃）
-        const rawText = await res.text()
+        const body = await res.json().catch(() => ({} as Record<string, unknown>))
 
-        // 直接把状态码 + 原始返回塞进红字提示框，肉眼生擒
-        if (msgEl) {
-          showFieldError(msgEl, `[状态码: ${res.status}] ${rawText}`)
-        }
-
-        if (res.ok) {
-          setButtonState('success')
-          setTimeout(() => {
-            window.location.href = '/thank-you'
-          }, 1200)
-        } else {
+        if (!res.ok) {
+          // Graceful error display on the message textarea's inline hint
+          const errMsg =
+            typeof body.error === 'string'
+              ? body.error
+              : 'Something went wrong. Please try again.'
+          if (msgEl) showFieldError(msgEl, errMsg)
           setButtonState('error')
-          setTimeout(() => setButtonState('idle'), 4000)
+          setTimeout(() => setButtonState('idle'), 2500)
+          return
         }
-      } catch (err) {
-        if (msgEl) {
-          showFieldError(
-            msgEl,
-            `[前端捕获网络崩溃] ${err instanceof Error ? err.message : String(err)}`,
-          )
-        }
+
+        // ── Success → redirect to /thank-you ──
+        window.location.href = '/thank-you'
+      } catch {
+        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection and try again.')
         setButtonState('error')
-        setTimeout(() => setButtonState('idle'), 4000)
+        setTimeout(() => setButtonState('idle'), 2500)
       }
     }
   }
