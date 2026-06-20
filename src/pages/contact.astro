@@ -402,15 +402,12 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           body: JSON.stringify(data),
         })
 
-        const body = await res.json().catch(() => ({} as Record<string, unknown>))
+        await res.json().catch(() => {}) // drain the body but never expose it
 
         if (!res.ok) {
-          // Graceful error display on the message textarea's inline hint
-          const errMsg =
-            typeof body.error === 'string'
-              ? body.error
-              : 'Something went wrong. Please try again.'
-          if (msgEl) showFieldError(msgEl, errMsg)
+          // Friendly, sanitised message — never leak backend debug info
+          if (msgEl)
+            showFieldError(msgEl, 'Something went wrong on my end. Please try again later or email directly.')
           setButtonState('error')
           setTimeout(() => setButtonState('idle'), 2500)
           return
