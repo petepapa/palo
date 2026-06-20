@@ -298,8 +298,6 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       const data = collectFormData()
       setButtonState('sending')
 
-      const nameEl = form.querySelector<HTMLInputElement>('input[name="firstname"]')
-      const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
       const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
 
       try {
@@ -309,31 +307,32 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           body: JSON.stringify(data),
         })
 
-        if (!res.ok) {
-          const errBody = await res.json().catch(() => ({}))
-          if (errBody.fields) {
-            ;(errBody.fields as string[]).forEach((field: string) => {
-              if (field === 'name' && nameEl) showFieldError(nameEl, 'This field is required')
-              if (field === 'email' && emailEl) showFieldError(emailEl, 'This field is required')
-              if (field === 'message' && msgEl) showFieldError(msgEl, 'This field is required')
-            })
-          } else {
-            if (msgEl) showFieldError(msgEl, 'Something went wrong. Please try again.')
-          }
-          setButtonState('error')
-          setTimeout(() => setButtonState('idle'), 2500)
-          return
+        // ⚠️ 暴力抓取原始文本（不用 .json()，避免非 JSON 响应二次崩溃）
+        const rawText = await res.text()
+
+        // 直接把状态码 + 原始返回塞进红字提示框，肉眼生擒
+        if (msgEl) {
+          showFieldError(msgEl, `[状态码: ${res.status}] ${rawText}`)
         }
 
-        // ── Success → redirect to /thank-you ──
-        setButtonState('success')
-        setTimeout(() => {
-          window.location.href = '/thank-you'
-        }, 600)
-      } catch {
-        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection and try again.')
+        if (res.ok) {
+          setButtonState('success')
+          setTimeout(() => {
+            window.location.href = '/thank-you'
+          }, 1200)
+        } else {
+          setButtonState('error')
+          setTimeout(() => setButtonState('idle'), 4000)
+        }
+      } catch (err) {
+        if (msgEl) {
+          showFieldError(
+            msgEl,
+            `[前端捕获网络崩溃] ${err instanceof Error ? err.message : String(err)}`,
+          )
+        }
         setButtonState('error')
-        setTimeout(() => setButtonState('idle'), 2500)
+        setTimeout(() => setButtonState('idle'), 4000)
       }
     }
   }
