@@ -13,6 +13,7 @@ import type { APIRoute } from 'astro'
 import { Resend } from 'resend'
 import config from '@config'
 import type { ContactConfig } from '../../types/config'
+import { contactFormConfig } from '../../config/contact-form'
 
 const IDENTITY_LABELS: Record<string, string> = {
   creator: 'Content Creator',
@@ -123,21 +124,38 @@ export const POST: APIRoute = async ({ request }) => {
     .map((t: string) => `  • ${TOPIC_LABELS[t] || t}`)
     .join('\n')
 
-  const htmlBody = [
+  const htmlParts = [
     '<div style="font-family: system-ui, sans-serif; max-width: 600px;">',
     '<h2 style="margin-bottom: 0.5rem;">New Contact Inquiry</h2>',
     '<hr style="border: 1px solid #e5e7eb; margin-bottom: 1rem;">',
     `<p><strong>Name:</strong> ${sanitize(name as string)}</p>`,
     `<p><strong>Email:</strong> ${sanitize(email as string)}</p>`,
-    `<p><strong>Identity:</strong> ${sanitize(identityLabel as string)}</p>`,
-    '<p><strong>Topics of Interest:</strong></p>',
-    `<pre style="margin-left: 1rem; color: #374151;">${sanitize(topicsList || '  • None specified')}</pre>`,
+  ]
+
+  // Only include identity when the section is enabled in config
+  if (contactFormConfig.dynamicSections.identity.enable) {
+    htmlParts.push(
+      `<p><strong>Identity:</strong> ${sanitize(identityLabel as string)}</p>`,
+    )
+  }
+
+  // Only include topics when the section is enabled in config
+  if (contactFormConfig.dynamicSections.collaboration.enable) {
+    htmlParts.push(
+      '<p><strong>Topics of Interest:</strong></p>',
+      `<pre style="margin-left: 1rem; color: #374151;">${sanitize(topicsList || '  • None specified')}</pre>`,
+    )
+  }
+
+  htmlParts.push(
     '<p><strong>Message:</strong></p>',
     `<blockquote style="margin-left: 1rem; padding-left: 1rem; border-left: 3px solid #d1d5db; color: #374151; white-space: pre-wrap;">${sanitize(message as string)}</blockquote>`,
     '<hr style="border: 1px solid #e5e7eb; margin-top: 1rem;">',
     '<p style="color: #9ca3af; font-size: 0.875rem;">Sent via Palo Contact Form</p>',
     '</div>',
-  ].join('\n')
+  )
+
+  const htmlBody = htmlParts.join('\n')
 
   // ── Send via Resend ──
   let data: { id?: string } | null = null
