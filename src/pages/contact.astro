@@ -15,6 +15,9 @@ import {
 } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { contactFormConfig } from '../config/contact-form'
+
+const { fields, dynamicSections } = contactFormConfig
 ---
 
 <DefaultLayout title="Contact" hasHero={true}>
@@ -52,38 +55,38 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           <!-- 姓名输入框 / Name input -->
           <Input
             name="firstname"
-            label="YOUR NAME"
+            label={fields.name.label}
             required
             autocomplete="given-name"
           />
 
           <!-- 邮箱输入框 / Email input -->
-          <Input name="email" label="EMAIL ADDRESS" type="email" required autocomplete="email" />
+          <Input name="email" label={fields.email.label} type="email" required autocomplete="email" />
 
           <!-- 模块 A：身份识别 (单选) / Identity radio group -->
-          <Fieldset name="identity" legend="WHO ARE YOU?">
-            <Radio name="identity" value="creator" label="Content Creator" />
-            <Radio name="identity" value="designer" label="Designer / Artist" />
-            <Radio name="identity" value="musician" label="Musician / Band Leader" />
-            <Radio name="identity" value="dev" label="Passionate Dev" />
-            <Radio name="identity" value="kindred" label="Just a kindred spirit" />
-          </Fieldset>
+          {dynamicSections.identity.enable && (
+            <Fieldset name="identity" legend={dynamicSections.identity.legend}>
+              {dynamicSections.identity.options.map((opt) => (
+                <Radio name="identity" value={opt.value} label={opt.label} />
+              ))}
+            </Fieldset>
+          )}
 
           <!-- 模块 B：协作内容 (多选) / Collaboration checkbox group -->
-          <Fieldset name="collaboration" legend="WHAT'S ON YOUR MIND?">
-            <Checkbox name="visual" value="visual" label="Visual Identity &amp; Branding" />
-            <Checkbox name="web" value="web" label="Interactive Web Experiences" />
-            <Checkbox name="motion" value="motion" label="Motion Typography &amp; Video" />
-            <Checkbox name="audiovisual" value="audiovisual" label="Audio-Visual / Music Project" />
-            <Checkbox name="chat" value="chat" label="Coffee &amp; Late-night chat" />
-          </Fieldset>
+          {dynamicSections.collaboration.enable && (
+            <Fieldset name="collaboration" legend={dynamicSections.collaboration.legend}>
+              {dynamicSections.collaboration.options.map((opt) => (
+                <Checkbox name={opt.value} value={opt.value} label={opt.label} />
+              ))}
+            </Fieldset>
+          )}
 
           <!-- 项目/想法多行文本框 / Project or idea textarea -->
           <Textarea
             name="message"
-            label="YOUR PROJECT OR IDEA"
+            label={fields.message.label}
             required
-            placeholder="Tell me about your product goals, budget scope, or timeline..."
+            placeholder={fields.message.placeholder}
           />
 
           <!-- 提交按钮 / Submit button -->
@@ -231,42 +234,21 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
     const form = document.getElementById('contact-form-element') as HTMLFormElement | null
     if (!form) return
 
-    // Prevent double-binding (Astro view transitions)
     if (form.dataset.paloContactBound === 'true') return
     form.dataset.paloContactBound = 'true'
 
-    // ── Live validation: reward early, punish late ──
-
     const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
-    /**
-     * Semantic-aware live error sync.
-     *
-     * Guards:
-     *  - No prior error → skip entirely (don't punish preemptively).
-     *  - Prior error exists → decide based on current input state:
-     *
-     *    ┌──────────┬───────────────────┬────────────────────────────────┐
-     *    │  Input   │  Action           │  Message                       │
-     *    ├──────────┼───────────────────┼────────────────────────────────┤
-     *    │ empty    │  persist error    │  emptyMsg  (e.g. "required")   │
-     *    │ filled,  │  persist error    │  invalidMsg (e.g. "invalid")   │
-     *    │ invalid  │                   │                                │
-     *    │ valid    │  clear error      │  (removed)                     │
-     *    └──────────┴───────────────────┴────────────────────────────────┘
-     */
+    // 🔒 1. 完美的局部三态同步校验
     function syncFieldError(
       el: HTMLInputElement | HTMLTextAreaElement,
       regExp: RegExp | null,
       emptyMsg: string,
       invalidMsg: string,
     ) {
-      // Auto-lock: first time we see aria-invalid, permanently tag this field
       if (el.getAttribute('aria-invalid') === 'true') {
         el.dataset.hadError = 'true'
       }
-
-      // Use the permanent lock, not the transient aria-invalid attribute
       if (el.dataset.hadError !== 'true') return
 
       const value = el.value
@@ -286,14 +268,13 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       }
     }
 
-    /** Clear fieldset-level error when at least one option is selected. */
     function clearFieldsetError(fieldset: HTMLFieldSetElement) {
       fieldset.setAttribute('aria-invalid', 'false')
       const msgEl = fieldset.querySelector<HTMLElement>('.message')
       if (msgEl) msgEl.textContent = ''
     }
 
-    // ── Input / Textarea: smart sync on every keystroke ──
+    // ⚡ 2. 核心文本字段高频监听
     const nameEl = form.querySelector<HTMLInputElement>('input[name="firstname"]')
     const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
     const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
@@ -308,31 +289,32 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       syncFieldError(msgEl, null, 'Please tell me about your project or idea', '')
     })
 
-    // ── Radio group: clear fieldset error once any option is selected ──
+    // 🎯 3. 单选组自动绑定：通过属性选择器动态查找，零变量依赖
     const identityFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="identity"]')
-    const identityRadios = form.querySelectorAll<HTMLInputElement>('input[name="identity"]')
-    identityRadios.forEach((radio) => {
-      radio.addEventListener('change', () => {
-        const checked = form.querySelector<HTMLInputElement>('input[name="identity"]:checked')
-        if (checked && identityFieldset) clearFieldsetError(identityFieldset)
+    if (identityFieldset) {
+      const identityRadios = identityFieldset.querySelectorAll<HTMLInputElement>('input[type="radio"]')
+      identityRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+          const checked = identityFieldset.querySelector('input[type="radio"]:checked')
+          if (checked) clearFieldsetError(identityFieldset)
+        })
       })
-    })
+    }
 
-    // ── Checkbox group: clear fieldset error on any toggle ──
+    // 🔗 4. 多选组自动绑定：全自动化收集，不论配置如何变动都完美契合
     const collabFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="collaboration"]')
-    const collabCheckboxes = form.querySelectorAll<HTMLInputElement>(
-      'input[name="visual"], input[name="web"], input[name="motion"], input[name="audiovisual"], input[name="chat"]',
-    )
-    collabCheckboxes.forEach((cb) => {
-      cb.addEventListener('change', () => {
-        if (collabFieldset) clearFieldsetError(collabFieldset)
+    if (collabFieldset) {
+      const collabCheckboxes = collabFieldset.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+      collabCheckboxes.forEach((cb) => {
+        cb.addEventListener('change', () => {
+          clearFieldsetError(collabFieldset)
+        })
       })
-    })
+    }
 
     const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
     const originalBtnText = submitBtn?.textContent || 'SUBMIT'
 
-    // Helper: set button state
     function setButtonState(state: 'idle' | 'sending' | 'success' | 'error') {
       if (!submitBtn) return
       submitBtn.disabled = state !== 'idle'
@@ -351,31 +333,18 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       }
     }
 
-    // Helper: show inline error on a field
     function showFieldError(input: HTMLInputElement | HTMLTextAreaElement, message: string) {
       input.setAttribute('aria-invalid', 'true')
-      input.dataset.hadError = 'true' // permanent lock
+      input.dataset.hadError = 'true'
       const group = input.closest('.input-group, .textarea-group')
       const msgEl = group?.querySelector<HTMLElement>('.message')
       if (msgEl) msgEl.textContent = message
     }
 
-    // Helper: collect form data
+    // 🚀 5. 全自动化、零泄露的数据收集器
     function collectFormData(): Record<string, unknown> {
-      const nameEl = form!.querySelector<HTMLInputElement>('input[name="firstname"]')
-      const emailEl = form!.querySelector<HTMLInputElement>('input[name="email"]')
-      const msgEl = form!.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
-
-      const identityRadio = form!.querySelector<HTMLInputElement>(
-        'input[name="identity"]:checked',
-      )
-
-      const topicCheckboxes = form!.querySelectorAll<HTMLInputElement>(
-        'input[name="visual"], input[name="web"], input[name="motion"], input[name="audiovisual"], input[name="chat"]',
-      )
-
-      const topics = Array.from(topicCheckboxes)
-        .filter((cb) => cb.checked)
+      const identityRadio = identityFieldset?.querySelector<HTMLInputElement>('input[type="radio"]:checked')
+      const topics = Array.from(form!.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'))
         .map((cb) => cb.value)
 
       return {
@@ -387,13 +356,10 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
       }
     }
 
-    // ── Override form.submit: js-validate runs client-validation first,
-    //     then calls form.submit() only when all fields pass ──
+    // 🛠️ 6. 拦截默认代理，重写接管表单提交逻辑
     form.submit = async () => {
       const data = collectFormData()
       setButtonState('sending')
-
-      const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
 
       try {
         const res = await fetch('/api/send-email', {
@@ -402,21 +368,18 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
           body: JSON.stringify(data),
         })
 
-        await res.json().catch(() => {}) // drain the body but never expose it
+        await res.json().catch(() => ({}))
 
         if (!res.ok) {
-          // Friendly, sanitised message — never leak backend debug info
-          if (msgEl)
-            showFieldError(msgEl, 'Something went wrong on my end. Please try again later or email directly.')
+          if (msgEl) showFieldError(msgEl, 'Something went wrong on my end. Please try again later.')
           setButtonState('error')
           setTimeout(() => setButtonState('idle'), 2500)
           return
         }
 
-        // ── Success → redirect to /thank-you ──
         window.location.href = '/thank-you'
       } catch {
-        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection and try again.')
+        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection.')
         setButtonState('error')
         setTimeout(() => setButtonState('idle'), 2500)
       }
