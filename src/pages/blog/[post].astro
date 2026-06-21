@@ -23,28 +23,33 @@ const showShareDefault = postHeaderDefaults.showShare ?? true
 
 /**
  * 动态路由：/blog/[post]
- * 
+ *
+ * 关键渲染策略：
+ *   prerender = true  → 构建期静态生成，避免 SSR 下 getStaticPaths 被忽略导致 404 / FOUC
+ *
  * 终极防崩溃架构：
- * 
+ *
  * 第一层防护（Schema 层）：
  *   - imageField 使用 .catch(undefined) 确保图片解析失败不阻断 collection
  *   - 所有字段都有默认值和 catch 兜底
- * 
+ *
  * 第二层防护（路由层）：
  *   - getStaticPaths 只传递纯数据 props（不传递 entry 对象）
  *   - 路由主体用 getEntry() 重新获取完整 entry
  *   - smartRender() 带指数退避重试机制
- * 
+ *
  * 第三层防护（渲染层）：
  *   - render() 失败时显示友好的加载中占位符
  *   - Dev 模式下显示错误详情和重新加载按钮
  *   - 支持客户端自动重试和手动刷新
- * 
+ *
  * 自愈机制：
  *   - 检测到图片加载错误时，自动使用 fallback 图片
  *   - 检测到 Schema 验证错误时，跳过渲染并显示提示
  *   - 支持指数退避重试策略
  */
+
+export const prerender = true
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
