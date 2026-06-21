@@ -13,7 +13,7 @@ import type { APIRoute } from 'astro'
 import { Resend } from 'resend'
 import config from '@config'
 import type { ContactConfig } from '../../types/config'
-import { contactFormConfig } from '../../config/contact-form'
+import { contactFormConfig } from '../../contactForm'
 
 const IDENTITY_LABELS: Record<string, string> = {
   creator: 'Content Creator',

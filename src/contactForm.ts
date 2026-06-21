@@ -60,9 +60,9 @@ export interface ContactFormConfig {
   }
   /** Optional Radio / Checkbox groups that can be toggled or customised. 可开关、可自定义的单选/复选组。 */
   dynamicSections: {
-    /** "Who are you?" Radio group. “你是谁” 单选组。 */
+    /** "Who are you?" Radio group. "你是谁" 单选组。 */
     identity: FieldsetSchema
-    /** "What's on your mind?" Checkbox group. “你想聊什么” 复选组。 */
+    /** "What's on your mind?" Checkbox group. "你想聊什么" 复选组。 */
     collaboration: FieldsetSchema
   }
 }
