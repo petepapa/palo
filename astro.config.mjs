@@ -114,7 +114,7 @@ const integrations = [compress(), icon({ include: { ph: ['*'] } }), mdx()]
 if (siteUrl) integrations.push(sitemap())
 
 export default defineConfig({
-  output: 'server',
+  output: 'static',
   adapter: vercel(),
   compressHTML: true,
   site: siteUrl || undefined,
