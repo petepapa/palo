@@ -231,6 +231,35 @@ const sanitizedSubtitle: string = subtitle
       border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
 
+    /* Fixed background: dividers repainted as pseudo-elements above the background layer */
+    .palo-page-header--background-fixed.palo-page-header--with-divider-top {
+      border-block-start: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-top::before {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: -1px 0 auto 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-bottom {
+      border-block-end: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-bottom::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 0 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
     // 与 PostHeader 保持一致：当 fixedHeader=false 时，
     // 确保慢速网络下内容不被 absolute 定位的导航栏遮挡。
     // 使用 --nav-min-height（静态 CSS 变量），不依赖 JS 执行。
@@ -270,6 +299,13 @@ const sanitizedSubtitle: string = subtitle
       inset: 0;
       inline-size: 100vw;
       block-size: 100vh;
+      z-index: 0;
+    }
+
+    .palo-page-header--background-fixed .palo-page-header__background-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
     }
 
     // 修复：非固定全屏模式外层容器物理高度像素对冲

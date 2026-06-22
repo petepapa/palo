@@ -17,7 +17,7 @@ pageHeader:
     image: ''
     video: '/bg.mp4'
     color: 'red'
-    fixed: ''
+    fixed: 'true'
     overlayOpacity: 0.45
 ---
 

@@ -177,6 +177,35 @@ const sectionStyle = {
       border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
 
+    /* Fixed background: dividers repainted as pseudo-elements above the background layer */
+    .creative-section.has-fixed-background.has-divider-top {
+      border-block-start: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-top::before {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: -1px 0 auto 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-bottom {
+      border-block-end: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-bottom::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 0 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
     /* 全屏显示模式 / Fullscreen display mode */
     .creative-section.is-fullscreen {
       /* 全屏高度覆盖整个视口 / Fullscreen height covers the entire viewport */
@@ -200,6 +229,13 @@ const sectionStyle = {
       inset: 0;
       width: 100vw;
       height: 100vh;
+      z-index: 0;
+    }
+
+    .creative-section.has-fixed-background .section-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
     }
 
     .creative-section.has-fixed-background .bg-image-layer {
