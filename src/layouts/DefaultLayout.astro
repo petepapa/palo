@@ -838,6 +838,34 @@ ${bodyLineHeights}
         a {
           color: var(--link-color);
         }
+
+        /* ── Spacing fallback —— 慢速网络下外部 SCSS 到达前的占位值 ── */
+        :root {
+          --space-xl: clamp(3rem, 2.8696rem + 0.6522vw, 3.375rem);
+          --space-l: clamp(2rem, 1.913rem + 0.4348vw, 2.25rem);
+        }
+
+        /* ── PaloPageHeader 骨架：慢速网络下首屏基础 padding ──
+           放在 @layer base，确保 config.yaml 中 paloPageHeader.class 的
+           pt-* / pb-* / py-* / p-* 工具类（@layer utilities）能覆盖。
+           使用 --nav-min-height 而非 --header-height：前者是静态 CSS 变量，
+           不依赖 JS 执行，第一帧即有正确的顶部空间。 ── */
+        :where(.palo-page-header--standard) {
+          padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+          padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
+        }
+
+        /* ── PaloPageHeader 全屏模式骨架 ── */
+        :where(.section-fullscreen.palo-page-header) {
+          min-height: 100vh;
+          padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+          padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
+        }
+
+        /* ── PaloPageHeader 非固定导航模式：额外的顶部空间 ── */
+        :where(.palo-page-header--needs-header-space) {
+          padding-top: var(--nav-min-height, 4.5rem);
+        }
       }
 
       @layer components {
@@ -847,6 +875,20 @@ ${bodyLineHeights}
           padding-inline: var(--grid-gutter);
           width: min(100%, var(--grid-max-width));
           max-width: var(--grid-max-width);
+        }
+
+        /* ── PaloPageHeader 布局骨架 —— CSS 到达前确保不会贴顶塌陷 ── */
+        .palo-page-header {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          overflow: hidden;
+          background-color: var(--page-header-background-color, var(--background-color));
+        }
+
+        .palo-page-header__content {
+          position: relative;
+          z-index: 2;
         }
 
         /* ── 文章详情页 Grid 布局 —— 防止 TOC 无约束平铺 ── */

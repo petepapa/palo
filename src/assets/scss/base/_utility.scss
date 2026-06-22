@@ -69,7 +69,7 @@
     align-content: var(--page-header-content-align, center);
     justify-content: stretch;
     justify-items: stretch;
-    padding-block-start: calc(var(--header-height, 0px) + var(--page-header-padding-block, var(--space-xl)));
+    padding-block-start: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl)));
     padding-block-end: var(--page-header-padding-block, var(--space-xl));
   }
 

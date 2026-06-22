@@ -43,6 +43,12 @@ interface Props {
 // 📖 从 config.yaml 读取组件全局默认值
 const componentDefaults = config.components?.paloPageHeader ?? {}
 
+// 📖 从 config.yaml 读取导航相关配置（与 PostHeader 保持一致）
+// 用于当 fixedHeader=false 时，确保慢速网络下内容不被导航栏遮挡
+const { navigation, layout } = config
+const fixedHeader = navigation?.fixedHeader ?? layout.fixedHeader ?? false
+const navMinHeight = navigation?.minHeight ?? '4.5rem'
+
 // 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config.yaml 默认值
 const _props = Astro.props as Props
 
@@ -122,6 +128,11 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
 const dominantColor = bgImage ? await getDominantColor(bgImage) : ''
 const bgImageBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
 
+// ── 慢速网络优化：直接计算内联 padding，确保第一帧即有正确的顶部空间 ──
+// 不依赖外部 CSS 文件，避免加载延迟导致的内容贴顶塌陷
+// 策略：只定义 CSS 变量，不直接设置 padding 属性
+// 这样允许 Tailwind utilities（@layer utilities）覆盖默认值
+// 用户可通过 config.yaml 的 class 参数设置 pt-* / pb-* / py-* 来自定义
 const resolvedPageHeaderStyle = [
   pageHeaderStyle,
   bgImageBgStyle,
@@ -129,6 +140,8 @@ const resolvedPageHeaderStyle = [
   `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedAlignH]}`,
   `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedAlignH]}`,
   `--page-header-background-overlay-opacity: ${resolvedBgOverlayOpacity}`,
+  `--page-header-padding-top: calc(${navMinHeight} + var(--page-header-padding-block, var(--space-xl, 3rem)))`,
+  `--page-header-padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem))`,
 ]
   .filter(Boolean)
   .join('; ')
@@ -152,6 +165,7 @@ const sanitizedSubtitle: string = subtitle
     bgFixed && 'palo-page-header--background-fixed',
     (dividerPlacement === 'top' || dividerPlacement === 'both') && 'palo-page-header--with-divider-top',
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'palo-page-header--with-divider-bottom',
+    !fixedHeader && 'palo-page-header--needs-header-space',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={resolvedPageHeaderStyle || undefined}
@@ -175,12 +189,14 @@ const sanitizedSubtitle: string = subtitle
 </section>
 
 <style lang="scss">
-  // 默认 padding（含 header-height 补偿）：放在 @layer base，
+  // 默认 padding（含导航栏补偿）：放在 @layer base，
   // 使其优先级低于 Tailwind 在 @layer utilities 中的 pt-、pb-、py-、p- 工具类
+  // 使用 --nav-min-height 而非 --header-height：前者是静态 CSS 变量，
+  // 不依赖 JS 执行，慢速网络下第一帧即有正确的顶部空间。
   @layer base {
     :where(.palo-page-header--standard) {
-      padding-top: calc(var(--header-height, 0px) + var(--space-xl));
-      padding-bottom: var(--space-xl);
+      padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+      padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
     }
   }
 
@@ -213,6 +229,13 @@ const sanitizedSubtitle: string = subtitle
 
     .palo-page-header--with-divider-bottom {
       border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    // 与 PostHeader 保持一致：当 fixedHeader=false 时，
+    // 确保慢速网络下内容不被 absolute 定位的导航栏遮挡。
+    // 使用 --nav-min-height（静态 CSS 变量），不依赖 JS 执行。
+    .palo-page-header--needs-header-space {
+      padding-block-start: var(--nav-min-height, 4.5rem);
     }
 
     .palo-page-header > .container {
