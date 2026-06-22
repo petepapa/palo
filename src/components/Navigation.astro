@@ -20,6 +20,7 @@ const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightSca
 const navDesktopDropdownLineHeightScale = themeConfig.navigation?.desktopDropdownLineHeightScale ?? 1
 const navMobileDropdownLineHeightScale = themeConfig.navigation?.mobileDropdownLineHeightScale ?? 1
 const launcherGradientBorder = site.launcher === 'gradientBorder'
+
 const navStyle = [
   navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
   `--navigation-main-menu-line-height-scale: ${navMainMenuLineHeightScale}`,
@@ -35,6 +36,7 @@ const navStyle = [
   class=""
   data-nav-active-style={navActiveStyle}
   data-dropdown-desktop-color-mode={navDropdownDesktopColorMode}
+  data-dropdown-color-mode-config={navDropdownDesktopColorMode}
   style={navStyle}
 >
   <div class="container">
@@ -66,6 +68,12 @@ const navStyle = [
 </div>
 
 <script>
+  // 从 data 属性读取原始 dropdownColorMode 配置（inverse 或 theme）
+  const getDropdownColorMode = () => {
+    const mainNav = document.querySelector('#main-navigation')
+    return mainNav?.dataset.dropdownColorModeConfig || 'theme'
+  }
+
   document.addEventListener('astro:page-load', () => {
     // variables
     const mainNav = document.querySelector('#main-navigation') as HTMLElement | null
@@ -189,7 +197,34 @@ const navStyle = [
       }
     }
 
-    // execution
+    const updateDropdownColorMode = (): void => {
+      const header = document.querySelector('header') as HTMLElement | null
+      const dropdownColorMode = getDropdownColorMode()
+
+      // 页面到顶且有 topNavigationTheme：使用用户设置的主题
+      // 滚动后或无主题：使用系统主题
+      const headerTheme = header?.dataset.topNavigationTheme
+      const isDarkmode = document.documentElement.classList.contains('darkmode')
+      const currentTheme = headerTheme || (isDarkmode ? 'dark' : 'light')
+
+      // 计算下拉菜单应该使用的颜色模式
+      let computedMode = dropdownColorMode
+      if (dropdownColorMode === 'inverse') {
+        // inverse: 与当前导航主题相反
+        // inverse-dark = 白底黑字（对 dark 取反）
+        // inverse-light = 黑底白字（对 light 取反）
+        computedMode = currentTheme === 'dark' ? 'inverse-dark' : 'inverse-light'
+      }
+
+      mainNav.setAttribute('data-dropdown-desktop-color-mode', computedMode)
+    }
+
+    updateDropdownColorMode()
+    window.addEventListener('astro:page-load', updateDropdownColorMode)
+    window.addEventListener('astro:after-swap', updateDropdownColorMode)
+    // 监听 Header 主题变化事件，实时更新下拉菜单样式
+    window.addEventListener('palo:header-theme-change', updateDropdownColorMode)
+
     mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
       const list = dropdownList as HTMLUListElement
       list.hidden = true
@@ -555,6 +590,36 @@ const navStyle = [
           --text-decoration-color: var(--color-neutral-700);
           --outline-color: var(--color-outline-200);
           color-scheme: light;
+        }
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse-dark'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
+          color-scheme: light;
+        }
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse-light'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
+          color-scheme: dark;
         }
       }
 

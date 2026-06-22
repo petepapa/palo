@@ -43,15 +43,18 @@ interface Props {
 // 📖 从 config.yaml 读取组件全局默认值
 const componentDefaults = config.components?.paloPageHeader ?? {}
 
-// 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config 默认值
+// 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config.yaml 默认值
 const _props = Astro.props as Props
 
 const className = _props.class || componentDefaults.class || ''
 const title = _props.title
 const subtitle = _props.subtitle
-const fullscreen = _props.fullscreen ?? false
+// ⚡ 布尔解析：支持 boolean/string，未设置或空串回退到 config 默认值
+const isFullscreenExplicitFalse = _props.fullscreen === false || _props.fullscreen === 'false'
+const hasFullscreenProp = _props.fullscreen !== undefined && _props.fullscreen !== null && _props.fullscreen !== ''
+const fullscreen = isFullscreenExplicitFalse ? false : (hasFullscreenProp ? Boolean(_props.fullscreen) : Boolean(componentDefaults.fullscreen))
 const contentColor = _props.contentColor || ''
-const topNavigationTheme = _props.topNavigationTheme || ''
+const topNavigationTheme = _props.topNavigationTheme || componentDefaults.topNavigationTheme || ''
 
 // ⚡ 空字符串拦截：当 Astro 传入空 string 时视为未设置，回退至 config.yaml 默认值
 function resolveStringProp<T>(prop: any, configDefault: T, fallback: T): T {

@@ -267,6 +267,9 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
       } else {
         delete header.dataset.topNavigationTheme
       }
+
+      // 派发自定义事件，通知下拉菜单更新样式
+      window.dispatchEvent(new CustomEvent('palo:header-theme-change'))
     }
 
     window.__paloHeaderScrollController?.abort()

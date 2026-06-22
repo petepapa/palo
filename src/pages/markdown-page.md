@@ -6,7 +6,7 @@ toc: true
 narrow: false
 
 pageHeader:
-  fullscreen: ''
+  fullscreen: ''  # 空字符串 → 回退到 config.yaml 的全局默认值
   contentColor: '#fff'
   topNavigationTheme: 'dark'
   divider: ''
