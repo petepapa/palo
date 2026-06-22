@@ -10,8 +10,8 @@ pageHeader:
   contentColor: '#fff'
   topNavigationTheme: 'dark'
   divider: ''
-  alignV: bottom
-  alignH: left
+  alignV: 
+  alignH: 
   bg:
     image: ''
     video: '/bg.mp4'
