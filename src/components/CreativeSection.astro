@@ -110,27 +110,16 @@ const sectionStyle = {
   ]}
   style={sectionStyle}
 >
-  <!-- 层 1: 视频或图片媒体背景 / Layer 1: Video or image background media -->
-  {backgroundVideo && (
+  <!-- 层 1: 背景媒体（图片垫底 + 视频覆盖）/ Layer 1: Background media (image fallback + video overlay) -->
+  {(backgroundImage || backgroundVideo) && (
     <div class="media-container" aria-hidden="true" tabindex="-1">
-      <video
-        autoplay
-        loop
-        muted
-        playsinline
-        class="background-media"
-      >
-        <source src={resolvedBackgroundVideo} type="video/mp4" />
-      </video>
+      {backgroundImage && <div class="bg-image-layer" />}
+      {backgroundVideo && (
+        <video autoplay loop muted playsinline class="background-media">
+          <source src={resolvedBackgroundVideo} type="video/mp4" />
+        </video>
+      )}
     </div>
-  )}
-
-  {!backgroundVideo && backgroundImage && (
-    <div 
-      class="media-container bg-image-layer" 
-      aria-hidden="true" 
-      tabindex="-1"
-    ></div>
   )}
 
   <!-- 层 2: 可配置半透明遮罩 (当存在背景视频或图片时启用) / Layer 2: Configurable semi-transparent backdrop overlay (enabled when video or image background is present) -->
@@ -243,14 +232,20 @@ const sectionStyle = {
     }
 
     .background-media {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       width: 100%;
       height: 100%;
       object-fit: cover;
       object-position: center;
     }
 
-    /* 背景图特殊处理：防止网络慢时背景出现空白抖动 / Background image styling: prevents white block flashing during slow network loads */
+    /* 背景图垫底层：视频加载前作为占位 / Background image fallback: placeholder while video loads */
     .bg-image-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
       background-image: var(--section-bg-image);
       background-size: cover;
       background-position: center;

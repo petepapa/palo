@@ -170,14 +170,15 @@ const sanitizedSubtitle: string = subtitle
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={resolvedPageHeaderStyle || undefined}
 >
-  {bgVideo && (
+  {(bgImage || bgVideo) && (
     <div class="palo-page-header__background-media" aria-hidden="true">
-      <video class="palo-page-header__background-video" src={resolvedBgVideo} autoplay muted loop playsinline />
+      {bgImage && (
+        <div class="palo-page-header__background-image" style={bgImageBgStyle}></div>
+      )}
+      {bgVideo && (
+        <video class="palo-page-header__background-video" src={resolvedBgVideo} autoplay muted loop playsinline />
+      )}
     </div>
-  )}
-
-  {!bgVideo && bgImage && (
-    <div class="palo-page-header__background-media palo-page-header__background-image" aria-hidden="true" style={bgImageBgStyle}></div>
   )}
 
   {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
@@ -322,6 +323,9 @@ const sanitizedSubtitle: string = subtitle
     }
 
     .palo-page-header__background-video {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
@@ -329,6 +333,9 @@ const sanitizedSubtitle: string = subtitle
     }
 
     .palo-page-header__background-image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
       background-image: var(--page-header-background-image, none);
       background-position: center;
       background-size: cover;

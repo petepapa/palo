@@ -111,13 +111,14 @@ const heroStyle = [
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={heroStyle || undefined}
 >
-  {backgroundVideo && (
+  {(backgroundImage || backgroundVideo) && (
     <div class="hero__background-media" aria-hidden="true">
-      <video class="hero__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
+      {backgroundImage && <div class="hero__background-image" />}
+      {backgroundVideo && (
+        <video class="hero__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
+      )}
     </div>
   )}
-
-  {!backgroundVideo && backgroundImage && <div class="hero__background-media hero__background-image" aria-hidden="true"></div>}
 
   {(backgroundVideo || backgroundImage) && <div class="hero__background-overlay" aria-hidden="true"></div>}
 
@@ -214,6 +215,9 @@ const heroStyle = [
     }
 
     .hero__background-video {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
@@ -221,6 +225,9 @@ const heroStyle = [
     }
 
     .hero__background-image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
       background-image: var(--hero-background-image, none);
       background-position: center;
       background-size: cover;
