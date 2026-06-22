@@ -15,7 +15,7 @@ const pageHeaderBg = pageHeader?.bg ?? {}
 <DefaultLayout
   title={frontmatter.title}
   description={frontmatter.description}
-  hasHero={!!(frontmatter.pageHeader?.fullscreen)}
+  hasHero={!!pageHeader}
   {...(frontmatter.image ? { image: frontmatter.image } : {})}
   {...(frontmatter.author ? { author: frontmatter.author } : {})}
   {...(frontmatter.type ? { type: frontmatter.type } : {})}

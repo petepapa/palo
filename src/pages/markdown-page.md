@@ -6,17 +6,17 @@ toc: true
 narrow: false
 
 pageHeader:
-  fullscreen: true
+  fullscreen: ''
   contentColor: '#fff'
   topNavigationTheme: 'dark'
-  divider: true
+  divider: ''
   alignV: bottom
   alignH: left
   bg:
     image: ''
     video: '/bg.mp4'
     color: 'red'
-    fixed: true
+    fixed: ''
     overlayOpacity: 0.45
 ---
 

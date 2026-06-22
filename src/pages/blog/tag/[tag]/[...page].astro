@@ -142,7 +142,7 @@ if (pageConfig.showTags) {
 }
 ---
 
-<DefaultLayout title={resolvedMetaDescription ? `${resolvedMetaTitle} - ${resolvedMetaDescription}` : resolvedMetaTitle} description={resolvedMetaDescription}>
+<DefaultLayout title={resolvedMetaDescription ? `${resolvedMetaTitle} - ${resolvedMetaDescription}` : resolvedMetaTitle} description={resolvedMetaDescription} hasHero={true}>
   <PaloPageHeader
     title={`Blog: ${currentTag.label}`}
     subtitle={`Showing ${page.total} post${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/blog')}">View all posts</a> or filter by other tags below.`}

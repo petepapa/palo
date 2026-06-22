@@ -138,7 +138,7 @@ const pageHeading = `${currentType.label} Projects`
 const pageSubtitle = `${currentType.description} <a href="/portfolio">View all projects</a>.`
 ---
 
-<DefaultLayout title={resolvedMetaTitle} description={resolvedMetaDescription}>
+<DefaultLayout title={resolvedMetaTitle} description={resolvedMetaDescription} hasHero={true}>
   <PaloPageHeader title={pageHeading} subtitle={pageSubtitle} {...pageHeader} />
 
   <section class="my-12">

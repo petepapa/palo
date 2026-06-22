@@ -143,7 +143,7 @@ border:
   media: '0'                  # 图片/媒体描边
   surface: '0.1rem'           # 下拉菜单、面板等容器
   codeBlock: '0'              # 代码块描边
-  divider: '0.075rem'         # 分隔线线宽
+  divider: '10.075rem'         # 分隔线线宽
 
 
 # ╔══════════════════════════════════════════════════════════════╗
@@ -181,7 +181,7 @@ components:
     descClass: "text-lg"  # 描述文字的 Tailwind 类名
     alignV: "center"      # 垂直对齐方式: center (居中) | top (靠顶) | bottom (靠底)
     alignH: "left"        # 水平对齐方式: left (靠左) | center (居中) | right (靠右)
-    divider: "bottom"     # 装饰分割线位置: bottom | top | none
+    divider: "top"     # 装饰分割线位置: bottom | top | none
 
   # 📄 所有内容详情页头部总控 (穿透应用于所有的 Single Post 文章页与 Single Project 作品详情页)
   postHeader:

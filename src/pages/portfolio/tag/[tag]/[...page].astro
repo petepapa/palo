@@ -140,7 +140,7 @@ const resolvedMetaTitle = pageConfig.metaTitle || `Portfolio - ${currentTag.labe
 const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered by ${currentTag.label} tag. Discover our work in ${currentTag.label} and related technologies.`
 ---
 
-<DefaultLayout title={resolvedMetaTitle} description={resolvedMetaDescription}>
+<DefaultLayout title={resolvedMetaTitle} description={resolvedMetaDescription} hasHero={true}>
   <PaloPageHeader
     title={`Portfolio: ${currentTag.label}`}
     subtitle={`Showing ${page.total} project${page.total !== 1 ? 's' : ''} tagged with "${currentTag.label}". <a href="${ensureTrailingSlash('/portfolio')}">View all projects</a> or filter by other tags below.`}
