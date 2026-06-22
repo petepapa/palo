@@ -224,6 +224,15 @@ const navStyle = [
     window.addEventListener('astro:after-swap', updateDropdownColorMode)
     // 监听 Header 主题变化事件，实时更新下拉菜单样式
     window.addEventListener('palo:header-theme-change', updateDropdownColorMode)
+    // 监听主题切换（darkmode 类变化），实时更新下拉菜单样式
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          updateDropdownColorMode()
+        }
+      })
+    })
+    observer.observe(document.documentElement, { attributes: true })
 
     mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
       const list = dropdownList as HTMLUListElement
