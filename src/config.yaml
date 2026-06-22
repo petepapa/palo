@@ -69,7 +69,7 @@ branding:
 
 navigation:
   # ── 固定顶栏 / Sticky Header ─────────────────────────────────
-  fixedHeader: false              # 固定顶部，滚动时始终可见
+  fixedHeader: true              # 固定顶部，滚动时始终可见
   minHeight: '6rem'               # 导航栏最小高度
   headerBackgroundOpacity: 0.45   # 背景透明度（0 全透明 → 1 不透明）
   headerBackgroundBlur: 10px      # 背景模糊（0 = 关闭）

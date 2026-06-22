@@ -9,6 +9,10 @@ import config from '@config'
 import { getDominantColor } from '@utils/imageColor'
 import defaultCover from '../assets/images/posts/default.png'
 
+const { navigation, layout } = config
+const fixedHeader = navigation?.fixedHeader ?? layout.fixedHeader ?? false
+const navMinHeight = navigation?.minHeight ?? '4.5rem'
+
 type Author = {
   name: string
   image: string
@@ -142,6 +146,7 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
     'post-header',
     (dividerPlacement === 'top' || dividerPlacement === 'both') && 'post-header--with-divider-top',
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'post-header--with-divider-bottom',
+    !fixedHeader && 'post-header--needs-header-space',
   ]}
 >
   {isCoverImageTop && (
@@ -300,6 +305,10 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
 
       &--with-divider-bottom {
         border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+      }
+
+      &--needs-header-space {
+        padding-block-start: var(--nav-min-height, 6rem);
       }
 
       @media (max-width: 768px) {
