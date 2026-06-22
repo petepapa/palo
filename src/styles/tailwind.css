@@ -2,7 +2,7 @@
 
 @import 'tailwindcss' source(none);
 
-@source '../../src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}';
+@source '../../src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue,yaml,yml,json}';
 @custom-variant dark (&:where(.darkmode, .darkmode *));
 
 @theme {

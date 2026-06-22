@@ -46,7 +46,7 @@ const componentDefaults = config.components?.paloPageHeader ?? {}
 // 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config 默认值
 const _props = Astro.props as Props
 
-const className = _props.class
+const className = _props.class || componentDefaults.class || ''
 const title = _props.title
 const subtitle = _props.subtitle
 const fullscreen = _props.fullscreen ?? false
@@ -64,7 +64,9 @@ const alignH: string = resolveStringProp(_props.alignH, componentDefaults.alignH
 const headingLevel = _props.headingLevel || componentDefaults.headingLevel || 'h1'
 const descClass = _props.descClass || componentDefaults.descClass || 'text-lg'
 const bg = _props.bg ?? {}
-const useContainer = _props.useContainer ?? true
+// ⚡ 布尔解析：仅 boolean false / string 'false' 为关闭，undefined/null/空串回退到 config 默认值
+const isExplicitFalse = _props.useContainer === false || _props.useContainer === 'false'
+const useContainer = isExplicitFalse ? false : (componentDefaults.useContainer ?? true)
 
 const bgImage = bg.image ?? ''
 const bgVideo = bg.video ?? ''
@@ -163,13 +165,22 @@ const sanitizedSubtitle: string = subtitle
 
   {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
 
-  <div class:list={['palo-page-header__content', 'space-content', useContainer && 'container']}>
+  <div class:list={['palo-page-header__content', 'space-content', useContainer ? 'container' : 'palo-page-header__content--no-container']}>
     <Heading level={headingLevel}>{title}</Heading>
     {sanitizedSubtitle && <p class={descClass} set:html={sanitizedSubtitle} />}
   </div>
 </section>
 
 <style lang="scss">
+  // 默认 padding（含 header-height 补偿）：放在 @layer base，
+  // 使其优先级低于 Tailwind 在 @layer utilities 中的 pt-、pb-、py-、p- 工具类
+  @layer base {
+    :where(.palo-page-header--standard) {
+      padding-top: calc(var(--header-height, 0px) + var(--space-xl));
+      padding-bottom: var(--space-xl);
+    }
+  }
+
   @layer components {
     .palo-page-header {
       position: relative;
@@ -191,8 +202,6 @@ const sanitizedSubtitle: string = subtitle
       align-content: var(--page-header-content-align, center);
       justify-content: stretch;
       justify-items: stretch;
-      padding-block-start: calc(var(--header-height, 0px) + var(--space-xl));
-      padding-block-end: var(--space-xl);
     }
 
     .palo-page-header--with-divider-top {
@@ -210,6 +219,15 @@ const sanitizedSubtitle: string = subtitle
       inline-size: 100%;
       max-width: none;
       max-inline-size: none;
+    }
+
+    .palo-page-header__content--no-container {
+      position: relative;
+      z-index: 2;
+      padding-inline: var(--grid-gutter, 1.5rem);
+      width: 100%;
+      inline-size: 100%;
+      box-sizing: border-box;
     }
 
     .palo-page-header__background-media {

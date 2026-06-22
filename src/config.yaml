@@ -182,6 +182,8 @@ components:
     alignV: "center"      # 垂直对齐方式: center (居中) | top (靠顶) | bottom (靠底)
     alignH: "left"        # 水平对齐方式: left (靠左) | center (居中) | right (靠右)
     divider: "bottom"     # 装饰分割线位置: bottom | top | none
+    useContainer: true    # 是否默认使用 container 包裹内容区
+    class: "bg-info text-neutral-100"             # 默认添加到组件根元素的自定义 CSS 类名
 
   # 📄 所有内容详情页头部总控 (穿透应用于所有的 Single Post 文章页与 Single Project 作品详情页)
   postHeader:

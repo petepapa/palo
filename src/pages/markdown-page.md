@@ -12,6 +12,7 @@ pageHeader:
   divider: ''
   alignV: 
   alignH: 
+  useContainer: ''
   bg:
     image: ''
     video: '/bg.mp4'
