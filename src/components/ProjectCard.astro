@@ -43,7 +43,7 @@ const mediaBgStyle = `background-color: ${dominantColor}; ${aspectStyle}`
   style={aspectStyle}
   aria-label={`View project: ${project.data.title}`}
 >
-  <span class="project-card__media" aria-hidden="true" style={`background-color: ${dominantColor}`}>
+  <span class="project-card__media" aria-hidden="true" style={`background-color: ${dominantColor}; aspect-ratio: var(--project-card-aspect-ratio, 8 / 5);`}>
     <ContentImage src={image} alt="" width={1200} height={900} class="project-card__image" fadeIn={true} bgColor={dominantColor} />
   </span>
   <span class="project-card__content">

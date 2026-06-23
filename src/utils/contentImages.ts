@@ -119,13 +119,17 @@ function resolveImageFromGlob(
     const normalizedImagePath = imagePath.replace(/^\.\//, '')
     const basePath = collection === 'posts' ? 'posts' : 'projects'
 
-    const contentDir = contentId.includes('/')
+    // 只有当 contentId 包含路径分隔符时才提取目录部分
+    // 例如：project-01/index → 目录是 project-01
+    //       project-02 → 没有子目录，目录为 null
+    const hasSubdirectory = contentId.includes('/')
+    const contentDir = hasSubdirectory
       ? contentId.substring(0, contentId.lastIndexOf('/'))
-      : contentId.replace(/\.(md|mdx)$/, '')
+      : null
 
     const fsPath = contentDir
       ? `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
-      : `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
+      : `/src/content/${basePath}/${normalizedImagePath}`
 
     return allGlobImages[fsPath] ?? null
   }

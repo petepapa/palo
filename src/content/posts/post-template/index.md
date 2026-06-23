@@ -11,7 +11,7 @@ author:
   bio: "PetePa.com"
 
 # Visual Assets & Layouts / 视觉资产与排版样式
-coverImage: ./cover.jpg      # Optional: Uncomment and provide path if needed / 可选：需要封面时再取消注释
+# coverImage: ./cover.jpg      # Optional: Uncomment and provide path if needed / 可选：需要封面时再取消注释
 coverImagePosition: ""
 
 # Feature Toggles / 极简功能开关 (Removed 'show' prefix)
