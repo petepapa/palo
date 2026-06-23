@@ -19,7 +19,7 @@ type Author = {
   bio: string
 }
 
-type DividerPlacement = boolean | 'top' | 'both' | 'bottom'
+type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
 
 type CoverImagePosition = boolean | 'top' | 'head' | 'bottom'
 
@@ -84,8 +84,8 @@ const liveDemo = _props.liveDemo
 const rawBreadcrumbs = _props.breadcrumbs ?? postHeaderDefaults.showBreadcrumbs ?? true
 const breadcrumbs = preferConfigOverZodCatch(rawBreadcrumbs, postHeaderDefaults.showBreadcrumbs, true)
 
-const rawDivider = resolveStringProp(_props.divider, postHeaderDefaults.divider, true) as boolean | 'top' | 'both' | 'bottom'
-const divider = preferConfigOverZodCatch(rawDivider, postHeaderDefaults.divider, true)
+const rawDivider = resolveStringProp(_props.divider, postHeaderDefaults.divider, 'both') as DividerPlacement
+const divider = preferConfigOverZodCatch(rawDivider, postHeaderDefaults.divider, 'both')
 
 const rawCoverImagePosition = resolveStringProp(_props.coverImagePosition, postHeaderDefaults.coverImagePosition, 'head') as boolean | 'top' | 'head' | 'bottom'
 const coverImagePosition = preferConfigOverZodCatch(rawCoverImagePosition, postHeaderDefaults.coverImagePosition, 'head')
@@ -104,8 +104,8 @@ const formatSegment = (segment: string): string => {
     .join(' ')
 }
 
-const resolveDividerPlacement = (value: DividerPlacement = true): 'top' | 'both' | 'bottom' | false => {
-  if (value === false) return false
+const resolveDividerPlacement = (value: DividerPlacement = 'both'): 'top' | 'both' | 'bottom' | 'none' => {
+  if (value === 'none' || value === '') return 'none'
   if (value === 'top') return 'top'
   if (value === 'both') return 'both'
   return 'bottom'

@@ -333,7 +333,7 @@ const paloPageHeaderConfigSchema = z
   .object({
     headingLevel: z.string().optional(),
     descClass: z.string().optional(),
-    divider: z.enum(['bottom', 'top', 'none']).optional(),
+    divider: z.enum(['top', 'bottom', 'both', 'none']).optional(),
   })
   .strip()
 
@@ -344,7 +344,7 @@ const postHeaderConfigSchema = z
     coverImagePosition: z.enum(['head', 'background', 'side']).optional(),
     showBreadcrumbs: z.boolean().optional(),
     showShare: z.boolean().optional(),
-    divider: z.enum(['bottom', 'top', 'none']).optional(),
+    divider: z.enum(['top', 'bottom', 'both', 'none']).optional(),
   })
   .strip()
 
