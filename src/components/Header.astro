@@ -81,18 +81,27 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
     flex-shrink: 0;
   }
 
-  .logo-link .logo-image {
-    /* 不设置 display——交由 Logo.astro 的 layered CSS 控制明暗切换 */
+  .logo-link .logo-svg,
+  .logo-link .logo-raster {
+    /* display 交由 Logo.astro 的 @layer overrides CSS 控制明暗切换 */
     width: auto;
-    height: 40px;
-    block-size: 40px;
+    height: var(--logo-size, 40px);
+    block-size: var(--logo-size, 40px);
     max-inline-size: 100%;
     background-color: transparent;
   }
 
+  /* 内联 SVG 首帧尺寸刚性——在 layered CSS 到达前防止布局塌陷 */
+  .logo-link .logo-svg svg {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+
   /* ── 6. 文本 Logo 备用样式 ── */
   .logo-link .logo-text {
-    font-size: 40px;
+    font-size: var(--logo-size, 40px);
     line-height: 1;
     text-transform: none;
     white-space: nowrap;

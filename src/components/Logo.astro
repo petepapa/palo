@@ -1,103 +1,228 @@
 ---
 import { Link } from 'accessible-astro-components'
 import themeConfig from '@config'
-import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getLogoSvg, isSvgPath, isRasterPath } from '@utils/logoInline'
 
 /**
- * Logo Component
+ * Logo Component — Build-Time SVG Inline Edition
  *
- * @description Logo description
+ * Three mutually exclusive rendering channels:
+ *  1. SVG inline  —  <div set:html="…">  with pure-CSS dark/light swap
+ *  2. Raster <img> —  traditional <img> fallback for PNG/JPG/WEBP
+ *  3. Text <span>  —  site-name fallback when no logo paths are set
+ *
+ * Dark/light switching is handled entirely by CSS (zero JS):
+ *  - Default:        light variant visible
+ *  - .darkmode:      dark  variant visible
+ *  - header[data-top-navigation-theme="light"]: light forced
+ *  - header[data-top-navigation-theme="dark"]:  dark  forced
+ *
+ * When only ONE logo is configured no modifier class is applied,
+ * so the single logo is always visible regardless of theme.
  */
-const logoLight = themeConfig.branding.logoLight ? `/${themeConfig.branding.logoLight.replace(/^\//, '')}` : ''
-const logoDark = themeConfig.branding.logoDark ? `/${themeConfig.branding.logoDark.replace(/^\//, '')}` : ''
-const hasImageLogo = Boolean(logoLight || logoDark)
+
+const { branding, site } = themeConfig
+
+const logoLight = (branding.logoLight || '').trim()
+const logoDark = (branding.logoDark || '').trim()
+const logoSize = branding.logoSize || '40px'
+const siteName = site.name
+
+const hasLight = !!logoLight
+const hasDark = !!logoDark
+const hasAnyLogo = hasLight || hasDark
+
+// ── Format classification ────────────────────────────────────────────
+const lightIsSvg = hasLight && isSvgPath(logoLight)
+const darkIsSvg = hasDark && isSvgPath(logoDark)
+const lightIsRaster = hasLight && !lightIsSvg && isRasterPath(logoLight)
+const darkIsRaster = hasDark && !darkIsSvg && isRasterPath(logoDark)
+
+// ── Build-time SVG preload ───────────────────────────────────────────
+const lightSvgContent = lightIsSvg ? getLogoSvg(logoLight) : null
+const darkSvgContent = darkIsSvg ? getLogoSvg(logoDark) : null
+
+// ── Raster asset URLs ────────────────────────────────────────────────
+const lightAssetUrl = hasLight && !lightIsSvg ? `/${logoLight.replace(/^\//, '')}` : ''
+const darkAssetUrl = hasDark && !darkIsSvg ? `/${logoDark.replace(/^\//, '')}` : ''
+
+// CSS custom property for sizing (shared by all three channels)
+const logoStyle = `--logo-size: ${logoSize};`
+
+/**
+ * Helper: determine the class for a logo slot.
+ *
+ * When BOTH light and dark are configured we apply a modifier
+ * ("--light" / "--dark") so the CSS swap rules kick in.
+ * When only ONE is configured we skip the modifier — the single
+ * logo stays visible across all themes.
+ */
+function slotClass(base: string, variant: 'light' | 'dark', hasOther: boolean): string {
+  return hasOther ? `${base} ${base}--${variant}` : base
+}
 ---
 
 <Link href="/" class="flex items-center gap-2 logo-link">
   {
-    hasImageLogo && logoLight && (
-      <img
-        class="logo-image logo-image--light"
-        src={logoLight}
-        alt={themeConfig.site.name}
-        width="47"
-        height="37"
-        loading="eager"
-        style="width: auto; height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));"
-      />
+    hasAnyLogo ? (
+      <>
+        {/* ── Light slot ──────────────────────────────────── */}
+        {lightSvgContent ? (
+          <div
+            class={slotClass('logo-svg', 'light', hasDark)}
+            style={logoStyle}
+            set:html={lightSvgContent}
+          />
+        ) : lightIsRaster ? (
+          <img
+            class={slotClass('logo-raster', 'light', hasDark)}
+            src={lightAssetUrl}
+            alt={siteName}
+            loading="eager"
+            decoding="async"
+            style={logoStyle}
+          />
+        ) : null}
+
+        {/* ── Dark slot ───────────────────────────────────── */}
+        {darkSvgContent ? (
+          <div
+            class={slotClass('logo-svg', 'dark', hasLight)}
+            style={logoStyle}
+            set:html={darkSvgContent}
+          />
+        ) : darkIsRaster ? (
+          <img
+            class={slotClass('logo-raster', 'dark', hasLight)}
+            src={darkAssetUrl}
+            alt={siteName}
+            loading="eager"
+            decoding="async"
+            style={logoStyle}
+          />
+        ) : null}
+      </>
+    ) : (
+      /* ── Text fallback ─────────────────────────────────── */
+      <span
+        class="logo-text"
+        style={`
+          ${logoStyle}
+          font-weight: var(--font-weight-heading, ${branding.font.weights.heading});
+          font-size: var(--logo-size, 1rem);
+          text-transform: none;
+        `}
+      >
+        {siteName}
+      </span>
     )
   }
-  {
-    hasImageLogo && logoDark && (
-      <img
-        class="logo-image logo-image--dark"
-        src={logoDark}
-        alt={themeConfig.site.name}
-        width="47"
-        height="37"
-        loading="eager"
-        style="width: auto; height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));"
-      />
-    )
-  }
-  {!hasImageLogo && (
-    <span
-      class="logo-text"
-      style={`font-weight: var(--font-weight-heading, ${themeConfig.branding.font.weights.heading}); font-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem)); text-transform: none;`}
-    >
-      {themeConfig.site.name}
-    </span>
-  )}
 </Link>
 
 <style is:global>
-@layer overrides {
-  .logo-link,
-  .logo-link:hover,
-  .logo-link:focus-visible {
-    text-decoration: none !important;
+  @layer overrides {
+    /* ================================================================
+       Link decoration reset
+       ================================================================ */
+    .logo-link,
+    .logo-link:hover,
+    .logo-link:focus-visible {
+      text-decoration: none !important;
+    }
+    .logo-link .logo-text,
+    .logo-link .logo-text:hover,
+    .logo-link .logo-text:focus-visible {
+      text-decoration: none !important;
+    }
+
+    /* ==========================================================================
+       🚨 核心互斥矩阵：纯特异度级联，零 !important
+
+       特异度级联表（每个场景天然递增，无需 !important）：
+         (0,1,0) → 默认状态
+         (0,2,0) → .darkmode 覆盖
+         (0,2,1) → header[data-top-navigation-theme] 最终覆盖
+
+       基类 .logo-svg / .logo-raster 不设 display，
+       显隐完全由下方穷举矩阵控制。
+       ========================================================================== */
+
+    /* ================================================================
+       SVG Inline Channel
+       ================================================================ */
+
+    .logo-svg {
+      width: auto;
+      height: var(--logo-size, 2.5rem);
+      block-size: var(--logo-size, 2.5rem);
+      max-inline-size: 100%;
+      background-color: transparent;
+    }
+
+    /* 内联 SVG 子元素尺寸约束 */
+    .logo-svg svg {
+      display: block;
+      width: auto;
+      height: 100%;
+      max-width: 100%;
+    }
+
+    /* ① 默认（浅色环境）：Light 可见，Dark 隐藏 —— (0,1,0) */
+    .logo-svg--light { display: block; }
+    .logo-svg--dark  { display: none; }
+
+    /* ② 全局深色模式 (.darkmode)：Dark 可见，Light 隐藏 —— (0,2,0) */
+    .darkmode .logo-svg--light { display: none; }
+    .darkmode .logo-svg--dark  { display: block; }
+
+    /*
+     * ③ Header 局部主题强制覆盖 —— (0,2,1)，最高优先级
+     *    当页面顶部 Hero/PaloPageHeader 声明了 data-top-navigation-theme，
+     *    Header JS 会将其传播到 <header> 元素，此场景需覆盖 .darkmode。
+     */
+    header[data-top-navigation-theme="light"] .logo-svg--light { display: block; }
+    header[data-top-navigation-theme="light"] .logo-svg--dark  { display: none; }
+
+    header[data-top-navigation-theme="dark"] .logo-svg--light { display: none; }
+    header[data-top-navigation-theme="dark"] .logo-svg--dark  { display: block; }
+
+
+    /* ================================================================
+       Raster Fallback Channel
+       ================================================================ */
+
+    .logo-raster {
+      width: auto;
+      height: var(--logo-size, 2.5rem);
+      block-size: var(--logo-size, 2.5rem);
+      max-inline-size: 100%;
+      background-color: transparent;
+    }
+
+    /* ① 默认 —— (0,1,0) */
+    .logo-raster--light { display: block; }
+    .logo-raster--dark  { display: none; }
+
+    /* ② 全局深色模式 —— (0,2,0) */
+    .darkmode .logo-raster--light { display: none; }
+    .darkmode .logo-raster--dark  { display: block; }
+
+    /* ③ Header 局部覆盖 —— (0,2,1) */
+    header[data-top-navigation-theme="light"] .logo-raster--light { display: block; }
+    header[data-top-navigation-theme="light"] .logo-raster--dark  { display: none; }
+
+    header[data-top-navigation-theme="dark"] .logo-raster--light { display: none; }
+    header[data-top-navigation-theme="dark"] .logo-raster--dark  { display: block; }
+
+    /* ================================================================
+       Text Fallback Channel
+       ================================================================ */
+    .logo-link .logo-text {
+      font-weight: var(--font-weight-heading, 600);
+      font-size: var(--logo-size, 2.5rem);
+      line-height: 1;
+      text-transform: none;
+      white-space: nowrap;
+    }
   }
-  .logo-link .logo-text,
-  .logo-link .logo-text:hover,
-  .logo-link .logo-text:focus-visible {
-    text-decoration: none !important;
-  }
-  .logo-link .logo-image {
-    display: block;
-    width: auto;
-    height: var(--logo-size, var(--navigation-desktop-font-size, 1rem));
-    block-size: var(--logo-size, var(--navigation-desktop-font-size, 1rem));
-    inline-size: auto;
-    max-inline-size: 100%;
-  }
-  .logo-link .logo-image--dark {
-    display: none;
-  }
-  .darkmode .logo-link .logo-image--light {
-    display: none;
-  }
-  .darkmode .logo-link .logo-image--dark {
-    display: block;
-  }
-  header.is-at-top[data-top-navigation-theme='light'] .logo-link .logo-image--light {
-    display: block;
-  }
-  header.is-at-top[data-top-navigation-theme='light'] .logo-link .logo-image--dark {
-    display: none;
-  }
-  header.is-at-top[data-top-navigation-theme='dark'] .logo-link .logo-image--light {
-    display: none;
-  }
-  header.is-at-top[data-top-navigation-theme='dark'] .logo-link .logo-image--dark {
-    display: block;
-  }
-  header.is-at-top[data-top-navigation-theme='light'] .darkmode-toggle .icon-light,
-  header.is-at-top[data-top-navigation-theme='dark'] .darkmode-toggle .icon-dark {
-    display: none;
-  }
-  header.is-at-top[data-top-navigation-theme='light'] .darkmode-toggle .icon-dark,
-  header.is-at-top[data-top-navigation-theme='dark'] .darkmode-toggle .icon-light {
-    display: flex;
-  }
-}
 </style>
