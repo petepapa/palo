@@ -48,12 +48,12 @@
   --color-error-400: oklch(from var(--brand-error) 0.55 calc(c * 1.25) h);
   --color-error-500: oklch(from var(--brand-error) 0.40 calc(c * 1.35) h);
 
-  // ── WARNING (释放明度留饱和空间，色相回弹对冲红移，死锁重工业金黄) ──
+  // ── WARNING (重校明度过渡曲线，平缓放量，锁死高维清透金黄) ──
   --color-warning-100: oklch(from var(--brand-warning) 0.92 calc(c * 0.18) 63.80);
   --color-warning-200: oklch(from var(--brand-warning) 0.85 calc(c * 0.42) 65.80);
-  --color-warning-300: var(--brand-warning);
-  --color-warning-400: oklch(from var(--brand-warning) 0.58 calc(c * 1.30) calc(h + 8));
-  --color-warning-500: oklch(from var(--brand-warning) 0.45 calc(c * 1.40) calc(h + 18));
+  --color-warning-300: var(--brand-warning);                                          // 基准色 (~0.75)
+  --color-warning-400: oklch(from var(--brand-warning) 0.65 calc(c * 1.15) calc(h + 4));  // 平缓下滑，减弱红移
+  --color-warning-500: oklch(from var(--brand-warning) 0.54 calc(c * 1.25) calc(h + 10)); // 优雅落底，保障警示
 
   // ── SUCCESS (释放明度锁死高纯翡翠翠绿) ──
   --color-success-100: oklch(from var(--brand-success) 0.86 calc(c * 0.20) 145.94);
