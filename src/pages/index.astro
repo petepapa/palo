@@ -21,14 +21,14 @@ import { Card } from 'accessible-astro-components'
     topNavigationTheme=""
     class="py-8"
     alignV="center"
-    alignH="left"
-    divider="true"
+    alignH="center"
+    divider="bottom"
     useContainer={false}
     bg={{
       image: "/branding/hero-bg.png",
       video: "",
       color: "",
-      fixed: true,
+      fixed: false,
       overlayOpacity: 0,
     }}
   >
@@ -66,21 +66,20 @@ import { Card } from 'accessible-astro-components'
     contentColor=""
     class="py-16 bg-primary text-neutral-100"
     alignV="center"
-    alignH="left"
+    alignH="center"
     divider="false"
+    useContainer={false}
     bg={{
-      image: "",
-      video: "",
+      image: "/123.jpeg",
+      video: "/bg.mp4",
       color: "",
-      fixed: false,
-      overlayOpacity: 0.5,
+      fixed: true,
+      overlayOpacity: 0.45,
     }}
   >
-    <div class="text-center">
       <p class="text-xl font-semibold">
         A portfolio framework that gets out of your way — and stays true to your aesthetic.
       </p>
-    </div>
   </CreativeSection>
 
   {/* FEATURES======================================== */}

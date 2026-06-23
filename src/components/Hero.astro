@@ -143,8 +143,11 @@ const heroStyle = [
     }
 
     .hero--standard {
-      display: grid;
-      place-content: var(--hero-content-align, center) var(--hero-text-align, center);
+      display: flex;
+      flex-direction: column;
+      align-items: var(--hero-text-align, center);
+      text-align: var(--hero-text-align, center);
+      justify-content: var(--hero-content-align, center);
       padding-block-start: calc(var(--header-height, 0px) + var(--space-xl));
       padding-block-end: var(--space-xl);
     }

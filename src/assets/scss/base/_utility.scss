@@ -59,9 +59,11 @@
   }
 
   .section-fullscreen:where(.hero) {
-    place-content: var(--hero-content-align, center) center;
-    padding-block-start: calc(var(--header-height, 0px) + var(--hero-padding-block, var(--space-xl)));
-    padding-block-end: var(--hero-padding-block, var(--space-xl));
+    display: flex;
+    flex-direction: column;
+    align-items: var(--hero-text-align, center);
+    text-align: var(--hero-text-align, center);
+    justify-content: var(--hero-content-align, center);
   }
 
   .section-fullscreen:where(.palo-page-header) {
