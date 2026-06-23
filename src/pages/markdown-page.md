@@ -7,18 +7,18 @@ narrow: false
 
 pageHeader:
   fullscreen: ''  # 空字符串 → 回退到 config.yaml 的全局默认值
-  contentColor: '#fff'
-  topNavigationTheme: 'dark'
+  contentColor: ''
+  topNavigationTheme: ''
   divider: ''
   alignV: 
   alignH: 
   useContainer: ''
   bg:
     image: ''
-    video: '/bg.mp4'
-    color: 'red'
+    video: ''
+    color: ''
     fixed: 'true'
-    overlayOpacity: 0.45
+    overlayOpacity: 0
 ---
 
 

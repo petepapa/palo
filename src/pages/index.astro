@@ -28,7 +28,7 @@ import { Card } from 'accessible-astro-components'
       image: "/branding/hero-bg.png",
       video: "",
       color: "",
-      fixed: false,
+      fixed: true,
       overlayOpacity: 0,
     }}
   >
@@ -61,6 +61,14 @@ import { Card } from 'accessible-astro-components'
     {/* 可编辑区域结束 / Editable Content End */}
   </Hero>
 
+
+  <section class="my-64">
+    <div class="container">
+      <h2 class="mb-8">Features</h2>
+    </div>
+  </section>
+
+
   <CreativeSection
     fullscreen={true}
     contentColor=""
@@ -84,24 +92,20 @@ import { Card } from 'accessible-astro-components'
 
   {/* FEATURES======================================== */}
 
-  <section class="my-64">
-    <div class="container">
-      <h2 class="mb-8">Features</h2>
-    </div>
-    
-</section>
+  
     
 
   
 
   <section class="my-64">
-  <FeaturedProjects />
+    <FeaturedProjects />
   </section>
 
   {/* LATEST POSTS SECTION ========================================*/}
+
   <section class="my-64">
-  <LatestPosts />
-</section>
+    <LatestPosts />
+  </section>
 
 </DefaultLayout>
 

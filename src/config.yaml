@@ -184,8 +184,8 @@ components:
     divider: "bottom"     # 装饰分割线位置: bottom | top | none
     useContainer: true    # 是否默认使用 container 包裹内容区
     fullscreen: false     # 是否全屏显示: true | false
-    topNavigationTheme: "dark" # 顶部导航主题: ''(跟随主题) | dark | light
-    class: "bg-info text-neutral-100 pb-24"             # 默认添加到组件根元素的自定义 CSS 类名
+    topNavigationTheme: "" # 顶部导航主题: ''(跟随主题) | dark | light
+    class: ""             # 默认添加到组件根元素的自定义 CSS 类名
 
   # 📄 所有内容详情页头部总控 (穿透应用于所有的 Single Post 文章页与 Single Project 作品详情页)
   postHeader:
