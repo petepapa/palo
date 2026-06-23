@@ -115,9 +115,7 @@ const sectionStyle = {
     <div class="media-container" aria-hidden="true" tabindex="-1">
       {backgroundImage && <div class="bg-image-layer" />}
       {backgroundVideo && (
-        <video autoplay loop muted playsinline class="background-media">
-          <source src={resolvedBackgroundVideo} type="video/mp4" />
-        </video>
+        <video class="background-media" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
       )}
     </div>
   )}
