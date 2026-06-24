@@ -1,6 +1,9 @@
 ---
 // src/components/CreativeSection.astro
 import { normalizePublicAssetUrl, resolveVisualImageUrl } from '@utils/pageHeaderVisuals'
+import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
 
 type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
 
@@ -87,6 +90,13 @@ const resolvedBackgroundOverlayOpacity =
 const resolvedBackgroundImage = resolveVisualImageUrl(backgroundImage)
 const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
 
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(backgroundImage)
+const dominantColor = isPng ? '' : (backgroundImage ? await getDominantColor(backgroundImage) : '')
+const shouldBgFadeOut = !isPng
+
 // 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
 const sectionStyle = {
   '--section-bg': backgroundColor || 'transparent',
@@ -112,7 +122,20 @@ const sectionStyle = {
   <!-- 层 1: 背景媒体（图片垫底 + 视频覆盖）/ Layer 1: Background media (image fallback + video overlay) -->
   {(backgroundImage || backgroundVideo) && (
     <div class="media-container" aria-hidden="true" tabindex="-1">
-      {backgroundImage && <div class="bg-image-layer" />}
+      {backgroundImage && (
+        <ContentImage
+          src={resolvedBackgroundImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="bg-image-layer"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
+      )}
       {backgroundVideo && (
         <video class="background-media" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
       )}
@@ -244,10 +267,15 @@ const sectionStyle = {
       position: absolute;
       inset: 0;
       z-index: 0;
-      background-image: var(--section-bg-image);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg-image-layer :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     /* 可配置半透明遮罩层：用于按需降低背景亮度，提高文字可读性 / Configurable overlay layer: darkens backdrop on demand to improve text readability */

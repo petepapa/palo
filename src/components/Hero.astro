@@ -1,5 +1,8 @@
 ---
 import { createPageHeaderVisuals, normalizePublicAssetUrl, resolveVisualImageUrl } from '@utils/pageHeaderVisuals'
+import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
 
 /**
  * Hero Component
@@ -82,6 +85,13 @@ const resolvedBackgroundOverlayOpacity =
     : 0
 const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
 
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(backgroundImage)
+const dominantColor = isPng ? '' : (backgroundImage ? await getDominantColor(backgroundImage) : '')
+const shouldBgFadeOut = !isPng
+
 const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
   backgroundColor,
   backgroundImage,
@@ -112,7 +122,20 @@ const heroStyle = [
 >
   {(backgroundImage || backgroundVideo) && (
     <div class="hero__background-media" aria-hidden="true">
-      {backgroundImage && <div class="hero__background-image" />}
+      {backgroundImage && (
+        <ContentImage
+          src={backgroundImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="hero__background-image"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
+      )}
       {backgroundVideo && (
         <video class="hero__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
       )}
@@ -230,10 +253,15 @@ const heroStyle = [
       position: absolute;
       inset: 0;
       z-index: 0;
-      background-image: var(--hero-background-image, none);
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero__background-image :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     .hero__background-overlay {

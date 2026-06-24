@@ -41,6 +41,35 @@ export function isImageMetadata(value: unknown): value is ImageMetadata {
   )
 }
 
+/**
+ * 判断图片是否为 PNG 格式
+ * 支持 ImageMetadata 对象和字符串路径两种输入
+ */
+export function isPngImage(src: unknown): boolean {
+  if (!src) return false
+
+  // 1. ImageMetadata 对象（有 format 属性）
+  if (isImageMetadata(src)) {
+    return src.format.toLowerCase() === 'png'
+  }
+
+  // 2. 普通对象带 format 属性
+  if (typeof src === 'object' && src !== null && 'format' in src) {
+    const fmt = (src as { format: unknown }).format
+    if (typeof fmt === 'string') {
+      return fmt.toLowerCase() === 'png'
+    }
+  }
+
+  // 3. 字符串路径
+  if (typeof src === 'string') {
+    const cleanSrc = src.split('?')[0].split('#')[0]
+    return cleanSrc.toLowerCase().endsWith('.png')
+  }
+
+  return false
+}
+
 export { defaultPostImage }
 
 export function getPostDefaultImage(): ImageMetadata {

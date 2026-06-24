@@ -4,6 +4,8 @@ import sanitizeHtml from 'sanitize-html'
 import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
 import config from '@config'
 import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
 
 type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
 
@@ -123,9 +125,13 @@ const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderV
   topNavigationTheme,
 })
 
-// ── 提取背景图主色调 ──
-const dominantColor = bgImage ? await getDominantColor(bgImage) : ''
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(bgImage)
+const dominantColor = isPng ? '' : (bgImage ? await getDominantColor(bgImage) : '')
 const bgImageBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
+const shouldBgFadeOut = !isPng
 
 // ── 慢速网络优化：直接计算内联 padding，确保第一帧即有正确的顶部空间 ──
 // 不依赖外部 CSS 文件，避免加载延迟导致的内容贴顶塌陷
@@ -172,7 +178,18 @@ const sanitizedSubtitle: string = subtitle
   {(bgImage || bgVideo) && (
     <div class="palo-page-header__background-media" aria-hidden="true">
       {bgImage && (
-        <div class="palo-page-header__background-image" style={bgImageBgStyle}></div>
+        <ContentImage
+          src={bgImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="palo-page-header__background-image"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
       )}
       {bgVideo && (
         <video class="palo-page-header__background-video" src={resolvedBgVideo} autoplay muted loop playsinline />
@@ -335,10 +352,15 @@ const sanitizedSubtitle: string = subtitle
       position: absolute;
       inset: 0;
       z-index: 0;
-      background-image: var(--page-header-background-image, none);
-      background-position: center;
-      background-size: cover;
-      background-repeat: no-repeat;
+      width: 100%;
+      height: 100%;
+    }
+
+    .palo-page-header__background-image :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
     }
 
     .palo-page-header__background-overlay {

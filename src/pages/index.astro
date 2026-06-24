@@ -72,22 +72,28 @@ import { Card } from 'accessible-astro-components'
   <CreativeSection
     fullscreen={true}
     contentColor=""
-    class="py-16 bg-primary text-neutral-100"
-    alignV="center"
+    class="py-16 bg-neutral-900 text-neutral-100"
+    alignV="bottom"
     alignH="center"
     divider="both"
     useContainer={false}
     bg={{
-      image: "/123.jpeg",
-      video: "/bg.mp4",
+      image: "/bg-video.jpg",
+      video: "/bg-video.mp4",
       color: "",
-      fixed: true,
-      overlayOpacity: 0.45,
+      fixed: false,
+      overlayOpacity: 0.25,
     }}
   >
       <p class="text-xl font-semibold">
-        A portfolio framework that gets out of your way — and stays true to your aesthetic.
+        A PORTFOLIO FRAMEWORK THAT GETS OUT OF YOUR WAY — AND STAYS TRUE TO YOUR AESTHETIC.
       </p>
+      
+
+      <p class="text-neutral-300">
+        Background Video: Excerpt from "It's Not the End of the World?" MV (Super Furry Animals) / Directed by Numero 6 (David Nicolas).
+      </p>
+
   </CreativeSection>
 
   {/* FEATURES======================================== */}

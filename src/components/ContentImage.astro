@@ -14,6 +14,12 @@ interface Props {
   fadeIn?: boolean
   bgColor?: string
   aspectRatio?: string
+  /**
+   * 图片加载完成后，背景色是否淡出为透明
+   * 适用于通栏大图 / 透明 PNG 场景，让图片透明区域透出页面背景
+   * @default false
+   */
+  bgFadesOut?: boolean
 }
 
 const {
@@ -27,6 +33,7 @@ const {
   fadeIn = false,
   bgColor = '',
   aspectRatio,
+  bgFadesOut = false,
 } = Astro.props
 
 const containerClass = fadeIn ? 'progressive-img-container' : undefined
@@ -68,7 +75,8 @@ const responsiveWidths = (() => {
           class="progressive-img-inner"
           loading={loading}
           decoding={decoding}
-          onload="if ('decode' in this) { this.decode().then(() => this.setAttribute('data-loaded', 'true')).catch(() => this.setAttribute('data-loaded', 'true')) } else { this.setAttribute('data-loaded', 'true') }"
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          onload="if ('decode' in this) { this.decode().then(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }).catch(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }) } else { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }"
         />
       ) : isImageMetadata(src) ? (
         <Image
@@ -80,7 +88,8 @@ const responsiveWidths = (() => {
           class="progressive-img-inner"
           loading={loading}
           decoding={decoding}
-          onload="if ('decode' in this) { this.decode().then(() => this.setAttribute('data-loaded', 'true')).catch(() => this.setAttribute('data-loaded', 'true')) } else { this.setAttribute('data-loaded', 'true') }"
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          onload="if ('decode' in this) { this.decode().then(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }).catch(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }) } else { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }"
         />
       ) : null}
       <noscript>
@@ -111,12 +120,18 @@ const responsiveWidths = (() => {
   const checkProgressiveImages = () => {
     document.querySelectorAll('.progressive-img-inner').forEach((img) => {
       if (img instanceof HTMLImageElement && img.complete) {
+        const markLoaded = () => {
+          img.setAttribute('data-loaded', 'true');
+          if (img.dataset.bgFadesOut === 'true') {
+            img.parentElement?.setAttribute('data-loaded', 'true');
+          }
+        };
         if ('decode' in img) {
           img.decode()
-            .then(() => img.setAttribute('data-loaded', 'true'))
-            .catch(() => img.setAttribute('data-loaded', 'true'));
+            .then(markLoaded)
+            .catch(markLoaded);
         } else {
-          img.setAttribute('data-loaded', 'true');
+          markLoaded();
         }
       }
     });
@@ -140,6 +155,11 @@ const responsiveWidths = (() => {
     overflow: hidden;
     inline-size: 100%;
     block-size: 100%;
+    transition: background-color 0.45s ease-out;
+  }
+
+  .progressive-img-container[data-loaded="true"] {
+    background-color: transparent !important;
   }
 
   .progressive-img-inner {

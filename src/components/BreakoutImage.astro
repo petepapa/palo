@@ -121,6 +121,7 @@ const realAspectRatioInline = hasImageSize
 
 // ── 提取主色调，作为图片加载前的纯色占位背景 ──
 const dominantColor = await getDominantColor(resolvedSrc)
+
 const containerInlineStyle = [
   `background-color: ${dominantColor}`,
   realAspectRatioInline,
@@ -141,7 +142,7 @@ const radiusClass = resolvedLayout === 'full'
 ---
 
 <div
-  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass]}
+  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass, 'transition-colors', 'duration-500', 'ease-out']}
   style={containerInlineStyle || undefined}
   data-layout={resolvedLayout}
   data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
@@ -154,7 +155,7 @@ const radiusClass = resolvedLayout === 'full'
       class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
-      onload="if ('decode' in this) { this.decode().then(() => this.classList.remove('opacity-0')).catch(() => this.classList.remove('opacity-0')) } else { this.classList.remove('opacity-0') }"
+      onload="var c=this.closest('.breakout-image-container');if('decode' in this){this.decode().then(()=>{this.classList.remove('opacity-0');if(c){c.style.backgroundColor='transparent'}}).catch(()=>{this.classList.remove('opacity-0');if(c){c.style.backgroundColor='transparent'}})}else{this.classList.remove('opacity-0');if(c){c.style.backgroundColor='transparent'}}}"
     />
   ) : (
     <img
@@ -163,7 +164,7 @@ const radiusClass = resolvedLayout === 'full'
       class:list={['absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
-      onload="var i=this;function r(){i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}};if('decode' in i){i.decode().then(r).catch(r)}else{r()}"
+      onload="var i=this;var c=i.closest('.breakout-image-container');function r(){i.classList.remove('opacity-0');if(c){c.style.backgroundColor='transparent'}if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}};if('decode' in i){i.decode().then(r).catch(r)}else{r()}"
     />
   )}
   <style is:global>
@@ -196,10 +197,13 @@ const radiusClass = resolvedLayout === 'full'
         const reveal = () => {
           img.classList.remove('opacity-0');
           const container = img.closest('.breakout-image-container');
-          if (container && container.hasAttribute('data-fallback-ratio')) {
-            container.removeAttribute('data-fallback-ratio');
-            img.classList.remove('absolute', 'inset-0', 'h-full');
-            img.classList.add('block');
+          if (container) {
+            container.style.backgroundColor = 'transparent';
+            if (container.hasAttribute('data-fallback-ratio')) {
+              container.removeAttribute('data-fallback-ratio');
+              img.classList.remove('absolute', 'inset-0', 'h-full');
+              img.classList.add('block');
+            }
           }
         };
         if ('decode' in img) {

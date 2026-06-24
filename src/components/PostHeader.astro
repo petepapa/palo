@@ -150,8 +150,8 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   ]}
 >
   {isCoverImageTop && (
-    <div class="post-header__image" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
+    <div class="post-header__image">
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}
 
@@ -196,8 +196,8 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   )}
 
   {isCoverImageHead && (
-    <div class="post-header__image post-header__image--head" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
+    <div class="post-header__image post-header__image--head">
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}
 
@@ -235,8 +235,8 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   </div>
 
   {isCoverImageBottom && (
-    <div class="post-header__image post-header__image--bottom" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} />
+    <div class="post-header__image post-header__image--bottom">
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}
 </section>
