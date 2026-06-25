@@ -97,6 +97,16 @@ const { src, layout, fullWidth, decorative = false, alt = '' } = Astro.props
 // ── 解析 src：将 MDX 中传入的相对路径（如 ./cover.jpg）转换为 ImageMetadata ──
 const resolvedSrc = resolveImageSrc(src)
 
+// ═══════════════════════════════════════════════════════
+//  Dev 模式缓存破防：public/ 绝对路径强制附加时间戳后缀
+//  浏览器对固定路径的 304 强缓存会吞掉 <img> 的 onload 事件，
+//  动态后缀迫使浏览器发起完整 HTTP 请求，精准激活状态机。
+// ═══════════════════════════════════════════════════════
+let imageSrc: string | ImageMetadata = resolvedSrc
+if (import.meta.env.DEV && typeof imageSrc === 'string' && imageSrc.startsWith('/')) {
+  imageSrc = `${imageSrc}?palo-breakout-bypass=${Date.now()}`
+}
+
 // Determine layout style, supporting backward compatibility with fullWidth
 let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
 if (layout) {
@@ -153,7 +163,7 @@ const radiusClass = resolvedLayout === 'full'
 >
   {isImageMetadata(resolvedSrc) ? (
     <Image
-      src={resolvedSrc}
+      src={imageSrc}
       alt={altText}
       widths={[560, 840, 1120, 1400, 1680]}
       class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
@@ -163,12 +173,12 @@ const radiusClass = resolvedLayout === 'full'
     />
   ) : (
     <img
-      src={resolvedSrc}
+      src={imageSrc}
       alt={altText}
-      class:list={['absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
-      onload="var i=this;var c=i.closest('.breakout-image-container');i.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}"
+      onload="var i=this;var c=i.closest('.breakout-image-container');i.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}if(i.complete){i.classList.remove('opacity-0');c&&c.setAttribute('data-loaded','true')}"
     />
   )}
   <style is:global>
@@ -198,29 +208,77 @@ const radiusClass = resolvedLayout === 'full'
   <div class:list={['absolute inset-0 shadow-inner pointer-events-none', radiusClass]}></div>
 </div>
 
-<script>
-  const checkBreakoutImages = () => {
-    document.querySelectorAll('.breakout-image-container img').forEach((img) => {
-      if (img instanceof HTMLImageElement && img.complete) {
+<!-- is:inline → 脚本内联于 HTML 流中，首帧即刻执行，不受外部 JS 阻塞 -->
+<script is:inline>
+  // ── BreakoutImage DOM 状态机：public/ 路径 304 缓存吞 onload 的终极防御 ──
+  var enforceBreakoutStatus = function() {
+    var imgs = document.querySelectorAll('.breakout-image-container .progressive-img-inner, .breakout-image-container img');
+    for (var i = 0; i < imgs.length; i++) {
+      var img = imgs[i];
+      if (!(img instanceof HTMLImageElement)) continue;
+
+      var container = img.closest('.breakout-image-container');
+      if (!container) continue;
+
+      // 核心防线：浏览器缓存命中 (304/强缓存) → img.complete 瞬时为 true
+      if (img.complete) {
         img.classList.remove('opacity-0');
-        const container = img.closest('.breakout-image-container');
-        if (container) {
+        container.setAttribute('data-loaded', 'true');
+        if (container.hasAttribute('data-fallback-ratio')) {
+          container.removeAttribute('data-fallback-ratio');
+          img.classList.remove('absolute', 'inset-0', 'h-full');
+          img.classList.add('block');
+        }
+      } else {
+        // 慢速网络拉取：重新绑定 onload，确保任何时序都能触发
+        img.onload = function() {
+          img.classList.remove('opacity-0');
           container.setAttribute('data-loaded', 'true');
           if (container.hasAttribute('data-fallback-ratio')) {
             container.removeAttribute('data-fallback-ratio');
             img.classList.remove('absolute', 'inset-0', 'h-full');
             img.classList.add('block');
           }
-        }
+        };
       }
-    });
+    }
   };
 
+  // 全生命周期绑定：首屏、SPA 导航、View Transitions 交换，无一遗漏
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkBreakoutImages);
+    document.addEventListener('DOMContentLoaded', enforceBreakoutStatus);
   } else {
-    checkBreakoutImages();
+    enforceBreakoutStatus();
   }
-
-  document.addEventListener('astro:page-load', checkBreakoutImages);
+  document.addEventListener('astro:page-load', enforceBreakoutStatus);
+  document.addEventListener('astro:after-swap', enforceBreakoutStatus);
 </script>
+
+{import.meta.env.DEV && (
+  <script is:inline>
+    // DEV 专属：Astro / Vite HMR 热更新后 DOM 节点替换，防止 opacity: 0 假死
+    var breakoutObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (!(node instanceof HTMLElement) || !node.querySelectorAll) return;
+          var hmrImgs = node.querySelectorAll('.progressive-img-inner, img');
+          for (var i = 0; i < hmrImgs.length; i++) {
+            (function(img) {
+              var container = img.closest('.breakout-image-container');
+              if (!container) return;
+              if (img.complete) {
+                img.classList.remove('opacity-0');
+                container.setAttribute('data-loaded', 'true');
+              }
+              img.onload = function() {
+                img.classList.remove('opacity-0');
+                container.setAttribute('data-loaded', 'true');
+              };
+            })(hmrImgs[i]);
+          }
+        });
+      });
+    });
+    breakoutObserver.observe(document.body, { childList: true, subtree: true });
+  </script>
+)}

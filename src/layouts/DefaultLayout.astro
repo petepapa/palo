@@ -570,6 +570,10 @@ const bodyFontFile = variableFontFile ?? selectStaticFontFile(font.weights.body)
 const bodyFontPreloadUrl = bodyFontFile ? getPublicUrl(bodyFontFile) : null
 const bodyFontIsWoff2 = bodyFontPreloadUrl?.endsWith('.woff2') ?? false
 
+// Preload accent weight font for instant navigation text (no FOUT)
+const navFontFile = selectStaticFontFile(font.weights.accent)
+const navFontPreloadUrl = navFontFile ? getPublicUrl(navFontFile) : null
+
 const mobileScale = typography.mobileHeadingScale
 const desktopScale = typography.desktopHeadingScale
 const viewportMin = 375
@@ -770,6 +774,188 @@ ${bodyLineHeights}
         // Keep the static light theme if browser storage or media queries are unavailable.
       }
     </script>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Anti-FOUC Shield / 刚性尺寸锚定版
+         Slow 4G 下外部 CSS 到达前：
+           • 纯黑底色，系统字体秒开导航文字（不再隐藏）
+           • 导航栏锁死 64px + flex + gap 刚性布局，杜绝字体替换偏移
+           • 右侧动态组件（图标/搜索框）隐藏，防止塌陷撑开
+         font-display: swap 已在 @font-face 声明中配置，文字不会隐形。
+         CSS 就绪后 data-css-ready="true" 激活，骨架平滑绽放。
+         ═══════════════════════════════════════════════════════════════ -->
+    <style is:inline>
+      /* ═══════════════════════════════════════════════════════════════
+         关键字体基座内联化（Critical Font Base64 Embedding）
+         将导航所需字符的 League Spartan 子集（~2KB）以 Base64 嵌入，
+         浏览器解析 HTML 首字节即拥有完整字体，导航文字开局即终局。
+
+         生成命令（在项目根目录执行）：
+           pip install fonttools brotli
+           pyftsubset public/fonts/League_Spartan/static/LeagueSpartan-Medium.ttf \
+             --text="HOMEBLGPORTFIAUCSN" \
+             --layout-features='' --flavor=woff2 --output-file=/tmp/nav-subset.woff2
+           base64 -i /tmp/nav-subset.woff2 | tr -d '\n' | pbcopy
+
+         将输出的 Base64 字符串替换下方 url() 中的占位符即可激活。
+         ═══════════════════════════════════════════════════════════════ */
+      /*
+      @font-face {
+        font-family: 'League Spartan Base';
+        src: url('data:font/woff2;charset=utf-8;base64,PASTE_BASE64_HERE') format('woff2');
+        font-weight: 500;
+        font-style: normal;
+        font-display: block;
+      }
+      */
+
+      /* 外壳：全站纯黑底色 */
+      html:not([data-css-ready="true"]) {
+        background-color: #0a0a0a !important;
+      }
+
+      html:not([data-css-ready="true"]) body {
+        background-color: #0a0a0a !important;
+        /* 取消 color: transparent —— 让系统字体在第 0.5s 内秒开文字 */
+      }
+
+      /* 导航栏骨架壳：fix 64px，flex 布局，刚性间距 */
+      html:not([data-css-ready="true"]) #main-navigation,
+      html:not([data-css-ready="true"]) .site-header,
+      html:not([data-css-ready="true"]) header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 64px !important;
+        background-color: #0a0a0a !important;
+        border-bottom: 1px solid #1f1f1f !important;
+        z-index: 9999;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 24px !important;
+      }
+
+      /* 核心：锁死导航菜单项物理间距，字体替换绝不移位 */
+      html:not([data-css-ready="true"]) #main-navigation ul,
+      html:not([data-css-ready="true"]) .nav-links {
+        display: flex !important;
+        gap: 32px !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      /* 导航文字：Base64 内联字体优先 → preload 回退 → 系统字体兜底 */
+      html:not([data-css-ready="true"]) #main-navigation a {
+        font-family: 'League Spartan Base', 'League Spartan', sans-serif !important;
+        text-transform: uppercase !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.05em !important;
+        text-decoration: none !important;
+        color: #e5e5e5 !important;
+      }
+
+      /* 隐藏未水合完的动态组件 + a11y 标签 */
+      html:not([data-css-ready="true"]) .skip-to-content,
+      html:not([data-css-ready="true"]) [href="#main-content"],
+      html:not([data-css-ready="true"]) .search-box,
+      html:not([data-css-ready="true"]) .theme-toggle {
+        opacity: 0 !important;
+      }
+
+      /* 导航核心图标 VIP 通道：astro-icon 内联 SVG 首帧可见 */
+      html:not([data-css-ready="true"]) svg:not(.logo-svg svg, .type-icon svg, .menu-item--utility svg) {
+        opacity: 0 !important;
+      }
+
+      /* <i> 标签（图标容器）锁死尺寸，半透明骨架占位，防止字体未到时坍塌 */
+      html:not([data-css-ready="true"]) i {
+        display: inline-block !important;
+        width: 24px !important;
+        height: 24px !important;
+        color: #e5e5e5 !important;
+        opacity: 0.5 !important;
+      }
+
+      /* Logo VIP 通道：骨架屏期间 Logo 保持完全可见，锚定左上角 */
+      html:not([data-css-ready="true"]) .logo-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        position: fixed !important;
+        top: 12px !important;
+        left: 24px !important;
+        z-index: 10000 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      /* ═══════════════════════════════════════════════════════════
+         纯 CSS 下拉菜单交互兜底（JS 到达前的空窗期防线）
+         Slow 4G 下 JS 排队时，:hover/:focus-within 本能接管交互，
+         用户点击/触摸 PORTFOLIO 立刻弹出菜单，不死等脚本水合。
+         ═══════════════════════════════════════════════════════════ */
+
+      /* 初始隐藏：避免 JS 未到前裸露 */
+      html:not([data-css-ready="true"]) .dropdown-menu {
+        display: none;
+      }
+
+      /* Hover / 触摸长按 / 键盘聚焦 → 瞬时展开 */
+      html:not([data-css-ready="true"]) .has-dropdown:hover .dropdown-menu,
+      html:not([data-css-ready="true"]) .has-dropdown:focus .dropdown-menu,
+      html:not([data-css-ready="true"]) .has-dropdown:focus-within .dropdown-menu {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: absolute !important;
+        top: 64px !important;
+        background-color: #0a0a0a !important;
+        border: 1px solid #1f1f1f !important;
+        padding: 16px !important;
+        z-index: 100000 !important;
+        list-style: none !important;
+      }
+    </style>
+
+    <script is:inline>
+      // ── 盾牌生命周期：监听 CSS 加载 + Astro SPA 路由往复重置 ──
+      function initShield() {
+        // 查找页面主样式表，以其加载完成作为「CSS 就绪」信号
+        var mainStylesheet = document.querySelector('link[rel="stylesheet"]');
+        if (mainStylesheet) {
+          if (mainStylesheet.sheet) {
+            // 已缓存，直接释放
+            document.documentElement.setAttribute('data-css-ready', 'true');
+          } else {
+            mainStylesheet.addEventListener('load', function () {
+              document.documentElement.setAttribute('data-css-ready', 'true');
+            });
+          }
+        } else {
+          // 无外部样式表，直接释放
+          document.documentElement.setAttribute('data-css-ready', 'true');
+        }
+      }
+
+      // 1. 首屏直接运行
+      initShield();
+
+      // 2. Client Router SPA 导航：新页面即将交换 DOM 前，剥夺旧页激活状态
+      //    新页面 body 替换后，盾牌重新生效直到新 CSS 加载完成
+      document.addEventListener('astro:before-swap', function () {
+        document.documentElement.removeAttribute('data-css-ready');
+      });
+
+      // 3. DOM 交换完成后，对新页面重新初始化样式表监听
+      document.addEventListener('astro:page-load', function () {
+        initShield();
+      });
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
@@ -778,6 +964,10 @@ ${bodyLineHeights}
     <!-- Preload body weight font to reduce CLS -->
     {bodyFontPreloadUrl && bodyFontIsWoff2 && (
       <link rel="preload" as="font" type="font/woff2" crossorigin href={bodyFontPreloadUrl} />
+    )}
+    <!-- Preload navigation accent font: 抢在网络请求最前列，杜绝导航 FOUT -->
+    {navFontPreloadUrl && (
+      <link rel="preload" as="font" type="font/ttf" crossorigin href={navFontPreloadUrl} />
     )}
 
     {fontFaceCss && <style is:global set:html={`@layer base { ${fontFaceCss} }`} />}

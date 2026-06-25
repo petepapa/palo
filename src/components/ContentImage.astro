@@ -179,87 +179,71 @@ const onImgReady =
   ) : null
 }
 
-<script>
-  // ── 标记已缓存的图片为 loaded ──
-  const markImgLoaded = (img) => {
-    if (!(img instanceof HTMLImageElement)) return;
-    if (img.hasAttribute('data-loaded')) return;
-    img.setAttribute('data-loaded', 'true');
-    const container = img.closest('.progressive-img-container');
-    if (container && (img.dataset.bgFadesOut === 'true' || img.dataset.hasLoadedBg === 'true')) {
+<!-- is:inline → 脚本内联于 HTML 流中，首帧即刻执行，不受外部 JS 阻塞 -->
+<script is:inline>
+  // 封装统一的状态标记函数，带 0.4s 渐入过渡
+  var markAsLoaded = function(img) {
+    if (!img) return;
+    var container = img.parentElement;
+    if (container && container.getAttribute('data-loaded') !== 'true') {
+      // 严格遵守物理时序：此时触发 transition，背景色平滑切换，图片 opacity 渐入
       container.setAttribute('data-loaded', 'true');
     }
   };
 
-  const checkProgressiveImages = () => {
-    document.querySelectorAll('.progressive-img-inner').forEach((img) => {
-      if (img instanceof HTMLImageElement && img.complete && img.currentSrc) {
-        markImgLoaded(img);
-      }
-    });
-  };
-
-  const activateDeferredProgressiveImages = () => {
-    document.querySelectorAll('img.progressive-img-inner[data-progressive-src]').forEach((img) => {
-      if (!(img instanceof HTMLImageElement)) return;
-      const src = img.dataset.progressiveSrc;
-      if (!src || img.currentSrc || img.getAttribute('src')) return;
-      img.src = src;
-      img.removeAttribute('data-progressive-src');
-    });
-  };
-
-  const scheduleDeferredProgressiveImages = () => {
-    const runWhenIdle = () => {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(activateDeferredProgressiveImages, { timeout: 2500 });
+  var initProgressiveImages = function() {
+    var images = document.querySelectorAll('.progressive-img-inner');
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      // 1. 缓存命中防御：如果图片已经加载完成（缓存），立刻标记
+      if (img.complete) {
+        markAsLoaded(img);
       } else {
-        window.setTimeout(activateDeferredProgressiveImages, 1200);
+        // 2. 正常网络加载：绑定原生 onload，走 0.4s ease-out 丝滑过渡
+        img.onload = function() { markAsLoaded(img); };
+        img.addEventListener('load', function() { markAsLoaded(img); });
       }
-    };
-
-    if (document.readyState === 'complete') {
-      runWhenIdle();
-    } else {
-      window.addEventListener('load', runWhenIdle, { once: true });
     }
   };
 
-  if (import.meta.env.DEV) {
-    // Dev-only: capture images injected by Astro HMR without keeping this observer in production.
-    const progressiveObserver = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-          if (!(node instanceof HTMLElement)) continue;
-          if (node.classList?.contains('progressive-img-inner') && node instanceof HTMLImageElement && node.complete && node.currentSrc) {
-            markImgLoaded(node);
-          }
-          const imgs = node.querySelectorAll?.('.progressive-img-inner');
-          if (imgs?.length) {
-            imgs.forEach((img) => {
-              if (img instanceof HTMLImageElement && img.complete && img.currentSrc) {
-                markImgLoaded(img);
-              }
-            });
-          }
-        }
-      }
-    });
-    progressiveObserver.observe(document.body, { childList: true, subtree: true });
-  }
-
-  // 页面加载后立即扫描，消除缓存图片及快速加载图片的未加载状态
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', checkProgressiveImages);
-  } else {
-    checkProgressiveImages();
-  }
-
-  // 兼容 View Transitions 或动态更新场景
-  document.addEventListener('astro:page-load', checkProgressiveImages);
-  document.addEventListener('astro:page-load', scheduleDeferredProgressiveImages);
-  scheduleDeferredProgressiveImages();
+  // 基础首屏与 View Transitions 导航生命周期绑定
+  document.addEventListener('DOMContentLoaded', initProgressiveImages);
+  document.addEventListener('astro:page-load', initProgressiveImages);
+  document.addEventListener('astro:after-swap', initProgressiveImages);
 </script>
+
+{import.meta.env.DEV && (
+  <script is:inline>
+    // 专治开发模式下 Astro / Vite HMR 动态注入新 DOM 片段的终极防线
+    var hmrObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (!node.querySelectorAll) return;
+
+          // 找到 HMR 期间被新插入或替换的图片节点
+          var hmrImages = node.classList && node.classList.contains('progressive-img-inner')
+            ? [node]
+            : node.querySelectorAll('.progressive-img-inner');
+
+          for (var i = 0; i < hmrImages.length; i++) {
+            (function(img) {
+              // 关键：在 HMR 插入瞬间，若浏览器有缓存则瞬发；若无缓存，严禁硬着陆，继续监听加载
+              if (img.complete) {
+                markAsLoaded(img);
+              } else {
+                img.onload = function() { markAsLoaded(img); };
+                // 针对 HMR 极为特殊的 src 替换场景的兜底
+                img.addEventListener('load', function() { markAsLoaded(img); }, { once: true });
+              }
+            })(hmrImages[i]);
+          }
+        });
+      });
+    });
+
+    hmrObserver.observe(document.body, { childList: true, subtree: true });
+  </script>
+)}
 
 <style is:global>
   /* ═══════════════════════════════════════════════════════════════
