@@ -20,6 +20,13 @@ interface Props {
    * @default false
    */
   bgFadesOut?: boolean
+  /**
+   * 加载完成后的背景色（可选）
+   * 设置后，加载完成时背景会从 bgColor 平滑过渡到 loadedBgColor
+   * 不设置则保持 bgColor 不变（或当 bgFadesOut 时变为透明）
+   * 适用于 PNG 卡片：加载时主色调占位，加载后反差色衬托
+   */
+  loadedBgColor?: string
   fetchPriority?: 'high' | 'low' | 'auto'
   loadStrategy?: 'normal' | 'defer'
 }
@@ -36,6 +43,7 @@ const {
   bgColor = '',
   aspectRatio,
   bgFadesOut = false,
+  loadedBgColor = '',
   fetchPriority,
   loadStrategy = 'normal',
 } = Astro.props
@@ -65,6 +73,11 @@ if (isImageMetadata(src)) {
   containerStyle['--img-original-ratio'] = `${width} / ${height}`
 }
 
+// 如果设置了 loadedBgColor，将其作为 CSS 变量注入，供 CSS transition 使用
+if (loadedBgColor) {
+  containerStyle['--loaded-bg-color'] = loadedBgColor
+}
+
 // ── 自动计算 5 对响应式 srcset 宽度 ──
 const responsiveWidths = (() => {
   if (!width) return undefined
@@ -81,25 +94,19 @@ const responsiveWidths = (() => {
 const shouldDeferImage = loadStrategy === 'defer'
 const deferredSrc = typeof src === 'string' ? src : isImageMetadata(src) ? src.src : ''
 
-// ── 图片 onload 回调：decode 后标记 loaded ──
+// ── 图片 onload 回调：标记 loaded ──
 // 使用 closest() 向上查找 .progressive-img-container，兼容 Astro <Image> 的 <picture> 包裹层
+// 当设置了 loadedBgColor 时，容器也标记 loaded，CSS 会将背景色过渡到 --loaded-bg-color
 const onImgReady =
   `var d=this.dataset;` +
-  `if('decode' in this){this.decode().then(function(){` +
-    `this.setAttribute('data-loaded','true');` +
-    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
-  `}.bind(this)).catch(function(){` +
-    `this.setAttribute('data-loaded','true');` +
-    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
-  `}.bind(this))}else{` +
-    `this.setAttribute('data-loaded','true');` +
-    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
-  `}`
+  `this.setAttribute('data-loaded','true');` +
+  `var c=this.closest('.progressive-img-container');` +
+  `if(c&&(d.bgFadesOut==='true'||d.hasLoadedBg==='true')){c.setAttribute('data-loaded','true')}`
 ---
 
 {
   fadeIn ? (
-    <div class:list={[containerClass, className]} style={containerStyle} data-bg-fades-out={bgFadesOut ? 'true' : undefined}>
+    <div class:list={[containerClass, className]} style={containerStyle} data-bg-fades-out={bgFadesOut ? 'true' : undefined} data-has-loaded-bg={loadedBgColor ? 'true' : undefined}>
       {shouldDeferImage && deferredSrc ? (
         <img
           data-progressive-src={deferredSrc}
@@ -111,6 +118,7 @@ const onImgReady =
           decoding={decoding}
           fetchpriority={fetchPriority ?? 'low'}
           data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
           onload={onImgReady}
         />
       ) : typeof src === 'string' ? (
@@ -124,6 +132,7 @@ const onImgReady =
           decoding={decoding}
           fetchpriority={fetchPriority}
           data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
           onload={onImgReady}
         />
       ) : isImageMetadata(src) ? (
@@ -138,6 +147,7 @@ const onImgReady =
           decoding={decoding}
           fetchpriority={fetchPriority}
           data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
           onload={onImgReady}
         />
       ) : null}
@@ -174,17 +184,10 @@ const onImgReady =
   const markImgLoaded = (img) => {
     if (!(img instanceof HTMLImageElement)) return;
     if (img.hasAttribute('data-loaded')) return;
-    const doMark = () => {
-      img.setAttribute('data-loaded', 'true');
-      if (img.dataset.bgFadesOut === 'true') {
-        const container = img.closest('.progressive-img-container');
-        if (container) container.setAttribute('data-loaded', 'true');
-      }
-    };
-    if ('decode' in img) {
-      img.decode().then(doMark).catch(doMark);
-    } else {
-      doMark();
+    img.setAttribute('data-loaded', 'true');
+    const container = img.closest('.progressive-img-container');
+    if (container && (img.dataset.bgFadesOut === 'true' || img.dataset.hasLoadedBg === 'true')) {
+      container.setAttribute('data-loaded', 'true');
     }
   };
 
@@ -293,8 +296,24 @@ const onImgReady =
     aspect-ratio: inherit !important;
   }
 
-  .progressive-img-container[data-loaded="true"] {
+  /* bgFadesOut 模式：加载完成后背景色淡出为透明 */
+  .progressive-img-container[data-bg-fades-out="true"][data-loaded="true"] {
     background-color: transparent !important;
+  }
+
+  /* loadedBgColor 模式：加载完成后背景色过渡到 --loaded-bg-color */
+  .progressive-img-container[data-has-loaded-bg="true"][data-loaded="true"] {
+    background-color: var(--loaded-bg-color) !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     暗黑模式下的 PNG 反差色保护
+     当主色调计算选择 light var（neutral-200）时，dark 模式下需要
+     改用 dark var（neutral-800），避免在深色界面突然爆出亮灰色块
+     ═══════════════════════════════════════════════════════════════ */
+  :global(.darkmode) .progressive-img-container[data-has-loaded-bg="true"][data-loaded="true"] {
+    /* light 时 200, dark 时 800 */
+    background-color: light-dark(var(--loaded-bg-color), var(--color-neutral-800, #262626)) !important;
   }
 
   /* ═══════════════════════════════════════════════════════════════

@@ -5,6 +5,8 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { parseResponsiveGap } from '@utils/tailwindSpacing'
 import themeConfig from '@config'
 import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import { getContrastBgColor } from '@utils/pngTheme'
 
 /**
  * PostCard Component
@@ -84,7 +86,16 @@ const gapMdValue = gapTokens.md ?? gapBase
 
 // ── 提取图片主色调 ──
 const dominantColor = await getDominantColor(image)
-const mediaBgStyle = `background-color: ${dominantColor}; ${imageRatioStyle}`
+
+// ── PNG 检测：加载时主色调占位，加载完成后平滑过渡到反差色 ──
+const isPng = isPngImage(image)
+
+// PNG 图片：bgColor 用主色调（加载时占位），loadedBgColor 用反差色（加载完成后衬托）
+// 非 PNG 图片：bgColor 用主色调，无 loadedBgColor（保持主色调）
+const contrastBg = isPng ? getContrastBgColor(dominantColor) : null
+const bgColor = dominantColor
+const loadedBgColor = isPng ? contrastBg!.cssVar : ''
+const mediaBgStyle = `background-color: ${bgColor}; ${imageRatioStyle}`
 ---
 <!--
   直接使用 inline style 设置 gap base 值，确保最高优先级。
@@ -95,7 +106,7 @@ const mediaBgStyle = `background-color: ${dominantColor}; ${imageRatioStyle}`
   style={`--card-gap: ${gapBase}; --card-gap-md: ${gapMdValue}`}
 >
   <a class="post-card__media" href={postUrl} aria-label={`Read post: ${title}`} style={`${mediaBgStyle}; --post-card-radius: ${cardRadius}`}>
-    <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" fadeIn={true} bgColor={dominantColor} />
+    <ContentImage src={image} alt={imageAlt} width={800} height={500} class="post-card__image" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor || undefined} />
   </a>
   <div class="post-card__content space-content flex flex-col justify-center">
     <HeadingTag class="post-card__title">
