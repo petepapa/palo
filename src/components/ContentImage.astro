@@ -182,11 +182,16 @@ const onImgReady =
 <!-- is:inline → 脚本内联于 HTML 流中，首帧即刻执行，不受外部 JS 阻塞 -->
 <script is:inline>
   // 封装统一的状态标记函数，带 0.4s 渐入过渡
+  // 使用 closest('.progressive-img-container') 向上穿透 <picture> 包裹层（Astro <Image> 组件会生成 <picture>）
   var markAsLoaded = function(img) {
     if (!img) return;
-    var container = img.parentElement;
+    // 1. 标记图片自身 → opacity 从 0 渐入
+    if (img.getAttribute('data-loaded') !== 'true') {
+      img.setAttribute('data-loaded', 'true');
+    }
+    // 2. 向上查找 progressive-img-container → 触发背景色 transition
+    var container = img.closest('.progressive-img-container');
     if (container && container.getAttribute('data-loaded') !== 'true') {
-      // 严格遵守物理时序：此时触发 transition，背景色平滑切换，图片 opacity 渐入
       container.setAttribute('data-loaded', 'true');
     }
   };
@@ -195,14 +200,17 @@ const onImgReady =
     var images = document.querySelectorAll('.progressive-img-inner');
     for (var i = 0; i < images.length; i++) {
       var img = images[i];
-      // 1. 缓存命中防御：如果图片已经加载完成（缓存），立刻标记
-      if (img.complete) {
-        markAsLoaded(img);
-      } else {
-        // 2. 正常网络加载：绑定原生 onload，走 0.4s ease-out 丝滑过渡
-        img.onload = function() { markAsLoaded(img); };
-        img.addEventListener('load', function() { markAsLoaded(img); });
-      }
+      // 使用 IIFE 避免 var 闭包陷阱：确保回调中 img 始终指向当前元素
+      (function(imgEl) {
+        // 1. 缓存命中防御：如果图片已经加载完成（缓存），立刻标记
+        if (imgEl.complete) {
+          markAsLoaded(imgEl);
+        } else {
+          // 2. 正常网络加载：绑定原生 onload，走 0.4s ease-out 丝滑过渡
+          imgEl.onload = function() { markAsLoaded(imgEl); };
+          imgEl.addEventListener('load', function() { markAsLoaded(imgEl); });
+        }
+      })(img);
     }
   };
 
