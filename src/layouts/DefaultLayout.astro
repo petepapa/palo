@@ -1003,6 +1003,47 @@ ${bodyLineHeights}
         .prose {
           color: var(--foreground-color);
         }
+
+        /* ── 导航链接首帧样式 —— 防止慢网下退化为纯文本堆叠 ── */
+        #main-navigation a {
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-accent, 500);
+          font-size: var(--text-base);
+          display: inline-flex;
+          align-items: center;
+          text-decoration: none;
+          color: var(--foreground-color);
+        }
+
+        #main-navigation .menu-item {
+          display: flex;
+          align-items: center;
+          list-style: none;
+        }
+
+        /* ── PostHeader 元信息 & 分割线骨架 —— 防止作者/操作区塌陷 ── */
+        .post-header__meta {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: center;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+
+        .post-header__divider {
+          display: block;
+          border-block-end: 1px solid var(--border-color-subtle, var(--color-neutral-300));
+        }
+
+        .post-header--needs-header-space {
+          padding-block-start: var(--nav-min-height, 6rem);
+        }
+
+        @media (max-width: 768px) {
+          .post-header__meta {
+            grid-template-columns: 1fr;
+          }
+        }
       }
     </style>
   </head>

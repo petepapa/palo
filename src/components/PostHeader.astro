@@ -11,7 +11,6 @@ import defaultCover from '../assets/images/posts/default.png'
 
 const { navigation, layout } = config
 const fixedHeader = navigation?.fixedHeader ?? layout.fixedHeader ?? false
-const navMinHeight = navigation?.minHeight ?? '4.5rem'
 
 type Author = {
   name: string
@@ -150,7 +149,7 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   ]}
 >
   {isCoverImageTop && (
-    <div class="post-header__image">
+    <div class="post-header__image" style={coverImageBgStyle}>
       <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}
@@ -196,7 +195,7 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   )}
 
   {isCoverImageHead && (
-    <div class="post-header__image post-header__image--head">
+    <div class="post-header__image post-header__image--head" style={coverImageBgStyle}>
       <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}
@@ -235,7 +234,7 @@ const coverImageBgStyle = `background-color: ${dominantColor} !important;`
   </div>
 
   {isCoverImageBottom && (
-    <div class="post-header__image post-header__image--bottom">
+    <div class="post-header__image post-header__image--bottom" style={coverImageBgStyle}>
       <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={dominantColor} bgFadesOut={true} />
     </div>
   )}

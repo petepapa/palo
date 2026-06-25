@@ -20,6 +20,8 @@ interface Props {
    * @default false
    */
   bgFadesOut?: boolean
+  fetchPriority?: 'high' | 'low' | 'auto'
+  loadStrategy?: 'normal' | 'defer'
 }
 
 const {
@@ -34,6 +36,8 @@ const {
   bgColor = '',
   aspectRatio,
   bgFadesOut = false,
+  fetchPriority,
+  loadStrategy = 'normal',
 } = Astro.props
 
 const containerClass = fadeIn ? 'progressive-img-container' : undefined
@@ -43,10 +47,22 @@ if (bgColor) {
   containerStyle.backgroundColor = bgColor
 }
 
-// 自动锁死宽高比以实现 0 CLS
-const finalAspectRatio = aspectRatio || (width && height ? `${width} / ${height}` : undefined)
-if (finalAspectRatio) {
-  containerStyle.aspectRatio = finalAspectRatio
+// bgFadesOut 容器：inline style 预置 height:100%，确保 CSS 延迟加载时有刚性尺寸
+// 与 global CSS 中的 .progressive-img-container[data-bg-fades-out="true"] 形成双重保险
+if (bgFadesOut) {
+  containerStyle.height = '100%'
+}
+
+// 显式传入的 aspectRatio prop 优先使用
+if (aspectRatio) {
+  containerStyle.aspectRatio = aspectRatio
+}
+
+// 注入原始比例变量：父容器无高度约束时作为骨架，避免慢网下正文流坍塌。
+if (isImageMetadata(src)) {
+  containerStyle['--img-original-ratio'] = `${src.width} / ${src.height}`
+} else if (width && height) {
+  containerStyle['--img-original-ratio'] = `${width} / ${height}`
 }
 
 // ── 自动计算 5 对响应式 srcset 宽度 ──
@@ -61,12 +77,43 @@ const responsiveWidths = (() => {
     Math.round(base * 1.2),
   ].filter((w, i, arr) => w > 0 && arr.indexOf(w) === i)
 })()
+
+const shouldDeferImage = loadStrategy === 'defer'
+const deferredSrc = typeof src === 'string' ? src : isImageMetadata(src) ? src.src : ''
+
+// ── 图片 onload 回调：decode 后标记 loaded ──
+// 使用 closest() 向上查找 .progressive-img-container，兼容 Astro <Image> 的 <picture> 包裹层
+const onImgReady =
+  `var d=this.dataset;` +
+  `if('decode' in this){this.decode().then(function(){` +
+    `this.setAttribute('data-loaded','true');` +
+    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
+  `}.bind(this)).catch(function(){` +
+    `this.setAttribute('data-loaded','true');` +
+    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
+  `}.bind(this))}else{` +
+    `this.setAttribute('data-loaded','true');` +
+    `if(d.bgFadesOut==='true'){var c=this.closest('.progressive-img-container');if(c)c.setAttribute('data-loaded','true')}` +
+  `}`
 ---
 
 {
   fadeIn ? (
-    <div class:list={[containerClass, className]} style={containerStyle}>
-      {typeof src === 'string' ? (
+    <div class:list={[containerClass, className]} style={containerStyle} data-bg-fades-out={bgFadesOut ? 'true' : undefined}>
+      {shouldDeferImage && deferredSrc ? (
+        <img
+          data-progressive-src={deferredSrc}
+          alt={alt}
+          width={width}
+          height={height}
+          class="progressive-img-inner"
+          loading="lazy"
+          decoding={decoding}
+          fetchpriority={fetchPriority ?? 'low'}
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          onload={onImgReady}
+        />
+      ) : typeof src === 'string' ? (
         <img
           src={src}
           alt={alt}
@@ -75,8 +122,9 @@ const responsiveWidths = (() => {
           class="progressive-img-inner"
           loading={loading}
           decoding={decoding}
+          fetchpriority={fetchPriority}
           data-bg-fades-out={bgFadesOut ? 'true' : undefined}
-          onload="if ('decode' in this) { this.decode().then(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }).catch(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }) } else { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }"
+          onload={onImgReady}
         />
       ) : isImageMetadata(src) ? (
         <Image
@@ -88,8 +136,9 @@ const responsiveWidths = (() => {
           class="progressive-img-inner"
           loading={loading}
           decoding={decoding}
+          fetchpriority={fetchPriority}
           data-bg-fades-out={bgFadesOut ? 'true' : undefined}
-          onload="if ('decode' in this) { this.decode().then(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }).catch(() => { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }) } else { this.setAttribute('data-loaded', 'true'); if (this.dataset.bgFadesOut === 'true') { this.parentElement?.setAttribute('data-loaded', 'true'); } }"
+          onload={onImgReady}
         />
       ) : null}
       <noscript>
@@ -98,10 +147,13 @@ const responsiveWidths = (() => {
             opacity: 1 !important;
           }
         </style>
+        {shouldDeferImage && deferredSrc && (
+          <img src={deferredSrc} alt={alt} width={width} height={height} class="progressive-img-inner" loading="eager" decoding={decoding} />
+        )}
       </noscript>
     </div>
   ) : typeof src === 'string' ? (
-    <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} />
+    <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} fetchpriority={fetchPriority} />
   ) : isImageMetadata(src) ? (
     <Image
       src={src}
@@ -112,30 +164,86 @@ const responsiveWidths = (() => {
       class={className}
       loading={loading}
       decoding={decoding}
+      fetchpriority={fetchPriority}
     />
   ) : null
 }
 
 <script>
+  // ── 标记已缓存的图片为 loaded ──
+  const markImgLoaded = (img) => {
+    if (!(img instanceof HTMLImageElement)) return;
+    if (img.hasAttribute('data-loaded')) return;
+    const doMark = () => {
+      img.setAttribute('data-loaded', 'true');
+      if (img.dataset.bgFadesOut === 'true') {
+        const container = img.closest('.progressive-img-container');
+        if (container) container.setAttribute('data-loaded', 'true');
+      }
+    };
+    if ('decode' in img) {
+      img.decode().then(doMark).catch(doMark);
+    } else {
+      doMark();
+    }
+  };
+
   const checkProgressiveImages = () => {
     document.querySelectorAll('.progressive-img-inner').forEach((img) => {
-      if (img instanceof HTMLImageElement && img.complete) {
-        const markLoaded = () => {
-          img.setAttribute('data-loaded', 'true');
-          if (img.dataset.bgFadesOut === 'true') {
-            img.parentElement?.setAttribute('data-loaded', 'true');
-          }
-        };
-        if ('decode' in img) {
-          img.decode()
-            .then(markLoaded)
-            .catch(markLoaded);
-        } else {
-          markLoaded();
-        }
+      if (img instanceof HTMLImageElement && img.complete && img.currentSrc) {
+        markImgLoaded(img);
       }
     });
   };
+
+  const activateDeferredProgressiveImages = () => {
+    document.querySelectorAll('img.progressive-img-inner[data-progressive-src]').forEach((img) => {
+      if (!(img instanceof HTMLImageElement)) return;
+      const src = img.dataset.progressiveSrc;
+      if (!src || img.currentSrc || img.getAttribute('src')) return;
+      img.src = src;
+      img.removeAttribute('data-progressive-src');
+    });
+  };
+
+  const scheduleDeferredProgressiveImages = () => {
+    const runWhenIdle = () => {
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(activateDeferredProgressiveImages, { timeout: 2500 });
+      } else {
+        window.setTimeout(activateDeferredProgressiveImages, 1200);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      runWhenIdle();
+    } else {
+      window.addEventListener('load', runWhenIdle, { once: true });
+    }
+  };
+
+  if (import.meta.env.DEV) {
+    // Dev-only: capture images injected by Astro HMR without keeping this observer in production.
+    const progressiveObserver = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+          if (node.classList?.contains('progressive-img-inner') && node instanceof HTMLImageElement && node.complete && node.currentSrc) {
+            markImgLoaded(node);
+          }
+          const imgs = node.querySelectorAll?.('.progressive-img-inner');
+          if (imgs?.length) {
+            imgs.forEach((img) => {
+              if (img instanceof HTMLImageElement && img.complete && img.currentSrc) {
+                markImgLoaded(img);
+              }
+            });
+          }
+        }
+      }
+    });
+    progressiveObserver.observe(document.body, { childList: true, subtree: true });
+  }
 
   // 页面加载后立即扫描，消除缓存图片及快速加载图片的未加载状态
   if (document.readyState === 'loading') {
@@ -146,30 +254,70 @@ const responsiveWidths = (() => {
 
   // 兼容 View Transitions 或动态更新场景
   document.addEventListener('astro:page-load', checkProgressiveImages);
+  document.addEventListener('astro:page-load', scheduleDeferredProgressiveImages);
+  scheduleDeferredProgressiveImages();
 </script>
 
 <style is:global>
+  /* ═══════════════════════════════════════════════════════════════
+     三层硬核防线 (Hardened CLS Shield)
+     Slow 4G 下 CSS 自然优先级失效 → 显式消费方选择器强行锁死
+     ═══════════════════════════════════════════════════════════════ */
+
   .progressive-img-container {
-    position: relative;
     display: block;
+    width: 100%;
+    position: relative;
     overflow: hidden;
-    inline-size: 100%;
-    block-size: 100%;
-    transition: background-color 0.45s ease-out;
+    transition: background-color 0.4s ease-out;
+
+    /* 防线 ①：默认 / 正文流兜底 —— 用图片原始比例撑开占位块 */
+    aspect-ratio: var(--img-original-ratio, 16 / 9);
+  }
+
+  /* 防线 ②：详情页页头大图（PostHeader）—— 无条件强制拉满父级高度 */
+  .post-header__image .progressive-img-container,
+  .post-header .progressive-img-container,
+  .progressive-img-container[data-bg-fades-out="true"] {
+    height: 100% !important;
+    min-height: 100% !important;
+    block-size: 100% !important;
+    aspect-ratio: auto !important;
+  }
+
+  /* 防线 ③：卡片流（PostCard / ProjectCard）—— 强制继承父级比例 */
+  .post-card__media .progressive-img-container,
+  .project-card__media .progressive-img-container {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: inherit !important;
   }
 
   .progressive-img-container[data-loaded="true"] {
     background-color: transparent !important;
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     内部图片层：绝对定位，100% 填充上层骨架
+     ═══════════════════════════════════════════════════════════════ */
   .progressive-img-inner {
     position: absolute;
-    inset: 0;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
     opacity: 0;
     transition: opacity 0.45s ease-out !important;
+  }
+
+  .progressive-img-inner img,
+  .progressive-img-inner picture,
+  .progressive-img-inner :where(img) {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
   }
 
   .progressive-img-inner[data-loaded="true"] {

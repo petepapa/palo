@@ -75,9 +75,17 @@ function resolveImagePath(imageInput: unknown): string | null {
 
     const inputPath = imageInput.trim()
 
-    // ── 形态 2: public/ 绝对虚拟路径（以 / 开头） ──
+    // ── 形态 2: 绝对虚拟路径（以 / 开头） ──
     if (inputPath.startsWith('/')) {
-      // 去除开头的 /，拼上 ./public/
+      // 2a. /@fs/ 前缀：Vite dev server 虚拟绝对路径，直接剔除前缀
+      if (inputPath.startsWith('/@fs/')) {
+        const cleanPath = inputPath.substring(4).split('?')[0]
+        if (fs.existsSync(cleanPath)) {
+          return cleanPath
+        }
+      }
+
+      // 2b. 去除开头的 /，拼上 ./public/
       const relative = inputPath.slice(1)
       const candidate = path.resolve(process.cwd(), 'public', relative)
       if (fs.existsSync(candidate)) {

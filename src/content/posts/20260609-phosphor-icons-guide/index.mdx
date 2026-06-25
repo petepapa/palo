@@ -7,7 +7,7 @@ author:
   image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Documentation', 'Icons', 'Design']
-coverImage: /posts/docs/icons.png
+coverImage: ./cover.png
 coverImagePosition: head
 breadcrumbs: true
 customBreadcrumbLabels:
@@ -21,8 +21,6 @@ toc: true
 featuredOrder: 3
 
 ---
-
-import { Icon } from 'astro-icon/components'
 
 ### Introduction
 
@@ -441,3 +439,50 @@ Phosphor Icons provides everything you need for beautiful, consistent iconograph
 Phosphor Icons 为您的 Palo 网站提供了美丽、一致的图标所需的一切。凭借多种风格、重量和数千种图标可供选择，您可以为您的项目创建统一的视觉语言。
 
 Remember to visit [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/) whenever you need to find a specific icon!
+
+---
+
+## STRATEGIC ASSET LOADING PRIORITIZATION (ANTI-LAZY-DEADLOCK)
+
+To eliminate visual deadlocks where a user is stranded with a static solid color placeholder, Palo enforces a strict boundary between eager hero components and deferred content elements.
+为了根除用户因纯色块占位卡死而产生页面损坏的错觉，Palo 在首屏核心组件与延时非首屏元素之间，划定了极其严格的资源抢占界限。
+
+This technical partitioning alignment ensures that structural integrity is immediately followed by standard high-priority stream decoding.
+这种加载策略的对齐，确保了页面在完成大结构布局锁死之后，能够第一时间发起高优先级的数据流解码。
+
+### Hero and Header Eager Pipeline
+Any media assets dominating the initial folder screen viewpoint—such as `PostHeader` layouts or top-level `Hero` background modules—must actively bypass lazy-loading architecture.
+凡是主导首屏核心视觉焦点的媒介素材——如文章详情页头 `PostHeader` 或通栏 `Hero` 模块——必须绝对绕过任何形式的延迟初始化架构。
+
+* **Immediate Fetching Trigger**: These assets strictly implement `loading="eager"` and reject `loadStrategy="defer"` modifiers, prompting the server to download data instantly during the first browser HTML pass.
+  *即时捕获触发：此类资产严格声明 `loading="eager"` 并彻底剔除 `loadStrategy="defer"` 属性，强制浏览器在解析 HTML 第一帧时无条件启动并发网络请求。*
+* **Inline Height Isolation Constraints**: To shield against async runtime style delays, the underlying rendering box embeds raw inline height parameters directly within the markup tree.
+  *内联高度隔离约束：为了防御异步 CSS 文件在慢速网络下的到达延迟，底层媒介块会将 `height: 100%` 直接作为内联样式随 HTML 刺入文档树，避免首屏瞬间产生高度塌陷。*
+
+### Non-Hero Content Deferral
+The `loadStrategy="defer"` system remains fully active as a secondary runtime system tailored exclusively for standard body flows.
+`loadStrategy="defer"` 机制将退回为纯粹的辅助系统，全权接管标准文章正文流中非首屏的图片资产。
+
+* **Idle Callback Execution**: Images inside subsequent content markers or standard markdown bodies utilize `requestIdleCallback` to delay processing until core main-thread interactive tasks settle down.
+  *空闲回调执行：后置正文流或 Markdown 内部的普通插图将继续利用 `requestIdleCallback`，将线程压力推迟至主流程交互安全落盘之后。*
+
+---
+
+## CRITICAL CSS INLINING (ANTI-FOUC SHIELD)
+
+To completely eliminate Flash of Unstyled Content (FOUC) during the volatile first few seconds on Slow 4G networks, Palo decouples above-the-fold layout architecture from external stylesheets.
+为了彻底消除低速 4G 网络下首屏前几秒惨烈的无样式内容闪烁（FOUC），Palo 将首屏核心布局骨架与外部大体积样式表进行了解耦。
+
+By immediately rendering crucial structural definitions, the framework provides an instant seamless dark viewport long before heavy style chunks arrive.
+通过即时渲染关键的结构定义，该框架在沉重的样式分块到达前，便能瞬间提供一个视觉无缝的暗色视口骨架。
+
+### Core Structural Inlining
+Essential flex-box boundaries, base layout heights, and foundational dark mode system background colors are injected directly via inline compilation tags.
+最核心的弹性盒边界、基础布局高度、以及全站底层的深色系统背景色，均通过内联编译标签直接刺入主文档流。
+
+* **Zero-Delay Shell Rendering**: The skeleton framework processes concurrently with raw HTML parsing, preventing navigation menus and header wrappers from rendering as misaligned plain text during asset streams.
+  *零延迟壳层渲染：骨架外壳与原始 HTML 解析完全同步生效，严防导航菜单与页头容器在外部资产下载期间退化为错位的纯文本排版。*
+* **Font Swap Synchronization**: All editorial typography enforces strict `font-display: swap` rules paired with strategic head preloading to mitigate sudden fallback shifts.
+  *字体平滑同步：所有社论版式字体强制执行严格的 `font-display: swap` 规则，并配合头部策略性预加载，以抹平字体文件突发性到达时的空间位移。*
+* **Navigation Link Hardening**: Base typography tokens—`font-family`, `font-weight`, `font-size`, `display: inline-flex`—are anchored directly to `#main-navigation` link selectors within the inline critical shield, ensuring navigation items never regress to browser-default serif stacking before external CSS arrives.
+  *导航链接硬化：基础排版令牌——`font-family`、`font-weight`、`font-size`、`display: inline-flex`——直接锚定到内联关键 CSS 中的 `#main-navigation` 链接选择器，确保在外部 CSS 到达前，导航项绝不会退化为浏览器默认衬线字体堆叠。*

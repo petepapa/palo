@@ -1,4 +1,7 @@
 import type { ImageMetadata } from 'astro'
+import fs from 'node:fs'
+import path from 'node:path'
+
 import type { CollectionEntry, RenderResult } from 'astro:content'
 import { render } from 'astro:content'
 import defaultPostImage from '@assets/images/posts/default.png'
@@ -196,20 +199,37 @@ export function resolveContentImage(
       return imagePath
     }
 
-    // ── Phase 3: 相对路径兜底 → 构造 public 路径（当 glob 未命中时）──
+    // ── Phase 3: 相对路径兜底 → 构造可访问路径（当 glob 未命中时）──
     if (isRelativeContentImage(imagePath) && contentId && collection) {
-      // 将相对路径（如 ./cover.jpg）转换为内容集合路径
       const normalizedImagePath = imagePath.replace(/^\.\//, '')
-      const basePath = collection === 'posts' ? '/posts' : '/projects'
+      const baseContentPath = collection === 'posts' ? 'posts' : 'projects'
 
-      // 如果 contentId 已经包含文件夹路径（如 project-01/index.md），需要提取目录部分
       const contentDir = contentId.includes('/')
         ? contentId.substring(0, contentId.lastIndexOf('/'))
         : ''
 
+      const fsContentPath = contentDir
+        ? `src/content/${baseContentPath}/${contentDir}/${normalizedImagePath}`
+        : `src/content/${baseContentPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
+
+      // Dev 模式：通过 /@fs/ 直接从源码目录提供 co-located 图片
+      // 避免依赖 public/ 下的复制（copy-colocated-images.mjs 仅在 build 时执行）
+      if (import.meta.env.DEV) {
+        const absolutePath = path.resolve(process.cwd(), fsContentPath)
+        if (fs.existsSync(absolutePath)) {
+          return `/@fs/${absolutePath}`
+        }
+        // /@fs/ fallback 失败时继续走 public 路径兜底
+        console.warn(
+          `[contentImages] Dev 模式 co-located 图片不存在：${fsContentPath}，回退到 public 路径`
+        )
+      }
+
+      // 非 dev 模式或文件不存在：构造 public 路径（依赖 copy-colocated-images.mjs 或构建）
+      const basePublicPath = collection === 'posts' ? '/posts' : '/projects'
       const resolvedPath = contentDir
-        ? `${basePath}/${contentDir}/${normalizedImagePath}`
-        : `${basePath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
+        ? `${basePublicPath}/${contentDir}/${normalizedImagePath}`
+        : `${basePublicPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
 
       return resolvedPath
     }

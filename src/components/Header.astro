@@ -20,47 +20,9 @@ const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
 const headerPosition = fixedHeader ? 'fixed' : 'absolute'
 ---
 
-<header
-  class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
-  style={`position: ${headerPosition}; top: 0; left: 0; right: 0; width: 100%; min-height: ${navMinHeight}; z-index: 50; --header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
->
-  <SkipLink />
-  <!-- Initialize preference components -->
-  <div hidden>
-    <HighContrast />
-    <ReducedMotion />
-  </div>
-
-  <Navigation />
-  {
-    site.launcher && <LauncherConfig />
-  }
-</header>
-
-<!-- ════════════════════════════════════════════════════════
-     Critical CSS: 导航栏骨架刚体样式
-     确保在外部 CSS/JS 加载前，顶栏已经完美站住位置，
-     不发生 FOUC / 布局塌陷。
-     ════════════════════════════════════════════════════════ -->
 <style is:inline>
-  /* ── 1. 导航栏容器骨架 ── */
   header {
-    /* position 由内联 style 属性直接控制，此处不重复设置 */
-
-    /* 刚性高度：在 JS 注入 is-fixed 前预先占用空间 */
     min-height: var(--nav-min-height, 6rem);
-  }
-
-  /* ── 2. 固定模式：JS 加载后 is-fixed 类追加，但这里预先埋好选择器 ── */
-  header.is-fixed {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  /* ── 3. 使用 color-mix 预置背景，避免透明闪烁 ── */
-  header {
     background-color: color-mix(
       in oklab,
       var(--background-color, #000) calc(var(--header-bg-opacity, 0.45) * 100%),
@@ -68,46 +30,18 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
     );
   }
 
-  /* ── 4. 导航栏内部布局骨架：nav-bar 最小高度 ── */
-  #main-navigation .nav-bar {
-    min-block-size: var(--nav-min-height, 6rem);
+  header.is-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
   }
 
-  /* ── 5. 确保 Logo 区域在图片加载前已有刚性尺寸 ── */
-  .logo-link {
+  #main-navigation {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+    flex-direction: column;
   }
 
-  .logo-link .logo-svg,
-  .logo-link .logo-raster {
-    /* display 交由 Logo.astro 的 @layer overrides CSS 控制明暗切换 */
-    width: auto;
-    height: var(--logo-size, 40px);
-    block-size: var(--logo-size, 40px);
-    max-inline-size: 100%;
-    background-color: transparent;
-  }
-
-  /* 内联 SVG 首帧尺寸刚性——在 layered CSS 到达前防止布局塌陷 */
-  .logo-link .logo-svg svg {
-    display: block;
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-  }
-
-  /* ── 6. 文本 Logo 备用样式 ── */
-  .logo-link .logo-text {
-    font-size: var(--logo-size, 40px);
-    line-height: 1;
-    text-transform: none;
-    white-space: nowrap;
-  }
-
-  /* ── 7. wrapper 弹性布局骨架 - 防止导航菜单项换行塌陷 ── */
   #main-navigation > .container {
     display: flex;
     flex-wrap: wrap;
@@ -131,7 +65,89 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
     gap: var(--space-m, 1rem);
   }
 
-  /* ── 8. 响应式汉堡按钮 ── */
+  #main-navigation ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #main-navigation a {
+    text-decoration: none;
+  }
+
+  #main-navigation .desktop-menu {
+    display: none;
+  }
+
+  #main-navigation .mobile-menu {
+    position: absolute;
+    z-index: 110;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    height: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: var(--background-color);
+  }
+
+  #main-navigation .has-dropdown > ul {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .logo-link .logo-svg,
+  .logo-link .logo-raster {
+    width: auto;
+    height: var(--logo-size, 40px);
+    block-size: var(--logo-size, 40px);
+    max-inline-size: 100%;
+    background-color: transparent;
+  }
+
+  .logo-link .logo-svg svg {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+
+  .logo-svg--light,
+  .logo-raster--light {
+    display: block;
+  }
+
+  .logo-svg--dark,
+  .logo-raster--dark {
+    display: none;
+  }
+
+  .darkmode .logo-svg--light,
+  .darkmode .logo-raster--light {
+    display: none;
+  }
+
+  .darkmode .logo-svg--dark,
+  .darkmode .logo-raster--dark {
+    display: block;
+  }
+
+  .logo-link .logo-text {
+    font-size: var(--logo-size, 40px);
+    line-height: 1;
+    text-transform: none;
+    white-space: nowrap;
+  }
+
   .responsive-toggle {
     display: flex;
     align-items: center;
@@ -144,7 +160,50 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
     flex-shrink: 0;
   }
 
+  @media (min-width: 1050px) {
+    #main-navigation .nav-bar {
+      flex: 1 1 auto;
+    }
+
+    #main-navigation .mobile-menu,
+    #main-navigation .responsive-toggle,
+    #main-navigation .mobile-launcher {
+      display: none;
+    }
+
+    #main-navigation .desktop-menu {
+      display: grid;
+      flex: 1 1 auto;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: var(--space-m, 1rem);
+      min-inline-size: 0;
+    }
+
+    #main-navigation .desktop-menu > ul {
+      display: flex;
+      align-items: center;
+      gap: var(--space-m, 1rem);
+    }
+  }
 </style>
+
+<header
+  class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
+  style={`position: ${headerPosition}; top: 0; left: 0; right: 0; width: 100%; min-height: ${navMinHeight}; z-index: 50; --header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
+>
+  <SkipLink />
+  <!-- Initialize preference components -->
+  <div hidden>
+    <HighContrast />
+    <ReducedMotion />
+  </div>
+
+  <Navigation />
+  {
+    site.launcher && <LauncherConfig />
+  }
+</header>
 
 <style lang="scss" is:global>
   header {
