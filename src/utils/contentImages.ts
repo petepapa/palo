@@ -14,23 +14,32 @@ export type ContentCollection = 'posts' | 'projects'
 //    将 Vite 编译期 import 产物缓存为 ImageMetadata 映射表，
 //    使 resolveContentImage 能返还完整对象而非退化字符串。
 // ═══════════════════════════════════════════════════════════════
-const postImages = import.meta.glob<ImageMetadata>(
+// 不使用 import: 'default' —— Vite 对 src/content/ 下图片的 default export 可能仅返回 URL 字符串，
+// 缺少 width/height/format 元数据。改为获取完整模块对象，再手动提取 .default，
+// 强制触发 Astro 图片管道的完整 ImageMetadata 转换。
+const postImagesRaw = import.meta.glob(
   '/src/content/posts/**/*.{jpg,jpeg,png,gif,webp,avif}',
-  { eager: true, import: 'default' }
+  { eager: true }
 )
-const projectImages = import.meta.glob<ImageMetadata>(
+const projectImagesRaw = import.meta.glob(
   '/src/content/projects/**/*.{jpg,jpeg,png,gif,webp,avif}',
-  { eager: true, import: 'default' }
+  { eager: true }
 )
-const assetsImages = import.meta.glob<ImageMetadata>(
+const assetsImagesRaw = import.meta.glob(
   '/src/assets/**/*.{jpg,jpeg,png,gif,webp,avif}',
-  { eager: true, import: 'default' }
+  { eager: true }
 )
 
-const allGlobImages: Record<string, ImageMetadata> = {
-  ...postImages,
-  ...projectImages,
-  ...assetsImages,
+const allGlobImages: Record<string, ImageMetadata> = {}
+for (const [filePath, mod] of Object.entries({
+  ...postImagesRaw,
+  ...projectImagesRaw,
+  ...assetsImagesRaw,
+})) {
+  const metadata = (mod as { default: unknown }).default
+  if (isImageMetadata(metadata)) {
+    allGlobImages[filePath] = metadata
+  }
 }
 
 export function isImageMetadata(value: unknown): value is ImageMetadata {
@@ -151,9 +160,7 @@ function resolveImageFromGlob(
     const normalizedImagePath = imagePath.replace(/^\.\//, '')
     const basePath = collection === 'posts' ? 'posts' : 'projects'
 
-    // 只有当 contentId 包含路径分隔符时才提取目录部分
-    // 例如：project-01/index → 目录是 project-01
-    //       project-02 → 没有子目录，目录为 null
+    // ── 精确路径匹配 ──
     const hasSubdirectory = contentId.includes('/')
     const contentDir = hasSubdirectory
       ? contentId.substring(0, contentId.lastIndexOf('/'))
@@ -163,7 +170,27 @@ function resolveImageFromGlob(
       ? `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
       : `/src/content/${basePath}/${normalizedImagePath}`
 
-    return allGlobImages[fsPath] ?? null
+    const exactMatch = allGlobImages[fsPath]
+    if (exactMatch) return exactMatch
+
+    // ── 文件名回退匹配 ──
+    // 当精确路径推算偏差（如 contentDir 与实际目录结构不一致）时，
+    // 提取文件名在 glob 中做 basename 查找，与 BreakoutImage 行为一致。
+    const filename = normalizedImagePath.split('/').pop()!
+    for (const [globKey, metadata] of Object.entries(allGlobImages)) {
+      if (globKey.endsWith('/' + filename) || globKey.split('/').pop() === filename) {
+        // 优先匹配与 collection 相关的路径
+        if (globKey.includes(`/content/${basePath}/`)) {
+          return metadata
+        }
+      }
+    }
+    // 放宽约束：跨 collection 也接受（作为最终回退）
+    for (const [globKey, metadata] of Object.entries(allGlobImages)) {
+      if (globKey.split('/').pop() === filename) {
+        return metadata
+      }
+    }
   }
 
   return null

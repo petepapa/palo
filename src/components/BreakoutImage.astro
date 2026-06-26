@@ -31,15 +31,20 @@ import { getDominantColor } from '@utils/imageColor'
 //    使 BreakoutImage 能解析 MDX 中传入的纯相对路径（如 ./cover.jpg）
 //    并通过 filename → ImageMetadata 索引快速命中。
 // ═══════════════════════════════════════════════════════════════════
-const contentImageGlob = import.meta.glob<ImageMetadata>(
+// 不使用 import: 'default' —— 改为完整模块对象再提取 .default，确保获得
+// Astro 图片管道的完整 ImageMetadata（含 width/height/format），而非退化 URL 字符串。
+const contentImageGlob = import.meta.glob(
   '/src/content/**/*.{jpg,jpeg,png,gif,webp,avif}',
-  { eager: true, import: 'default' }
+  { eager: true }
 )
 
 const imageByFilename: Record<string, ImageMetadata> = {}
-for (const [filePath, metadata] of Object.entries(contentImageGlob)) {
-  const filename = filePath.split('/').pop()!
-  imageByFilename[filename] = metadata
+for (const [filePath, mod] of Object.entries(contentImageGlob)) {
+  const metadata = (mod as { default: unknown }).default
+  if (isImageMetadata(metadata)) {
+    const filename = filePath.split('/').pop()!
+    imageByFilename[filename] = metadata
+  }
 }
 
 /**
@@ -166,23 +171,23 @@ const radiusClass = resolvedLayout === 'full'
       src={imageSrc}
       alt={altText}
       widths={[560, 840, 1120, 1400, 1680]}
-      class:list={['h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
       loading="lazy"
       decoding="async"
-      onload="var c=this.closest('.breakout-image-container');this.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}"
+      onload="this.setAttribute('data-loaded','true');var c=this.closest('.breakout-image-container');this.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}"
     />
   ) : (
     <img
       src={imageSrc}
       alt={altText}
       class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
-      loading="lazy"
+      loading="eager"
       decoding="async"
-      onload="var i=this;var c=i.closest('.breakout-image-container');i.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}if(c&&c.hasAttribute('data-fallback-ratio')){c.removeAttribute('data-fallback-ratio');i.classList.remove('absolute','inset-0','h-full');i.classList.add('block')}if(i.complete){i.classList.remove('opacity-0');c&&c.setAttribute('data-loaded','true')}"
+      onload="var i=this;i.setAttribute('data-loaded','true');i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c){c.setAttribute('data-loaded','true');var w=i.naturalWidth;var h=i.naturalHeight;if(w&&h){c.style.transition='aspect-ratio .4s';c.style.aspectRatio=w+' / '+h}}"
     />
   )}
   <style is:global>
-    .breakout-image-container[data-fallback-ratio="true"] {
+    .breakout-image-container {
       aspect-ratio: 8 / 5;
     }
 
@@ -222,24 +227,28 @@ const radiusClass = resolvedLayout === 'full'
 
       // 核心防线：浏览器缓存命中 (304/强缓存) → img.complete 瞬时为 true
       if (img.complete) {
+        img.setAttribute('data-loaded', 'true');
         img.classList.remove('opacity-0');
         container.setAttribute('data-loaded', 'true');
-        if (container.hasAttribute('data-fallback-ratio')) {
-          container.removeAttribute('data-fallback-ratio');
-          img.classList.remove('absolute', 'inset-0', 'h-full');
-          img.classList.add('block');
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (w && h) {
+          container.style.transition = 'aspect-ratio .4s';
+          container.style.aspectRatio = w + ' / ' + h;
         }
       } else {
-        // 慢速网络拉取：重新绑定 onload，确保任何时序都能触发
-        img.onload = function() {
+        // 慢速网络拉取：只用 addEventListener，不覆盖内联 onload
+        img.addEventListener('load', function() {
+          img.setAttribute('data-loaded', 'true');
           img.classList.remove('opacity-0');
           container.setAttribute('data-loaded', 'true');
-          if (container.hasAttribute('data-fallback-ratio')) {
-            container.removeAttribute('data-fallback-ratio');
-            img.classList.remove('absolute', 'inset-0', 'h-full');
-            img.classList.add('block');
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          if (w && h) {
+            container.style.transition = 'aspect-ratio .4s';
+            container.style.aspectRatio = w + ' / ' + h;
           }
-        };
+        });
       }
     }
   };
@@ -267,13 +276,16 @@ const radiusClass = resolvedLayout === 'full'
               var container = img.closest('.breakout-image-container');
               if (!container) return;
               if (img.complete) {
+                img.setAttribute('data-loaded', 'true');
                 img.classList.remove('opacity-0');
                 container.setAttribute('data-loaded', 'true');
+              } else {
+                img.addEventListener('load', function() {
+                  img.setAttribute('data-loaded', 'true');
+                  img.classList.remove('opacity-0');
+                  container.setAttribute('data-loaded', 'true');
+                });
               }
-              img.onload = function() {
-                img.classList.remove('opacity-0');
-                container.setAttribute('data-loaded', 'true');
-              };
             })(hmrImgs[i]);
           }
         });

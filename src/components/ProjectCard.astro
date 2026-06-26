@@ -76,7 +76,6 @@ const mediaBgStyle = `background-color: ${bgColor};`
 </a>
 
 <style lang="scss">
-  @layer components {
     .project-card {
       display: block;
       position: relative;
@@ -127,11 +126,12 @@ const mediaBgStyle = `background-color: ${bgColor};`
       }
     }
 
-    :global(.project-card__image) {
+    :global(.project-card__image.progressive-img-container) {
       display: block;
       transition:
+        background-color 0.4s ease-out,
         transform var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease),
-        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease);
+        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease) !important;
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
@@ -326,5 +326,4 @@ const mediaBgStyle = `background-color: ${bgColor};`
         }
       }
     }
-  }
 </style>

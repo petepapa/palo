@@ -206,8 +206,8 @@ const onImgReady =
         if (imgEl.complete) {
           markAsLoaded(imgEl);
         } else {
-          // 2. 正常网络加载：绑定原生 onload，走 0.4s ease-out 丝滑过渡
-          imgEl.onload = function() { markAsLoaded(imgEl); };
+          // 2. 正常网络加载：只用 addEventListener，不覆盖元素已有的内联 onload
+          //    （如 BreakoutImage 的自定义 onload 处理器，负责移除 opacity-0 等）
           imgEl.addEventListener('load', function() { markAsLoaded(imgEl); });
         }
       })(img);
@@ -239,8 +239,7 @@ const onImgReady =
               if (img.complete) {
                 markAsLoaded(img);
               } else {
-                img.onload = function() { markAsLoaded(img); };
-                // 针对 HMR 极为特殊的 src 替换场景的兜底
+                // 只用 addEventListener，不覆盖已有的内联 onload
                 img.addEventListener('load', function() { markAsLoaded(img); }, { once: true });
               }
             })(hmrImages[i]);
@@ -264,7 +263,10 @@ const onImgReady =
     width: 100%;
     position: relative;
     overflow: hidden;
-    transition: background-color 0.4s ease-out;
+    /* 使用 longhand 避免 transition 简写覆盖消费组件（如 PostCard/ProjectCard）注入的 transform transition */
+    transition-property: background-color;
+    transition-duration: 0.4s;
+    transition-timing-function: ease-out;
 
     /* 防线 ①：默认 / 正文流兜底 —— 用图片原始比例撑开占位块 */
     aspect-ratio: var(--img-original-ratio, 16 / 9);
