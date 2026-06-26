@@ -450,6 +450,7 @@ const navStyle = [
       &.show {
         opacity: 1;
         overflow-y: hidden;
+        pointer-events: auto;
         padding-block-start: var(--space-m);
         padding-block-end: var(--space-2xs);
       }
@@ -892,6 +893,8 @@ const navStyle = [
 
     .mobile-menu .has-dropdown ul {
       display: flex;
+      flex-direction: column;
+      gap: var(--space-2xs);
       inline-size: 100%;
       position: relative;
       visibility: visible;
@@ -904,18 +907,12 @@ const navStyle = [
       border-radius: 0;
       background: transparent;
       padding: 0;
-      padding-inline-start: 0;
-      margin-inline-start: 0;
       min-inline-size: auto;
       height: 0;
       overflow: hidden;
       will-change: height;
       transition:
         height var(--mobile-menu-duration) var(--mobile-menu-easing);
-      margin-block-start: 0;
-      margin-inline-start: 0;
-      padding-block-start: 0;
-      padding-block-end: 0;
 
       a {
         inline-size: 100%;
@@ -936,6 +933,7 @@ const navStyle = [
     // Ensure dropdown ul is left-aligned with its parent button in mobile
     .mobile-menu li.menu-item.has-dropdown {
       padding-inline: 0;
+      flex-direction: column;
     }
 
     .mobile-menu .has-dropdown > button {
