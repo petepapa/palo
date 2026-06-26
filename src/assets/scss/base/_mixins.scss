@@ -1,10 +1,10 @@
 @mixin text-decoration(
   $color: var(--text-decoration-color),
   $hoverColor: var(--text-decoration-hover-color),
-  $thickness: 2px,
-  $hoverThickness: 1px,
-  $underlineOffset: 4px,
-  $hoverUnderlineOffset: 2px
+  $thickness: 0.125em,
+  $hoverThickness: 0.0625em,
+  $underlineOffset: 0.25em,
+  $hoverUnderlineOffset: 0.125em
 ) {
   transition: text-decoration, text-underline-offset, text-decoration-color, text-decoration-thickness;
   transition-duration: var(--animation-speed-fast);
