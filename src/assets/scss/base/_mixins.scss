@@ -12,13 +12,13 @@
   text-decoration: underline;
   text-decoration-style: solid;
   text-decoration-color: $color;
-  text-decoration-thickness: $thickness;
+  text-decoration-thickness: max(1px, $thickness);
   text-decoration-skip-ink: none;
   text-underline-offset: $underlineOffset;
 
   &:where(:hover, :focus-visible) {
     text-decoration-color: $hoverColor;
-    text-decoration-thickness: $hoverThickness;
+    text-decoration-thickness: max(1px, $hoverThickness);
     text-underline-offset: $hoverUnderlineOffset;
   }
 }
