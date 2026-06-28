@@ -2,26 +2,33 @@
 import { Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 
-/**
- * SocialShares Component
- *
- * @description A component for sharing content on social media platforms
- */
 interface Props {
-  /**
-   * The URL to share
-   * @default Current page URL
-   */
   url?: string
+  title?: string
+  description?: string
 }
 
-const { url = Astro.url.href } = Astro.props
+const {
+  url = Astro.url.href,
+  title = '',
+  description = '',
+} = Astro.props
+
+const encodedUrl = encodeURIComponent(url)
+const twitterText = title
+  ? encodeURIComponent(`${title}${description ? ` - ${description}` : ''}`)
+  : ''
+const twitterShareUrl = twitterText
+  ? `https://x.com/share?url=${encodedUrl}&text=${twitterText}`
+  : `https://x.com/share?url=${encodedUrl}`
+const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
+const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
 ---
 
 <ul class="flex flex-wrap gap-2">
   <li>
     <Link
-      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+      href={facebookShareUrl}
       isButton
       isExternal
       hideIcon
@@ -34,7 +41,7 @@ const { url = Astro.url.href } = Astro.props
   </li>
   <li>
     <Link
-      href={`https://x.com/share?url=${encodeURIComponent(url)}`}
+      href={twitterShareUrl}
       isButton
       isExternal
       hideIcon
@@ -42,12 +49,12 @@ const { url = Astro.url.href } = Astro.props
       animationType="boop"
     >
       <Icon aria-hidden="true" name="ph:twitter-logo" size={32} />
-      <span class="sr-only">Share on Twitter, opens in a new tab</span>
+      <span class="sr-only">Share on X (Twitter), opens in a new tab</span>
     </Link>
   </li>
   <li>
     <Link
-      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
+      href={linkedinShareUrl}
       isButton
       isExternal
       hideIcon

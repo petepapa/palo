@@ -137,7 +137,7 @@ const authorInfo = typeof author === 'object'
     }
 ---
 
-<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/portfolio/${projectId}`)}>
+<DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/portfolio/${projectId}`)} image={coverImage}>
   <PostHeader
     title={title}
     subtitle={description}
@@ -162,7 +162,7 @@ const authorInfo = typeof author === 'object'
             <div class={`space-content mt-12 ${!projectEntry.data.toc ? 'narrow' : ''}`}>
               <Heading level="h5">Share this project</Heading>
               <p>Like this project? Share it with your network!</p>
-              <SocialShares />
+              <SocialShares title={title} description={description} />
             </div>
           )}
         </div>
