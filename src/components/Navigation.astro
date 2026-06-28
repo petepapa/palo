@@ -692,7 +692,7 @@ const navStyle = [
       }
     }
 
-    // Bold mode: hover/focus → solid underline, active → bold heading weight (except responsive-toggle)
+    // Bold mode: hover/focus → solid underline, active → bold heading weight (no underline)
     &[data-nav-active-style='bold'] {
       a:hover,
       a:focus-visible,
@@ -704,6 +704,29 @@ const navStyle = [
 
       .is-active {
         text-decoration: none;
+        font-weight: var(--font-weight-heading);
+      }
+    }
+
+    // Bold + wavy mode: active → bold heading weight with wavy underline
+    &[data-nav-active-style='boldwavy'] {
+      .is-active {
+        font-weight: var(--font-weight-heading);
+      }
+    }
+
+    // Bold + underline mode: all interactive states → solid underline, active → bold heading weight
+    &[data-nav-active-style='boldunderline'] {
+      a:hover,
+      a:focus-visible,
+      .is-active,
+      button[aria-expanded='true']:not(.responsive-toggle),
+      .has-dropdown > button:hover,
+      .has-dropdown > button:focus-visible {
+        text-decoration-style: solid;
+      }
+
+      .is-active {
         font-weight: var(--font-weight-heading);
       }
     }

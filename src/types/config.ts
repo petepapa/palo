@@ -54,7 +54,7 @@ export interface NavigationConfig {
   desktopDropdownLineHeightScale?: number
   mobileDropdownLineHeightScale?: number
   minHeight?: string
-  activeStyle?: 'wavy' | 'underline' | 'bold'
+  activeStyle?: 'wavy' | 'underline' | 'bold' | 'boldwavy' | 'boldunderline'
   navList?: NavListConfig
 }
 
@@ -170,7 +170,7 @@ export interface TypographyConfig {
   desktopHeadingScale: number
   headingLineHeightScale: number
   uppercaseDisplayText: boolean
-  navigationActiveStyle: 'wavy' | 'underline' | 'bold'
+  navigationActiveStyle: 'wavy' | 'underline' | 'bold' | 'boldwavy' | 'boldunderline'
 }
 
 // ================================================================

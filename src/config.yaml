@@ -89,7 +89,7 @@ navigation:
   mobileDropdownLineHeightScale: 1      # 移动端下拉菜单竖排行高倍数 (仅控制折叠展开项间隙)
 
   # ── 高亮样式 / Active Style ───────────────────────────────────
-  activeStyle: 'underline'             # 'wavy' 波浪线 | 'underline' 直线 | 'bold' 加粗
+  activeStyle: 'boldwavy'             # 'wavy' 波浪线 | 'underline' 直线 | 'bold' 加粗 | 'boldwavy' 加粗+波浪线 | 'boldunderline' 加粗+直线
 
   # ── 二级导航列表（Tags、TOC、Footer 等）/ Nav List ──────────────
   navList:

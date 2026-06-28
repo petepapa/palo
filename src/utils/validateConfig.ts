@@ -89,7 +89,7 @@ const dropdownDesktopColorModeEnum = z
   .describe('desktop dropdown color mode')
 
 const activeStyleEnum = z
-  .enum(['wavy', 'underline', 'bold'])
+  .enum(['wavy', 'underline', 'bold', 'boldwavy', 'boldunderline'])
   .describe('active link style')
 
 const navListActiveStyleEnum = z
