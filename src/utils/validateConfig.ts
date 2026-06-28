@@ -259,6 +259,7 @@ const borderConfigSchema = z
     media: cssLengthOptional('border.media'),
     surface: cssLengthOptional('border.surface'),
     codeBlock: cssLengthOptional('border.codeBlock'),
+    modal: cssLengthOptional('border.modal'),
     divider: cssLengthOptional('border.divider'),
   })
   .strip()
@@ -278,6 +279,7 @@ const radiusConfigSchema = z
     toggle: cssLengthOptional('radius.toggle'),
     surface: cssLengthOptional('radius.surface'),
     codeBlock: cssLengthOptional('radius.codeBlock'),
+    modal: cssLengthOptional('radius.modal'),
   })
   .strip()
 

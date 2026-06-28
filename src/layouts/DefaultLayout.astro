@@ -334,6 +334,7 @@ const toggleBorderWidth = resolveCssLength(themeConfig.border?.toggle, defaultBo
 const mediaBorderWidth = resolveCssLength(themeConfig.border?.media, defaultBorderWidth)
 const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surface, defaultBorderWidth)
 const codeBlockBorderWidth = resolveCssLength(themeConfig.border?.codeBlock, surfaceBorderWidth)
+const modalBorderWidth = resolveCssLength(themeConfig.border?.modal, surfaceBorderWidth)
 const dividerBorderWidth = resolveCssLength(themeConfig.border?.divider, defaultBorderWidth)
 const defaultRadiusSize = resolveCssLength(themeConfig.radius?.global, '0.5rem')
 const buttonRadiusSize = resolveCssLength(themeConfig.radius?.button, defaultRadiusSize)
@@ -348,6 +349,7 @@ const paginationRadiusSize = resolveCssLength(themeConfig.radius?.pagination, de
 const toggleRadiusSize = resolveCssLength(themeConfig.radius?.toggle, defaultRadiusSize)
 const surfaceRadiusSize = resolveCssLength(themeConfig.radius?.surface, defaultRadiusSize)
 const codeBlockRadiusSize = resolveCssLength(themeConfig.radius?.codeBlock, surfaceRadiusSize)
+const modalRadiusSize = resolveCssLength(themeConfig.radius?.modal, surfaceRadiusSize)
 
 const navigationDesktopFontSize = resolveFontSizeValue(
   themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
@@ -674,6 +676,7 @@ const themeVariablesCss = `
   --border-width-media: ${mediaBorderWidth};
   --border-width-surface: ${surfaceBorderWidth};
   --border-width-code-block: ${codeBlockBorderWidth};
+  --border-width-modal: ${modalBorderWidth};
   --border-width-divider: ${dividerBorderWidth};
   --radius-global: ${defaultRadiusSize};
   --radius-xs: calc(${defaultRadiusSize} * 0.25);
@@ -696,6 +699,7 @@ const themeVariablesCss = `
   --radius-toggle: ${toggleRadiusSize};
   --radius-surface: ${surfaceRadiusSize};
   --radius-code-block: ${codeBlockRadiusSize};
+  --radius-modal: ${modalRadiusSize};
   --navigation-desktop-font-size: ${navigationDesktopFontSize};
   --navigation-mobile-font-size: ${navigationMobileFontSize};
   --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};

@@ -156,7 +156,6 @@ pre,
 code:not(pre code),
 kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
-.modal,
 .skip-link a {
   border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
 }
@@ -493,7 +492,6 @@ pre,
 code:not(pre code),
 kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 .tooltip,
-.modal,
 .skip-link a {
   border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
 }
@@ -544,7 +542,9 @@ body:has(dialog[open]) {
 
 dialog.modal {
   color: var(--foreground-color);
-  border-color: light-dark(var(--color-neutral-300), var(--color-neutral-700));
+  border-width: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+  border-radius: var(--radius-modal, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  border-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800))) !important;
 }
 
 dialog.modal::backdrop {

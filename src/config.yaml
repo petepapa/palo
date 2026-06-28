@@ -143,6 +143,7 @@ border:
   media: '0'                  # 图片/媒体描边
   surface: '0.1rem'           # 下拉菜单、面板等容器
   codeBlock: '0'              # 代码块描边
+  modal: '0.075rem'                  # Modal 弹窗
   divider: '0.075rem'         # 分隔线线宽
 
 
@@ -167,6 +168,7 @@ radius:
   toggle: '0.5rem'            # Toggle 切换按钮
   surface: ''                 # 下拉菜单、工具面板等容器
   codeBlock: '0.25rem'        # 代码块圆角
+  modal: '1rem'                  # Modal 弹窗
 
 
 # ╔══════════════════════════════════════════════════════════════╗
