@@ -1,6 +1,7 @@
 ---
-import { Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { Link, Modal } from 'accessible-astro-components'
+import { shareConfig } from '../shareConfig'
 
 interface Props {
   url?: string
@@ -14,55 +15,64 @@ const {
   description = '',
 } = Astro.props
 
-const encodedUrl = encodeURIComponent(url)
-const twitterText = title
-  ? encodeURIComponent(`${title}${description ? ` - ${description}` : ''}`)
-  : ''
-const twitterShareUrl = twitterText
-  ? `https://x.com/share?url=${encodedUrl}&text=${twitterText}`
-  : `https://x.com/share?url=${encodedUrl}`
-const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`
-const linkedinShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`
+const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}`
+
+const wechatModalId = 'palo-wechat-share-modal'
+const wechatTriggerId = 'palo-wechat-share-trigger'
 ---
 
 <ul class="flex flex-wrap gap-2">
-  <li>
-    <Link
-      href={facebookShareUrl}
-      isButton
-      isExternal
-      hideIcon
-      animateOnHover
-      animationType="boop"
-    >
-      <Icon aria-hidden="true" name="ph:facebook-logo" size={32} />
-      <span class="sr-only">Share on Facebook, opens in a new tab</span>
-    </Link>
-  </li>
-  <li>
-    <Link
-      href={twitterShareUrl}
-      isButton
-      isExternal
-      hideIcon
-      animateOnHover
-      animationType="boop"
-    >
-      <Icon aria-hidden="true" name="ph:twitter-logo" size={32} />
-      <span class="sr-only">Share on X (Twitter), opens in a new tab</span>
-    </Link>
-  </li>
-  <li>
-    <Link
-      href={linkedinShareUrl}
-      isButton
-      isExternal
-      hideIcon
-      animateOnHover
-      animationType="boop"
-    >
-      <Icon aria-hidden="true" name="ph:linkedin-logo" size={32} />
-      <span class="sr-only">Share on LinkedIn, opens in a new tab</span>
-    </Link>
-  </li>
+  {
+    shareConfig.map((channel) => {
+      if (channel.actionType === 'link' && channel.buildUrl) {
+        const href = channel.buildUrl({ url, title, description })
+        return (
+          <li>
+            <Link
+              href={href}
+              isButton
+              isExternal
+              hideIcon
+              animateOnHover
+              animationType="boop"
+            >
+              <Icon aria-hidden="true" name={channel.icon} size={32} />
+              <span class="sr-only">{channel.srText ?? `Share on ${channel.name}`}</span>
+            </Link>
+          </li>
+        )
+      }
+
+      if (channel.actionType === 'modal') {
+        return (
+          <li>
+            <Link
+              href="javascript:void(0)"
+              id={wechatTriggerId}
+              isButton
+              hideIcon
+              animateOnHover
+              animationType="boop"
+            >
+              <Icon aria-hidden="true" name={channel.icon} size={32} />
+              <span class="sr-only">{channel.srText ?? `Share on ${channel.name}`}</span>
+            </Link>
+          </li>
+        )
+      }
+
+      return null
+    })
+  }
 </ul>
+
+<Modal triggerId={wechatTriggerId} id={wechatModalId} title="Share on WeChat" headingSize="h5">
+  <div class="flex flex-col items-center justify-center px-4 pb-16 pt-16 text-center">
+      <div class="mb-4 overflow-hidden rounded-lg border bg-white p-2" style="border-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));">
+        <img src={qrCodeApiUrl} alt="WeChat QR Code" class="h-[180px] w-[180px]" loading="lazy" />
+      </div>
+      <p class="font-base" style="color: light-dark(var(--color-neutral-600), var(--color-neutral-400));">
+        Open WeChat, scan the QR code to share this page with friends or moments.
+      </p>
+    </div>
+</Modal>

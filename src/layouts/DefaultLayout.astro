@@ -1842,5 +1842,58 @@ ${bodyLineHeights}
         }
       }
     </style>
+
+    <script>
+      const MODAL_CLOSING_DURATION = 250
+
+      const animateAndCloseModal = (modal) => {
+        if (modal.classList.contains('closing')) return
+        modal.classList.add('closing')
+        setTimeout(() => {
+          modal.close()
+          modal.classList.remove('closing')
+        }, MODAL_CLOSING_DURATION)
+      }
+
+      const setupModalClosingAnimation = () => {
+        document.addEventListener(
+          'cancel',
+          (e) => {
+            const target = e.target
+            if (target instanceof HTMLDialogElement && target.classList.contains('modal')) {
+              e.preventDefault()
+              animateAndCloseModal(target)
+            }
+          },
+          { capture: true },
+        )
+
+        document.addEventListener(
+          'click',
+          (e) => {
+            const modal = e.target.closest('dialog.modal')
+            if (!modal || !modal.open) return
+
+            if (e.target.closest('.modal-close button')) {
+              e.stopPropagation()
+              animateAndCloseModal(modal)
+              return
+            }
+
+            if (e.target === modal) {
+              e.stopPropagation()
+              animateAndCloseModal(modal)
+            }
+          },
+          { capture: true },
+        )
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupModalClosingAnimation)
+      } else {
+        setupModalClosingAnimation()
+      }
+    </script>
   </body>
 </html>

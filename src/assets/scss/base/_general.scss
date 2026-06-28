@@ -514,7 +514,7 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 }
 
 // ──────────────────────────────────────────────
-//  Modal & Launcher 淡入淡出动画
+//  Modal & Launcher 淡入淡出动画 + 主题化
 //  使用 @keyframes animation 替代 @starting-style + transition，
 //  解决 Safari 下 @starting-style 动画卡顿问题。
 //  打开/关闭均为 fade + slide，方向一致。
@@ -526,9 +526,10 @@ dialog.modal {
   background-color: transparent !important;
 }
 
-dialog.modal .modal-content {
+:where(dialog.modal) .modal-content {
   backdrop-filter: blur(40px) !important;
-  background-color: rgba(30, 41, 59, 0.8) !important;
+  background-color: light-dark(rgba(255, 255, 255, 0.85), rgba(30, 30, 40, 0.85)) !important;
+  color: var(--foreground-color);
 }
 
 // 允许背景页面滚动，不要禁用（与 Launcher 保持一致）
@@ -539,6 +540,11 @@ body:has(dialog[open]) {
   overflow: visible !important;
   overflow-y: visible !important;
   overflow-x: visible !important;
+}
+
+dialog.modal {
+  color: var(--foreground-color);
+  border-color: light-dark(var(--color-neutral-300), var(--color-neutral-700));
 }
 
 dialog.modal::backdrop {
@@ -557,6 +563,41 @@ dialog.modal[open]::backdrop {
   opacity: 1;
 }
 
+// Modal 关闭态（始终启用，确保 JS 能安全插入 closing 类）
+dialog.modal.closing {
+  pointer-events: none;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; translate: 0 -40px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes modal-fade-out {
+  from { opacity: 1; translate: 0 0; }
+  to   { opacity: 0; translate: 0 40px; }
+}
+
+@keyframes backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes backdrop-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes launcher-fade-in {
+  from { opacity: 0; translate: 0 -40px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+@keyframes launcher-fade-out {
+  from { opacity: 1; translate: 0 0; }
+  to   { opacity: 0; translate: 0 40px; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   // ════════════════════ Modal ════════════════════
 
@@ -569,7 +610,6 @@ dialog.modal[open]::backdrop {
   // Modal 关闭
   dialog.modal.closing {
     animation: modal-fade-out 0.25s cubic-bezier(0.4, 0, 0.6, 1) forwards;
-    pointer-events: none;
   }
 
   // Modal backdrop 打开
@@ -605,35 +645,5 @@ dialog.modal[open]::backdrop {
   dialog.launcher.closing::backdrop {
     animation: backdrop-fade-out 0.15s ease-out forwards;
   }
-}
-
-@keyframes modal-fade-in {
-  from { opacity: 0; translate: 0 -40px; }
-  to   { opacity: 1; translate: 0 0; }
-}
-
-@keyframes modal-fade-out {
-  from { opacity: 1; translate: 0 0; }
-  to   { opacity: 0; translate: 0 40px; }
-}
-
-@keyframes launcher-fade-in {
-  from { opacity: 0; translate: 0 -40px; }
-  to   { opacity: 1; translate: 0 0; }
-}
-
-@keyframes launcher-fade-out {
-  from { opacity: 1; translate: 0 0; }
-  to   { opacity: 0; translate: 0 40px; }
-}
-
-@keyframes backdrop-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes backdrop-fade-out {
-  from { opacity: 1; }
-  to   { opacity: 0; }
 }
 }

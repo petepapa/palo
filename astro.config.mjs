@@ -110,7 +110,7 @@ console.log('[Build Config] URL policy is controlled by config.yaml -> Astro tra
 console.log('[Build Config] ==========================================\n')
 
 // https://astro.build/config
-const integrations = [compress(), icon({ include: { ph: ['*'] } }), mdx()]
+const integrations = [compress(), icon({ include: { ph: ['*'], 'fa6-brands': ['*'] } }), mdx()]
 if (siteUrl) integrations.push(sitemap())
 
 export default defineConfig({

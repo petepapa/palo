@@ -40,6 +40,7 @@
     "@astrojs/partytown": "^2.1.6",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^9.39.2",
+    "@iconify-json/fa6-brands": "^1.2.6",
     "@iconify-json/mingcute": "^1.2.7",
     "@types/js-yaml": "^4.0.9",
     "@types/sanitize-html": "^2.16.1",
