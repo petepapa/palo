@@ -74,7 +74,7 @@ const navStyle = [
     return mainNav?.dataset.dropdownColorModeConfig || 'theme'
   }
 
-  document.addEventListener('astro:page-load', () => {
+  const initNavigation = () => {
     // variables
     const mainNav = document.querySelector('#main-navigation') as HTMLElement | null
     if (!mainNav) return
@@ -383,6 +383,24 @@ const navStyle = [
         dropdownMenu.addEventListener('click', toggleDropdownMenu as EventListener)
       })
 
+    // ── 事件委托兜底：即使在 SPA 导航后 bundled JS 未水合的间隙，
+    //    点击 .has-dropdown > button 也能立即触发展开 ────────────
+    mainNav.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest('.has-dropdown > button')
+      if (button instanceof HTMLButtonElement && button.hasAttribute('aria-haspopup')) {
+        // 如果 toggleDropdownMenu 已经绑定（通过上面的 forEach），
+        // 此委托不会二次触发，因为 event.target 在冒泡时依然会被 button 的
+        // 原生监听器拦截（stopPropagation 未调用）。
+        // 但为了安全，我们直接调用 toggle，避免重复执行。
+        const menu = button.parentNode?.querySelector('ul')
+        if (menu && !menu.classList.contains('show')) {
+          openDropdownMenu(button)
+        } else if (menu) {
+          closeDropdownMenu(button)
+        }
+      }
+    })
+
     setActiveMenuItem()
     window.addEventListener('click', (event: MouseEvent) => {
       const element = event.target as Element
@@ -390,7 +408,11 @@ const navStyle = [
         closeAllDropdownMenus()
       }
     })
-  })
+  }
+
+  document.addEventListener('astro:page-load', initNavigation)
+  document.addEventListener('astro:after-swap', initNavigation)
+  initNavigation()
 </script>
 
 <style lang="scss" is:global>

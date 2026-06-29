@@ -813,14 +813,14 @@ ${bodyLineHeights}
       }
       */
 
-      /* 外壳：全站纯黑底色 */
+      /* 外壳：主题感知底色（light-dark 由 --background-color 驱动）
+         在慢速网络下，CSS 变量已通过内联 <style is:global> 写入首帧，始终可用 */
       html:not([data-css-ready="true"]) {
-        background-color: #0a0a0a !important;
+        background-color: var(--background-color, #0a0a0a) !important;
       }
 
       html:not([data-css-ready="true"]) body {
-        background-color: #0a0a0a !important;
-        /* 取消 color: transparent —— 让系统字体在第 0.5s 内秒开文字 */
+        background-color: var(--background-color, #0a0a0a) !important;
       }
 
       /* 导航栏骨架壳：fix 64px，flex 布局，刚性间距 */
@@ -832,7 +832,7 @@ ${bodyLineHeights}
         left: 0;
         width: 100%;
         height: 64px !important;
-        background-color: #0a0a0a !important;
+        background-color: var(--background-color, #0a0a0a) !important;
         border-bottom: 1px solid #1f1f1f !important;
         z-index: 9999;
         display: flex !important;
