@@ -661,13 +661,38 @@ const pageHeaderAppearance = {
     </div>
   </section>
 
-  <script>
+  <script is:inline>
     const paloInitComponentsNavigation = () => {
       const navLinks = [...document.querySelectorAll('.components-navigation a')]
       if (navLinks.length === 0) return
 
       const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       let activeScrollFrame = null
+
+      // ── 动态边界视口追光：激活项超出侧边栏可见边界时自动滚动暴露 ──
+      const paloTraceActiveLink = (activeLink) => {
+        const sidebar = activeLink.closest('.article-content__toc, .components-navigation')
+        if (!(sidebar instanceof HTMLElement)) return
+
+        const itemTop = activeLink.offsetTop
+        const itemBottom = itemTop + activeLink.offsetHeight
+        const containerTop = sidebar.scrollTop
+        const containerBottom = containerTop + sidebar.clientHeight
+        const padding = 16
+
+        if (itemBottom > containerBottom - padding) {
+          sidebar.scrollTo({
+            top: itemBottom - sidebar.clientHeight + padding,
+            behavior: prefersReducedMotion ? 'instant' : 'smooth',
+          })
+        } else if (itemTop < containerTop + padding) {
+          sidebar.scrollTo({
+            top: 0,
+            behavior: prefersReducedMotion ? 'instant' : 'smooth',
+          })
+        }
+      }
+
       const setActiveLink = (activeLink) => {
         navLinks.forEach((link) => {
           const isActive = link === activeLink
@@ -678,13 +703,22 @@ const pageHeaderAppearance = {
             link.removeAttribute('aria-current')
           }
         })
+        paloTraceActiveLink(activeLink)
       }
 
-      const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+      const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+      const calculateDuration = (distance) => {
+        const absDistance = Math.abs(distance)
+        const minDuration = 300
+        const maxDuration = 900
+        const baseDuration = Math.sqrt(absDistance) * 18
+        return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+      }
 
       const smoothScrollToHeading = (heading) => {
         if (prefersReducedMotion) {
-          heading.scrollIntoView({ block: 'start' })
+          heading.scrollIntoView({ block: 'start', behavior: 'instant' })
           return
         }
 
@@ -693,11 +727,14 @@ const pageHeaderAppearance = {
           activeScrollFrame = null
         }
 
-        const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
+        let headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height'))
+        if (!headerHeight || headerHeight <= 0) {
+          headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-min-height')) || 96
+        }
         const startY = window.scrollY
         const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - headerHeight)
         const distance = targetY - startY
-        const duration = 600
+        const duration = calculateDuration(distance)
         const startTime = performance.now()
         const rootStyle = document.documentElement.style
         const previousScrollBehavior = rootStyle.scrollBehavior
@@ -711,7 +748,7 @@ const pageHeaderAppearance = {
         const step = (currentTime) => {
           const elapsed = currentTime - startTime
           const progress = Math.min(elapsed / duration, 1)
-          const eased = easeOutCubic(progress)
+          const eased = easeOutExpo(progress)
           window.scrollTo(0, startY + distance * eased)
 
           if (progress < 1) {
@@ -722,7 +759,6 @@ const pageHeaderAppearance = {
           }
         }
 
-        window.scrollTo(0, startY)
         step(startTime)
       }
 
@@ -767,8 +803,15 @@ const pageHeaderAppearance = {
       const initialHash = window.location.hash.replace('#', '')
       if (initialHash) {
         const initialLink = document.querySelector(`.components-navigation a[href="#${initialHash}"]`)
+        const initialHeading = document.getElementById(initialHash)
         if (initialLink instanceof HTMLAnchorElement) {
           setActiveLink(initialLink)
+        }
+        if (initialHeading) {
+          // 使用 requestAnimationFrame 确保 DOM 就绪后再滚动
+          requestAnimationFrame(() => {
+            smoothScrollToHeading(initialHeading)
+          })
         }
       } else if (navLinks[0] instanceof HTMLAnchorElement) {
         setActiveLink(navLinks[0])
@@ -811,10 +854,25 @@ const pageHeaderAppearance = {
           align-self: start;
           inset-block-start: calc(var(--header-height) + var(--space-l));
           padding-inline-end: var(--space-l);
+          padding-block-end: 5rem;
           max-inline-size: 100%;
-          max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
+          max-block-size: calc(100vh - var(--header-height) - var(--space-l));
           overflow-y: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
           transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+
+          &.is-un-stuck-locked {
+            overflow-y: hidden;
+          }
+
+          &.is-stuck {
+            overflow-y: auto;
+          }
         }
       }
 

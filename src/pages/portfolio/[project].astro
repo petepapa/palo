@@ -241,11 +241,25 @@ const authorInfo = typeof author === 'object'
         align-self: start;
         inset-block-start: calc(var(--header-height) + var(--space-l));
         padding-inline-start: 0;
+        padding-block-end: 5rem;
         max-inline-size: 100%;
-        max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
-        overflow-x: hidden;
+        max-block-size: calc(100vh - var(--header-height) - var(--space-l));
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        &.is-un-stuck-locked {
+          overflow-y: hidden;
+        }
+
+        &.is-stuck {
+          overflow-y: auto;
+        }
       }
     }
 

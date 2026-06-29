@@ -152,6 +152,26 @@ const sanitizedSubtitle: string = subtitle
 const coverImageBgStyle = `background-color: ${bgColor} !important;`
 ---
 
+<style is:inline define:vars={{ bgColor }}>
+  .post-header__image {
+    background-color: var(--bgColor) !important;
+  }
+  .post-header__image .progressive-img-container {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    block-size: 100% !important;
+    position: relative !important;
+    background-color: var(--bgColor) !important;
+    overflow: hidden !important;
+    aspect-ratio: auto !important;
+  }
+  .post-header__image .progressive-img-inner:not([src]) {
+    opacity: 0 !important;
+  }
+</style>
+
 <section
   class:list={[
     className,

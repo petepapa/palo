@@ -156,13 +156,62 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     if (!link || link.dataset.paloBound === 'true') return
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let activeScrollFrame = null
+
+    const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+    const calculateDuration = (distance) => {
+      const absDistance = Math.abs(distance)
+      const minDuration = 300
+      const maxDuration = 900
+      const baseDuration = Math.sqrt(absDistance) * 18
+      return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+    }
+
+    const smoothScrollToTop = () => {
+      if (prefersReducedMotion) {
+        window.scrollTo(0, 0)
+        return
+      }
+
+      if (activeScrollFrame) {
+        cancelAnimationFrame(activeScrollFrame)
+        activeScrollFrame = null
+      }
+
+      const startY = window.scrollY
+      const distance = -startY
+      const duration = calculateDuration(distance)
+      const startTime = performance.now()
+      const rootStyle = document.documentElement.style
+      const previousScrollBehavior = rootStyle.scrollBehavior
+      rootStyle.scrollBehavior = 'auto'
+
+      if (Math.abs(distance) < 2) {
+        rootStyle.scrollBehavior = previousScrollBehavior
+        return
+      }
+
+      const step = (currentTime) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const eased = easeOutExpo(progress)
+        window.scrollTo(0, startY + distance * eased)
+
+        if (progress < 1) {
+          activeScrollFrame = requestAnimationFrame(step)
+        } else {
+          rootStyle.scrollBehavior = previousScrollBehavior
+          activeScrollFrame = null
+        }
+      }
+
+      step(startTime)
+    }
 
     link.addEventListener('click', (e) => {
       e.preventDefault()
-      window.scrollTo({
-        top: 0,
-        behavior: prefersReducedMotion ? 'instant' : 'smooth',
-      })
+      smoothScrollToTop()
       history.pushState(null, '', window.location.pathname)
     })
 

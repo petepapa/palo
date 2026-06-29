@@ -17,7 +17,13 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     <Heading level="h3" size="h4">On this page</Heading>
     <nav aria-label="On this page" class="palo-nav-list" data-active-style={navListActiveStyle} data-context="toc">
       <ul class="list-none is-vertical">
-        <!-- 导航项通过 JS 动态生成 -->
+        <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h3"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h3"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h3"><span></span></li>
+        <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
       </ul>
     </nav>
   </div>
@@ -31,11 +37,10 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     const contentMain = document.querySelector('.article-content__main')
     if (!contentMain) return
 
-    const headings = [
-      ...contentMain.querySelectorAll('h2'),
-      ...contentMain.querySelectorAll('h3'),
-      ...contentMain.querySelectorAll('h4'),
-    ].sort((a, b) => a.offsetTop - b.offsetTop)
+    const allHeadings = contentMain.querySelectorAll('h2, h3, h4')
+    const headings = [...allHeadings]
+      .filter((h) => !h.closest('dialog')) // 排除 modal 内的标题
+      .sort((a, b) => a.offsetTop - b.offsetTop)
 
     if (headings.length === 0) {
       const tocWrapper = document.querySelector('.article-content__toc')
@@ -53,6 +58,8 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + 2rem)'
     })
 
+    tocContainer.style.opacity = '0'
+    tocContainer.style.transition = 'opacity 200ms ease-out'
     tocContainer.innerHTML = ''
 
     const navItems = headings.map((heading) => {
@@ -67,6 +74,13 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     })
 
     navItems.forEach((item) => tocContainer.appendChild(item))
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tocContainer.style.opacity = '1'
+      })
+    })
+
     initTocNavigation()
   }
 
@@ -81,7 +95,31 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     let debounceTimer = null
     const DEBOUNCE_MS = 120
 
-    // ── 高亮切换（刚性瞬时，无动画） ────────────────────────────
+    // ── 动态边界视口追光：激活项超出侧边栏可见边界时自动滚动暴露 ──
+    const paloTraceActiveLink = (activeLink) => {
+      const sidebar = activeLink.closest('.article-content__toc, .components-navigation')
+      if (!(sidebar instanceof HTMLElement)) return
+
+      const itemTop = activeLink.offsetTop
+      const itemBottom = itemTop + activeLink.offsetHeight
+      const containerTop = sidebar.scrollTop
+      const containerBottom = containerTop + sidebar.clientHeight
+      const padding = 16
+
+      if (itemBottom > containerBottom - padding) {
+        sidebar.scrollTo({
+          top: itemBottom - sidebar.clientHeight + padding,
+          behavior: prefersReducedMotion ? 'instant' : 'smooth',
+        })
+      } else if (itemTop < containerTop + padding) {
+        sidebar.scrollTo({
+          top: 0,
+          behavior: prefersReducedMotion ? 'instant' : 'smooth',
+        })
+      }
+    }
+
+    // ── 高亮切换（刚性瞬时，无动画，附带追光） ─────────────────
     const setActiveLink = (activeLink) => {
       navLinks.forEach((link) => {
         const isActive = link === activeLink
@@ -92,6 +130,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
           link.removeAttribute('aria-current')
         }
       })
+      paloTraceActiveLink(activeLink)
     }
 
     // ── 防抖版高亮：滚动停止 DEBOUNCE_MS 后才执行唯一一次判定 ──
@@ -111,11 +150,19 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       }, 150)
     }
 
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3)
+    const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+    const calculateDuration = (distance) => {
+      const absDistance = Math.abs(distance)
+      const minDuration = 300
+      const maxDuration = 900
+      const baseDuration = Math.sqrt(absDistance) * 18
+      return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+    }
 
     const smoothScrollToHeading = (heading) => {
       if (prefersReducedMotion) {
-        heading.scrollIntoView({ block: 'start' })
+        heading.scrollIntoView({ block: 'start', behavior: 'instant' })
         unlockAfterScroll()
         return
       }
@@ -129,7 +176,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       const startY = window.scrollY
       const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - headerHeight)
       const distance = targetY - startY
-      const duration = 600
+      const duration = calculateDuration(distance)
       const startTime = performance.now()
       const rootStyle = document.documentElement.style
       const previousScrollBehavior = rootStyle.scrollBehavior
@@ -144,7 +191,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       const step = (currentTime) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
-        const eased = easeOutCubic(progress)
+        const eased = easeOutExpo(progress)
         window.scrollTo(0, startY + distance * eased)
 
         if (progress < 1) {
@@ -152,12 +199,10 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         } else {
           rootStyle.scrollBehavior = previousScrollBehavior
           activeScrollFrame = null
-          // 平滑滚动结束 → 解锁 observer
           unlockAfterScroll()
         }
       }
 
-      window.scrollTo(0, startY)
       step(startTime)
     }
 
@@ -242,5 +287,44 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     .article-toc__item--h2 a { font-size: 1.25rem; }
     .article-toc__item--h3 a { font-size: 1.125rem; }
     .article-toc__item--h4 a { font-size: 1rem; }
+
+    /* 骨架屏占位 */
+    .article-toc__skeleton {
+      display: block;
+      margin-block: 0.35rem;
+
+      & span {
+        display: block;
+        height: 1em;
+        border-radius: 0.25rem;
+        background: linear-gradient(
+          90deg,
+          var(--color-neutral-200, #e5e5e5) 25%,
+          var(--color-neutral-100, #f5f5f5) 50%,
+          var(--color-neutral-200, #e5e5e5) 75%
+        );
+        background-size: 200% 100%;
+        animation: toc-skeleton-shimmer 1.5s ease-in-out infinite;
+
+        @media (prefers-color-scheme: dark) {
+          background: linear-gradient(
+            90deg,
+            var(--color-neutral-700, #404040) 25%,
+            var(--color-neutral-800, #262626) 50%,
+            var(--color-neutral-700, #404040) 75%
+          );
+          background-size: 200% 100%;
+        }
+      }
+
+      &--h2 span { font-size: 1.25rem; width: 85%; }
+      &--h3 span { font-size: 1.125rem; width: 70%; margin-inline-start: 1rem; }
+      &--h4 span { font-size: 1rem; width: 60%; margin-inline-start: 2rem; }
+    }
+
+    @keyframes toc-skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
   }
 </style>

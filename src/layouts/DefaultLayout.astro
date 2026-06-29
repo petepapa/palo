@@ -604,7 +604,7 @@ const fontScaleMap = Object.fromEntries(fontScaleSteps.map((step) => [step, buil
 
 const themeVariablesCss = `
 :root:root {
-  --header-height: 0px;
+  --header-height: var(--nav-min-height);
   --nav-min-height: ${navMinHeight};
   font-size: ${typography.baseFontSize};
   --m-scale: ${mobileScale};
@@ -1123,6 +1123,59 @@ ${bodyLineHeights}
           color: var(--link-color);
         }
 
+        /* ── TOC 骨架屏：慢速网络下首帧即有动画效果 ── */
+        .article-toc__skeleton {
+          display: block;
+          margin-block: 0.35rem;
+          list-style: none;
+        }
+
+        .article-toc__skeleton span {
+          display: block;
+          height: 1em;
+          border-radius: 0.25rem;
+          background: linear-gradient(
+            90deg,
+            var(--color-neutral-200, #e5e5e5) 25%,
+            var(--color-neutral-100, #f5f5f5) 50%,
+            var(--color-neutral-200, #e5e5e5) 75%
+          );
+          background-size: 200% 100%;
+          animation: toc-skeleton-shimmer 1.5s ease-in-out infinite;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .article-toc__skeleton span {
+            background: linear-gradient(
+              90deg,
+              var(--color-neutral-700, #404040) 25%,
+              var(--color-neutral-800, #262626) 50%,
+              var(--color-neutral-700, #404040) 75%
+            );
+            background-size: 200% 100%;
+          }
+        }
+
+        .article-toc__skeleton--h2 span { font-size: 1.25rem; width: 85%; }
+        .article-toc__skeleton--h3 span { font-size: 1.125rem; width: 70%; margin-inline-start: 1rem; }
+        .article-toc__skeleton--h4 span { font-size: 1rem; width: 60%; margin-inline-start: 2rem; }
+
+        @keyframes toc-skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        /* ── TOC 标题 "On this page" 基础样式：慢网下保持正确外观 ── */
+        .article-toc > h3,
+        .article-toc > h4,
+        .article-toc .space-content > h3,
+        .article-toc .space-content > h4 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-block: 0 0.75rem;
+          color: var(--foreground-color);
+        }
+
         /* ── Tags 标签栏 & 页脚导航：CSS 到达前屏蔽浏览器默认下划线 ── */
         .palo-nav-list a {
           text-decoration: none;
@@ -1138,8 +1191,23 @@ ${bodyLineHeights}
             position: sticky;
             align-self: start;
             top: calc(var(--header-height, 0px) + var(--space-l, 2rem));
-            max-height: calc(100vh - calc(var(--header-height, 0px) + var(--space-l, 2rem)));
+            max-height: calc(100vh - var(--header-height, 0px) - var(--space-l, 2rem));
             overflow-y: auto;
+            padding-block-end: 5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+
+            &::-webkit-scrollbar {
+              display: none;
+            }
+
+            &.is-un-stuck-locked {
+              overflow-y: hidden;
+            }
+
+            &.is-stuck {
+              overflow-y: auto;
+            }
           }
         }
 
@@ -1850,7 +1918,82 @@ ${bodyLineHeights}
     <script>
       const MODAL_CLOSING_DURATION = 250
 
-      const animateAndCloseModal = (modal) => {
+      const easeOutExpo = (t: number): number => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+      const calculateDuration = (distance: number): number => {
+        const absDistance = Math.abs(distance)
+        const minDuration = 300
+        const maxDuration = 900
+        const baseDuration = Math.sqrt(absDistance) * 18
+        return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+      }
+
+      let globalScrollFrame: number | null = null
+
+      const smoothScrollTo = (targetY: number, offset = 0): void => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (prefersReducedMotion) {
+          window.scrollTo(0, Math.max(0, targetY - offset))
+          return
+        }
+
+        if (globalScrollFrame !== null) {
+          cancelAnimationFrame(globalScrollFrame)
+          globalScrollFrame = null
+        }
+
+        const finalY = Math.max(0, targetY - offset)
+        const startY = window.scrollY
+        const distance = finalY - startY
+
+        if (Math.abs(distance) < 2) return
+
+        const duration = calculateDuration(distance)
+        const startTime = performance.now()
+        const rootStyle = document.documentElement.style
+        const previousScrollBehavior = rootStyle.scrollBehavior
+        rootStyle.scrollBehavior = 'auto'
+
+        const step = (currentTime: number) => {
+          const elapsed = currentTime - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          const eased = easeOutExpo(progress)
+          window.scrollTo(0, startY + distance * eased)
+
+          if (progress < 1) {
+            globalScrollFrame = requestAnimationFrame(step)
+          } else {
+            rootStyle.scrollBehavior = previousScrollBehavior
+            globalScrollFrame = null
+          }
+        }
+
+        step(startTime)
+      }
+
+      const initHashScroll = () => {
+        const hash = window.location.hash.replace('#', '')
+        if (!hash) return
+
+        const element = document.getElementById(hash)
+        if (!element) return
+
+        // 使用 --header-height，如果还没被 JS 设置（为 0）则用 --nav-min-height 作为 fallback
+        // --nav-min-height 是静态 CSS 变量，第一帧就有值
+        let headerHeight = parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
+        )
+        if (!headerHeight || headerHeight <= 0) {
+          headerHeight = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--nav-min-height'),
+          ) || 96
+        }
+
+        const targetY = Math.max(0, element.getBoundingClientRect().top + window.scrollY - headerHeight)
+        smoothScrollTo(targetY, 0)
+      }
+
+      const animateAndCloseModal = (modal: HTMLDialogElement) => {
         if (modal.classList.contains('closing')) return
         modal.classList.add('closing')
         setTimeout(() => {
@@ -1897,6 +2040,68 @@ ${bodyLineHeights}
         document.addEventListener('DOMContentLoaded', setupModalClosingAnimation)
       } else {
         setupModalClosingAnimation()
+      }
+
+      document.addEventListener('astro:page-load', initHashScroll)
+      document.addEventListener('astro:after-swap', initHashScroll)
+      if (document.readyState !== 'loading') {
+        initHashScroll()
+      }
+
+      // ── 弹性上下文锁定（Elastic Context Locking）──
+      // CSS 默认 overflow-y: auto（慢网/无 JS 安全）
+      // JS 加载后动态切换状态：
+      //   .is-un-stuck-locked → overflow-y: hidden（未贴顶时滚轮滚页面）
+      //   .is-stuck → overflow-y: auto（贴顶后滚轮滚内部）
+      const ELASTIC_SIDEBAR_SELECTORS = [
+        '.article-content__toc',
+        '.components-navigation',
+      ]
+
+      const checkSidebarStuck = (sidebar: HTMLElement): boolean => {
+        const stickyTopStr = getComputedStyle(sidebar).top
+        const stickyTop = parseFloat(stickyTopStr)
+        if (isNaN(stickyTop)) return false
+
+        const actualTop = sidebar.getBoundingClientRect().top
+        return Math.abs(actualTop - stickyTop) < 2
+      }
+
+      const updateSidebarStuckState = () => {
+        const sidebars = document.querySelectorAll(ELASTIC_SIDEBAR_SELECTORS.join(','))
+        sidebars.forEach((el) => {
+          const sidebar = el as HTMLElement
+          if (sidebar.offsetParent === null) return
+
+          const isStuck = checkSidebarStuck(sidebar)
+          sidebar.classList.toggle('is-stuck', isStuck)
+          sidebar.classList.toggle('is-un-stuck-locked', !isStuck)
+        })
+      }
+
+      let elasticScrollRaf = 0
+      const scheduleElasticUpdate = () => {
+        if (elasticScrollRaf) return
+        elasticScrollRaf = requestAnimationFrame(() => {
+          updateSidebarStuckState()
+          elasticScrollRaf = 0
+        })
+      }
+
+      const initElasticSidebarScroll = () => {
+        const sidebars = document.querySelectorAll(ELASTIC_SIDEBAR_SELECTORS.join(','))
+        if (sidebars.length === 0) return
+
+        updateSidebarStuckState()
+
+        window.addEventListener('scroll', scheduleElasticUpdate, { passive: true })
+        window.addEventListener('resize', scheduleElasticUpdate, { passive: true })
+      }
+
+      document.addEventListener('astro:page-load', initElasticSidebarScroll)
+      document.addEventListener('astro:after-swap', initElasticSidebarScroll)
+      if (document.readyState !== 'loading') {
+        initElasticSidebarScroll()
       }
     </script>
   </body>
