@@ -212,6 +212,23 @@ const mediaBgStyle = `background-color: ${bgColor};`
       -webkit-mask-image: -webkit-radial-gradient(white, black);
       backface-visibility: hidden;
 
+      /* 🛡️ Card-level L-shaped sub-pixel gap barrier: 1px border at bottom and right edges.
+         Unlike the media-level ::after (which seals the border-radius + overflow:hidden clip gap),
+         this sits at the card's outermost boundary and uses the card's own background color,
+         so it seamlessly blends in regardless of the image's dominant color inside.
+         - Bottom: seals column padding gap between this card and the one below
+         - Right:  seals multi-column sub-pixel width truncation gap */
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        border: 0 solid light-dark(var(--color-neutral-100), var(--color-neutral-900));
+        border-right-width: 1px;
+        border-bottom-width: 1px;
+        pointer-events: none;
+      }
+
       .project-card__media {
         border-radius: inherit;
       }
