@@ -1306,6 +1306,25 @@ ${bodyLineHeights}
             grid-template-columns: 1fr;
           }
         }
+
+        /* ── 纯图标按钮：完美正方形，图标尺寸由按钮 size 联动 ── */
+        .button--icon-only {
+          aspect-ratio: 1;
+          padding: var(--space-xs);
+        }
+
+        .button--icon-only.button--sm {
+          padding: var(--space-2xs);
+        }
+
+        .button--icon-only.button--lg {
+          padding: var(--space-s);
+        }
+
+        .button--icon-only svg {
+          width: 1.75em !important;
+          height: 1.75em !important;
+        }
       }
     </style>
   </head>

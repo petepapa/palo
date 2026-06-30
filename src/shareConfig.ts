@@ -32,6 +32,14 @@ export const shareConfig: ShareChannel[] = [
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
   },
   {
+    name: 'Instagram',
+    icon: 'ph:instagram-logo',
+    actionType: 'link',
+    srText: 'Share on Instagram, opens in a new tab',
+    buildUrl: ({ url }) =>
+      `https://www.instagram.com/?url=${encodeURIComponent(url)}`,
+  },
+  {
     name: 'LinkedIn',
     icon: 'ph:linkedin-logo',
     actionType: 'link',
@@ -48,18 +56,18 @@ export const shareConfig: ShareChannel[] = [
       `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
   },
   {
+    name: 'WeChat',
+    icon: 'fa6-brands:weixin',
+    actionType: 'modal',
+    srText: 'Share on WeChat',
+    modalId: 'palo-wechat-share-modal',
+  },
+  {
     name: 'Email',
     icon: 'ph:envelope',
     actionType: 'link',
     srText: 'Share via Email, opens in a new tab',
     buildUrl: ({ url, title, description }) =>
       `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${description || ''}\n\n${url}`)}`,
-  },
-  {
-    name: 'WeChat',
-    icon: 'fa6-brands:weixin',
-    actionType: 'modal',
-    srText: 'Share on WeChat',
-    modalId: 'palo-wechat-share-modal',
   },
 ]
