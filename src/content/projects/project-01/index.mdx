@@ -12,7 +12,7 @@ author:
   bio: "PetePa.com"
 
 # Visual Assets & Layouts / 视觉资产与排版样式
-coverImage: ./bbb.jpg                      # Co-located path for WebP optimization / 同级相对路径，触发 Sharp 极致压缩
+# coverImage: ./cover.jpg                      # Co-located path for WebP optimization / 同级相对路径，触发 Sharp 极致压缩
 coverImagePosition: "head"
 type: "default"                               # Project Layout: default, video, etc. / 作品集专属排版布局类型
 
@@ -31,7 +31,7 @@ liveDemo: "https://palo.petepa.com/"
 import BreakoutImage from '@components/BreakoutImage.astro'
 
 
-## Project Overview / 项目概述
+## Project Overview
 
 这里开始编写你的 MDX 或者是 Markdown 正文内容...
 
@@ -41,18 +41,12 @@ import BreakoutImage from '@components/BreakoutImage.astro'
 
 #### text-base this is h4
 
+<BreakoutImage src="./cover.jpg" alt="This is a cover image." layout="full" />
+
+<BreakoutImage src="./sample.jpg" slt="This is a sample image." layout="wide" />
 
 
-<BreakoutImage src="./abc.jpeg" />
 
-##### test
+![This is an alt text.](./cover.jpg "This is a cover image.")
 
-<BreakoutImage src="/123.jpeg" />
-
-
-# 123 test
-
-
-![This is an alt text.](./bbb.jpg "This is a sample image.")
-
-![This is an alt text.](./123.jpg "This is a sample image.")
+![This is an alt text.](./sample.jpg "This is a sample image.")
