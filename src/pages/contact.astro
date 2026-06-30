@@ -241,18 +241,13 @@ const { fields, dynamicSections } = contactFormConfig
 
     const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
 
-    // 🔒 1. 完美的局部三态同步校验
+    // 🔒 1. 完整的局部三态同步校验（始终执行，不离场守卫）
     function syncFieldError(
       el: HTMLInputElement | HTMLTextAreaElement,
       regExp: RegExp | null,
       emptyMsg: string,
       invalidMsg: string,
     ) {
-      if (el.getAttribute('aria-invalid') === 'true') {
-        el.dataset.hadError = 'true'
-      }
-      if (el.dataset.hadError !== 'true') return
-
       const value = el.value
       const group = el.closest('.input-group, .textarea-group')
       const msgEl = group?.querySelector<HTMLElement>('.message')
