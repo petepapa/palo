@@ -7,7 +7,7 @@ import sanitizeHtml from 'sanitize-html'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import config from '@config'
 import { getDominantColor } from '@utils/imageColor'
-import { isPngImage } from '@utils/contentImages'
+import { isPngImage, type ResolvedImage } from '@utils/contentImages'
 import { getContrastBgColor } from '@utils/pngTheme'
 import defaultCover from '../assets/images/posts/default.png'
 
@@ -30,6 +30,7 @@ type Props = {
   title: string
   subtitle?: string
   author?: Author
+  authorImageResolved?: ResolvedImage
   breadcrumbs?: boolean
   customBreadcrumbLabels?: Record<string, string>
   joinLastBreadcrumb?: boolean
@@ -71,6 +72,7 @@ const className = _props.class
 const title = _props.title
 const subtitle = _props.subtitle
 const coverImage = _props.coverImage
+const authorImageResolved = _props.authorImageResolved
 
 // ── 合并并统一提取封面图/默认图的主色调 ──
 const finalImage = coverImage || defaultCover
@@ -242,8 +244,19 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
       
       <div class="post-header__meta">
         <div class="post-header__author">
-          {author?.name && (
-            <Avatar title={author.name} {...(author.image && { img: author.image })} subtitle={author.bio} />
+          {author?.name && authorImageResolved && (
+            <div class="avatar shape-round type-default">
+              <div class="image">
+                <ContentImage src={authorImageResolved} alt={author.name} width={80} height={80} loading="eager" decoding="async" />
+              </div>
+              <div class="content">
+                <p class="title">{author.name}</p>
+                <p class="subtitle" set:text={author.bio} />
+              </div>
+            </div>
+          )}
+          {author?.name && !authorImageResolved && (
+            <Avatar title={author.name} subtitle={author.bio} />
           )}
         </div>
         {(source || liveDemo) && (
@@ -356,6 +369,53 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
           justify-self: start;
           margin-top: 1rem;
         }
+      }
+
+      .post-header__author .avatar {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .post-header__author .avatar .image {
+        display: grid;
+        flex-shrink: 0;
+        place-items: center;
+        aspect-ratio: 1;
+        width: 5rem;
+        height: 5rem;
+        overflow: clip;
+        border-radius: 50%;
+      }
+
+      .post-header__author .avatar .image picture {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      .post-header__author .avatar .image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .post-header__author .avatar .content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+      }
+
+      .post-header__author .avatar .title {
+        margin: 0;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+
+      .post-header__author .avatar .subtitle {
+        margin: 0;
+        font-size: 0.875rem;
+        color: var(--color-neutral-500, #6b7280);
       }
     }
   }

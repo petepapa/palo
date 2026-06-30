@@ -8,6 +8,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { 
   getPostDefaultImage, 
   resolveCollectionCoverImage, 
+  resolveAuthorImageResolved,
   type ResolvedImage,
   smartRender,
   getFallbackContentHtml,
@@ -128,6 +129,8 @@ const authorInfo = typeof author === 'object'
       image: undefined,
       bio: 'Blog Author',
     }
+
+const authorImageResolved = resolveAuthorImageResolved(authorInfo.image, postId, 'posts')
 ---
 
 <DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/blog/${postId}`)} image={coverImage}>
@@ -135,6 +138,7 @@ const authorInfo = typeof author === 'object'
     title={title}
     subtitle={description}
     author={authorInfo}
+    authorImageResolved={authorImageResolved}
     coverImage={coverImage}
     breadcrumbs={postEntry.data.breadcrumbs}
     source={postEntry.data.source}

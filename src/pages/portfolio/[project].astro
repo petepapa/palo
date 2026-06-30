@@ -8,6 +8,7 @@ import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { getProjectTypeDefaultImage } from '@utils/projectImages'
 import { 
   resolveCollectionCoverImage, 
+  resolveAuthorImageResolved,
   type ResolvedImage,
   smartRender,
   getFallbackContentHtml,
@@ -135,6 +136,8 @@ const authorInfo = typeof author === 'object'
       image: undefined,
       bio: 'Project Creator',
     }
+
+const authorImageResolved = resolveAuthorImageResolved(authorInfo.image, projectId, 'projects')
 ---
 
 <DefaultLayout title={title} description={description} url={ensureTrailingSlash(`/portfolio/${projectId}`)} image={coverImage}>
@@ -142,6 +145,7 @@ const authorInfo = typeof author === 'object'
     title={title}
     subtitle={description}
     author={authorInfo}
+    authorImageResolved={authorImageResolved}
     coverImage={coverImage}
     breadcrumbs={breadcrumbs}
     source={source}

@@ -276,6 +276,24 @@ export function resolveCollectionCoverImage(
   return resolveContentImage(coverImage, { contentId, collection, fallback }) ?? fallback
 }
 
+export function resolveAuthorImage(
+  authorImage: string | undefined | null,
+  contentId: string,
+  collection: ContentCollection,
+): string | undefined {
+  if (!authorImage) return undefined
+  return getPublicImageUrl(resolveContentImage(authorImage, { contentId, collection }))
+}
+
+export function resolveAuthorImageResolved(
+  authorImage: string | undefined | null,
+  contentId: string,
+  collection: ContentCollection,
+): ResolvedImage | undefined {
+  if (!authorImage) return undefined
+  return resolveContentImage(authorImage, { contentId, collection })
+}
+
 export function getPublicImageUrl(image: ResolvedImage | undefined): string | undefined {
   if (!image) {
     return undefined
