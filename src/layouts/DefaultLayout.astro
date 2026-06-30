@@ -2086,6 +2086,8 @@ ${bodyLineHeights}
         return Math.abs(actualTop - stickyTop) < 2
       }
 
+      const __paloSidebarStuckStates = new WeakMap<HTMLElement, boolean>()
+
       const updateSidebarStuckState = () => {
         const sidebars = document.querySelectorAll(ELASTIC_SIDEBAR_SELECTORS.join(','))
         sidebars.forEach((el) => {
@@ -2093,8 +2095,17 @@ ${bodyLineHeights}
           if (sidebar.offsetParent === null) return
 
           const isStuck = checkSidebarStuck(sidebar)
+          const wasStuck = __paloSidebarStuckStates.get(sidebar) ?? false
+
           sidebar.classList.toggle('is-stuck', isStuck)
           sidebar.classList.toggle('is-un-stuck-locked', !isStuck)
+
+          // 从 stuck → un-stuck 时刚性复位 scrollTop，确保标题始终在视口内
+          if (wasStuck && !isStuck && sidebar.scrollTop > 0) {
+            sidebar.scrollTop = 0
+          }
+
+          __paloSidebarStuckStates.set(sidebar, isStuck)
         })
       }
 
