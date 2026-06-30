@@ -1,21 +1,38 @@
 ---
-title: Sign Language Bridge
-author: Jane Smith
-description: An AI-powered real-time sign language translation system that enables seamless communication between deaf and hearing individuals
-type: video
-tags: ['Accessibility', 'AI', 'Computer Vision']
-coverImage: 
+# Base Metadata / 基础元数据
+title: "Sign Language Bridge"
+description: "An AI-powered real-time sign language translation system that enables seamless communication between deaf and hearing individuals"
+publishDate: 2024-09-15
+tags: ['Accessibility', 'AI', 'Computer Vision'] # Keywords for filtering / 用于列表过滤的标签
+
+# Author Profile / 结构化作者信息
+author:
+  name: "Jane Smith"
+  image: "/branding/avatar.png"
+  bio: "Jane Smith"
+
+# Visual Assets & Layouts / 视觉资产与排版样式
+type: "video"                               # Project Layout: default, video, etc. / 作品集专属排版布局类型
+
+# Feature Toggles / 极简功能开关 (Removed 'show' prefix)
+breadcrumbs: true
+toc: false                                    # Projects usually focus on imagery, TOC can be disabled / 作品集通常以大图为主，可选择关闭目录
+share: true
+
+# Status & External Links / 状态与外部链接
+draft: false
+featuredOrder: 2
 ---
-
-## Project Overview
-
-Sign Language Bridge revolutionizes communication for the deaf community by providing real-time translation between sign language and spoken/written language. Using advanced computer vision and natural language processing, the system captures sign language gestures and converts them into text or speech, while also translating spoken words into animated sign language.
 
 import BlockQuote from '@components/BlockQuote.astro'
 import BreakoutImage from '@components/BreakoutImage.astro'
 import { Image } from 'astro:assets'
 
 <BreakoutImage src="/projects/project-image-2.jpg" decorative={true} />
+
+## Project Overview
+
+Sign Language Bridge revolutionizes communication for the deaf community by providing real-time translation between sign language and spoken/written language. Using advanced computer vision and natural language processing, the system captures sign language gestures and converts them into text or speech, while also translating spoken words into animated sign language.
 
 ## Technical Challenges
 
