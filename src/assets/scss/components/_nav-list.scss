@@ -24,11 +24,15 @@
     // ── 0b. 容器内政仅清 list-style，外交边界绝不插手 ─────────
     list-style: none !important;
 
-    // ── 1. 默认：清空下划线，字重跟随正文 ──────────────────────────
+    // ── 1. 默认：清空下划线，字重跟随正文，长文本换行 ────────────
     a {
       text-decoration: none;
       font-weight: var(--font-weight-body, 400);
       transition: none;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
     }
 
     // ── 2. 横排容器（Tags 标签栏）────────────────────────────────

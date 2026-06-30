@@ -860,6 +860,10 @@ const navStyle = [
         padding-block: var(--mobile-menu-item-padding-block);
         padding-inline: 0;
         inline-size: 100%;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
       }
 
       .dropdown-menu a,
@@ -1055,7 +1059,10 @@ const navStyle = [
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    white-space: nowrap !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
   }
 }
 </style>

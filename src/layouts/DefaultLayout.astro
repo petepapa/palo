@@ -1212,9 +1212,8 @@ ${bodyLineHeights}
         .article-toc a {
           display: inline-block;
           max-width: 100%;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          overflow-wrap: break-word;
+          word-break: break-word;
           text-decoration: none;
           color: var(--link-color);
         }
