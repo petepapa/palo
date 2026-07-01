@@ -167,6 +167,46 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
   border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s))) !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Astro Code (Shiki) 语法高亮颜色映射
+   使用 'css-variables' 主题时，Shiki 输出形如
+   color: var(--astro-code-token-xxx) 的 CSS 变量引用。
+   在此处将变量映射到项目的语义色系统。
+
+   配色哲学：4 色分层 + neutral 退隐
+   ─────────────────────────────────
+   蓝 (info)     → 代码结构 (关键字/常量/链接)
+   绿 (success)  → 行为 (函数名)
+   橙 (warning)  → 数据 (字符串)
+   灰 (neutral)  → 降噪 (注释/标点)
+
+   可用令牌：
+   --astro-code-background         背景色
+   --astro-code-foreground         默认文本色
+   --astro-code-token-constant     常量（true/false/null/数字/组件名）
+   --astro-code-token-string       字符串
+   --astro-code-token-comment      注释
+   --astro-code-token-keyword      关键字（import, const, return, YAML key...）
+   --astro-code-token-parameter    参数
+   --astro-code-token-function     函数名 / 属性名
+   --astro-code-token-string-expression  模板字符串 / 字符串值
+   --astro-code-token-punctuation  标点/运算符
+   --astro-code-token-link         链接
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --astro-code-background: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+  --astro-code-foreground: var(--foreground-color);
+  --astro-code-token-keyword: var(--color-info-400);
+  --astro-code-token-constant: var(--color-info-300);
+  --astro-code-token-function: var(--color-success-400);
+  --astro-code-token-string: var(--color-warning-300);
+  --astro-code-token-string-expression: var(--color-warning-300);
+  --astro-code-token-comment: var(--color-neutral-500);
+  --astro-code-token-punctuation: var(--color-neutral-400);
+  --astro-code-token-parameter: var(--foreground-color);
+  --astro-code-token-link: var(--color-info-400);
+}
+
 .feature::before,
 .feature::after {
   border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;

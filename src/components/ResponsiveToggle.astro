@@ -27,10 +27,11 @@ const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
 </button>
 
 <script>
-  document.addEventListener('astro:page-load', () => {
-    // variables
+  const paloInitMobileMenu = () => {
     const responsiveToggle = document.querySelector('.responsive-toggle') as HTMLButtonElement | null
-    if (!responsiveToggle) return
+    if (!responsiveToggle || responsiveToggle.dataset.paloMobileBound) return
+    responsiveToggle.dataset.paloMobileBound = 'true'
+
     const mobileNavigation = document.querySelector('.mobile-menu') as HTMLElement | null
     if (!mobileNavigation) return
     const navBar = document.querySelector('#main-navigation .nav-bar') as HTMLElement | null
@@ -233,7 +234,11 @@ const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
 
     window.addEventListener('resize', handleResize)
     window.visualViewport?.addEventListener('resize', handleResize)
-  })
+  }
+
+  document.addEventListener('astro:page-load', paloInitMobileMenu)
+  document.addEventListener('astro:after-swap', paloInitMobileMenu)
+  paloInitMobileMenu()
 </script>
 
 <style lang="scss">

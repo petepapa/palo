@@ -27,3 +27,9 @@ declare module '@config' {
 }
 
 declare const __PALO_TRAILING_SLASH__: boolean
+declare global {
+  interface Window {
+    __paloCustomHashScroll?: boolean
+    __paloInitialHash?: string
+  }
+}

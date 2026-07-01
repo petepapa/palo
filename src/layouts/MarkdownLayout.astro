@@ -21,46 +21,40 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
 
 <style is:inline>
   /* ═══════════════════════════════════════════════════════════
-     导航栏首帧防御盾（First-Frame Layout Lock）
-     与 DefaultLayout 保持同步——MarkdownLayout 文章详情页
-     在外部 CSS bundle 到达前，确保导航栏刚性骨架。
+     状态隔离盾（State Isolation Shield）— 原子属性兼容版
+     与 DefaultLayout 保持同步。
      ═══════════════════════════════════════════════════════════ */
 
-  /* 外壳：主题感知底色 */
-  html:not([data-css-ready="true"]) {
-    background-color: var(--background-color) !important;
-  }
-
-  html:not([data-css-ready="true"]) body {
-    background-color: var(--background-color) !important;
-  }
-
-  /* ── 1. header 骨架壳 ── */
+  /* ── 1. Header 外壳：固定 64px 高度 + 物理留白 ── */
   html:not([data-css-ready="true"]) #main-navigation,
   html:not([data-css-ready="true"]) .site-header,
   html:not([data-css-ready="true"]) header {
     position: fixed !important;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     width: 100% !important;
-    min-height: var(--nav-min-height, 4.5rem) !important;
-    height: var(--nav-min-height, 4.5rem) !important;
-    background-color: var(--background-color) !important;
-    border-bottom: 1px solid var(--border-color-subtle) !important;
+    height: 64px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
     z-index: 9999;
+    background-color: light-dark(#f5f5f5, #262626) !important;
+    border-bottom-width: 1px !important;
+    border-bottom-style: solid !important;
+    border-bottom-color: light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.05)) !important;
   }
 
-  /* ── 2. 内部容器布局刚性锁定 ── */
+  /* ── 2. 内部容器布局 ── */
   html:not([data-css-ready="true"]) #main-navigation > .container {
     display: flex !important;
     flex-wrap: wrap !important;
     justify-content: space-between !important;
-    align-items: flex-start !important;
+    align-items: center !important;
     width: 100% !important;
     max-width: var(--grid-max-width, 90rem) !important;
     margin-inline: auto !important;
-    padding-inline: var(--grid-gutter, 1.5rem) !important;
   }
 
   html:not([data-css-ready="true"]) #main-navigation .nav-bar {
@@ -69,7 +63,7 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
     justify-content: space-between !important;
     align-items: center !important;
     gap: 1rem !important;
-    min-block-size: var(--nav-min-height, 4.5rem) !important;
+    min-block-size: 64px !important;
   }
 
   html:not([data-css-ready="true"]) #main-navigation .wrapper {
@@ -78,146 +72,113 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
     gap: 1rem !important;
   }
 
-  /* ── 3. 菜单项 UL 布局锁定 ── */
-  html:not([data-css-ready="true"]) #main-navigation ul {
+  /* ── 3. desktop-menu 水平排列 + 垂直居中 ── */
+  html:not([data-css-ready="true"]) #main-navigation nav,
+  html:not([data-css-ready="true"]) #main-navigation .desktop-menu {
+    display: block !important;
+    margin-top: 0 !important;
+  }
+
+  html:not([data-css-ready="true"]) #main-navigation .desktop-menu > ul {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: var(--palo-nav-horizontal-space, 2rem) !important;
+    gap: 1.5rem !important;
     list-style: none !important;
     margin: 0 !important;
     padding: 0 !important;
+    height: 64px !important;
   }
 
-  html:not([data-css-ready="true"]) #main-navigation .menu-item {
-    display: flex !important;
-    align-items: center !important;
-    list-style: none !important;
-  }
-
-  /* ── 4. 导航链接文字：主题字体 + CSS 变量色 ── */
+  /* ── 4. 导航链接：行高 64px 实现垂直居中 ── */
   html:not([data-css-ready="true"]) #main-navigation a,
-  html:not([data-css-ready="true"]) #main-navigation button:not(.responsive-toggle) {
-    font-family: var(--font-body, sans-serif) !important;
-    font-weight: var(--font-weight-accent, 500) !important;
-    font-size: var(--navigation-desktop-font-size, 1rem) !important;
-    display: inline-flex !important;
-    align-items: center !important;
+  html:not([data-css-ready="true"]) #main-navigation button {
+    color: light-dark(#333333, #f5f5f5) !important;
     text-decoration: none !important;
-    color: var(--foreground-color) !important;
-    background: none !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 64px !important;
+    background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    cursor: pointer !important;
-    -webkit-appearance: none !important;
+    box-shadow: none !important;
   }
 
-  /* ── 5. .has-dropdown > button：彻底剥离默认按钮灰色外观 ── */
+  /* ── 5. .has-dropdown > button：清零默认灰色背景 ── */
   html:not([data-css-ready="true"]) .has-dropdown > button {
     display: inline-flex !important;
     align-items: center !important;
     gap: 0.25rem !important;
-    background: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
     border: none !important;
     border-radius: 0 !important;
+    box-shadow: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    color: var(--foreground-color) !important;
-    font-family: var(--font-body, sans-serif) !important;
-    font-weight: var(--font-weight-accent, 500) !important;
-    font-size: var(--navigation-desktop-font-size, 1rem) !important;
-    line-height: inherit !important;
-    box-shadow: none !important;
-    outline: none !important;
-    cursor: pointer !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    text-transform: none !important;
-    letter-spacing: normal !important;
-  }
-
-  html:not([data-css-ready="true"]) .has-dropdown > button:hover {
+    color: light-dark(#333333, #f5f5f5) !important;
     cursor: pointer !important;
   }
 
-  html:not([data-css-ready="true"]) .has-dropdown > button svg {
-    width: 0.75em !important;
-    height: 0.75em !important;
-    opacity: 0.5 !important;
+  /* ── 6. Launcher 区域：靠右 + 垂直居中 + 兜底样式 ── */
+  html:not([data-css-ready="true"]) [class*="launcher"] {
+    height: 64px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+    margin-top: 0 !important;
   }
 
-  /* ── 6. 下拉菜单初始隐藏 ── */
-  html:not([data-css-ready="true"]) .has-dropdown > ul.dropdown-menu {
+  html:not([data-css-ready="true"]) [class*="launcher"] button,
+  html:not([data-css-ready="true"]) [class*="launcher"] kbd {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background-color: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.08)) !important;
+    color: light-dark(#333333, #f5f5f5) !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1)) !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    height: 28px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    margin-left: 4px !important;
+  }
+
+  /* ── 7. 下拉菜单初始隐藏 ── */
+  html:not([data-css-ready="true"]) .has-dropdown > ul.dropdown-menu,
+  html:not([data-css-ready="true"]) .dropdown-menu {
     display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
   }
 
-  /* ── 7. 移动端元素骨架期间隐藏 ── */
+  /* ── 8. 桌面端强制隐藏汉堡菜单 + a11y 辅助文本 ── */
   html:not([data-css-ready="true"]) .responsive-toggle,
+  html:not([data-css-ready="true"]) .skip-to-content,
+  html:not([data-css-ready="true"]) [href="#main-content"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+
+  /* ── 9. 移动端元素骨架期间隐藏 ── */
   html:not([data-css-ready="true"]) .mobile-launcher,
   html:not([data-css-ready="true"]) .mobile-menu {
     display: none !important;
   }
 
-  /* 隐藏未水合完的动态组件 + a11y 标签 */
-  html:not([data-css-ready="true"]) .skip-to-content,
-  html:not([data-css-ready="true"]) [href="#main-content"],
-  html:not([data-css-ready="true"]) .search-box,
-  html:not([data-css-ready="true"]) .theme-toggle,
-  html:not([data-css-ready="true"]) .darkmode-toggle {
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  /* 导航核心图标 VIP 通道：astro-icon 内联 SVG 首帧可见 */
-  html:not([data-css-ready="true"]) svg:not(.logo-svg svg, .type-icon svg, .menu-item--utility svg) {
-    opacity: 0 !important;
-  }
-
-  /* Logo VIP 通道：骨架屏期间 Logo 保持完全可见 */
+  /* ── 10. Logo 首帧保持完全可见 ── */
   html:not([data-css-ready="true"]) .logo-link {
     display: flex !important;
     align-items: center !important;
     gap: 0.5rem !important;
     opacity: 1 !important;
     visibility: visible !important;
-  }
-
-  /* ═══════════════════════════════════════════════════════════
-     纯 CSS 下拉菜单交互兜底（JS 到达前的空窗期防线）
-     Slow 4G 下 JS 排队时，:hover/:focus-within 本能接管交互，
-     用户悬停/聚焦 PORTFOLIO 立刻弹出菜单，不死等脚本水合。
-     ═══════════════════════════════════════════════════════════ */
-
-  /* Hover / 聚焦 → 展开下拉菜单（主题感知配色） */
-  html:not([data-css-ready="true"]) .has-dropdown:hover > .dropdown-menu,
-  html:not([data-css-ready="true"]) .has-dropdown:focus > .dropdown-menu,
-  html:not([data-css-ready="true"]) .has-dropdown:focus-within > .dropdown-menu {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    position: absolute !important;
-    inset-block-start: var(--nav-min-height, 4.5rem) !important;
-    inset-inline-start: 0 !important;
-    background-color: var(--background-color) !important;
-    border: 1px solid var(--border-color-subtle) !important;
-    padding: 1rem !important;
-    min-inline-size: 275px !important;
-    z-index: 100000 !important;
-    list-style: none !important;
-  }
-
-  html:not([data-css-ready="true"]) .has-dropdown:hover > .dropdown-menu a,
-  html:not([data-css-ready="true"]) .has-dropdown:focus > .dropdown-menu a,
-  html:not([data-css-ready="true"]) .has-dropdown:focus-within > .dropdown-menu a {
-    display: block !important;
-    color: var(--foreground-color) !important;
-    font-family: var(--font-body, sans-serif) !important;
-    font-weight: var(--font-weight-body, 400) !important;
-    font-size: 1rem !important;
-    text-decoration: none !important;
-    padding: 0.25rem 0 !important;
-    text-transform: none !important;
-    letter-spacing: normal !important;
   }
 </style>
 

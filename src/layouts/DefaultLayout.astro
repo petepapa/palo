@@ -789,78 +789,89 @@ ${bodyLineHeights}
          CSS 就绪后 data-css-ready="true" 激活，骨架平滑绽放。
          ═══════════════════════════════════════════════════════════════ -->
     <style is:inline>
-      /* ═══════════════════════════════════════════════════════════════
-         关键字体基座内联化（Critical Font Base64 Embedding）
-         将导航所需字符的 League Spartan 子集（~2KB）以 Base64 嵌入，
-         浏览器解析 HTML 首字节即拥有完整字体，导航文字开局即终局。
-
-         生成命令（在项目根目录执行）：
-           pip install fonttools brotli
-           pyftsubset public/fonts/League_Spartan/static/LeagueSpartan-Medium.ttf \
-             --text="HOMEBLGPORTFIAUCSN" \
-             --layout-features='' --flavor=woff2 --output-file=/tmp/nav-subset.woff2
-           base64 -i /tmp/nav-subset.woff2 | tr -d '\n' | pbcopy
-
-         将输出的 Base64 字符串替换下方 url() 中的占位符即可激活。
-         ═══════════════════════════════════════════════════════════════ */
-      /*
-      @font-face {
-        font-family: 'League Spartan Base';
-        src: url('data:font/woff2;charset=utf-8;base64,PASTE_BASE64_HERE') format('woff2');
-        font-weight: 500;
-        font-style: normal;
-        font-display: block;
-      }
-      */
-
-      /* 外壳：主题感知底色（light-dark 由 --background-color 驱动）
-         在慢速网络下，CSS 变量已通过内联 <style is:global> 写入首帧，始终可用 */
       html:not([data-css-ready="true"]) {
-        background-color: var(--background-color) !important;
+        background-color: var(--background-color, #0f172a) !important;
+        color: var(--foreground-color, #f8fafc) !important;
       }
 
       html:not([data-css-ready="true"]) body {
-        background-color: var(--background-color) !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+        background-color: var(--background-color, #0f172a) !important;
+        color: var(--foreground-color, #f8fafc) !important;
       }
 
-      /* ═══════════════════════════════════════════════════════════
-         导航栏首帧防御盾（First-Frame Layout Lock）
-         在外部 CSS bundle 到达前，内联样式确保：
-
-         1. header 锚定固定定位 + 主题背景色 + 精确高度
-         2. .nav-bar 锁死 flex 布局（logo / nav / hamburger 刚性排列）
-         3. .has-dropdown > button 剥离默认按钮灰色外观 → 纯文本
-         4. .menu-item 内联排列，杜绝原生 HTML 结构散落
-         5. 下拉菜单 UL 初始隐藏，hover/focus 时通过纯 CSS 展开
-         6. 移动端元素（responsive-toggle, mobile-menu）骨架期间隐藏
-         ═══════════════════════════════════════════════════════════ */
-
-      /* ── 1. header 骨架壳 ── */
+      html:not([data-css-ready="true"]) header,
+      html:not([data-css-ready="true"]) header.is-fixed,
+      html:not([data-css-ready="true"]) header.is-at-top,
       html:not([data-css-ready="true"]) #main-navigation,
-      html:not([data-css-ready="true"]) .site-header,
-      html:not([data-css-ready="true"]) header {
+      html:not([data-css-ready="true"]) .site-header {
         position: fixed !important;
-        top: 0;
-        left: 0;
-        right: 0;
+        inset-block-start: 0 !important;
+        inset-inline-start: 0 !important;
+        inset-inline-end: 0 !important;
         width: 100% !important;
-        min-height: var(--nav-min-height, 4.5rem) !important;
-        height: var(--nav-min-height, 4.5rem) !important;
-        background-color: var(--background-color) !important;
-        border-bottom: 1px solid var(--border-color-subtle) !important;
-        z-index: 9999;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+        background-color: color-mix(in oklab, var(--background-color, #0f172a) calc(var(--header-bg-opacity, 0.75) * 100%), transparent) !important;
+        backdrop-filter: blur(var(--header-bg-blur, 12px)) !important;
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px)) !important;
+        color: var(--foreground-color, #f8fafc) !important;
+        border-bottom-width: 1px !important;
+        border-bottom-style: solid !important;
+        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        box-sizing: border-box !important;
+        z-index: 9999 !important;
       }
 
-      /* ── 2. 内部容器布局刚性锁定 ── */
+      html:not([data-css-ready="true"]) header.is-at-top:not(.is-menu-open) {
+        background-color: transparent !important;
+        backdrop-filter: blur(0) !important;
+        -webkit-backdrop-filter: blur(0) !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme='light'] {
+        --foreground-color: #1f2937 !important;
+        --background-color: #f8fafc !important;
+        --icon-color: #1f2937 !important;
+        --link-color: #1d4ed8 !important;
+        --link-hover-color: #1e40af !important;
+        --border-color: #111827 !important;
+        --text-decoration-color: #374151 !important;
+        --text-decoration-color-hover: #111827 !important;
+        --outline-color: #d1d5db !important;
+        color-scheme: light !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme='dark'] {
+        --foreground-color: #f8fafc !important;
+        --background-color: #111827 !important;
+        --icon-color: #f8fafc !important;
+        --link-color: #f8fafc !important;
+        --link-hover-color: #e5e7eb !important;
+        --border-color: #f8fafc !important;
+        --text-decoration-color: #e5e7eb !important;
+        --text-decoration-color-hover: #f8fafc !important;
+        --outline-color: #f8fafc !important;
+        color-scheme: dark !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+        color: var(--foreground-color) !important;
+      }
+
       html:not([data-css-ready="true"]) #main-navigation > .container {
+        position: relative !important;
         display: flex !important;
         flex-wrap: wrap !important;
         justify-content: space-between !important;
         align-items: flex-start !important;
         width: 100% !important;
         max-width: var(--grid-max-width, 90rem) !important;
-        margin-inline: auto !important;
-        padding-inline: var(--grid-gutter, 1.5rem) !important;
+        margin-inline-start: auto !important;
+        margin-inline-end: auto !important;
+        padding-inline-start: var(--grid-gutter, 1.5rem) !important;
+        padding-inline-end: var(--grid-gutter, 1.5rem) !important;
+        box-sizing: border-box !important;
       }
 
       html:not([data-css-ready="true"]) #main-navigation .nav-bar {
@@ -868,112 +879,19 @@ ${bodyLineHeights}
         flex: 1 1 100% !important;
         justify-content: space-between !important;
         align-items: center !important;
-        gap: 1rem !important;
+        gap: var(--space-m, 1rem) !important;
         min-block-size: var(--nav-min-height, 4.5rem) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       html:not([data-css-ready="true"]) #main-navigation .wrapper {
         display: flex !important;
         align-items: center !important;
-        gap: 1rem !important;
+        gap: var(--space-m, 1rem) !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
       }
 
-      /* ── 3. 菜单项 UL 布局锁定 ── */
-      html:not([data-css-ready="true"]) #main-navigation ul {
-        display: flex !important;
-        align-items: center !important;
-        gap: var(--palo-nav-horizontal-space, 2rem) !important;
-        list-style: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-
-      html:not([data-css-ready="true"]) #main-navigation .menu-item {
-        display: flex !important;
-        align-items: center !important;
-        list-style: none !important;
-      }
-
-      /* ── 4. 导航链接文字：主题字体 + CSS 变量色 ── */
-      html:not([data-css-ready="true"]) #main-navigation a,
-      html:not([data-css-ready="true"]) #main-navigation button:not(.responsive-toggle) {
-        font-family: var(--font-body, sans-serif) !important;
-        font-weight: var(--font-weight-accent, 500) !important;
-        font-size: var(--navigation-desktop-font-size, 1rem) !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        text-decoration: none !important;
-        color: var(--foreground-color) !important;
-        background: none !important;
-        border: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        cursor: pointer !important;
-        -webkit-appearance: none !important;
-      }
-
-      /* ── 5. .has-dropdown > button：彻底剥离默认按钮灰色外观 ── */
-      html:not([data-css-ready="true"]) .has-dropdown > button {
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 0.25rem !important;
-        background: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        color: var(--foreground-color) !important;
-        font-family: var(--font-body, sans-serif) !important;
-        font-weight: var(--font-weight-accent, 500) !important;
-        font-size: var(--navigation-desktop-font-size, 1rem) !important;
-        line-height: inherit !important;
-        box-shadow: none !important;
-        outline: none !important;
-        cursor: pointer !important;
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        text-transform: none !important;
-        letter-spacing: normal !important;
-      }
-
-      html:not([data-css-ready="true"]) .has-dropdown > button:hover {
-        cursor: pointer !important;
-      }
-
-      html:not([data-css-ready="true"]) .has-dropdown > button svg {
-        width: 0.75em !important;
-        height: 0.75em !important;
-        opacity: 0.5 !important;
-      }
-
-      /* ── 6. 下拉菜单初始隐藏 ── */
-      html:not([data-css-ready="true"]) .has-dropdown > ul.dropdown-menu {
-        display: none !important;
-      }
-
-      /* ── 7. 移动端元素骨架期间隐藏 ── */
-      html:not([data-css-ready="true"]) .responsive-toggle,
-      html:not([data-css-ready="true"]) .mobile-launcher,
-      html:not([data-css-ready="true"]) .mobile-menu {
-        display: none !important;
-      }
-
-      /* 隐藏未水合完的动态组件 + a11y 标签 */
-      html:not([data-css-ready="true"]) .skip-to-content,
-      html:not([data-css-ready="true"]) [href="#main-content"],
-      html:not([data-css-ready="true"]) .search-box,
-      html:not([data-css-ready="true"]) .theme-toggle,
-      html:not([data-css-ready="true"]) .darkmode-toggle {
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-
-      /* 导航核心图标 VIP 通道：astro-icon 内联 SVG 首帧可见 */
-      html:not([data-css-ready="true"]) svg:not(.logo-svg svg, .type-icon svg, .menu-item--utility svg) {
-        opacity: 0 !important;
-      }
-
-      /* Logo VIP 通道：骨架屏期间 Logo 保持完全可见 */
       html:not([data-css-ready="true"]) .logo-link {
         display: flex !important;
         align-items: center !important;
@@ -982,78 +900,314 @@ ${bodyLineHeights}
         visibility: visible !important;
       }
 
-      /* ═══════════════════════════════════════════════════════════
-         纯 CSS 下拉菜单交互兜底（JS 到达前的空窗期防线）
-         Slow 4G 下 JS 排队时，:hover/:focus-within 本能接管交互，
-         用户悬停/聚焦 PORTFOLIO 立刻弹出菜单，不死等脚本水合。
-         ═══════════════════════════════════════════════════════════ */
-
-      /* Hover / 聚焦 → 展开下拉菜单（主题感知配色） */
-      html:not([data-css-ready="true"]) .has-dropdown:hover > .dropdown-menu,
-      html:not([data-css-ready="true"]) .has-dropdown:focus > .dropdown-menu,
-      html:not([data-css-ready="true"]) .has-dropdown:focus-within > .dropdown-menu {
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        position: absolute !important;
-        inset-block-start: var(--nav-min-height, 4.5rem) !important;
-        inset-inline-start: 0 !important;
-        background-color: var(--background-color) !important;
-        border: 1px solid var(--border-color-subtle) !important;
-        padding: 1rem !important;
-        min-inline-size: 275px !important;
-        z-index: 100000 !important;
-        list-style: none !important;
+      html:not([data-css-ready="true"]) .desktop-menu {
+        display: none !important;
       }
 
-      html:not([data-css-ready="true"]) .has-dropdown:hover > .dropdown-menu a,
-      html:not([data-css-ready="true"]) .has-dropdown:focus > .dropdown-menu a,
-      html:not([data-css-ready="true"]) .has-dropdown:focus-within > .dropdown-menu a {
-        display: block !important;
-        color: var(--foreground-color) !important;
-        font-family: var(--font-body, sans-serif) !important;
-        font-weight: var(--font-weight-body, 400) !important;
-        font-size: 1rem !important;
+      html:not([data-css-ready="true"]) .desktop-menu > ul {
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-m, 1rem) !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .responsive-toggle,
+      html:not([data-css-ready="true"]) .mobile-launcher {
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-2xs, 0.25rem) !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .mobile-menu {
+        display: none !important;
+      }
+
+      @media (min-width: 1050px) {
+        html:not([data-css-ready="true"]) .desktop-menu {
+          display: grid !important;
+          flex: 1 1 auto !important;
+          grid-template-columns: minmax(0, 1fr) auto !important;
+          align-items: center !important;
+          column-gap: var(--space-m, 1rem) !important;
+          min-inline-size: 0 !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu > ul {
+          display: flex !important;
+          align-items: center !important;
+          gap: var(--space-m, 1rem) !important;
+          list-style: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-sizing: border-box !important;
+        }
+
+        html:not([data-css-ready="true"]) .mobile-launcher,
+        html:not([data-css-ready="true"]) .mobile-menu,
+        html:not([data-css-ready="true"]) .responsive-toggle {
+          display: none !important;
+        }
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation a,
+      html:not([data-css-ready="true"]) #main-navigation button {
+        color: var(--foreground-color, #f8fafc) !important;
+        background-color: transparent !important;
+        border: none !important;
         text-decoration: none !important;
-        padding: 0.25rem 0 !important;
-        text-transform: none !important;
-        letter-spacing: normal !important;
+        font-weight: var(--font-weight-accent, 400) !important;
+        line-height: 1.5 !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation a:hover,
+      html:not([data-css-ready="true"]) #main-navigation button:hover,
+      html:not([data-css-ready="true"]) #main-navigation a:focus-visible,
+      html:not([data-css-ready="true"]) #main-navigation button:focus-visible {
+        text-decoration: underline !important;
+        text-decoration-thickness: max(1.5px, 0.0625em) !important;
+        text-underline-offset: 0.4375em !important;
+        text-decoration-style: wavy !important;
+      }
+
+      html:not([data-css-ready="true"]) .has-dropdown > button {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        background-color: transparent !important;
+        border: none !important;
+        padding-inline-start: 0 !important;
+        padding-inline-end: 0 !important;
+        margin: 0 !important;
+        color: inherit !important;
+        cursor: pointer !important;
+      }
+
+      html:not([data-css-ready="true"]) .has-dropdown > ul,
+      html:not([data-css-ready="true"]) .dropdown-menu {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .skip-to-content,
+      html:not([data-css-ready="true"]) [href="#main-content"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-launcher {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      @media (max-width: 1049px) {
+        html:not([data-css-ready="true"]) .mobile-launcher {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-inline-size: var(--launcher-trigger-width-min, 3.25rem) !important;
+        min-block-size: var(--launcher-trigger-height, 2.5rem) !important;
+        border-radius: var(--launcher-radius-md, 0.75rem) !important;
+        background-color: var(--launcher-action-bar-color, rgba(255, 255, 255, 0.08)) !important;
+        border: 1px solid var(--launcher-inner-border-color, rgba(255, 255, 255, 0.12)) !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.icon-only) {
+        inline-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+        block-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.compact) {
+        inline-size: var(--launcher-trigger-compact-width, 5.9375rem) !important;
+        block-size: var(--launcher-trigger-height, 2.5rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) .mobile-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger {
+        visibility: hidden !important;
+        opacity: 0 !important;
+        min-inline-size: clamp(var(--launcher-trigger-width-min, 3.25rem), 100%, var(--launcher-trigger-width-max, 13rem)) !important;
+        min-block-size: var(--launcher-trigger-height, 2.5rem) !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger.icon-only {
+        inline-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+        block-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger.compact {
+        inline-size: var(--launcher-trigger-compact-width, 5.9375rem) !important;
+        block-size: var(--launcher-trigger-height, 2.5rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .wrapper,
+      html:not([data-css-ready="true"]) .launcher-trigger .shortcut,
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
       }
     </style>
 
     <script is:inline>
-      // ── 盾牌生命周期：监听 CSS 加载 + Astro SPA 路由往复重置 ──
-      function initShield() {
-        // 查找页面主样式表，以其加载完成作为「CSS 就绪」信号
-        var mainStylesheet = document.querySelector('link[rel="stylesheet"]');
-        if (mainStylesheet) {
-          if (mainStylesheet.sheet) {
-            // 已缓存，直接释放
-            document.documentElement.setAttribute('data-css-ready', 'true');
-          } else {
-            mainStylesheet.addEventListener('load', function () {
-              document.documentElement.setAttribute('data-css-ready', 'true');
-            });
-          }
-        } else {
-          // 无外部样式表，直接释放
-          document.documentElement.setAttribute('data-css-ready', 'true');
+      (function () {
+        function getStorageKey() {
+          return 'palo_scroll_' + window.location.pathname + window.location.search;
         }
-      }
 
-      // 1. 首屏直接运行
-      initShield();
+        if (window.location.pathname === '/accessible-components' && window.location.hash) {
+          window['__paloCustomHashScroll'] = true;
+          window['__paloInitialHash'] = window.location.hash.replace('#', '');
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          window.scrollTo(0, 0);
+        } else {
+          window['__paloCustomHashScroll'] = false;
+        }
 
-      // 2. Client Router SPA 导航：新页面即将交换 DOM 前，剥夺旧页激活状态
-      //    新页面 body 替换后，盾牌重新生效直到新 CSS 加载完成
-      document.addEventListener('astro:before-swap', function () {
-        document.documentElement.removeAttribute('data-css-ready');
-      });
+        if ('scrollRestoration' in history) {
+          history.scrollRestoration = 'manual';
+        }
 
-      // 3. DOM 交换完成后，对新页面重新初始化样式表监听
-      document.addEventListener('astro:page-load', function () {
-        initShield();
-      });
+        var activeScrollFrame = null
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        function cancelSmoothScroll() {
+          if (activeScrollFrame !== null) {
+            cancelAnimationFrame(activeScrollFrame)
+            activeScrollFrame = null
+          }
+        }
+
+        function smoothScrollTo(targetY) {
+          if (prefersReducedMotion) {
+            window.scrollTo(0, targetY)
+            return
+          }
+
+          cancelSmoothScroll()
+          var startY = window.scrollY
+          var distance = targetY - startY
+          if (Math.abs(distance) < 2) {
+            window.scrollTo(0, targetY)
+            return
+          }
+
+          var duration = Math.min(900, Math.max(300, Math.sqrt(Math.abs(distance)) * 18))
+          var startTime = performance.now()
+          var rootStyle = document.documentElement.style
+          var previousScrollBehavior = rootStyle.scrollBehavior
+          rootStyle.scrollBehavior = 'auto'
+
+          function easeOutExpo(t) {
+            return t === 0 ? 0 : 1 - Math.pow(2, -10 * t)
+          }
+
+          function step(currentTime) {
+            var elapsed = currentTime - startTime
+            var progress = Math.min(elapsed / duration, 1)
+            var eased = easeOutExpo(progress)
+            window.scrollTo(0, startY + distance * eased)
+
+            if (progress < 1) {
+              activeScrollFrame = requestAnimationFrame(step)
+            } else {
+              rootStyle.scrollBehavior = previousScrollBehavior
+              activeScrollFrame = null
+            }
+          }
+
+          step(startTime)
+        }
+
+        var restoredScrollPosition = false
+
+        function restoreScrollPosition() {
+          if (restoredScrollPosition || window.location.hash || window['__paloInitialHash']) {
+            return
+          }
+          restoredScrollPosition = true
+
+          var rootStyle = document.documentElement.style
+          var previousScrollBehavior = rootStyle.scrollBehavior
+          rootStyle.scrollBehavior = 'auto'
+          window.scrollTo(0, 0)
+          rootStyle.scrollBehavior = previousScrollBehavior
+
+          var savedY = sessionStorage.getItem(getStorageKey())
+          if (savedY !== null) {
+            smoothScrollTo(parseInt(savedY, 10))
+          }
+        }
+
+        function releaseShield() { document.documentElement.setAttribute('data-css-ready', 'true'); }
+        function lockShield() { document.documentElement.removeAttribute('data-css-ready'); }
+
+        function initScrollRestore() {
+          if (document.readyState !== 'loading') {
+            restoreScrollPosition()
+          } else {
+            document.addEventListener('DOMContentLoaded', restoreScrollPosition)
+          }
+        }
+
+        // 1. 首次加载：等待 DOM 完成后再执行滚动恢复，并释放首帧盾牌
+        initScrollRestore()
+        window.addEventListener('pageshow', initScrollRestore)
+        if (document.readyState !== 'loading') {
+          releaseShield()
+        } else {
+          document.addEventListener('DOMContentLoaded', releaseShield)
+        }
+
+        // 2. 实时保存滚动位置（100ms 节流）
+        var scrollTimer;
+        window.addEventListener('scroll', function () {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(function () {
+            sessionStorage.setItem(getStorageKey(), String(window.scrollY));
+          }, 100);
+        }, { passive: true });
+
+        // 3. Astro SPA 生命周期深度适配
+        document.addEventListener('astro:before-swap', function () {
+          sessionStorage.setItem(getStorageKey(), String(window.scrollY));
+          lockShield();
+        });
+
+        document.addEventListener('astro:after-swap', function () {
+          // DOM 树已替换完毕，节点存在，精确恢复滚动
+          restoreScrollPosition();
+        });
+
+        document.addEventListener('astro:page-load', function () {
+          releaseShield();
+        });
+
+        // 4. 兜底
+        window.addEventListener('load', releaseShield);
+      })();
     </script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -2086,6 +2240,10 @@ ${bodyLineHeights}
       }
 
       const initHashScroll = () => {
+        if (window.location.pathname === '/accessible-components') return
+        // @ts-ignore: window custom flag injected at runtime
+        if (window['__paloCustomHashScroll']) return
+
         const hash = window.location.hash.replace('#', '')
         if (!hash) return
 
@@ -2104,7 +2262,17 @@ ${bodyLineHeights}
         }
 
         const targetY = Math.max(0, element.getBoundingClientRect().top + window.scrollY - headerHeight)
-        smoothScrollTo(targetY, 0)
+        const rootStyle = document.documentElement.style
+        const previousScrollBehavior = rootStyle.scrollBehavior
+        rootStyle.scrollBehavior = 'auto'
+        window.scrollTo(0, 0)
+        rootStyle.scrollBehavior = previousScrollBehavior
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            smoothScrollTo(targetY, 0)
+          })
+        })
       }
 
       const animateAndCloseModal = (modal: HTMLDialogElement) => {
@@ -2132,16 +2300,20 @@ ${bodyLineHeights}
         document.addEventListener(
           'click',
           (e) => {
-            const modal = e.target.closest('dialog.modal')
-            if (!modal || !modal.open) return
+            const target = e.target
+            if (!(target instanceof Element)) return
+            const modalEl = target.closest('dialog.modal')
+            if (!(modalEl instanceof HTMLDialogElement)) return
+            const modal = modalEl as HTMLDialogElement
+            if (!modal.open) return
 
-            if (e.target.closest('.modal-close button')) {
+            if (target.closest('.modal-close button')) {
               e.stopPropagation()
               animateAndCloseModal(modal)
               return
             }
 
-            if (e.target === modal) {
+            if (target === modal) {
               e.stopPropagation()
               animateAndCloseModal(modal)
             }
@@ -2160,6 +2332,8 @@ ${bodyLineHeights}
       document.addEventListener('astro:after-swap', initHashScroll)
       if (document.readyState !== 'loading') {
         initHashScroll()
+      } else {
+        document.addEventListener('DOMContentLoaded', initHashScroll)
       }
 
       // ── 弹性上下文锁定（Elastic Context Locking）──

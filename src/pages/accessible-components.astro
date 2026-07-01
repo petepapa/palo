@@ -81,7 +81,7 @@ const pageHeaderAppearance = {
   <PaloPageHeader
     title="Accessible components"
     subtitle="This theme includes comprehensive accessibility components from the <a href='https://github.com/incluud/accessible-astro-components'>Accessible Astro Components</a> NPM package to accelerate accessible development. For detailed documentation and usage examples, visit our <a href='https://accessible-astro.incluud.dev/'>documentation website</a>. Additional components are available in the theme's components directory. Note: accessibility tools like aXe may report issues due to the static demonstration of the components on this page."
-    {...pageHeaderAppearance}
+    {...(pageHeaderAppearance as any)}
   />
   <section class="mt-32 mb-12">
     <div class="components container grid">
@@ -662,6 +662,11 @@ const pageHeaderAppearance = {
   </section>
 
   <script is:inline>
+    window['__paloCustomHashScroll'] = true
+    if (window.location.hash) {
+      window.scrollTo(0, 0)
+    }
+
     const paloInitComponentsNavigation = () => {
       const navLinks = [...document.querySelectorAll('.components-navigation a')]
       if (navLinks.length === 0) return
@@ -800,17 +805,30 @@ const pageHeaderAppearance = {
         link.dataset.paloBound = 'true'
       })
 
-      const initialHash = window.location.hash.replace('#', '')
+      const getScrollStorageKey = () => 'palo_scroll_' + window.location.pathname + window.location.search + window.location.hash
+      const initialHash = window['__paloInitialHash'] || window.location.hash.replace('#', '')
+      const hasSavedScroll = initialHash === '' ? sessionStorage.getItem(getScrollStorageKey()) !== null : false
+
       if (initialHash) {
         const initialLink = document.querySelector(`.components-navigation a[href="#${initialHash}"]`)
         const initialHeading = document.getElementById(initialHash)
         if (initialLink instanceof HTMLAnchorElement) {
           setActiveLink(initialLink)
         }
-        if (initialHeading) {
-          // 使用 requestAnimationFrame 确保 DOM 就绪后再滚动
+        if (initialHeading && !hasSavedScroll) {
+          // 首次加载时先禁用浏览器原生 hash 位置，再执行自定义平滑滚动。
+          // 通过两次 requestAnimationFrame 确保页面完成重排后再滚动。
+          const rootStyle = document.documentElement.style
+          const previousScrollBehavior = rootStyle.scrollBehavior
+          rootStyle.scrollBehavior = 'auto'
+          window.scrollTo(0, 0)
+          rootStyle.scrollBehavior = previousScrollBehavior
+
           requestAnimationFrame(() => {
-            smoothScrollToHeading(initialHeading)
+            requestAnimationFrame(() => {
+              smoothScrollToHeading(initialHeading)
+              history.replaceState(null, '', `#${initialHash}`)
+            })
           })
         }
       } else if (navLinks[0] instanceof HTMLAnchorElement) {
