@@ -1077,7 +1077,7 @@ ${bodyLineHeights}
           return 'palo_scroll_' + window.location.pathname + window.location.search;
         }
 
-        if (window.location.pathname === '/accessible-components' && window.location.hash) {
+        if (window.location.hash) {
           window['__paloCustomHashScroll'] = true;
           window['__paloInitialHash'] = window.location.hash.replace('#', '');
           history.replaceState(null, '', window.location.pathname + window.location.search);
@@ -1127,14 +1127,14 @@ ${bodyLineHeights}
           function step(currentTime) {
             var elapsed = currentTime - startTime
             var progress = Math.min(elapsed / duration, 1)
-            var eased = easeOutExpo(progress)
-            window.scrollTo(0, startY + distance * eased)
-
-            if (progress < 1) {
-              activeScrollFrame = requestAnimationFrame(step)
-            } else {
+            if (progress >= 1) {
+              window.scrollTo(0, targetY)
               rootStyle.scrollBehavior = previousScrollBehavior
               activeScrollFrame = null
+            } else {
+              var eased = easeOutExpo(progress)
+              window.scrollTo(0, startY + distance * eased)
+              activeScrollFrame = requestAnimationFrame(step)
             }
           }
 
@@ -2225,14 +2225,14 @@ ${bodyLineHeights}
         const step = (currentTime: number) => {
           const elapsed = currentTime - startTime
           const progress = Math.min(elapsed / duration, 1)
-          const eased = easeOutExpo(progress)
-          window.scrollTo(0, startY + distance * eased)
-
-          if (progress < 1) {
-            globalScrollFrame = requestAnimationFrame(step)
-          } else {
+          if (progress >= 1) {
+            window.scrollTo(0, finalY)
             rootStyle.scrollBehavior = previousScrollBehavior
             globalScrollFrame = null
+          } else {
+            const eased = easeOutExpo(progress)
+            window.scrollTo(0, startY + distance * eased)
+            globalScrollFrame = requestAnimationFrame(step)
           }
         }
 
@@ -2240,7 +2240,6 @@ ${bodyLineHeights}
       }
 
       const initHashScroll = () => {
-        if (window.location.pathname === '/accessible-components') return
         // @ts-ignore: window custom flag injected at runtime
         if (window['__paloCustomHashScroll']) return
 
@@ -2250,21 +2249,14 @@ ${bodyLineHeights}
         const element = document.getElementById(hash)
         if (!element) return
 
-        // 使用 --header-height，如果还没被 JS 设置（为 0）则用 --nav-min-height 作为 fallback
-        // --nav-min-height 是静态 CSS 变量，第一帧就有值
-        let headerHeight = parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
-        )
-        if (!headerHeight || headerHeight <= 0) {
-          headerHeight = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--nav-min-height'),
-          ) || 96
-        }
-
-        const targetY = Math.max(0, element.getBoundingClientRect().top + window.scrollY - headerHeight)
+        // 用 scrollIntoView 测量准确的目标位置，
+        // 确保与原生锚点跳转行为像素级一致
         const rootStyle = document.documentElement.style
         const previousScrollBehavior = rootStyle.scrollBehavior
         rootStyle.scrollBehavior = 'auto'
+        window.scrollTo(0, 0)
+        element.scrollIntoView({ block: 'start', behavior: 'instant' })
+        const targetY = window.scrollY
         window.scrollTo(0, 0)
         rootStyle.scrollBehavior = previousScrollBehavior
 

@@ -9,10 +9,23 @@ let activeScrollFrame: number | null = null
 const easeOutExpo = (t: number): number => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
 
 const getHeaderOffset = (): number => {
-  const val = parseFloat(
+  const headerHeight = parseFloat(
     getComputedStyle(document.documentElement).getPropertyValue('--header-height'),
   )
-  return Number.isFinite(val) ? val : 0
+  const spaceL = parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue('--space-l'),
+  )
+  const hh = Number.isFinite(headerHeight) ? headerHeight : 0
+  const sl = Number.isFinite(spaceL) ? spaceL : 32
+  return hh + sl
+}
+
+const getElementScrollOffset = (element: HTMLElement): number => {
+  const margin = parseFloat(getComputedStyle(element).scrollMarginBlockStart)
+  if (Number.isFinite(margin) && margin > 0) {
+    return margin
+  }
+  return getHeaderOffset()
 }
 
 const calculateDuration = (distance: number): number => {
@@ -62,15 +75,15 @@ export const smoothScrollTo = (
   const step = (currentTime: number) => {
     const elapsed = currentTime - startTime
     const progress = Math.min(elapsed / duration, 1)
-    const eased = easeOutExpo(progress)
-    window.scrollTo(0, startY + distance * eased)
-
-    if (progress < 1) {
-      activeScrollFrame = requestAnimationFrame(step)
-    } else {
+    if (progress >= 1) {
+      window.scrollTo(0, finalY)
       rootStyle.scrollBehavior = previousScrollBehavior
       activeScrollFrame = null
       options.onComplete?.()
+    } else {
+      const eased = easeOutExpo(progress)
+      window.scrollTo(0, startY + distance * eased)
+      activeScrollFrame = requestAnimationFrame(step)
     }
   }
 
@@ -83,9 +96,22 @@ export const smoothScrollToElement = (
     offset?: number
     duration?: number
     onComplete?: () => void
+    precise?: boolean
   } = {},
 ): void => {
-  const offset = options.offset ?? getHeaderOffset()
+  if (options.precise) {
+    const startY = window.scrollY
+    const rootStyle = document.documentElement.style
+    const prevBehavior = rootStyle.scrollBehavior
+    rootStyle.scrollBehavior = 'auto'
+    element.scrollIntoView({ block: 'start', behavior: 'instant' })
+    const targetY = window.scrollY
+    window.scrollTo(0, startY)
+    rootStyle.scrollBehavior = prevBehavior
+    smoothScrollTo(targetY, { ...options, offset: 0 })
+    return
+  }
+  const offset = options.offset ?? getElementScrollOffset(element)
   const targetY = window.scrollY + element.getBoundingClientRect().top
   smoothScrollTo(targetY, { ...options, offset })
 }

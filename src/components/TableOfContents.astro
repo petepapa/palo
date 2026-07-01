@@ -1,21 +1,23 @@
 ---
 import { Heading } from 'accessible-astro-components'
 import config from '@config'
-
 /**
  * TableOfContents — 页面内容导航共享组件
  *
  * 自动扫描 .article-content__main 中的 h2/h3/h4 标题，
  * 生成导航链接，支持 IntersectionObserver 高亮和平滑滚动。
  * 用于 blog、portfolio、MarkdownLayout 页面。
+ *
+ * @prop {string[]} levels - 要扫描的标题层级，默认 ['h2','h3','h4']
  */
 const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
+const levels = Astro.props.levels ?? ['h2', 'h3', 'h4']
+const levelsAttr = levels.join(',')
 ---
-
 <div class="article-content__toc">
   <div class="article-toc space-content">
     <Heading level="h3" size="h4">On this page</Heading>
-    <nav aria-label="On this page" class="palo-nav-list" data-active-style={navListActiveStyle} data-context="toc">
+    <nav aria-label="On this page" class="palo-nav-list" data-active-style={navListActiveStyle} data-context="toc" data-toc-levels={levelsAttr}>
       <ul class="list-none is-vertical">
         <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
         <li class="article-toc__skeleton article-toc__skeleton--h2"><span></span></li>
@@ -28,20 +30,35 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
     </nav>
   </div>
 </div>
-
 <script is:inline>
   const paloInitTableOfContents = () => {
+    // ── 首次渲染前同步滚动到 hash 位置（防视觉闪烁） ─────────────
+    //     Chrome 借此一次到位；Safari 首次加载可能偏差，
+    //     initTocNavigation 中的 smoothScroll 会完成最终校正。
+    const paloInitialHash = window['__paloInitialHash']
+    if (paloInitialHash) {
+      const heading = document.getElementById(paloInitialHash)
+      if (heading) {
+        void heading.offsetTop
+        // 同步阶段不做滚动，避免用未准备好的 --header-height 定位
+        // 所有滚动都交给 rAF 中的 initTocNavigation 处理
+        // __paloInitialHashHandled 由 initTocNavigation 负责设置
+      }
+    }
     const tocContainer = document.querySelector('.article-toc nav ul')
     if (!tocContainer) return
-
     const contentMain = document.querySelector('.article-content__main')
     if (!contentMain) return
-
-    const allHeadings = contentMain.querySelectorAll('h2, h3, h4')
+    // 读取 data-toc-levels 构建选择器，默认 h2,h3,h4
+    const tocNav = document.querySelector('.article-toc nav')
+    const levelsAttr = tocNav?.getAttribute('data-toc-levels') || 'h2,h3,h4'
+    const levels = levelsAttr.split(',').map((s) => s.trim())
+    const selector = levels.join(', ')
+    const allHeadings = contentMain.querySelectorAll(selector)
     const headings = [...allHeadings]
       .filter((h) => !h.closest('dialog')) // 排除 modal 内的标题
+      .filter((h) => !h.closest('[data-toc-exclude]')) // 排除标记为排除的容器
       .sort((a, b) => a.offsetTop - b.offsetTop)
-
     if (headings.length === 0) {
       const tocWrapper = document.querySelector('.article-content__toc')
       const mainContent = document.querySelector('.article-content__main')
@@ -49,19 +66,16 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       if (mainContent) mainContent.style.gridColumn = '1 / -1'
       return
     }
-
     headings.forEach((heading, index) => {
       if (!heading.id) {
         const id = heading.textContent?.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') || `heading-${index}`
         heading.id = id
       }
-      heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + 2rem)'
+      heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + var(--space-l, 2rem))'
     })
-
     tocContainer.style.opacity = '0'
     tocContainer.style.transition = 'opacity 200ms ease-out'
     tocContainer.innerHTML = ''
-
     const navItems = headings.map((heading) => {
       const level = heading.tagName.toLowerCase()
       const li = document.createElement('li')
@@ -72,40 +86,32 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       li.appendChild(a)
       return li
     })
-
     navItems.forEach((item) => tocContainer.appendChild(item))
-
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         tocContainer.style.opacity = '1'
       })
     })
-
     initTocNavigation()
   }
-
   const initTocNavigation = () => {
     const navLinks = [...document.querySelectorAll('.article-toc nav a')]
     if (navLinks.length === 0) return
-
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let activeScrollFrame = null
     let scrollLocked = false
     let lockTimer = null
     let debounceTimer = null
     const DEBOUNCE_MS = 120
-
     // ── 动态边界视口追光：激活项超出侧边栏可见边界时自动滚动暴露 ──
     const paloTraceActiveLink = (activeLink) => {
       const sidebar = activeLink.closest('.article-content__toc, .components-navigation')
       if (!(sidebar instanceof HTMLElement)) return
-
       const itemTop = activeLink.offsetTop
       const itemBottom = itemTop + activeLink.offsetHeight
       const containerTop = sidebar.scrollTop
       const containerBottom = containerTop + sidebar.clientHeight
       const padding = 16
-
       if (itemBottom > containerBottom - padding) {
         sidebar.scrollTo({
           top: itemBottom - sidebar.clientHeight + padding,
@@ -118,7 +124,6 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         })
       }
     }
-
     // ── 高亮切换（刚性瞬时，无动画，附带追光） ─────────────────
     const setActiveLink = (activeLink) => {
       navLinks.forEach((link) => {
@@ -132,7 +137,6 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       })
       paloTraceActiveLink(activeLink)
     }
-
     // ── 防抖版高亮：滚动停止 DEBOUNCE_MS 后才执行唯一一次判定 ──
     const setActiveLinkDebounced = (activeLink) => {
       if (scrollLocked) return
@@ -141,7 +145,6 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         setActiveLink(activeLink)
       }, DEBOUNCE_MS)
     }
-
     // ── 解锁滚动监听（动画结束后延迟释放） ──────────────────────
     const unlockAfterScroll = () => {
       clearTimeout(lockTimer)
@@ -149,9 +152,7 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         scrollLocked = false
       }, 150)
     }
-
     const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
-
     const calculateDuration = (distance) => {
       const absDistance = Math.abs(distance)
       const minDuration = 300
@@ -159,63 +160,68 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       const baseDuration = Math.sqrt(absDistance) * 18
       return Math.min(maxDuration, Math.max(minDuration, baseDuration))
     }
-
+    const getHeadingScrollOffset = (heading) => {
+      const margin = parseFloat(getComputedStyle(heading).scrollMarginBlockStart)
+      return Number.isFinite(margin) ? margin : 0
+    }
+    const getTargetScrollY = (heading) => {
+      const startY = window.scrollY
+      const rootStyle = document.documentElement.style
+      const prevBehavior = rootStyle.scrollBehavior
+      rootStyle.scrollBehavior = 'auto'
+      heading.scrollIntoView({ block: 'start', behavior: 'instant' })
+      const targetY = window.scrollY
+      window.scrollTo(0, startY)
+      rootStyle.scrollBehavior = prevBehavior
+      return targetY
+    }
     const smoothScrollToHeading = (heading) => {
       if (prefersReducedMotion) {
         heading.scrollIntoView({ block: 'start', behavior: 'instant' })
         unlockAfterScroll()
         return
       }
-
       if (activeScrollFrame) {
         cancelAnimationFrame(activeScrollFrame)
         activeScrollFrame = null
       }
-
-      const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
       const startY = window.scrollY
-      const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - headerHeight)
+      const targetY = getTargetScrollY(heading)
       const distance = targetY - startY
       const duration = calculateDuration(distance)
       const startTime = performance.now()
       const rootStyle = document.documentElement.style
       const previousScrollBehavior = rootStyle.scrollBehavior
       rootStyle.scrollBehavior = 'auto'
-
       if (Math.abs(distance) < 2) {
         rootStyle.scrollBehavior = previousScrollBehavior
         unlockAfterScroll()
         return
       }
-
       const step = (currentTime) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
-        const eased = easeOutExpo(progress)
-        window.scrollTo(0, startY + distance * eased)
-
-        if (progress < 1) {
-          activeScrollFrame = requestAnimationFrame(step)
-        } else {
+        if (progress >= 1) {
+          window.scrollTo(0, targetY)
           rootStyle.scrollBehavior = previousScrollBehavior
           activeScrollFrame = null
           unlockAfterScroll()
+        } else {
+          const eased = easeOutExpo(progress)
+          window.scrollTo(0, startY + distance * eased)
+          activeScrollFrame = requestAnimationFrame(step)
         }
       }
-
       step(startTime)
     }
-
     // ── IntersectionObserver：触发时走防抖通道 ────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         const visibleEntries = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-
         const topEntry = visibleEntries[0]
         if (!topEntry) return
-
         const link = document.querySelector(`.article-toc nav a[href="#${topEntry.target.id}"]`)
         if (link instanceof HTMLAnchorElement) {
           setActiveLinkDebounced(link)
@@ -223,18 +229,13 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       },
       { rootMargin: '-12% 0px -55% 0px', threshold: [0.1, 0.25, 0.5, 0.75, 1] },
     )
-
     navLinks.forEach((link) => {
       if (!(link instanceof HTMLAnchorElement)) return
-
       const id = link.getAttribute('href')?.replace('#', '')
       const heading = id && document.getElementById(id)
       if (!heading) return
-
       observer.observe(heading)
-
       if (link.dataset.paloBound === 'true') return
-
       // ── 点击跳转：立即高亮 + 加锁，途中忽略 observer ─────────
       link.addEventListener('click', (event) => {
         event.preventDefault()
@@ -246,26 +247,74 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         history.replaceState(null, '', `#${id}`)
         smoothScrollToHeading(heading)
       })
-
       link.dataset.paloBound = 'true'
     })
-
-    const initialHash = window.location.hash.replace('#', '')
-    if (initialHash) {
+    // ── 初始 Hash 刷新防抽动吸附（死区过滤，干掉最后跳一下） ──
+    //     仅在首次（__paloInitialHashHandled=false）处理，避免多次调用导致重复滚动
+    const initialHash = window['__paloInitialHash'] || window.location.hash.replace('#', '')
+    if (initialHash && !window['__paloInitialHashHandled']) {
       const initialLink = document.querySelector(`.article-toc nav a[href="#${initialHash}"]`)
       if (initialLink instanceof HTMLAnchorElement) {
         setActiveLink(initialLink)
       }
+      const initialHeading = document.getElementById(initialHash)
+      if (initialHeading) {
+        requestAnimationFrame(function() {
+          const hh = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
+          window['__paloHeaderHeight'] = hh // 缓存准确值供后续使用
+          // 直接调用 smoothScrollToHeading，让它内部判断是否需要动画
+          // 如果偏差 < 2px，它会直接返回；否则平滑调整
+          // 这避免了在同步和 rAF 间 --header-height 变化导致的突兀跳跃
+          smoothScrollToHeading(initialHeading)
+          window['__paloInitialHashHandled'] = true
+        })
+      }
     } else if (navLinks[0] instanceof HTMLAnchorElement) {
       setActiveLink(navLinks[0])
     }
+    // ── 图片加载后校正 hash 滚动（防 CLS 导致定位偏移） ────────────
+    if (initialHash) {
+      var scrollHeading = document.getElementById(initialHash)
+      if (scrollHeading) {
+        var correctPosition = function() {
+          var targetY = getTargetScrollY(scrollHeading)
+          if (Math.abs(window.scrollY - targetY) > 2) {
+            smoothScrollToHeading(scrollHeading)
+          }
+        }
+        var imgs = (scrollHeading.closest('.article-content__main') || document).querySelectorAll('.article-content__main img')
+        var loadedCount = 0, total = imgs.length
+        if (total > 0) {
+          var onImgDone = function() {
+            loadedCount++
+            if (loadedCount >= total) {
+              correctPosition()
+            }
+          }
+          for (var i = 0; i < total; i++) {
+            if (imgs[i].complete) {
+              onImgDone()
+            } else {
+              imgs[i].addEventListener('load', onImgDone)
+              imgs[i].addEventListener('error', onImgDone)
+            }
+          }
+        }
+        // window.load 后再校正一次，覆盖字体、组件初始化等布局变化
+        if (document.readyState === 'complete') {
+          setTimeout(correctPosition, 100)
+        } else {
+          window.addEventListener('load', function() {
+            setTimeout(correctPosition, 100)
+          }, { once: true })
+        }
+      }
+    }
   }
-
   document.addEventListener('astro:page-load', paloInitTableOfContents)
   document.addEventListener('astro:after-swap', paloInitTableOfContents)
   paloInitTableOfContents()
 </script>
-
 <style lang="scss" is:global>
   @layer components {
     .article-toc {
@@ -273,26 +322,21 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
       overflow-wrap: break-word;
       word-wrap: break-word;
     }
-
     /* 文本装饰与激活态由 .palo-nav-list 统一管控，此处仅保留布局与层级字号 */
-
     .article-toc a {
       display: inline-block;
       max-width: 100%;
       word-break: break-word;
       overflow-wrap: break-word;
     }
-
     /* 层级字体：h2 > h3 > h4，移动端和 PC 端统一 */
     .article-toc__item--h2 a { font-size: 1.25rem; }
     .article-toc__item--h3 a { font-size: 1.125rem; }
     .article-toc__item--h4 a { font-size: 1rem; }
-
     /* 骨架屏占位 */
     .article-toc__skeleton {
       display: block;
       margin-block: 0.35rem;
-
       & span {
         display: block;
         height: 1em;
@@ -305,7 +349,6 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
         );
         background-size: 200% 100%;
         animation: toc-skeleton-shimmer 1.5s ease-in-out infinite;
-
         @media (prefers-color-scheme: dark) {
           background: linear-gradient(
             90deg,
@@ -316,12 +359,10 @@ const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
           background-size: 200% 100%;
         }
       }
-
       &--h2 span { font-size: 1.25rem; width: 85%; }
       &--h3 span { font-size: 1.125rem; width: 70%; margin-inline-start: 1rem; }
       &--h4 span { font-size: 1rem; width: 60%; margin-inline-start: 2rem; }
     }
-
     @keyframes toc-skeleton-shimmer {
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }

@@ -34,30 +34,9 @@ import {
   Tooltip,
   Video,
 } from 'accessible-astro-components'
+import TableOfContents from '@components/TableOfContents.astro'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 
-const components = [
-  { name: 'Accordion', id: 'accordion' },
-  { name: 'Avatar', id: 'avatar' },
-  { name: 'Badge', id: 'badge' },
-  { name: 'Breadcrumbs', id: 'breadcrumbs' },
-  { name: 'Button', id: 'button' },
-  { name: 'Card', id: 'card' },
-  { name: 'Dark mode toggle', id: 'darkmode' },
-  { name: 'Form', id: 'form' },
-  { name: 'Heading', id: 'heading' },
-  { name: 'High contrast toggle', id: 'highcontrast' },
-  { name: 'Link', id: 'link' },
-  { name: 'Media', id: 'media' },
-  { name: 'Modal', id: 'modals' },
-  { name: 'Notification', id: 'notification' },
-  { name: 'Pagination', id: 'pagination' },
-  { name: 'Reduced motion toggle', id: 'reducedmotion' },
-  { name: 'Skip link', id: 'skiplink' },
-  { name: 'Tabs', id: 'tabs' },
-  { name: 'Tooltip', id: 'tooltip' },
-  { name: 'Video', id: 'video' },
-]
 
 // PaloPageHeader settings / 页面头部设置
 const pageHeaderAppearance = {
@@ -84,865 +63,674 @@ const pageHeaderAppearance = {
     {...(pageHeaderAppearance as any)}
   />
   <section class="mt-32 mb-12">
-    <div class="components container grid">
-      <div class="components-showcase space-content">
-        <Heading level="h2" id="accordion">Accordion</Heading>
-        <p>
-          The Accordion component is used to show and hide content. It's a great way to keep your page clean and
-          accessible.
-        </p>
-        <Heading level="h3">Default</Heading>
-        <AccordionStable>
-          <AccordionItemStable title="First Item">
+    <div class="container">
+      <div class="article-content article-content--with-toc">
+        <div class="article-content__main">
+          <div class="components-showcase space-content">
+            <Heading level="h2" id="accordion">Accordion</Heading>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis <a href="#">sapiente obcaecati</a> magnam incidunt sit. Molestiae exercitationem quibusdam
-              quod veritatis laboriosam est tenetur.
+              The Accordion component is used to show and hide content. It's a great way to keep your page clean and
+              accessible.
             </p>
-            <a href="#">Tab to me!</a>
-          </AccordionItemStable>
-          <AccordionItemStable title="Second Item">
+            <Heading level="h3">Default</Heading>
+            <AccordionStable>
+              <AccordionItemStable title="First Item">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis <a href="#">sapiente obcaecati</a> magnam incidunt sit. Molestiae exercitationem quibusdam
+                  quod veritatis laboriosam est tenetur.
+                </p>
+                <a href="#">Tab to me!</a>
+              </AccordionItemStable>
+              <AccordionItemStable title="Second Item">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable title="Third Item">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable title="Fourth Item">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable title="Fifth Item">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+            </AccordionStable>
+
+            <Heading level="h3">Chevron</Heading>
+            <AccordionStable>
+              <AccordionItemStable name="exclusive" title="First Item" variant="chevron">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis <a href="#">sapiente obcaecati</a> magnam incidunt sit. Molestiae exercitationem quibusdam
+                  quod veritatis laboriosam est tenetur.
+                </p>
+                <a href="#">Tab to me!</a>
+              </AccordionItemStable>
+              <AccordionItemStable name="exclusive" title="Second Item" variant="chevron">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable name="exclusive" title="Third Item" variant="chevron">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable name="exclusive" title="Fourth Item" variant="chevron">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+              <AccordionItemStable name="exclusive" title="Fifth Item" variant="chevron">
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur.
+                </p>
+              </AccordionItemStable>
+            </AccordionStable>
+
+            <Heading level="h2" id="avatar">Avatar</Heading>
             <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
+              The Avatar component is used to display a user's profile picture. It can be used as a standalone component or
+              as part of an AvatarGroup.
             </p>
-          </AccordionItemStable>
-          <AccordionItemStable title="Third Item">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-          <AccordionItemStable title="Fourth Item">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-          <AccordionItemStable title="Fifth Item">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-        </AccordionStable>
-
-        <Heading level="h3">Chevron</Heading>
-        <AccordionStable>
-          <AccordionItemStable name="exclusive" title="First Item" variant="chevron">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis <a href="#">sapiente obcaecati</a> magnam incidunt sit. Molestiae exercitationem quibusdam
-              quod veritatis laboriosam est tenetur.
-            </p>
-            <a href="#">Tab to me!</a>
-          </AccordionItemStable>
-          <AccordionItemStable name="exclusive" title="Second Item" variant="chevron">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-          <AccordionItemStable name="exclusive" title="Third Item" variant="chevron">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-          <AccordionItemStable name="exclusive" title="Fourth Item" variant="chevron">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-          <AccordionItemStable name="exclusive" title="Fifth Item" variant="chevron">
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur.
-            </p>
-          </AccordionItemStable>
-        </AccordionStable>
-
-        <Heading level="h2" id="avatar">Avatar</Heading>
-        <p>
-          The Avatar component is used to display a user's profile picture. It can be used as a standalone component or
-          as part of an AvatarGroup.
-        </p>
-        <Heading level="h3">Default</Heading>
-        <div class="flex-w flex gap-3">
-          <Avatar initials="MT" label="Mark Teekman" />
-          <Avatar initials="PP" label="Peter Padberg" type="info" shape="square" />
-          <Avatar
-            label="Astronout"
-            img="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
-          />
-        </div>
-        <Heading level="h3">With title and subtitle</Heading>
-        <Avatar title="Mark Teekman" subtitle="Developer & A11Y Expert" />
-        <Heading level="h3">Avatar group</Heading>
-        <AvatarGroup>
-          <Avatar size="sm" label="Developer" initials="DV" />
-          <Avatar size="sm" type="info" label="Designer" initials="DS" />
-          <Avatar size="sm" type="success" label="Product Manager" initials="PM" />
-          <Avatar size="sm" type="warning" label="Marketing" initials="MK" />
-          <Avatar size="sm" type="error" label="Marketing" initials="MK" />
-        </AvatarGroup>
-
-        <Heading level="h2" id="badge">Badge</Heading>
-        <p>The Badge component is used to display a badge with a type and a pulse effect.</p>
-        <Heading level="h3">Default</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Badge type="default" pulse>Default</Badge>
-          <Badge type="info">Info</Badge>
-          <Badge type="success">Success</Badge>
-          <Badge type="warning">Warning</Badge>
-          <Badge type="error">Error</Badge>
-        </div>
-
-        <Heading level="h3">Notification</Heading>
-        <div class="badge-notification-demo">
-          <div class="badge-notification-demo__item">
-            <button class="badge-notification-demo__trigger">
-              <Icon aria-hidden="true" name="ph:envelope" size="1.5rem" />
-              <span class="sr-only">3 unread messages</span>
-            </button>
-            <Badge type="error" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">3</Badge>
-          </div>
-          <div class="badge-notification-demo__item">
-            <button class="badge-notification-demo__trigger">
-              <Icon aria-hidden="true" name="ph:bell" size="1.5rem" />
-              <span class="sr-only">5 new notifications</span>
-            </button>
-            <Badge type="info" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">5</Badge>
-          </div>
-          <div class="badge-notification-demo__item">
-            <button class="badge-notification-demo__trigger">
-              <Icon aria-hidden="true" name="ph:chat-dots" size="1.5rem" />
-              <span class="sr-only">2 new comments</span>
-            </button>
-            <Badge type="success" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">2</Badge>
-          </div>
-        </div>
-
-        <Heading level="h3">Interactive</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Badge
-            type="info"
-            isButton
-            animateOnHover
-            animationType="rotate"
-            animationIntensity={20}
-            label="Refresh content"
-          >
-            <Icon aria-hidden="true" name="ph:arrow-clockwise" size="1rem" />
-            Refresh
-          </Badge>
-
-          <Badge type="success" isButton animateOnHover animationType="bouncing" label="Approve item">
-            <Icon aria-hidden="true" name="ph:check-circle" size="1rem" />
-            Approve
-          </Badge>
-
-          <Badge type="warning" pulse> New feature (pulse) </Badge>
-        </div>
-
-        <Heading level="h2" id="breadcrumbs">Breadcrumbs</Heading>
-        <p>The Breadcrumbs component is used to display a list of breadcrumbs.</p>
-        <Heading level="h3">Default</Heading>
-        <Breadcrumbs>
-          <BreadcrumbsItem href="/" label="Home" />
-          <BreadcrumbsItem href={ensureTrailingSlash('/blog')} label="Blog" />
-          <BreadcrumbsItem currentPage={true} label="My blog post" />
-        </Breadcrumbs>
-        <Heading level="h3">With icons</Heading>
-        <Breadcrumbs>
-          <BreadcrumbsItem href="/" label="Home" hasIcon>
-            <Icon aria-hidden="true" name="ph:house" slot="icon" />
-          </BreadcrumbsItem>
-          <BreadcrumbsItem href="/docs" label="Documentation" />
-          <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
-        </Breadcrumbs>
-        <Heading level="h3">With custom separator</Heading>
-        <Breadcrumbs>
-          <BreadcrumbsItem href="/" label="Home">
-            <span slot="separator" class="separator" aria-hidden="true">
-              <Icon aria-hidden="true" name="ph:caret-right" />
-            </span>
-          </BreadcrumbsItem>
-          <BreadcrumbsItem href="/docs" label="Documentation">
-            <span slot="separator" class="separator" aria-hidden="true">
-              <Icon aria-hidden="true" name="ph:caret-right" />
-            </span>
-          </BreadcrumbsItem>
-          <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
-        </Breadcrumbs>
-        <Heading level="h3">With custom home icon</Heading>
-        <Breadcrumbs>
-          <BreadcrumbsItem href="/" label="Home" hasIcon>
-            <Icon aria-hidden="true" name="ph:house" slot="icon" />
-            <span slot="separator" class="separator" aria-hidden="true">
-              <Icon aria-hidden="true" name="ph:caret-right" />
-            </span>
-          </BreadcrumbsItem>
-          <BreadcrumbsItem href="/docs" label="Documentation">
-            <span slot="separator" class="separator" aria-hidden="true">
-              <Icon aria-hidden="true" name="ph:caret-right" />
-            </span>
-          </BreadcrumbsItem>
-          <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
-        </Breadcrumbs>
-
-        <Heading level="h2" id="button">Button</Heading>
-        <p>The Button component is used to display a button with a type and a pulse effect.</p>
-        <Heading level="h3">Default</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Button pulse>Default button</Button>
-          <Button type="primary" pulse>Primary button</Button>
-          <Button type="secondary">Secondary button</Button>
-          <Button type="info">Info button</Button>
-          <Button type="success">Success button</Button>
-          <Button type="warning">Warning button</Button>
-          <Button type="error">Error button</Button>
-        </div>
-        <Heading level="h3">Outline</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Button type="primary" variant="outlined">Outline primary button</Button>
-          <Button type="secondary" variant="outlined">Outline secondary button</Button>
-          <Button type="info" variant="outlined">Outline info button</Button>
-          <Button type="success" variant="outlined">Outline success button</Button>
-          <Button type="warning" variant="outlined">Outline warning button</Button>
-          <Button type="error" variant="outlined">Outline error button</Button>
-        </div>
-        <Heading level="h3">Sizes</Heading>
-        <div class="align-center flex flex-wrap gap-2">
-          <Button type="primary" size="sm">Small button</Button>
-          <Button type="primary" size="md">Medium button</Button>
-          <Button type="primary" size="lg">Large button</Button>
-        </div>
-        <Heading level="h3">Icon</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Button><Icon aria-hidden="true" name="ph:sparkle" size="24" />Icon button</Button>
-          <Button animateOnHover
-            ><Icon aria-hidden="true" name="ph:sparkle" size="24" />Animated icon button</Button
-          >
-        </div>
-
-        <Heading level="h2" id="card">Card</Heading>
-        <p>The Card component is used to display a card with a title, footer, and a media.</p>
-        <Card
-          img="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
-          title="Card Title"
-          footer="Author name"
-        >
-          <span slot="meta">
-            <Icon aria-hidden="true" name="ph:clock" />
-            10 min read
-          </span>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo accusantium debitis
-          sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod veritatis laboriosam est tenetur.
-        </Card>
-
-        <Heading level="h2" id="darkmode">Dark mode toggle</Heading>
-        <p>The Dark mode toggle component is used to toggle the dark mode of the page.</p>
-        <Heading level="h3">Default</Heading>
-        <DarkMode />
-        <Heading level="h3">Custom icons</Heading>
-        <DarkMode>
-          <Icon aria-hidden="true" name="ph:sun-horizon" slot="light" />
-          <Icon aria-hidden="true" name="ph:sun-horizon" slot="dark" />
-        </DarkMode>
-
-        <Heading level="h2" id="form">Form</Heading>
-        <p>
-          The Form component is used to display a form with a name, email, message, and a submit button. It has WCAG 2.2
-          AA compliant validation by default.
-        </p>
-        <Form>
-          <Input name="demo-name" label="Name" required />
-          <Input name="demo-email" label="Email" required />
-          <Textarea name="demo-message" label="Message" required />
-          <Fieldset
-            name="interests"
-            legend="What are you interested in?"
-            required
-            data-validation="Please select at least one area of interest"
-          >
-            <Checkbox name="accessibility" value="a11y" label="Accessibility and inclusive design" />
-            <Checkbox name="wcag-compliance" value="wcag" label="WCAG compliance and testing" />
-            <Checkbox name="screen-reader" value="sr" label="Screen reader optimization" />
-            <Checkbox name="keyboard-nav" value="keyboard" label="Keyboard navigation" />
-          </Fieldset>
-
-          <!-- Radio group (shared names) -->
-          <Fieldset name="experience" legend="Your experience level" required>
-            <Radio name="experience" value="beginner" label="Beginner" />
-            <Radio name="experience" value="intermediate" label="Intermediate" />
-            <Radio name="experience" value="advanced" label="Advanced" />
-          </Fieldset>
-          <Button htmlType="submit">Submit</Button>
-        </Form>
-
-        <Heading level="h2" id="heading">Heading</Heading>
-        <p>Headings are used to structure the content of a page. They should be used in the following order:</p>
-        <div class="flex-col flex-wrap gap-4">
-          <Heading level="h1">Heading 1</Heading>
-          <Heading level="h2">Heading 2</Heading>
-          <Heading level="h3">Heading 3</Heading>
-          <Heading level="h4">Heading 4</Heading>
-          <Heading level="h5">Heading 5</Heading>
-          <Heading level="h6">Heading 6</Heading>
-        </div>
-
-        <Heading level="h2" id="highcontrast">High contrast toggle</Heading>
-        <p>The High contrast toggle component is used to toggle the high contrast mode of the page.</p>
-        <Heading level="h3">Default</Heading>
-        <HighContrast />
-        <Heading level="h3">Custom icons</Heading>
-        <HighContrast>
-          <Icon aria-hidden="true" name="ph:eye" slot="off" />
-          <Icon aria-hidden="true" name="ph:text-t" slot="on" />
-        </HighContrast>
-
-        <Heading level="h2" id="link">Link</Heading>
-        <p>The Link component is used to display a link with a type and a color.</p>
-        <Heading level="h3">Default</Heading>
-        <Link href="/">Default link</Link>
-        <Heading level="h3">External</Heading>
-        <Link href="/" isExternal>External link</Link>
-        <Heading level="h3">Link as button</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Link href="/" isButton>Default button link</Link>
-          <Link href="/" isButton type="primary">Primary button link</Link>
-          <Link href="/" isButton type="secondary">Secondary button link</Link>
-          <Link href="/" isButton type="info">Info button link</Link>
-          <Link href="/" isButton type="success">Success button link</Link>
-          <Link href="/" isButton type="warning">Warning button link</Link>
-          <Link href="/" isButton type="error">Error button link</Link>
-        </div>
-        <Heading level="h3">Outline button</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Link href="/" isButton type="primary" variant="outlined">Outline primary button link</Link>
-          <Link href="/" isButton type="secondary" variant="outlined">Outline secondary button link</Link>
-          <Link href="/" isButton type="info" variant="outlined">Outline info button link</Link>
-          <Link href="/" isButton type="success" variant="outlined">Outline success button link</Link>
-          <Link href="/" isButton type="warning" variant="outlined">Outline warning button link</Link>
-          <Link href="/" isButton type="error" variant="outlined">Outline error button link</Link>
-        </div>
-        <Heading level="h3">Icon</Heading>
-        <div class="flex flex-wrap gap-2">
-          <Link href="/" isButton type="default">
-            <Icon aria-hidden="true" name="ph:link" />
-            Icon button link</Link
-          >
-          <Link href="/" isButton animateOnHover animationType="boop" type="primary">
-            <Icon aria-hidden="true" name="ph:link" />
-            Animated icon button link</Link
-          >
-        </div>
-
-        <Heading level="h2" id="media">Media</Heading>
-        <Media
-          class="rounded-lg"
-          src="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
-        />
-
-        <Heading level="h2" id="modals">Modals</Heading>
-        <p>The Modals component is used to display a modal with a title and a content.</p>
-        <button id="modal1-trigger" class="button">Modal 1</button>&nbsp;
-        <button id="modal2-trigger" class="button color-secondary">Modal 2</button>
-        <Modal triggerId="modal1-trigger" title="Modal 1">
-          <p>Why hello, I be the <strong>first</strong> Modal.</p>
-        </Modal>
-        <Modal triggerId="modal2-trigger" title="Modal 2" closeText="Close Modal">
-          <p>
-            Ah yes, and I be the <strong>second</strong> Modal. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            Sed, a! Ratione eaque temporibus alias tempora pariatur dolorem.
-          </p>
-          <button class="button" onclick="closeModal()">Confirm action</button>
-        </Modal>
-
-        <Heading level="h2" id="notification">Notification</Heading>
-        <p>The Notification component is used to display a notification with a type and a message.</p>
-        <Heading level="h3">Default</Heading>
-        <Notification>
-          <Icon aria-hidden="true" name="ph:bell" /><p><strong>Message:</strong> This is a notification!</p>
-        </Notification>
-        <Notification role="status" type="info">
-          <Icon aria-hidden="true" name="ph:info" /><p>
-            <strong>Info:</strong> This is a notification of type info.
-          </p>
-        </Notification>
-        <Notification role="status" type="success">
-          <Icon aria-hidden="true" name="ph:check-circle" /><p>
-            <strong>Success:</strong> This is a notification of type success.
-          </p>
-        </Notification>
-        <Notification role="status" type="warning">
-          <Icon aria-hidden="true" name="ph:warning" /><p>
-            <strong>Warning:</strong> This is a notification of type warning and goes on multiple lines to see how that looks.
-          </p>
-        </Notification>
-        <Notification role="alert" type="error">
-          <Icon aria-hidden="true" name="ph:x-circle" /><p>
-            <strong>Error:</strong> This is a notification of type error.
-          </p>
-        </Notification>
-
-        <Heading level="h3">Accent</Heading>
-        <Notification variant="accent" element="aside" role="region">
-          <p><strong>Message:</strong> This is a notification!</p>
-        </Notification>
-        <Notification type="info" variant="accent" element="aside" role="region">
-          <p>
-            <strong>Info:</strong> This is a notification of type info.
-          </p>
-        </Notification>
-        <Notification type="success" variant="accent" element="aside" role="region">
-          <p>
-            <strong>Success:</strong> This is a notification of type success.
-          </p>
-        </Notification>
-        <Notification type="warning" variant="accent" element="aside" role="region">
-          <p>
-            <strong>Warning:</strong> This is a notification of type warning and goes on multiple lines to see how that looks.
-          </p>
-        </Notification>
-        <Notification type="error" variant="accent" element="aside" role="region">
-          <p>
-            <strong>Error:</strong> This is a notification of type error.
-          </p>
-        </Notification>
-
-        <Heading level="h2" id="pagination">Pagination</Heading>
-        <p>The Pagination component is used to display a pagination with a total number of pages.</p>
-        <Pagination totalPages="200" />
-
-        <Heading level="h2" id="reducedmotion">Reduced motion toggle</Heading>
-        <p>The Reduced motion toggle component is used to toggle the reduced motion mode of the page.</p>
-        <Heading level="h3">Default</Heading>
-        <ReducedMotion />
-        <Heading level="h3">Custom icons</Heading>
-        <ReducedMotion>
-          <Icon aria-hidden="true" name="ph:heartbeat" slot="off" />
-          <Icon aria-hidden="true" name="ph:pause" slot="on" />
-        </ReducedMotion>
-
-        <Heading level="h2" id="skiplink">Skip link</Heading>
-        <p>
-          The SkipLink component becomes visible when you shift+tab to navigate backward through the page, it's the
-          first focusable element on the page.
-        </p>
-
-        <Heading level="h2" id="tabs">Tabs</Heading>
-        <p>The Tabs component is used to display a tabs with a list of tabs and a list of panels.</p>
-        <Tabs>
-          <TabsList>
-            <TabsTab id="tab-1" controls="panel-1" selected>First Panel</TabsTab>
-            <TabsTab id="tab-2" controls="panel-2">Second Panel</TabsTab>
-            <TabsTab id="tab-3" controls="panel-3">Third Panel</TabsTab>
-          </TabsList>
-
-          <TabsPanel id="panel-1" labelledby="tab-1" selected>
-            <Heading level="h3">First Panel</Heading>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sed eveniet
-              quidem earum at nobis enim.
-            </p>
-            <a href="#">Tab to me!</a>
-          </TabsPanel>
-          <TabsPanel id="panel-2" labelledby="tab-2">
-            <Heading level="h3">Second Panel</Heading>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Media
-                class="rounded-lg"
-                src="https://images.unsplash.com/photo-1636819488537-a9b1ffb315ce?auto=format&fit=crop&w=800&q=100"
-              />
-              <Media
-                class="rounded-lg"
-                src="https://images.unsplash.com/photo-1636819488537-a9b1ffb315ce?auto=format&fit=crop&w=800&q=100"
+            <Heading level="h3">Default</Heading>
+            <div class="flex-w flex gap-3">
+              <Avatar initials="MT" label="Mark Teekman" />
+              <Avatar initials="PP" label="Peter Padberg" type="info" shape="square" />
+              <Avatar
+                label="Astronout"
+                img="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
               />
             </div>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
-              accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
-              veritatis laboriosam est tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sed eveniet
-              quidem earum at nobis enim.
-            </p>
-            <a href="#">Tab to me!</a>
-          </TabsPanel>
-          <TabsPanel id="panel-3" labelledby="tab-3">
-            <Heading level="h3">Third Panel</Heading>
-            <p>
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tenetur, nulla! Sapiente saepe voluptate nemo in
-              id aperiam tempore quo unde, ipsum similique explicabo non maiores qui voluptates dolore obcaecati. Atque
-              voluptates similique ad ipsam nostrum quibusdam doloremque cum porro, aperiam beatae voluptas dolore et
-              neque voluptate alias nesciunt blanditiis totam voluptatem necessitatibus. Similique aliquid molestiae
-              iusto nam nobis ut aspernatur blanditiis provident iste corporis minima, quidem autem nulla doloremque
-              eaque a obcaecati! Nisi quod quam repellendus facilis? Libero voluptas doloribus maxime, suscipit odio
-              veritatis optio nulla officia quos cum at ea hic numquam perferendis molestiae! Aperiam quia veritatis
-              earum tempora.
-            </p>
-            <a href="#">Tab to me!</a>
-          </TabsPanel>
-        </Tabs>
+            <Heading level="h3">With title and subtitle</Heading>
+            <Avatar title="Mark Teekman" subtitle="Developer & A11Y Expert" />
+            <Heading level="h3">Avatar group</Heading>
+            <AvatarGroup>
+              <Avatar size="sm" label="Developer" initials="DV" />
+              <Avatar size="sm" type="info" label="Designer" initials="DS" />
+              <Avatar size="sm" type="success" label="Product Manager" initials="PM" />
+              <Avatar size="sm" type="warning" label="Marketing" initials="MK" />
+              <Avatar size="sm" type="error" label="Marketing" initials="MK" />
+            </AvatarGroup>
 
-        <Heading level="h2" id="tooltip">Tooltip</Heading>
-        <p>
-          The Tooltip component provides contextual helper text with Popover API and CSS Anchor Positioning while
-          keeping interactions keyboard accessible.
-        </p>
-        <Heading level="h3">Default</Heading>
-        <Tooltip id="starter-tooltip-default" triggerLabel="More information about API key">
-          <span>API key help</span>
-          <span slot="tooltip">Find your API key in account settings under Developer Access.</span>
-        </Tooltip>
+            <Heading level="h2" id="badge">Badge</Heading>
+            <p>The Badge component is used to display a badge with a type and a pulse effect.</p>
+            <Heading level="h3">Default</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Badge type="default" pulse>Default</Badge>
+              <Badge type="info">Info</Badge>
+              <Badge type="success">Success</Badge>
+              <Badge type="warning">Warning</Badge>
+              <Badge type="error">Error</Badge>
+            </div>
 
-        <Heading level="h3">Positions</Heading>
-        <div class="align-center flex flex-wrap gap-3">
-          <Tooltip id="starter-tooltip-top" position="top" triggerLabel="Top tooltip example">
-            <span>Top</span>
-            <span slot="tooltip">Tooltip on top (default).</span>
-          </Tooltip>
-          <Tooltip id="starter-tooltip-right" position="right" triggerLabel="Right tooltip example">
-            <span>Right</span>
-            <span slot="tooltip">Tooltip prefers the right side.</span>
-          </Tooltip>
-          <Tooltip id="starter-tooltip-left" position="left" triggerLabel="Left tooltip example">
-            <span>Left</span>
-            <span slot="tooltip">Tooltip prefers the left side.</span>
-          </Tooltip>
-          <Tooltip id="starter-tooltip-bottom" position="bottom" triggerLabel="Bottom tooltip example">
-            <span>Bottom</span>
-            <span slot="tooltip">Tooltip prefers the bottom side.</span>
-          </Tooltip>
+            <Heading level="h3">Notification</Heading>
+            <div class="badge-notification-demo">
+              <div class="badge-notification-demo__item">
+                <button class="badge-notification-demo__trigger">
+                  <Icon aria-hidden="true" name="ph:envelope" size="1.5rem" />
+                  <span class="sr-only">3 unread messages</span>
+                </button>
+                <Badge type="error" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">3</Badge>
+              </div>
+              <div class="badge-notification-demo__item">
+                <button class="badge-notification-demo__trigger">
+                  <Icon aria-hidden="true" name="ph:bell" size="1.5rem" />
+                  <span class="sr-only">5 new notifications</span>
+                </button>
+                <Badge type="info" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">5</Badge>
+              </div>
+              <div class="badge-notification-demo__item">
+                <button class="badge-notification-demo__trigger">
+                  <Icon aria-hidden="true" name="ph:chat-dots" size="1.5rem" />
+                  <span class="sr-only">2 new comments</span>
+                </button>
+                <Badge type="success" isCircular size="sm" style="position: absolute; top: -5px; right: -5px;">2</Badge>
+              </div>
+            </div>
+
+            <Heading level="h3">Interactive</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Badge
+                type="info"
+                isButton
+                animateOnHover
+                animationType="rotate"
+                animationIntensity={20}
+                label="Refresh content"
+              >
+                <Icon aria-hidden="true" name="ph:arrow-clockwise" size="1rem" />
+                Refresh
+              </Badge>
+
+              <Badge type="success" isButton animateOnHover animationType="bouncing" label="Approve item">
+                <Icon aria-hidden="true" name="ph:check-circle" size="1rem" />
+                Approve
+              </Badge>
+
+              <Badge type="warning" pulse> New feature (pulse) </Badge>
+            </div>
+
+            <Heading level="h2" id="breadcrumbs">Breadcrumbs</Heading>
+            <p>The Breadcrumbs component is used to display a list of breadcrumbs.</p>
+            <Heading level="h3">Default</Heading>
+            <Breadcrumbs>
+              <BreadcrumbsItem href="/" label="Home" />
+              <BreadcrumbsItem href={ensureTrailingSlash('/blog')} label="Blog" />
+              <BreadcrumbsItem currentPage={true} label="My blog post" />
+            </Breadcrumbs>
+            <Heading level="h3">With icons</Heading>
+            <Breadcrumbs>
+              <BreadcrumbsItem href="/" label="Home" hasIcon>
+                <Icon aria-hidden="true" name="ph:house" slot="icon" />
+              </BreadcrumbsItem>
+              <BreadcrumbsItem href="/docs" label="Documentation" />
+              <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
+            </Breadcrumbs>
+            <Heading level="h3">With custom separator</Heading>
+            <Breadcrumbs>
+              <BreadcrumbsItem href="/" label="Home">
+                <span slot="separator" class="separator" aria-hidden="true">
+                  <Icon aria-hidden="true" name="ph:caret-right" />
+                </span>
+              </BreadcrumbsItem>
+              <BreadcrumbsItem href="/docs" label="Documentation">
+                <span slot="separator" class="separator" aria-hidden="true">
+                  <Icon aria-hidden="true" name="ph:caret-right" />
+                </span>
+              </BreadcrumbsItem>
+              <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
+            </Breadcrumbs>
+            <Heading level="h3">With custom home icon</Heading>
+            <Breadcrumbs>
+              <BreadcrumbsItem href="/" label="Home" hasIcon>
+                <Icon aria-hidden="true" name="ph:house" slot="icon" />
+                <span slot="separator" class="separator" aria-hidden="true">
+                  <Icon aria-hidden="true" name="ph:caret-right" />
+                </span>
+              </BreadcrumbsItem>
+              <BreadcrumbsItem href="/docs" label="Documentation">
+                <span slot="separator" class="separator" aria-hidden="true">
+                  <Icon aria-hidden="true" name="ph:caret-right" />
+                </span>
+              </BreadcrumbsItem>
+              <BreadcrumbsItem label="Breadcrumbs" currentPage={true} />
+            </Breadcrumbs>
+
+            <Heading level="h2" id="button">Button</Heading>
+            <p>The Button component is used to display a button with a type and a pulse effect.</p>
+            <Heading level="h3">Default</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Button pulse>Default button</Button>
+              <Button type="primary" pulse>Primary button</Button>
+              <Button type="secondary">Secondary button</Button>
+              <Button type="info">Info button</Button>
+              <Button type="success">Success button</Button>
+              <Button type="warning">Warning button</Button>
+              <Button type="error">Error button</Button>
+            </div>
+            <Heading level="h3">Outline</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Button type="primary" variant="outlined">Outline primary button</Button>
+              <Button type="secondary" variant="outlined">Outline secondary button</Button>
+              <Button type="info" variant="outlined">Outline info button</Button>
+              <Button type="success" variant="outlined">Outline success button</Button>
+              <Button type="warning" variant="outlined">Outline warning button</Button>
+              <Button type="error" variant="outlined">Outline error button</Button>
+            </div>
+            <Heading level="h3">Sizes</Heading>
+            <div class="align-center flex flex-wrap gap-2">
+              <Button type="primary" size="sm">Small button</Button>
+              <Button type="primary" size="md">Medium button</Button>
+              <Button type="primary" size="lg">Large button</Button>
+            </div>
+            <Heading level="h3">Icon</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Button><Icon aria-hidden="true" name="ph:sparkle" size="24" />Icon button</Button>
+              <Button animateOnHover
+                ><Icon aria-hidden="true" name="ph:sparkle" size="24" />Animated icon button</Button
+              >
+            </div>
+
+            <Heading level="h2" id="card">Card</Heading>
+            <p>The Card component is used to display a card with a title, footer, and a media.</p>
+            <Card
+              img="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
+              title="Card Title"
+              footer="Author name"
+            >
+              <span slot="meta">
+                <Icon aria-hidden="true" name="ph:clock" />
+                10 min read
+              </span>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo accusantium debitis
+              sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod veritatis laboriosam est tenetur.
+            </Card>
+
+            <Heading level="h2" id="darkmode">Dark mode toggle</Heading>
+            <p>The Dark mode toggle component is used to toggle the dark mode of the page.</p>
+            <Heading level="h3">Default</Heading>
+            <DarkMode />
+            <Heading level="h3">Custom icons</Heading>
+            <DarkMode>
+              <Icon aria-hidden="true" name="ph:sun-horizon" slot="light" />
+              <Icon aria-hidden="true" name="ph:sun-horizon" slot="dark" />
+            </DarkMode>
+
+            <Heading level="h2" id="form">Form</Heading>
+            <p>
+              The Form component is used to display a form with a name, email, message, and a submit button. It has WCAG 2.2
+              AA compliant validation by default.
+            </p>
+            <Form>
+              <Input name="demo-name" label="Name" required />
+              <Input name="demo-email" label="Email" required />
+              <Textarea name="demo-message" label="Message" required />
+              <Fieldset
+                name="interests"
+                legend="What are you interested in?"
+                required
+                data-validation="Please select at least one area of interest"
+              >
+                <Checkbox name="accessibility" value="a11y" label="Accessibility and inclusive design" />
+                <Checkbox name="wcag-compliance" value="wcag" label="WCAG compliance and testing" />
+                <Checkbox name="screen-reader" value="sr" label="Screen reader optimization" />
+                <Checkbox name="keyboard-nav" value="keyboard" label="Keyboard navigation" />
+              </Fieldset>
+
+              <!-- Radio group (shared names) -->
+              <Fieldset name="experience" legend="Your experience level" required>
+                <Radio name="experience" value="beginner" label="Beginner" />
+                <Radio name="experience" value="intermediate" label="Intermediate" />
+                <Radio name="experience" value="advanced" label="Advanced" />
+              </Fieldset>
+              <Button htmlType="submit">Submit</Button>
+            </Form>
+
+            <Heading level="h2" id="heading">Heading</Heading>
+            <p>Headings are used to structure the content of a page. They should be used in the following order:</p>
+            <div class="flex-col flex-wrap gap-4" data-toc-exclude>
+              <Heading level="h1">Heading 1</Heading>
+              <Heading level="h2">Heading 2</Heading>
+              <Heading level="h3">Heading 3</Heading>
+              <Heading level="h4">Heading 4</Heading>
+              <Heading level="h5">Heading 5</Heading>
+              <Heading level="h6">Heading 6</Heading>
+            </div>
+
+            <Heading level="h2" id="highcontrast">High contrast toggle</Heading>
+            <p>The High contrast toggle component is used to toggle the high contrast mode of the page.</p>
+            <Heading level="h3">Default</Heading>
+            <HighContrast />
+            <Heading level="h3">Custom icons</Heading>
+            <HighContrast>
+              <Icon aria-hidden="true" name="ph:eye" slot="off" />
+              <Icon aria-hidden="true" name="ph:text-t" slot="on" />
+            </HighContrast>
+
+            <Heading level="h2" id="link">Link</Heading>
+            <p>The Link component is used to display a link with a type and a color.</p>
+            <Heading level="h3">Default</Heading>
+            <Link href="/">Default link</Link>
+            <Heading level="h3">External</Heading>
+            <Link href="/" isExternal>External link</Link>
+            <Heading level="h3">Link as button</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Link href="/" isButton>Default button link</Link>
+              <Link href="/" isButton type="primary">Primary button link</Link>
+              <Link href="/" isButton type="secondary">Secondary button link</Link>
+              <Link href="/" isButton type="info">Info button link</Link>
+              <Link href="/" isButton type="success">Success button link</Link>
+              <Link href="/" isButton type="warning">Warning button link</Link>
+              <Link href="/" isButton type="error">Error button link</Link>
+            </div>
+            <Heading level="h3">Outline button</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Link href="/" isButton type="primary" variant="outlined">Outline primary button link</Link>
+              <Link href="/" isButton type="secondary" variant="outlined">Outline secondary button link</Link>
+              <Link href="/" isButton type="info" variant="outlined">Outline info button link</Link>
+              <Link href="/" isButton type="success" variant="outlined">Outline success button link</Link>
+              <Link href="/" isButton type="warning" variant="outlined">Outline warning button link</Link>
+              <Link href="/" isButton type="error" variant="outlined">Outline error button link</Link>
+            </div>
+            <Heading level="h3">Icon</Heading>
+            <div class="flex flex-wrap gap-2">
+              <Link href="/" isButton type="default">
+                <Icon aria-hidden="true" name="ph:link" />
+                Icon button link</Link
+              >
+              <Link href="/" isButton animateOnHover animationType="boop" type="primary">
+                <Icon aria-hidden="true" name="ph:link" />
+                Animated icon button link</Link
+              >
+            </div>
+
+            <Heading level="h2" id="media">Media</Heading>
+            <Media
+              class="rounded-lg"
+              src="https://images.unsplash.com/photo-1620428268482-cf1851a36764?auto=format&fit=crop&q=100&w=800"
+            />
+
+            <Heading level="h2" id="modals">Modals</Heading>
+            <p>The Modals component is used to display a modal with a title and a content.</p>
+            <button id="modal1-trigger" class="button">Modal 1</button>&nbsp;
+            <button id="modal2-trigger" class="button color-secondary">Modal 2</button>
+            <Modal triggerId="modal1-trigger" title="Modal 1">
+              <p>Why hello, I be the <strong>first</strong> Modal.</p>
+            </Modal>
+            <Modal triggerId="modal2-trigger" title="Modal 2" closeText="Close Modal">
+              <p>
+                Ah yes, and I be the <strong>second</strong> Modal. Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                Sed, a! Ratione eaque temporibus alias tempora pariatur dolorem.
+              </p>
+              <button class="button" onclick="closeModal()">Confirm action</button>
+            </Modal>
+
+            <Heading level="h2" id="notification">Notification</Heading>
+            <p>The Notification component is used to display a notification with a type and a message.</p>
+            <Heading level="h3">Default</Heading>
+            <Notification>
+              <Icon aria-hidden="true" name="ph:bell" /><p><strong>Message:</strong> This is a notification!</p>
+            </Notification>
+            <Notification role="status" type="info">
+              <Icon aria-hidden="true" name="ph:info" /><p>
+                <strong>Info:</strong> This is a notification of type info.
+              </p>
+            </Notification>
+            <Notification role="status" type="success">
+              <Icon aria-hidden="true" name="ph:check-circle" /><p>
+                <strong>Success:</strong> This is a notification of type success.
+              </p>
+            </Notification>
+            <Notification role="status" type="warning">
+              <Icon aria-hidden="true" name="ph:warning" /><p>
+                <strong>Warning:</strong> This is a notification of type warning and goes on multiple lines to see how that looks.
+              </p>
+            </Notification>
+            <Notification role="alert" type="error">
+              <Icon aria-hidden="true" name="ph:x-circle" /><p>
+                <strong>Error:</strong> This is a notification of type error.
+              </p>
+            </Notification>
+
+            <Heading level="h3">Accent</Heading>
+            <Notification variant="accent" element="aside" role="region">
+              <p><strong>Message:</strong> This is a notification!</p>
+            </Notification>
+            <Notification type="info" variant="accent" element="aside" role="region">
+              <p>
+                <strong>Info:</strong> This is a notification of type info.
+              </p>
+            </Notification>
+            <Notification type="success" variant="accent" element="aside" role="region">
+              <p>
+                <strong>Success:</strong> This is a notification of type success.
+              </p>
+            </Notification>
+            <Notification type="warning" variant="accent" element="aside" role="region">
+              <p>
+                <strong>Warning:</strong> This is a notification of type warning and goes on multiple lines to see how that looks.
+              </p>
+            </Notification>
+            <Notification type="error" variant="accent" element="aside" role="region">
+              <p>
+                <strong>Error:</strong> This is a notification of type error.
+              </p>
+            </Notification>
+
+            <Heading level="h2" id="pagination">Pagination</Heading>
+            <p>The Pagination component is used to display a pagination with a total number of pages.</p>
+            <Pagination totalPages="200" />
+
+            <Heading level="h2" id="reducedmotion">Reduced motion toggle</Heading>
+            <p>The Reduced motion toggle component is used to toggle the reduced motion mode of the page.</p>
+            <Heading level="h3">Default</Heading>
+            <ReducedMotion />
+            <Heading level="h3">Custom icons</Heading>
+            <ReducedMotion>
+              <Icon aria-hidden="true" name="ph:heartbeat" slot="off" />
+              <Icon aria-hidden="true" name="ph:pause" slot="on" />
+            </ReducedMotion>
+
+            <Heading level="h2" id="skiplink">Skip link</Heading>
+            <p>
+              The SkipLink component becomes visible when you shift+tab to navigate backward through the page, it's the
+              first focusable element on the page.
+            </p>
+
+            <Heading level="h2" id="tabs">Tabs</Heading>
+            <p>The Tabs component is used to display a tabs with a list of tabs and a list of panels.</p>
+            <Tabs>
+              <TabsList>
+                <TabsTab id="tab-1" controls="panel-1" selected>First Panel</TabsTab>
+                <TabsTab id="tab-2" controls="panel-2">Second Panel</TabsTab>
+                <TabsTab id="tab-3" controls="panel-3">Third Panel</TabsTab>
+              </TabsList>
+
+              <TabsPanel id="panel-1" labelledby="tab-1" selected>
+                <Heading level="h3">First Panel</Heading>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sed eveniet
+                  quidem earum at nobis enim.
+                </p>
+                <a href="#">Tab to me!</a>
+              </TabsPanel>
+              <TabsPanel id="panel-2" labelledby="tab-2">
+                <Heading level="h3">Second Panel</Heading>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <Media
+                    class="rounded-lg"
+                    src="https://images.unsplash.com/photo-1636819488537-a9b1ffb315ce?auto=format&fit=crop&w=800&q=100"
+                  />
+                  <Media
+                    class="rounded-lg"
+                    src="https://images.unsplash.com/photo-1636819488537-a9b1ffb315ce?auto=format&fit=crop&w=800&q=100"
+                  />
+                </div>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto quasi nobis optio? Qui in quo
+                  accusantium debitis sapiente obcaecati magnam incidunt sit. Molestiae exercitationem quibusdam quod
+                  veritatis laboriosam est tenetur. Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sed eveniet
+                  quidem earum at nobis enim.
+                </p>
+                <a href="#">Tab to me!</a>
+              </TabsPanel>
+              <TabsPanel id="panel-3" labelledby="tab-3">
+                <Heading level="h3">Third Panel</Heading>
+                <p>
+                  Lorem ipsum dolor sit amet consectetur, adipisicing elit. Tenetur, nulla! Sapiente saepe voluptate nemo in
+                  id aperiam tempore quo unde, ipsum similique explicabo non maiores qui voluptates dolore obcaecati. Atque
+                  voluptates similique ad ipsam nostrum quibusdam doloremque cum porro, aperiam beatae voluptas dolore et
+                  neque voluptate alias nesciunt blanditiis totam voluptatem necessitatibus. Similique aliquid molestiae
+                  iusto nam nobis ut aspernatur blanditiis provident iste corporis minima, quidem autem nulla doloremque
+                  eaque a obcaecati! Nisi quod quam repellendus facilis? Libero voluptas doloribus maxime, suscipit odio
+                  veritatis optio nulla officia quos cum at ea hic numquam perferendis molestiae! Aperiam quia veritatis
+                  earum tempora.
+                </p>
+                <a href="#">Tab to me!</a>
+              </TabsPanel>
+            </Tabs>
+
+            <Heading level="h2" id="tooltip">Tooltip</Heading>
+            <p>
+              The Tooltip component provides contextual helper text with Popover API and CSS Anchor Positioning while
+              keeping interactions keyboard accessible.
+            </p>
+            <Heading level="h3">Default</Heading>
+            <Tooltip id="starter-tooltip-default" triggerLabel="More information about API key">
+              <span>API key help</span>
+              <span slot="tooltip">Find your API key in account settings under Developer Access.</span>
+            </Tooltip>
+
+            <Heading level="h3">Positions</Heading>
+            <div class="align-center flex flex-wrap gap-3">
+              <Tooltip id="starter-tooltip-top" position="top" triggerLabel="Top tooltip example">
+                <span>Top</span>
+                <span slot="tooltip">Tooltip on top (default).</span>
+              </Tooltip>
+              <Tooltip id="starter-tooltip-right" position="right" triggerLabel="Right tooltip example">
+                <span>Right</span>
+                <span slot="tooltip">Tooltip prefers the right side.</span>
+              </Tooltip>
+              <Tooltip id="starter-tooltip-left" position="left" triggerLabel="Left tooltip example">
+                <span>Left</span>
+                <span slot="tooltip">Tooltip prefers the left side.</span>
+              </Tooltip>
+              <Tooltip id="starter-tooltip-bottom" position="bottom" triggerLabel="Bottom tooltip example">
+                <span>Bottom</span>
+                <span slot="tooltip">Tooltip prefers the bottom side.</span>
+              </Tooltip>
+            </div>
+
+            <Heading level="h3">Custom icons</Heading>
+            <Tooltip id="starter-tooltip-custom-icon" triggerLabel="Custom icon tooltip example" showIcon={false}>
+              With custom icon
+              <Icon aria-hidden="true" name="ph:info" />
+              <span slot="tooltip">Tooltip with custom icon.</span>
+            </Tooltip>
+
+            <Heading level="h2" id="video">Video</Heading>
+            <p>The Video component is used to display a video with a title and a source.</p>
+            <Heading level="h3">Default</Heading>
+            <Video src="https://www.youtube.com/watch?v=j8K-ESJF814" title="Video" />
+
+            <Heading level="h3">Aspect ratio</Heading>
+            <Video src="https://www.youtube.com/watch?v=j8K-ESJF814" title="Video" ratio="1:1" />
+          </div>
         </div>
-
-        <Heading level="h3">Custom icons</Heading>
-        <Tooltip id="starter-tooltip-custom-icon" triggerLabel="Custom icon tooltip example" showIcon={false}>
-          With custom icon
-          <Icon aria-hidden="true" name="ph:info" />
-          <span slot="tooltip">Tooltip with custom icon.</span>
-        </Tooltip>
-
-        <Heading level="h2" id="video">Video</Heading>
-        <p>The Video component is used to display a video with a title and a source.</p>
-        <Heading level="h3">Default</Heading>
-        <Video src="https://www.youtube.com/watch?v=j8K-ESJF814" title="Video" />
-
-        <Heading level="h3">Aspect ratio</Heading>
-        <Video src="https://www.youtube.com/watch?v=j8K-ESJF814" title="Video" ratio="1:1" />
-      </div>
-      <div class="components-navigation space-content">
-        <Heading level="h3" size="h4">On this page</Heading>
-        <nav aria-label="On this page">
-          <ul class="list-none">
-            {
-              components.map((component) => (
-                <li class="my-1">
-                  <a class="text-base" href={`#${component.id}`}>
-                    {component.name}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
+        <TableOfContents levels={["h2"]} />
       </div>
     </div>
   </section>
-
-  <script is:inline>
-    window['__paloCustomHashScroll'] = true
-    if (window.location.hash) {
-      window.scrollTo(0, 0)
-    }
-
-    const paloInitComponentsNavigation = () => {
-      const navLinks = [...document.querySelectorAll('.components-navigation a')]
-      if (navLinks.length === 0) return
-
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      let activeScrollFrame = null
-
-      // ── 动态边界视口追光：激活项超出侧边栏可见边界时自动滚动暴露 ──
-      const paloTraceActiveLink = (activeLink) => {
-        const sidebar = activeLink.closest('.article-content__toc, .components-navigation')
-        if (!(sidebar instanceof HTMLElement)) return
-
-        const itemTop = activeLink.offsetTop
-        const itemBottom = itemTop + activeLink.offsetHeight
-        const containerTop = sidebar.scrollTop
-        const containerBottom = containerTop + sidebar.clientHeight
-        const padding = 16
-
-        if (itemBottom > containerBottom - padding) {
-          sidebar.scrollTo({
-            top: itemBottom - sidebar.clientHeight + padding,
-            behavior: prefersReducedMotion ? 'instant' : 'smooth',
-          })
-        } else if (itemTop < containerTop + padding) {
-          sidebar.scrollTo({
-            top: 0,
-            behavior: prefersReducedMotion ? 'instant' : 'smooth',
-          })
-        }
-      }
-
-      const setActiveLink = (activeLink) => {
-        navLinks.forEach((link) => {
-          const isActive = link === activeLink
-          link.classList.toggle('active', isActive)
-          if (isActive) {
-            link.setAttribute('aria-current', 'true')
-          } else {
-            link.removeAttribute('aria-current')
-          }
-        })
-        paloTraceActiveLink(activeLink)
-      }
-
-      const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
-
-      const calculateDuration = (distance) => {
-        const absDistance = Math.abs(distance)
-        const minDuration = 300
-        const maxDuration = 900
-        const baseDuration = Math.sqrt(absDistance) * 18
-        return Math.min(maxDuration, Math.max(minDuration, baseDuration))
-      }
-
-      const smoothScrollToHeading = (heading) => {
-        if (prefersReducedMotion) {
-          heading.scrollIntoView({ block: 'start', behavior: 'instant' })
-          return
-        }
-
-        if (activeScrollFrame) {
-          cancelAnimationFrame(activeScrollFrame)
-          activeScrollFrame = null
-        }
-
-        let headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height'))
-        if (!headerHeight || headerHeight <= 0) {
-          headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-min-height')) || 96
-        }
-        const startY = window.scrollY
-        const targetY = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - headerHeight)
-        const distance = targetY - startY
-        const duration = calculateDuration(distance)
-        const startTime = performance.now()
-        const rootStyle = document.documentElement.style
-        const previousScrollBehavior = rootStyle.scrollBehavior
-        rootStyle.scrollBehavior = 'auto'
-
-        if (Math.abs(distance) < 2) {
-          rootStyle.scrollBehavior = previousScrollBehavior
-          return
-        }
-
-        const step = (currentTime) => {
-          const elapsed = currentTime - startTime
-          const progress = Math.min(elapsed / duration, 1)
-          const eased = easeOutExpo(progress)
-          window.scrollTo(0, startY + distance * eased)
-
-          if (progress < 1) {
-            activeScrollFrame = requestAnimationFrame(step)
-          } else {
-            rootStyle.scrollBehavior = previousScrollBehavior
-            activeScrollFrame = null
-          }
-        }
-
-        step(startTime)
-      }
-
-      const observer = new IntersectionObserver(
-        (entries) => {
-          const visibleEntries = entries
-            .filter((entry) => entry.isIntersecting)
-            .sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-
-          const topEntry = visibleEntries[0]
-          if (!topEntry) return
-
-          const link = document.querySelector(`.components-navigation a[href="#${topEntry.target.id}"]`)
-          if (link instanceof HTMLAnchorElement) {
-            setActiveLink(link)
-          }
-        },
-        { rootMargin: '-12% 0px -55% 0px', threshold: [0.1, 0.25, 0.5, 0.75, 1] },
-      )
-
-      navLinks.forEach((link) => {
-        if (!(link instanceof HTMLAnchorElement)) return
-
-        const id = link.getAttribute('href')?.replace('#', '')
-        const heading = id && document.getElementById(id)
-        if (!heading) return
-
-        observer.observe(heading)
-
-        if (link.dataset.paloBound === 'true') return
-
-        link.addEventListener('click', (event) => {
-          event.preventDefault()
-          setActiveLink(link)
-          history.replaceState(null, '', `#${id}`)
-          smoothScrollToHeading(heading)
-        })
-
-        link.dataset.paloBound = 'true'
-      })
-
-      const getScrollStorageKey = () => 'palo_scroll_' + window.location.pathname + window.location.search + window.location.hash
-      const initialHash = window['__paloInitialHash'] || window.location.hash.replace('#', '')
-      const hasSavedScroll = initialHash === '' ? sessionStorage.getItem(getScrollStorageKey()) !== null : false
-
-      if (initialHash) {
-        const initialLink = document.querySelector(`.components-navigation a[href="#${initialHash}"]`)
-        const initialHeading = document.getElementById(initialHash)
-        if (initialLink instanceof HTMLAnchorElement) {
-          setActiveLink(initialLink)
-        }
-        if (initialHeading && !hasSavedScroll) {
-          // 首次加载时先禁用浏览器原生 hash 位置，再执行自定义平滑滚动。
-          // 通过两次 requestAnimationFrame 确保页面完成重排后再滚动。
-          const rootStyle = document.documentElement.style
-          const previousScrollBehavior = rootStyle.scrollBehavior
-          rootStyle.scrollBehavior = 'auto'
-          window.scrollTo(0, 0)
-          rootStyle.scrollBehavior = previousScrollBehavior
-
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              smoothScrollToHeading(initialHeading)
-              history.replaceState(null, '', `#${initialHash}`)
-            })
-          })
-        }
-      } else if (navLinks[0] instanceof HTMLAnchorElement) {
-        setActiveLink(navLinks[0])
-      }
-    }
-
-    document.addEventListener('astro:page-load', paloInitComponentsNavigation)
-    document.addEventListener('astro:after-swap', paloInitComponentsNavigation)
-    paloInitComponentsNavigation()
-  </script>
-
-  <style lang="scss" is:global>
-    @use 'scss/base/breakpoint' as *;
-
-    @layer components {
-      .components {
-        display: grid;
-        position: relative;
-        grid-template-columns: 1fr;
-        gap: var(--space-l);
-
-        @include breakpoint(m) {
-          grid-template-columns: 2fr 1fr;
-        }
-      }
-
-      .components-showcase {
-        @include breakpoint(m) {
-          border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
-          padding-inline-end: var(--space-l);
-        }
-      }
-
-      .components-navigation {
-        grid-row: 1;
-
-        @include breakpoint(m) {
-          position: sticky;
-          grid-row: auto;
-          align-self: start;
-          inset-block-start: calc(var(--header-height) + var(--space-l));
-          padding-inline-end: var(--space-l);
-          padding-block-end: 5rem;
-          max-inline-size: 100%;
-          max-block-size: calc(100vh - var(--header-height) - var(--space-l));
-          overflow-y: auto;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-          transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
-
-          &::-webkit-scrollbar {
-            display: none;
-          }
-
-          &.is-un-stuck-locked {
-            overflow-y: hidden;
-          }
-
-          &.is-stuck {
-            overflow-y: auto;
-          }
-        }
-      }
-
-      .components-navigation a {
-        display: inline-block;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        transform-origin: left center;
-        transition:
-          transform 0.22s var(--cubic-bezier),
-          font-size 0.22s var(--cubic-bezier),
-          color 0.22s var(--cubic-bezier);
-      }
-
-      ul:not([class]) li {
-        margin-block-end: 0.35rem;
-      }
-
-      .badge-notification-demo {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        gap: 1rem;
-      }
-
-      .badge-notification-demo__item {
-        position: relative;
-        display: grid;
-        place-items: center;
-        inline-size: max-content;
-        block-size: max-content;
-        line-height: 0;
-      }
-
-      .badge-notification-demo__trigger {
-        display: grid;
-        place-items: center;
-        background: none;
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        line-height: 0;
-        vertical-align: top;
-      }
-
-      .badge-notification-demo__trigger :global(svg) {
-        display: block;
-      }
-
-      :global(.heading) {
-        scroll-margin-block-start: calc(var(--header-height) + 2rem);
-      }
-    }
-  </style>
 </DefaultLayout>
+
+<style lang="scss" is:global>
+  @use 'scss/base/breakpoint' as *;
+
+  @layer components {
+    .article-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+
+      &--with-toc {
+        @media (min-width: 768px) {
+          grid-template-columns: minmax(0, 1fr) 280px;
+        }
+
+        @media (min-width: 1200px) {
+          grid-template-columns: minmax(0, 1fr) 320px;
+        }
+      }
+    }
+
+    .article-content__main {
+      min-width: 0;
+    }
+
+    .article-content--with-toc .article-content__main {
+      @media (min-width: 768px) {
+        border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+        padding-inline-end: var(--space-l);
+      }
+    }
+
+    .article-content__toc {
+      grid-row: 1;
+
+      @media (min-width: 768px) {
+        position: sticky;
+        grid-row: auto;
+        align-self: start;
+        inset-block-start: calc(var(--header-height) + var(--space-l));
+        padding-inline-start: 0;
+        padding-block-end: 5rem;
+        max-inline-size: 100%;
+        max-block-size: calc(100vh - var(--header-height) - var(--space-l));
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        &.is-un-stuck-locked {
+          overflow-y: hidden;
+        }
+
+        &.is-stuck {
+          overflow-y: auto;
+        }
+      }
+    }
+
+    .badge-notification-demo {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .badge-notification-demo__item {
+      position: relative;
+      display: grid;
+      place-items: center;
+      inline-size: max-content;
+      block-size: max-content;
+      line-height: 0;
+    }
+
+    .badge-notification-demo__trigger {
+      display: grid;
+      place-items: center;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      line-height: 0;
+      vertical-align: top;
+    }
+
+    .badge-notification-demo__trigger :global(svg) {
+      display: block;
+    }
+
+    /* 🔥 防止 Media 组件（ratio=auto）图片加载后撑开布局导致 hash 滚动位偏移 */
+    .media-wrapper[data-ratio="auto"] {
+      aspect-ratio: 16/9;
+    }
+
+
+    :global(.heading) {
+      scroll-margin-block-start: calc(var(--header-height) + var(--space-l, 2rem));
+    }
+  }
+</style>
