@@ -180,7 +180,6 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
     'post-header',
     (dividerPlacement === 'top' || dividerPlacement === 'both') && 'post-header--with-divider-top',
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'post-header--with-divider-bottom',
-    !fixedHeader && 'post-header--needs-header-space',
   ]}
 >
   {isCoverImageTop && (
@@ -350,10 +349,6 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
 
       &--with-divider-bottom {
         border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
-      }
-
-      &--needs-header-space {
-        padding-block-start: var(--nav-min-height, 6rem);
       }
 
       @media (max-width: 768px) {

@@ -668,11 +668,11 @@ const pageHeaderAppearance = {
         position: sticky;
         grid-row: auto;
         align-self: start;
-        inset-block-start: calc(var(--header-height) + var(--space-l));
+        inset-block-start: var(--space-l);
         padding-inline-start: 0;
         padding-block-end: 5rem;
         max-inline-size: 100%;
-        max-block-size: calc(100vh - var(--header-height) - var(--space-l));
+        max-block-size: calc(100vh - var(--space-l));
         overflow-y: auto;
         scrollbar-width: none;
         -ms-overflow-style: none;
@@ -689,6 +689,13 @@ const pageHeaderAppearance = {
         &.is-stuck {
           overflow-y: auto;
         }
+      }
+    }
+
+    body.has-fixed-header .article-content__toc {
+      @media (min-width: 768px) {
+        inset-block-start: calc(var(--header-height) + var(--space-l));
+        max-block-size: calc(100vh - var(--header-height) - var(--space-l));
       }
     }
 
@@ -730,6 +737,10 @@ const pageHeaderAppearance = {
 
 
     :global(.heading) {
+      scroll-margin-block-start: var(--space-l, 2rem);
+    }
+
+    body.has-fixed-header :global(.heading) {
       scroll-margin-block-start: calc(var(--header-height) + var(--space-l, 2rem));
     }
   }

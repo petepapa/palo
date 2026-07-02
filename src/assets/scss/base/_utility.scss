@@ -64,6 +64,8 @@
     align-items: var(--hero-text-align, center);
     text-align: var(--hero-text-align, center);
     justify-content: var(--hero-content-align, center);
+    padding-block-start: calc(var(--nav-min-height, 4.5rem) + var(--space-xl));
+    padding-block-end: var(--space-xl);
   }
 
   .section-fullscreen:where(.palo-page-header) {

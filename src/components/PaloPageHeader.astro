@@ -170,7 +170,6 @@ const sanitizedSubtitle: string = subtitle
     bgFixed && 'palo-page-header--background-fixed',
     (dividerPlacement === 'top' || dividerPlacement === 'both') && 'palo-page-header--with-divider-top',
     (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'palo-page-header--with-divider-bottom',
-    !fixedHeader && 'palo-page-header--needs-header-space',
   ]}
   data-top-navigation-theme={resolvedTopNavigationTheme}
   style={resolvedPageHeaderStyle || undefined}
@@ -275,13 +274,6 @@ const sanitizedSubtitle: string = subtitle
       block-size: var(--border-width-divider, var(--border-width-global, 3px));
       background: var(--border-color-subtle);
       pointer-events: none;
-    }
-
-    // 与 PostHeader 保持一致：当 fixedHeader=false 时，
-    // 确保慢速网络下内容不被 absolute 定位的导航栏遮挡。
-    // 使用 --nav-min-height（静态 CSS 变量），不依赖 JS 执行。
-    .palo-page-header--needs-header-space {
-      padding-block-start: var(--nav-min-height, 4.5rem);
     }
 
     .palo-page-header > .container {

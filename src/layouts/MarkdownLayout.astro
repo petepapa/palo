@@ -461,13 +461,20 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
         position: sticky;
         grid-row: auto;
         align-self: start;
-        inset-block-start: calc(var(--header-height) + var(--space-l));
+        inset-block-start: var(--space-l);
         padding-inline-start: 0;
         max-inline-size: 100%;
-        max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
+        max-block-size: calc(100vh - var(--space-l));
         overflow-x: hidden;
         overflow-y: auto;
         transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+      }
+    }
+
+    body.has-fixed-header .article-content__toc {
+      @media (min-width: 768px) {
+        inset-block-start: calc(var(--header-height) + var(--space-l));
+        max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
       }
     }
 

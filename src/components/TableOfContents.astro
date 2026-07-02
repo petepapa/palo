@@ -71,7 +71,10 @@ const levelsAttr = levels.join(',')
         const id = heading.textContent?.trim().toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, '-').replace(/^-+|-+$/g, '') || `heading-${index}`
         heading.id = id
       }
-      heading.style.scrollMarginBlockStart = 'calc(var(--header-height) + var(--space-l, 2rem))'
+      const hasFixedHeader = document.body.classList.contains('has-fixed-header')
+      heading.style.scrollMarginBlockStart = hasFixedHeader
+        ? 'calc(var(--header-height) + var(--space-l, 2rem))'
+        : 'var(--space-l, 2rem)'
     })
     tocContainer.style.opacity = '0'
     tocContainer.style.transition = 'opacity 200ms ease-out'
