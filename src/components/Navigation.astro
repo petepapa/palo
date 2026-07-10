@@ -67,6 +67,27 @@ const navStyle = [
   </div>
 </div>
 
+<script is:inline>
+  (function(){
+    if (document.readyState !== 'loading') return;
+    var path = window.location.pathname;
+    if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+    document.querySelectorAll('#main-navigation a[href]').forEach(function(a) {
+      if (a.getAttribute('rel')?.includes('external')) return;
+      var href = a.pathname;
+      if (href.length > 1 && href.endsWith('/')) href = href.slice(0, -1);
+      var isHome = a.textContent.trim() === 'Home';
+      var isActive = isHome ? (path === '/' || path === '') : (path === href || path.startsWith(href + '/'));
+      if (isActive) {
+        a.classList.add('is-active');
+        a.setAttribute('aria-current', 'page');
+        var li = a.closest('li');
+        if (li) li.classList.add('is-active');
+      }
+    });
+  })();
+</script>
+
 <script>
   // 从 data 属性读取原始 dropdownColorMode 配置（inverse 或 theme）
   const getDropdownColorMode = () => {
@@ -74,10 +95,21 @@ const navStyle = [
     return mainNav?.dataset.dropdownColorModeConfig || 'theme'
   }
 
+  let handleOutsideClick: ((event: MouseEvent) => void) | null = null
+  let handleDropdownClick: ((event: MouseEvent) => void) | null = null
+
   const initNavigation = () => {
+    // 清理旧的全局点击监听器，避免重复绑定
+    if (handleOutsideClick) {
+      window.removeEventListener('click', handleOutsideClick)
+    }
     // variables
     const mainNav = document.querySelector('#main-navigation') as HTMLElement | null
     if (!mainNav) return
+    // 清理旧的 mainNav 点击监听器
+    if (handleDropdownClick) {
+      mainNav.removeEventListener('click', handleDropdownClick)
+    }
     const navBreakpoint = window.matchMedia('(min-width: 1050px)')
 
     const mainContainer = mainNav.querySelector(':scope > .container') as HTMLElement | null
@@ -187,8 +219,17 @@ const navStyle = [
       }
     }
 
+    handleOutsideClick = (event: MouseEvent) => {
+      const element = event.target as Element
+      const isDropdownButton = element.closest('[aria-haspopup]') !== null
+      const isSubmenuItem = element.closest('.submenu-item') !== null
+      if (!isDropdownButton && !isSubmenuItem) {
+        closeAllDropdownMenus()
+      }
+    }
+
     const toggleDropdownMenu = (event: MouseEvent): void => {
-      const target = event.target as HTMLButtonElement
+      const target = event.currentTarget as HTMLButtonElement
       if (target.getAttribute('aria-expanded') === 'false') {
         closeAllDropdownMenus()
         openDropdownMenu(target)
@@ -378,36 +419,23 @@ const navStyle = [
       })
     })
 
-    dropdownMenus &&
-      dropdownMenus.forEach((dropdownMenu) => {
-        dropdownMenu.addEventListener('click', toggleDropdownMenu as EventListener)
-      })
-
-    // ── 事件委托兜底：即使在 SPA 导航后 bundled JS 未水合的间隙，
-    //    点击 .has-dropdown > button 也能立即触发展开 ────────────
-    mainNav.addEventListener('click', (event) => {
+    handleDropdownClick = (event: MouseEvent) => {
       const button = (event.target as Element).closest('.has-dropdown > button')
       if (button instanceof HTMLButtonElement && button.hasAttribute('aria-haspopup')) {
-        // 如果 toggleDropdownMenu 已经绑定（通过上面的 forEach），
-        // 此委托不会二次触发，因为 event.target 在冒泡时依然会被 button 的
-        // 原生监听器拦截（stopPropagation 未调用）。
-        // 但为了安全，我们直接调用 toggle，避免重复执行。
-        const menu = button.parentNode?.querySelector('ul')
-        if (menu && !menu.classList.contains('show')) {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true'
+        if (!isExpanded) {
+          closeAllDropdownMenus()
           openDropdownMenu(button)
-        } else if (menu) {
+        } else {
           closeDropdownMenu(button)
         }
       }
-    })
+    }
+
+    mainNav.addEventListener('click', handleDropdownClick)
 
     setActiveMenuItem()
-    window.addEventListener('click', (event: MouseEvent) => {
-      const element = event.target as Element
-      if (!element.hasAttribute('aria-haspopup') && !element.classList.contains('submenu-item')) {
-        closeAllDropdownMenus()
-      }
-    })
+    window.addEventListener('click', handleOutsideClick)
   }
 
   document.addEventListener('astro:page-load', initNavigation)

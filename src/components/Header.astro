@@ -9,6 +9,12 @@ import themeConfig from '@config'
  *
  * @description A component that displays the header of the website
  */
+interface Props {
+  /** Hero / page-header navigation theme at scroll top: '' | 'dark' | 'light' */
+  topNavigationTheme?: '' | 'dark' | 'light'
+}
+
+const { topNavigationTheme = '' } = Astro.props as Props
 const { layout, site } = themeConfig
 
 // Convert opacity (0–1) to a CSS alpha value for the fixed header background
@@ -18,16 +24,73 @@ const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.head
 const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
 const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
 const headerPosition = fixedHeader ? 'fixed' : 'absolute'
+const resolvedTopNavigationTheme =
+  topNavigationTheme === 'dark' || topNavigationTheme === 'light' ? topNavigationTheme : undefined
 ---
 
 <style is:inline>
   header {
-    min-height: var(--nav-min-height, 6rem);
+    min-height: var(--nav-min-height, 4.5rem);
     background-color: color-mix(
       in oklab,
-      var(--background-color, #000) calc(var(--header-bg-opacity, 0.45) * 100%),
+      var(--background-color, #000) calc(var(--header-bg-opacity, 0.75) * 100%),
       transparent
     );
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+    transition:
+      background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
+      backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  html:not([data-css-ready="true"]) header {
+    transition: none;
+  }
+
+  header.is-at-top:not(.is-menu-open) {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+
+  header.is-menu-open {
+    background-color: var(--background-color, #000);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+  }
+
+  header.is-at-top[data-top-navigation-theme='light'] {
+    --foreground-color: var(--color-neutral-800, #1f2937);
+    --background-color: var(--color-neutral-100, #f8fafc);
+    --icon-color: var(--color-neutral-800, #1f2937);
+    --link-color: var(--color-neutral-800, #1f2937);
+    --link-hover-color: var(--color-neutral-700, #374151);
+    --border-color: var(--color-neutral-900, #111827);
+    --text-decoration-color: var(--color-neutral-700, #374151);
+    --text-decoration-color-hover: var(--color-neutral-900, #111827);
+    --outline-color: var(--color-outline-200, #d1d5db);
+    color-scheme: light;
+  }
+
+  header.is-at-top[data-top-navigation-theme='dark'] {
+    --foreground-color: var(--color-neutral-100, #f8fafc);
+    --background-color: var(--color-neutral-900, #111827);
+    --icon-color: var(--color-neutral-100, #f8fafc);
+    --link-color: var(--color-neutral-100, #f8fafc);
+    --link-hover-color: var(--color-neutral-200, #e5e7eb);
+    --border-color: var(--color-neutral-100, #f8fafc);
+    --text-decoration-color: var(--color-neutral-100, #f8fafc);
+    --text-decoration-color-hover: var(--color-neutral-200, #e5e7eb);
+    --outline-color: var(--color-outline-100, #f8fafc);
+    color-scheme: dark;
+  }
+
+  header.is-at-top[data-top-navigation-theme] {
+    color: var(--foreground-color);
+  }
+
+  header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+    color: var(--foreground-color);
   }
 
   header.is-fixed {
@@ -190,6 +253,7 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
 
 <header
   class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
+  {...(resolvedTopNavigationTheme ? { 'data-top-navigation-theme': resolvedTopNavigationTheme } : {})}
   style={`position: ${headerPosition}; top: 0; left: 0; right: 0; width: 100%; min-height: ${navMinHeight}; z-index: 50; --header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
 >
   <SkipLink />
@@ -205,6 +269,30 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
   }
 </header>
 
+<script is:inline>
+  (function () {
+    var header = document.querySelector('header');
+    if (!header) return;
+
+    var threshold = header.offsetHeight || 72;
+    if (window.scrollY > threshold) header.classList.remove('is-at-top');
+
+    // 预填充 modifier 快捷键（launcher JS bundle 加载前即显示正确的修饰键图标）
+    if (document.readyState === 'loading') {
+      var modifiers = document.querySelectorAll('.key.modifier');
+      if (modifiers.length) {
+        var isMac = navigator.userAgent.indexOf('Mac') !== -1;
+        var content = isMac
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg><span class="sr-only">Command</span>'
+          : 'Ctrl';
+        for (var i = 0; i < modifiers.length; i++) {
+          modifiers[i].innerHTML = content;
+        }
+      }
+    }
+  })();
+</script>
+
 <style lang="scss" is:global>
   header {
     width: 100%;
@@ -215,6 +303,10 @@ const headerPosition = fixedHeader ? 'fixed' : 'absolute'
     transition:
       background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
       backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  html:not([data-css-ready="true"]) header {
+    transition: none;
   }
 
   header.is-fixed,

@@ -45,10 +45,8 @@ interface Props {
 // 📖 从 config.yaml 读取组件全局默认值
 const componentDefaults = config.components?.paloPageHeader ?? {}
 
-// 📖 从 config.yaml 读取导航相关配置（与 PostHeader 保持一致）
-// 用于当 fixedHeader=false 时，确保慢速网络下内容不被导航栏遮挡
-const { navigation, layout } = config
-const fixedHeader = navigation?.fixedHeader ?? layout.fixedHeader ?? false
+// 📖 从 config.yaml 读取导航相关配置
+const { navigation } = config
 const navMinHeight = navigation?.minHeight ?? '4.5rem'
 
 // 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config.yaml 默认值

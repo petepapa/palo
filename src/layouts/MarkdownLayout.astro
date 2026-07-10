@@ -1,191 +1,29 @@
 ---
 import DefaultLayout from './DefaultLayout.astro'
 import PaloPageHeader from '@components/PaloPageHeader.astro'
+import SocialShares from '@components/SocialShares.astro'
+import { Heading } from 'accessible-astro-components'
 import TableOfContents from '@components/TableOfContents.astro'
-import config from '@config'
 
 const { frontmatter } = Astro.props
 const toc = frontmatter.toc ?? false
 const narrow = frontmatter.narrow ?? false
+const showShare = frontmatter.share !== false
 const pageHeader = frontmatter.pageHeader
 const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
 const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
 const pageHeaderBg = pageHeader?.bg ?? {}
 
-// 读取全局 paloPageHeader.divider 默认值（来自 config.yaml）
-const globalPaloPageHeaderDivider = config.components?.paloPageHeader?.divider ?? 'top'
 // 前台显式传入 ''（空）时让 PaloPageHeader 走 resolveStringProp 回退到 config
 // 前台传入具体值（top/bottom/both/false）时直接透传
 const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined ? '' : pageHeader?.divider
 ---
 
-<style is:inline>
-  /* ═══════════════════════════════════════════════════════════
-     状态隔离盾（State Isolation Shield）— 原子属性兼容版
-     与 DefaultLayout 保持同步。
-     ═══════════════════════════════════════════════════════════ */
-
-  /* ── 1. Header 外壳：固定 64px 高度 + 物理留白 ── */
-  html:not([data-css-ready="true"]) #main-navigation,
-  html:not([data-css-ready="true"]) .site-header,
-  html:not([data-css-ready="true"]) header {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    height: 64px !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-    z-index: 9999;
-    background-color: light-dark(#f5f5f5, #262626) !important;
-    border-bottom-width: 1px !important;
-    border-bottom-style: solid !important;
-    border-bottom-color: light-dark(rgba(0,0,0,0.08), rgba(255,255,255,0.05)) !important;
-  }
-
-  /* ── 2. 内部容器布局 ── */
-  html:not([data-css-ready="true"]) #main-navigation > .container {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: var(--grid-max-width, 90rem) !important;
-    margin-inline: auto !important;
-  }
-
-  html:not([data-css-ready="true"]) #main-navigation .nav-bar {
-    display: flex !important;
-    flex: 1 1 100% !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    min-block-size: 64px !important;
-  }
-
-  html:not([data-css-ready="true"]) #main-navigation .wrapper {
-    display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-  }
-
-  /* ── 3. desktop-menu 水平排列 + 垂直居中 ── */
-  html:not([data-css-ready="true"]) #main-navigation nav,
-  html:not([data-css-ready="true"]) #main-navigation .desktop-menu {
-    display: block !important;
-    margin-top: 0 !important;
-  }
-
-  html:not([data-css-ready="true"]) #main-navigation .desktop-menu > ul {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 1.5rem !important;
-    list-style: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: 64px !important;
-  }
-
-  /* ── 4. 导航链接：行高 64px 实现垂直居中 ── */
-  html:not([data-css-ready="true"]) #main-navigation a,
-  html:not([data-css-ready="true"]) #main-navigation button {
-    color: light-dark(#333333, #f5f5f5) !important;
-    text-decoration: none !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    line-height: 64px !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  /* ── 5. .has-dropdown > button：清零默认灰色背景 ── */
-  html:not([data-css-ready="true"]) .has-dropdown > button {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 0.25rem !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    color: light-dark(#333333, #f5f5f5) !important;
-    cursor: pointer !important;
-  }
-
-  /* ── 6. Launcher 区域：靠右 + 垂直居中 + 兜底样式 ── */
-  html:not([data-css-ready="true"]) [class*="launcher"] {
-    height: 64px !important;
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    gap: 0.75rem !important;
-    margin-top: 0 !important;
-  }
-
-  html:not([data-css-ready="true"]) [class*="launcher"] button,
-  html:not([data-css-ready="true"]) [class*="launcher"] kbd {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: light-dark(rgba(0,0,0,0.06), rgba(255,255,255,0.08)) !important;
-    color: light-dark(#333333, #f5f5f5) !important;
-    border-width: 1px !important;
-    border-style: solid !important;
-    border-color: light-dark(rgba(0,0,0,0.1), rgba(255,255,255,0.1)) !important;
-    border-radius: 6px !important;
-    font-size: 13px !important;
-    height: 28px !important;
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-    margin-left: 4px !important;
-  }
-
-  /* ── 7. 下拉菜单初始隐藏 ── */
-  html:not([data-css-ready="true"]) .has-dropdown > ul.dropdown-menu,
-  html:not([data-css-ready="true"]) .dropdown-menu {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-
-  /* ── 8. 桌面端强制隐藏汉堡菜单 + a11y 辅助文本 ── */
-  html:not([data-css-ready="true"]) .responsive-toggle,
-  html:not([data-css-ready="true"]) .skip-to-content,
-  html:not([data-css-ready="true"]) [href="#main-content"] {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-
-  /* ── 9. 移动端元素骨架期间隐藏 ── */
-  html:not([data-css-ready="true"]) .mobile-launcher,
-  html:not([data-css-ready="true"]) .mobile-menu {
-    display: none !important;
-  }
-
-  /* ── 10. Logo 首帧保持完全可见 ── */
-  html:not([data-css-ready="true"]) .logo-link {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.5rem !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-  }
-</style>
-
 <DefaultLayout
   title={frontmatter.title}
   description={frontmatter.description}
   hasHero={!!pageHeader}
+  topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
   {...(frontmatter.image ? { image: frontmatter.image } : {})}
   {...(frontmatter.author ? { author: frontmatter.author } : {})}
   {...(frontmatter.type ? { type: frontmatter.type } : {})}
@@ -221,6 +59,13 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
     <div class={`prose space-content ${narrow ? 'narrow' : ''}`}>
       <slot />
     </div>
+          {showShare && (
+            <div class={`space-content mt-12 ${narrow ? 'narrow' : ''}`}>
+              <Heading level="h5">Share this page</Heading>
+              <p>Like this page? Share it with your network!</p>
+              <SocialShares title={frontmatter.title} description={frontmatter.description} />
+            </div>
+          )}
         </div>
         {toc && <TableOfContents />}
       </div>

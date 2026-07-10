@@ -11,9 +11,6 @@ import { isPngImage, type ResolvedImage } from '@utils/contentImages'
 import { getContrastBgColor } from '@utils/pngTheme'
 import defaultCover from '../assets/images/posts/default.png'
 
-const { navigation, layout } = config
-const fixedHeader = navigation?.fixedHeader ?? layout.fixedHeader ?? false
-
 type Author = {
   name: string
   image: string

@@ -21,10 +21,6 @@ interface Props {
    */
   description?: string
   /**
-   * The URL of the page
-   */
-  url?: string
-  /**
    * The image path for social sharing (can be ImageMetadata or string path)
    */
   image?: ImageMetadata | string | null
@@ -46,12 +42,15 @@ interface Props {
    * When true, &lt;main&gt; receives 0 padding-top so the hero sits flush at top: 0.
    */
   hasHero?: boolean
+  /**
+   * Top navigation theme when scrolled to top on hero/page-header pages.
+   */
+  topNavigationTheme?: '' | 'dark' | 'light'
 }
 
 const {
   title = themeConfig.metadata.title,
   description = themeConfig.metadata.description ?? '',
-  url = Astro.url.href,
   image = themeConfig.metadata.image ?? null,
   author = themeConfig.metadata.author ?? '',
   type = 'website',
@@ -133,6 +132,10 @@ const {
 
 const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
 const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+const headerBgOpacity = themeConfig.navigation?.headerBackgroundOpacity ?? layout.headerBackgroundOpacity ?? 0.75
+const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.headerBackgroundBlur ?? '12px'
+/* eslint-disable-next-line no-unused-vars */
+const shieldHeaderPosition = fixedHeader ? 'fixed' : 'absolute'
 
 // ── .palo-nav-list 间距配置（CSS 变量驱动，不依赖动态 Tailwind 类名拼接） ──
 const navListHorizontalGapClass = themeConfig.navigation?.navList?.horizontalGap ?? 'gap-4'
@@ -157,6 +160,7 @@ const tailwindGapToRem = (gapClass: string): string => {
 }
 const navListHorizontalGapRem = tailwindGapToRem(navListHorizontalGapClass)
 const hasHero = Astro.props.hasHero ?? false
+const topNavigationTheme = Astro.props.topNavigationTheme ?? ''
 const mainPaddingTop = !hasHero ? navMinHeight : '0'
 
 const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
@@ -606,6 +610,33 @@ const themeVariablesCss = `
 :root:root {
   --header-height: var(--nav-min-height);
   --nav-min-height: ${navMinHeight};
+  --header-bg-opacity: ${headerBgOpacity};
+  --header-bg-blur: ${headerBgBlur};
+
+  /* Launcher 按钮关键 CSS 变量 — 与 accessible-astro-launcher 包 :root 值逐字一致 */
+  --launcher-theme-light: #fff;
+  --launcher-theme-dark: #090b0f;
+  --launcher-text-color: light-dark(oklch(from var(--launcher-theme-light) 0% c h), oklch(from var(--launcher-theme-dark) 85% c h));
+  --launcher-action-bar-color: light-dark(oklch(from var(--launcher-theme-light) 100% c h), oklch(from var(--launcher-theme-dark) 20% c h));
+  --launcher-inner-border-color: light-dark(oklch(from var(--launcher-theme-light) 80% c h), oklch(from var(--launcher-theme-dark) 40% c h));
+  --launcher-border-interaction-color: light-dark(oklch(from var(--launcher-theme-light) 10% c h), oklch(from var(--launcher-theme-dark) 80% c h));
+  --launcher-kbd-background-color: light-dark(oklch(from var(--launcher-theme-light) 90% c h), oklch(from var(--launcher-theme-dark) 40% c h));
+  --launcher-kbd-text-color: light-dark(oklch(from var(--launcher-theme-light) 0% c h), oklch(from var(--launcher-theme-dark) 90% c h));
+  --launcher-radius-sm: 0.25rem;
+  --launcher-radius-md: 0.5rem;
+  --launcher-trigger-width-min: 44px;
+  --launcher-trigger-width-max: 350px;
+  --launcher-trigger-height: 40px;
+  --launcher-trigger-compact-width: 95px;
+  --launcher-trigger-compact-height: 40px;
+  --launcher-trigger-icon-only-size: 44px;
+  --launcher-font-size-xs: clamp(0.5831rem, 0.5778rem + 0.027vw, 0.59rem);
+  --launcher-font-size-sm: clamp(0.6944rem, 0.6855rem + 0.0446vw, 0.72rem);
+  --launcher-font-size-md: clamp(0.8331rem, 0.8099rem + 0.1163vw, 0.9rem);
+  --launcher-space-xs: clamp(0.25rem, 0.2283rem + 0.1087vw, 0.3125rem);
+  --launcher-space-sm: clamp(0.5rem, 0.4783rem + 0.1087vw, 0.5625rem);
+  --launcher-animation-duration: 0.2s;
+  --launcher-animation-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
   font-size: ${typography.baseFontSize};
   --m-scale: ${mobileScale};
   --d-scale: ${desktopScale};
@@ -790,37 +821,69 @@ ${bodyLineHeights}
          ═══════════════════════════════════════════════════════════════ -->
     <style is:inline>
       html:not([data-css-ready="true"]) {
-        background-color: var(--background-color, #0f172a) !important;
-        color: var(--foreground-color, #f8fafc) !important;
+        background-color: var(--background-color, #f8fafc) !important;
+        color: var(--foreground-color, #1f2937) !important;
       }
 
       html:not([data-css-ready="true"]) body {
         margin: 0 !important;
         min-height: 100vh !important;
+        background-color: var(--background-color, #f8fafc) !important;
+        color: var(--foreground-color, #1f2937) !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) {
         background-color: var(--background-color, #0f172a) !important;
         color: var(--foreground-color, #f8fafc) !important;
       }
 
-      html:not([data-css-ready="true"]) header,
-      html:not([data-css-ready="true"]) header.is-fixed,
-      html:not([data-css-ready="true"]) header.is-at-top,
-      html:not([data-css-ready="true"]) #main-navigation,
-      html:not([data-css-ready="true"]) .site-header {
-        position: fixed !important;
+      html.darkmode:not([data-css-ready="true"]) body {
+        background-color: var(--background-color, #0f172a) !important;
+        color: var(--foreground-color, #f8fafc) !important;
+      }
+
+      /* Header 背景与 Header.astro 内联关键 CSS 保持像素级一致，避免盾牌释放时跳变 */
+      html:not([data-css-ready="true"]) header {
+        position: ${shieldHeaderPosition} !important;
         inset-block-start: 0 !important;
         inset-inline-start: 0 !important;
         inset-inline-end: 0 !important;
         width: 100% !important;
         min-block-size: var(--nav-min-height, 4.5rem) !important;
-        background-color: color-mix(in oklab, var(--background-color, #0f172a) calc(var(--header-bg-opacity, 0.75) * 100%), transparent) !important;
-        backdrop-filter: blur(var(--header-bg-blur, 12px)) !important;
-        -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px)) !important;
-        color: var(--foreground-color, #f8fafc) !important;
-        border-bottom-width: 1px !important;
-        border-bottom-style: solid !important;
-        border-bottom-color: rgba(255, 255, 255, 0.08) !important;
         box-sizing: border-box !important;
-        z-index: 9999 !important;
+        z-index: 50 !important;
+        background-color: color-mix(
+          in oklab,
+          var(--background-color, #f8fafc) calc(var(--header-bg-opacity, ${headerBgOpacity}) * 100%),
+          transparent
+        ) !important;
+        backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        transition: none !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) header {
+        background-color: color-mix(
+          in oklab,
+          var(--background-color, #0f172a) calc(var(--header-bg-opacity, ${headerBgOpacity}) * 100%),
+          transparent
+        ) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation {
+        background-color: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-menu-open {
+        background-color: var(--background-color, #f8fafc) !important;
+        backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) header.is-menu-open {
+        background-color: var(--background-color, #0f172a) !important;
       }
 
       html:not([data-css-ready="true"]) header.is-at-top:not(.is-menu-open) {
@@ -874,6 +937,20 @@ ${bodyLineHeights}
         box-sizing: border-box !important;
       }
 
+      @media (min-width: 768px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          padding-inline-start: 2rem !important;
+          padding-inline-end: 2rem !important;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          padding-inline-start: 1rem !important;
+          padding-inline-end: 1rem !important;
+        }
+      }
+
       html:not([data-css-ready="true"]) #main-navigation .nav-bar {
         display: flex !important;
         flex: 1 1 100% !important;
@@ -885,7 +962,7 @@ ${bodyLineHeights}
         box-sizing: border-box !important;
       }
 
-      html:not([data-css-ready="true"]) #main-navigation .wrapper {
+      html:not([data-css-ready="true"]) #main-navigation > .container > .nav-bar > .wrapper {
         display: flex !important;
         align-items: center !important;
         gap: var(--space-m, 1rem) !important;
@@ -926,6 +1003,20 @@ ${bodyLineHeights}
       }
 
       @media (min-width: 1050px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          column-gap: var(--space-l, 1.5rem) !important;
+        }
+
+        html:not([data-css-ready="true"]) #main-navigation .nav-bar {
+          flex: 1 1 auto !important;
+        }
+
+        html:not([data-css-ready="true"]) #main-navigation > .container > .nav-bar > .wrapper {
+          flex: 1 1 auto !important;
+          justify-content: flex-start !important;
+          min-inline-size: 0 !important;
+        }
+
         html:not([data-css-ready="true"]) .desktop-menu {
           display: grid !important;
           flex: 1 1 auto !important;
@@ -945,6 +1036,51 @@ ${bodyLineHeights}
           box-sizing: border-box !important;
         }
 
+        html:not([data-css-ready="true"]) .desktop-menu > ul > li {
+          align-content: center !important;
+        }
+
+        html:not([data-css-ready="true"]) .menu--utility {
+          justify-self: end !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--left .menu--primary {
+          justify-self: start !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--center .menu--primary {
+          justify-self: center !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--right .menu--primary {
+          justify-self: end !important;
+        }
+
+        html:not([data-css-ready="true"]) .menu-item {
+          display: flex !important;
+          align-items: center !important;
+          list-style: none !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon {
+          display: block !important;
+          translate: 0 4px !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon button {
+          border: none !important;
+          border-radius: 0 !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon svg {
+          inline-size: 30px !important;
+          block-size: 30px !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon ~ li.type-icon {
+          margin-inline-start: calc(var(--space-2xs, 0.25rem) * -1) !important;
+        }
+
         html:not([data-css-ready="true"]) .mobile-launcher,
         html:not([data-css-ready="true"]) .mobile-menu,
         html:not([data-css-ready="true"]) .responsive-toggle {
@@ -953,24 +1089,45 @@ ${bodyLineHeights}
       }
 
       html:not([data-css-ready="true"]) #main-navigation a,
-      html:not([data-css-ready="true"]) #main-navigation button {
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger) {
         color: var(--foreground-color, #f8fafc) !important;
         background-color: transparent !important;
         border: none !important;
         text-decoration: none !important;
+        font-size: var(--navigation-desktop-font-size, 1rem) !important;
         font-weight: var(--font-weight-accent, 400) !important;
         line-height: 1.5 !important;
         box-sizing: border-box !important;
       }
 
       html:not([data-css-ready="true"]) #main-navigation a:hover,
-      html:not([data-css-ready="true"]) #main-navigation button:hover,
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger):hover,
       html:not([data-css-ready="true"]) #main-navigation a:focus-visible,
-      html:not([data-css-ready="true"]) #main-navigation button:focus-visible {
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger):focus-visible,
+      html:not([data-css-ready="true"]) #main-navigation .is-active {
         text-decoration: underline !important;
         text-decoration-thickness: max(1.5px, 0.0625em) !important;
         text-underline-offset: 0.4375em !important;
         text-decoration-style: wavy !important;
+      }
+
+      /* Active 样式 — 与 Navigation.astro data-nav-active-style 各模式保持一致 */
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='underline'] .is-active {
+        text-decoration-style: solid !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='bold'] .is-active {
+        text-decoration: none !important;
+        font-weight: var(--font-weight-heading) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='boldwavy'] .is-active {
+        font-weight: var(--font-weight-heading) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='boldunderline'] .is-active {
+        text-decoration-style: solid !important;
+        font-weight: var(--font-weight-heading) !important;
       }
 
       html:not([data-css-ready="true"]) .has-dropdown > button {
@@ -1021,54 +1178,138 @@ ${bodyLineHeights}
       }
 
       html:not([data-css-ready="true"]) .launcher-trigger {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        min-inline-size: var(--launcher-trigger-width-min, 3.25rem) !important;
-        min-block-size: var(--launcher-trigger-height, 2.5rem) !important;
-        border-radius: var(--launcher-radius-md, 0.75rem) !important;
-        background-color: var(--launcher-action-bar-color, rgba(255, 255, 255, 0.08)) !important;
-        border: 1px solid var(--launcher-inner-border-color, rgba(255, 255, 255, 0.12)) !important;
+        container-type: inline-size !important;
+        min-inline-size: var(--launcher-trigger-width-min, 44px) !important;
+        min-block-size: var(--launcher-trigger-height, 40px) !important;
         box-sizing: border-box !important;
       }
 
       html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.icon-only) {
-        inline-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
-        block-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+        inline-size: var(--launcher-trigger-icon-only-size, 44px) !important;
+        block-size: var(--launcher-trigger-icon-only-size, 44px) !important;
       }
 
       html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.compact) {
-        inline-size: var(--launcher-trigger-compact-width, 5.9375rem) !important;
-        block-size: var(--launcher-trigger-height, 2.5rem) !important;
+        inline-size: var(--launcher-trigger-compact-width, 95px) !important;
       }
 
       html:not([data-css-ready="true"]) .desktop-launcher .launcher-trigger .trigger,
       html:not([data-css-ready="true"]) .mobile-launcher .launcher-trigger .trigger,
       html:not([data-css-ready="true"]) .launcher-trigger .trigger {
-        visibility: hidden !important;
-        opacity: 0 !important;
-        min-inline-size: clamp(var(--launcher-trigger-width-min, 3.25rem), 100%, var(--launcher-trigger-width-max, 13rem)) !important;
-        min-block-size: var(--launcher-trigger-height, 2.5rem) !important;
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        border: 1px solid var(--launcher-inner-border-color) !important;
+        border-radius: var(--launcher-radius-md, 0.5rem) !important;
+        background-color: var(--launcher-action-bar-color) !important;
+        padding: var(--launcher-space-sm) !important;
+        inline-size: clamp(var(--launcher-trigger-width-min, 44px), 100%, var(--launcher-trigger-width-max, 350px)) !important;
+        min-block-size: var(--launcher-trigger-height, 40px) !important;
+        color: var(--launcher-text-color) !important;
+        font-size: var(--launcher-font-size-md) !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
         box-sizing: border-box !important;
       }
 
+      /* 桌面端 launcher 字号与 Navigation.astro 的 font-size:initial override 保持一致 */
+      html:not([data-css-ready="true"]) #main-navigation .desktop-menu .desktop-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) #main-navigation .desktop-menu .desktop-launcher .launcher-trigger kbd.key {
+        font-size: initial !important;
+      }
+
       html:not([data-css-ready="true"]) .launcher-trigger .trigger.icon-only {
-        inline-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
-        block-size: var(--launcher-trigger-icon-only-size, 2.75rem) !important;
+        justify-content: center !important;
+        block-size: var(--launcher-trigger-icon-only-size, 44px) !important;
       }
 
       html:not([data-css-ready="true"]) .launcher-trigger .trigger.compact {
-        inline-size: var(--launcher-trigger-compact-width, 5.9375rem) !important;
-        block-size: var(--launcher-trigger-height, 2.5rem) !important;
+        inline-size: var(--launcher-trigger-compact-width, 95px) !important;
       }
 
-      html:not([data-css-ready="true"]) .launcher-trigger .wrapper,
-      html:not([data-css-ready="true"]) .launcher-trigger .shortcut,
-      html:not([data-css-ready="true"]) .launcher-trigger kbd.key {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
+      html:not([data-css-ready="true"]) .launcher-trigger .wrapper {
+        display: flex !important;
+        flex-shrink: 0 !important;
+        align-items: center !important;
+        gap: var(--launcher-space-sm) !important;
       }
+
+      html:not([data-css-ready="true"]) .launcher-trigger svg {
+        flex-shrink: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .shortcut {
+        display: flex !important;
+        flex-shrink: 0 !important;
+        align-items: center !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key {
+        display: grid !important;
+        place-content: center !important;
+        border-radius: var(--launcher-radius-sm, 0.25rem) !important;
+        background-color: var(--launcher-kbd-background-color) !important;
+        padding: var(--launcher-space-xs) !important;
+        inline-size: fit-content !important;
+        block-size: 20px !important;
+        color: var(--launcher-kbd-text-color) !important;
+        font-weight: 500 !important;
+        font-size: var(--launcher-font-size-xs) !important;
+        text-shadow: none !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key:first-child {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        padding-inline-end: 1px !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key:last-child {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        padding-inline-start: 1px !important;
+        font-size: var(--launcher-font-size-sm) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger:hover,
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger:focus-visible {
+        border-color: var(--launcher-border-interaction-color) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger {
+        border: none !important;
+        background: linear-gradient(115deg, #a767e5, #12bcfe, #44ce7b, #fad648, #a767e5) !important;
+        background-position: 0 0 !important;
+        background-size: 200% 100% !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger::before {
+        position: absolute !important;
+        z-index: 1 !important;
+        inset: 2px !important;
+        border-radius: calc(var(--launcher-radius-md, 0.5rem) - 2px) !important;
+        background-color: var(--launcher-action-bar-color, #fff) !important;
+        content: '' !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger > * {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger:hover,
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger:focus-visible {
+        animation: palo-launcher-rainbow-effect 1s linear infinite !important;
+      }
+
+      @keyframes palo-launcher-rainbow-effect {
+        to {
+          background-position: 200% 0 !important;
+        }
+      }
+
     </style>
 
     <script is:inline>
@@ -1149,13 +1390,24 @@ ${bodyLineHeights}
           }
           restoredScrollPosition = true
 
+          var savedY = sessionStorage.getItem(getStorageKey())
+
+          // ── 在滚动动画之前，立即根据 saved 位置同步 header 状态 ──
+          // 解决 scroll 恢复时 header.is-at-top 未及时更新的问题
+          if (savedY !== null) {
+            var header = document.querySelector('header')
+            if (header) {
+              var headerHeight = header.offsetHeight || 64
+              header.classList.toggle('is-at-top', parseInt(savedY, 10) <= headerHeight)
+            }
+          }
+
           var rootStyle = document.documentElement.style
           var previousScrollBehavior = rootStyle.scrollBehavior
           rootStyle.scrollBehavior = 'auto'
           window.scrollTo(0, 0)
           rootStyle.scrollBehavior = previousScrollBehavior
 
-          var savedY = sessionStorage.getItem(getStorageKey())
           if (savedY !== null) {
             smoothScrollTo(parseInt(savedY, 10))
           }
@@ -1163,6 +1415,64 @@ ${bodyLineHeights}
 
         function releaseShield() { document.documentElement.setAttribute('data-css-ready', 'true'); }
         function lockShield() { document.documentElement.removeAttribute('data-css-ready'); }
+
+        function syncHeaderThemeFromMain() {
+          var header = document.querySelector('header')
+          if (!header || !header.classList.contains('is-at-top') || header.dataset.topNavigationTheme) return
+
+          var source = document.querySelector('main [data-top-navigation-theme]')
+          var theme = source && source.getAttribute('data-top-navigation-theme')
+          if (theme === 'light' || theme === 'dark') {
+            header.dataset.topNavigationTheme = theme
+          }
+        }
+
+        function scheduleReleaseShield() {
+          var released = false
+
+          function tryRelease() {
+            if (released) return
+            released = true
+            releaseShield()
+          }
+
+          function stylesheetsReady() {
+            var links = document.querySelectorAll('link[rel="stylesheet"]')
+            if (!links.length) return true
+
+            for (var i = 0; i < links.length; i++) {
+              if (!links[i].sheet) return false
+            }
+
+            return true
+          }
+
+          function waitForPaintReady() {
+            if (stylesheetsReady()) {
+              requestAnimationFrame(tryRelease)
+              return
+            }
+
+            setTimeout(waitForPaintReady, 32)
+          }
+
+          if (document.readyState === 'complete') {
+            tryRelease()
+            return
+          }
+
+          // DOM + 样式表就绪即可释放；不必等待图片/字体等阻塞资源
+          document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+              waitForPaintReady()
+            },
+            { once: true },
+          )
+
+          window.addEventListener('load', tryRelease, { once: true })
+          setTimeout(tryRelease, 3000)
+        }
 
         function initScrollRestore() {
           if (document.readyState !== 'loading') {
@@ -1172,13 +1482,19 @@ ${bodyLineHeights}
           }
         }
 
-        // 1. 首次加载：等待 DOM 完成后再执行滚动恢复，并释放首帧盾牌
+        // 1. 首次加载：DOM 就绪后同步 header 主题，等 CSS 加载完再释放首帧盾牌
         initScrollRestore()
         window.addEventListener('pageshow', initScrollRestore)
+
+        function onDomReady() {
+          syncHeaderThemeFromMain()
+          scheduleReleaseShield()
+        }
+
         if (document.readyState !== 'loading') {
-          releaseShield()
+          onDomReady()
         } else {
-          document.addEventListener('DOMContentLoaded', releaseShield)
+          document.addEventListener('DOMContentLoaded', onDomReady)
         }
 
         // 2. 实时保存滚动位置（100ms 节流）
@@ -1202,11 +1518,9 @@ ${bodyLineHeights}
         });
 
         document.addEventListener('astro:page-load', function () {
+          syncHeaderThemeFromMain();
           releaseShield();
         });
-
-        // 4. 兜底
-        window.addEventListener('load', releaseShield);
       })();
     </script>
 
@@ -1445,18 +1759,18 @@ ${bodyLineHeights}
             padding-block-end: 5rem;
             scrollbar-width: none;
             -ms-overflow-style: none;
+          }
 
-            &::-webkit-scrollbar {
-              display: none;
-            }
+          .article-content__toc::-webkit-scrollbar {
+            display: none;
+          }
 
-            &.is-un-stuck-locked {
-              overflow-y: hidden;
-            }
+          .article-content__toc.is-un-stuck-locked {
+            overflow-y: hidden;
+          }
 
-            &.is-stuck {
-              overflow-y: auto;
-            }
+          .article-content__toc.is-stuck {
+            overflow-y: auto;
           }
 
           body.has-fixed-header .article-content__toc {
@@ -1583,7 +1897,7 @@ ${bodyLineHeights}
     </style>
   </head>
   <body>
-    <Header />
+    <Header topNavigationTheme={topNavigationTheme} />
     <main id="main-content" transition:animate="fade" style={`padding-top: ${mainPaddingTop} !important;`}>
       <slot />
 
