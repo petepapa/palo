@@ -148,8 +148,8 @@ const containerInlineStyle = [
 
 // Define container spacing classes based on layout
 const containerClasses = {
-  full: '-mx-4 md:-mx-8 lg:-mx-[calc(50vw-50%+2rem)]',
-  wide: 'mx-0 md:-mx-4 lg:-mx-[calc(50vw-50%-1rem)]',
+  full: '-mx-4 md:-mx-[calc(50vw-50%)] lg:-mx-[calc(50vw-50%+2rem)]',
+  wide: 'mx-0 md:-mx-[calc(50vw-50%-1rem)] lg:-mx-[calc(50vw-50%-1rem)]',
   contained: 'mx-0 md:-mx-[calc(50vw-2rem-50%)] lg:-mx-[calc(min(50vw-1rem,var(--grid-max-width)/2-1rem)-50%)]',
 }[resolvedLayout]
 
