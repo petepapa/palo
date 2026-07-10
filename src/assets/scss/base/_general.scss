@@ -194,7 +194,7 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
    --astro-code-token-link         链接
 ═══════════════════════════════════════════════════════════════ */
 :root {
-  --astro-code-background: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+  --astro-code-background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
   --astro-code-foreground: var(--foreground-color);
   --astro-code-token-keyword: var(--color-info-400);
   --astro-code-token-constant: var(--color-info-300);
