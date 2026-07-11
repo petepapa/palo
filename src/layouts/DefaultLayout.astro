@@ -1815,12 +1815,60 @@ ${bodyLineHeights}
         .breakout-image-container {
           position: relative;
           overflow: hidden;
+          --breakout-radius: var(--radius-media, var(--radius-global, 0.5rem));
+        }
+
+        .breakout-image-container :is(img, > div.absolute) {
+          border-radius: var(--breakout-radius) !important;
         }
 
         .breakout-image-container img {
           display: block;
           width: 100%;
           height: auto;
+        }
+
+        /* ── full：贴近左右屏幕边缘，直角 ── */
+        .breakout-image-container[data-layout="full"] {
+          --breakout-radius: 0;
+          margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+          margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+          border-radius: 0 !important;
+        }
+
+        /* ── wide：距离左右屏幕 1rem 间隙，圆角 ── */
+        .breakout-image-container[data-layout="wide"] {
+          margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+          margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+          border-radius: var(--breakout-radius) !important;
+        }
+
+        /* ── contained：对齐页面最大宽度容器，圆角 ── */
+        .breakout-image-container[data-layout="contained"] {
+          --breakout-contained-padding: var(--grid-gutter, 1rem);
+          margin-left: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+          margin-right: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+          border-radius: var(--breakout-radius) !important;
+        }
+
+        @media (min-width: 768px) {
+          .breakout-image-container[data-layout="contained"] {
+            --breakout-contained-padding: 2rem;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          .breakout-image-container[data-layout="contained"] {
+            --breakout-contained-padding: 1rem;
+          }
+        }
+
+        /* ── TOC 模式（≥768px 侧栏显示时）：三种 layout 宽度统一为主内容列宽度，不突破 ── */
+        @media (min-width: 768px) {
+          .article-content--with-toc .breakout-image-container {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
         }
 
         /* ── 窄文栏居中 ── */

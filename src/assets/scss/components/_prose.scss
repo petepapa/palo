@@ -195,19 +195,19 @@
     // from inheriting prose img decoration.
     .breakout-image-container img,
     .progressive-img-container img {
-      max-inline-size: revert;
-      block-size: revert;
-      display: revert;
-      margin-inline: revert;
-      border-radius: revert;
-      border: revert;
-      box-shadow: revert;
-      background-color: revert;
-      background: revert;
-      transition: revert;
+      max-inline-size: revert !important;
+      block-size: revert !important;
+      display: revert !important;
+      margin-inline: revert !important;
+      border-radius: revert !important;
+      border: revert !important;
+      box-shadow: revert !important;
+      background-color: revert !important;
+      background: revert !important;
+      transition: revert !important;
 
       &:hover {
-        transform: revert;
+        transform: revert !important;
       }
     }
     // ──────────────────────────────────────────────

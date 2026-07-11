@@ -113,6 +113,7 @@ if (import.meta.env.DEV && typeof imageSrc === 'string' && imageSrc.startsWith('
 }
 
 // Determine layout style, supporting backward compatibility with fullWidth
+// Default: 'full' — applies when layout is undefined or empty
 let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
 if (layout) {
   resolvedLayout = layout
@@ -146,22 +147,13 @@ const containerInlineStyle = [
   realAspectRatioInline,
 ].filter(Boolean).join('; ')
 
-// Define container spacing classes based on layout
-const containerClasses = {
-  full: '-mx-4 md:-mx-[calc(50vw-50%)] lg:-mx-[calc(50vw-50%+2rem)]',
-  wide: 'mx-0 md:-mx-[calc(50vw-50%-1rem)] lg:-mx-[calc(50vw-50%-1rem)]',
-  contained: 'mx-0 md:-mx-[calc(50vw-2rem-50%)] lg:-mx-[calc(min(50vw-1rem,var(--grid-max-width)/2-1rem)-50%)]',
-}[resolvedLayout]
-
-// Define border radius classes based on layout
-const radiusClass = resolvedLayout === 'full'
-  ? 'rounded-none'
-  : 'rounded-[var(--radius-media,var(--radius-global,0.5rem))]'
+// Layout margins and border-radius are handled by CSS in <style is:global> below,
+// using data-layout attribute selectors — no responsive breakpoints needed.
 
 ---
 
 <div
-  class:list={['relative', 'my-8', 'breakout-image-container', containerClasses, 'overflow-hidden', radiusClass, 'transition-colors', 'duration-500', 'ease-out']}
+  class:list={['relative', 'my-8', 'breakout-image-container', 'overflow-hidden', 'transition-colors', 'duration-500', 'ease-out']}
   style={containerInlineStyle || undefined}
   data-layout={resolvedLayout}
   data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
@@ -171,7 +163,7 @@ const radiusClass = resolvedLayout === 'full'
       src={imageSrc}
       alt={altText}
       widths={[560, 840, 1120, 1400, 1680]}
-      class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out']}
       loading="lazy"
       decoding="async"
       onload="this.setAttribute('data-loaded','true');var c=this.closest('.breakout-image-container');this.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}"
@@ -180,7 +172,7 @@ const radiusClass = resolvedLayout === 'full'
     <img
       src={imageSrc}
       alt={altText}
-      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out', radiusClass]}
+      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out']}
       loading="eager"
       decoding="async"
       onload="var i=this;i.setAttribute('data-loaded','true');i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c){c.setAttribute('data-loaded','true');var w=i.naturalWidth;var h=i.naturalHeight;if(w&&h){c.style.transition='aspect-ratio .4s';c.style.aspectRatio=w+' / '+h}}"
@@ -193,6 +185,58 @@ const radiusClass = resolvedLayout === 'full'
 
     .breakout-image-container[data-loaded="true"] {
       background-color: var(--loaded-bg-color, transparent) !important;
+    }
+
+    /* Base: high-specificity selector used by all layouts */
+    .breakout-image-container.breakout-image-container {
+      --breakout-radius: var(--radius-media, var(--radius-global, 0.5rem));
+    }
+
+    .breakout-image-container.breakout-image-container :is(img, > div.absolute) {
+      border-radius: var(--breakout-radius) !important;
+    }
+
+    /* ── full：贴近左右屏幕边缘，直角 ── */
+    .breakout-image-container.breakout-image-container[data-layout="full"] {
+      --breakout-radius: 0;
+      margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+      margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+      border-radius: 0 !important;
+    }
+
+    /* ── wide：距离左右屏幕 1rem 间隙，圆角 ── */
+    .breakout-image-container.breakout-image-container[data-layout="wide"] {
+      margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+      margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+      border-radius: var(--breakout-radius) !important;
+    }
+
+    /* ── contained：对齐页面最大宽度容器，圆角 ── */
+    .breakout-image-container.breakout-image-container[data-layout="contained"] {
+      --breakout-contained-padding: var(--grid-gutter, 1rem);
+      margin-left: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+      margin-right: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+      border-radius: var(--breakout-radius) !important;
+    }
+
+    @media (min-width: 768px) {
+      .breakout-image-container.breakout-image-container[data-layout="contained"] {
+        --breakout-contained-padding: 2rem;
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .breakout-image-container.breakout-image-container[data-layout="contained"] {
+        --breakout-contained-padding: 1rem;
+      }
+    }
+
+    /* ── TOC 模式（≥768px 侧栏显示时）：三种 layout 宽度统一为主内容列宽度，不突破 ── */
+    @media (min-width: 768px) {
+      .article-content--with-toc .breakout-image-container.breakout-image-container {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
     }
   </style>
   <noscript>
@@ -210,11 +254,21 @@ const radiusClass = resolvedLayout === 'full'
       }
     </style>
   </noscript>
-  <div class:list={['absolute inset-0 shadow-inner pointer-events-none', radiusClass]}></div>
+  <div class:list={['absolute inset-0 shadow-inner pointer-events-none']}></div>
 </div>
 
 <!-- is:inline → 脚本内联于 HTML 流中，首帧即刻执行，不受外部 JS 阻塞 -->
 <script is:inline>
+  // ── 视口宽度精确测量：修正 100vw 包含滚动条导致的对齐偏差 ──
+  var updateBreakoutViewportWidth = function() {
+    var vw = document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--viewport-width', vw + 'px');
+  };
+
+  // 首帧立即执行，避免 FOUC
+  updateBreakoutViewportWidth();
+  window.addEventListener('resize', updateBreakoutViewportWidth);
+
   // ── BreakoutImage DOM 状态机：public/ 路径 304 缓存吞 onload 的终极防御 ──
   var enforceBreakoutStatus = function() {
     var imgs = document.querySelectorAll('.breakout-image-container .progressive-img-inner, .breakout-image-container img');
@@ -256,11 +310,15 @@ const radiusClass = resolvedLayout === 'full'
   // 全生命周期绑定：首屏、SPA 导航、View Transitions 交换，无一遗漏
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', enforceBreakoutStatus);
+    document.addEventListener('DOMContentLoaded', updateBreakoutViewportWidth);
   } else {
     enforceBreakoutStatus();
+    updateBreakoutViewportWidth();
   }
   document.addEventListener('astro:page-load', enforceBreakoutStatus);
+  document.addEventListener('astro:page-load', updateBreakoutViewportWidth);
   document.addEventListener('astro:after-swap', enforceBreakoutStatus);
+  document.addEventListener('astro:after-swap', updateBreakoutViewportWidth);
 </script>
 
 {import.meta.env.DEV && (

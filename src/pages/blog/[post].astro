@@ -170,8 +170,6 @@ const authorImageResolved = resolveAuthorImageResolved(authorInfo.image, postId,
 </DefaultLayout>
 
 <style lang="scss" is:global>
-  @use 'scss/base/breakpoint' as *;
-
   @layer components {
     .article-content {
       display: grid;
@@ -197,35 +195,6 @@ const authorImageResolved = resolveAuthorImageResolved(authorInfo.image, postId,
       @media (min-width: 768px) {
         border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
         padding-inline-end: var(--space-l);
-      }
-    }
-
-    .article-content--with-toc .breakout-image-container {
-      margin-inline: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-
-      img,
-      div.absolute {
-        border-radius: var(--radius-media, var(--radius-global, 0.5rem)) !important;
-      }
-    }
-
-    /* ── Mobile layout="full": true 100vw viewport breakout with zero border-radius ── */
-    @include breakpoint('m', 'max') {
-      .breakout-image-container[data-layout="full"] {
-        position: relative;
-        left: 50%;
-        right: 50%;
-        margin-left: -50vw !important;
-        margin-right: -50vw !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-
-        img,
-        div.absolute {
-          border-radius: 0 !important;
-        }
       }
     }
 
