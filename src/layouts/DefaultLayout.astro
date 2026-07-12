@@ -121,6 +121,7 @@ const seoTitleTemplate =
 const defaultTheme = themeConfig.site.defaultTheme ?? 'auto'
 const darkModeToggle = themeConfig.site.darkModeToggle
 const enableCustomCursor = themeConfig.site.enableCustomCursor ?? false
+const hideScrollbar = themeConfig.site.hideScrollbar ?? true
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -785,7 +786,7 @@ ${bodyLineHeights}
 `.trim()
 ---
 
-<html lang="en" dir="ltr">
+<html lang="en" dir="ltr" class:list={[hideScrollbar && 'hide-scrollbar']}>
   <head>
     <meta charset="utf-8" />
     <script is:inline define:vars={{ defaultTheme, darkModeToggle }}>
@@ -2657,6 +2658,15 @@ ${bodyLineHeights}
         body {
           min-height: 100%;
           overflow-x: clip;
+        }
+
+        html.hide-scrollbar {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        html.hide-scrollbar::-webkit-scrollbar {
+          display: none;
         }
 
         body {

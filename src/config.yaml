@@ -13,6 +13,7 @@ site:
   backToTop: true            # 启用页脚"回到顶部"链接 / Enable "Back to Top" link in footer
   backToTopText: 'Back to Top'  # "回到顶部"链接文本 / Custom text for the back-to-top link
   enableCustomCursor: true   # 启用自定义圆形鼠标指针（反色 + 悬停放大）/ Enable custom circular cursor with color inversion and hover scaling
+  hideScrollbar: true        # 隐藏网站滚动条 / Hide website scrollbar
 
 
 # ╔══════════════════════════════════════════════════════════════╗
