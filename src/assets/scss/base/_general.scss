@@ -626,31 +626,13 @@ dialog.launcher {
   background-color: rgba(0 0 0 / 0.3);
   opacity: 0;
   pointer-events: none;
-  animation: palo-backdrop-fade-out 0.25s ease-out forwards;
+  animation: palo-backdrop-fade-out var(--animation-speed-medium) var(--cubic-bezier) forwards;
 }
 
 .palo-dialog-backdrop.is-visible {
   opacity: 1;
   pointer-events: auto;
-  animation: palo-backdrop-fade-in 0.3s ease-out forwards;
-}
-
-@keyframes palo-backdrop-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes palo-backdrop-fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  animation: palo-backdrop-fade-in var(--animation-speed-medium) var(--cubic-bezier) forwards;
 }
 
 // Modal + Launcher 关闭态（始终启用，确保 JS 能安全插入 closing 类）
@@ -659,7 +641,6 @@ dialog.launcher.closing {
   pointer-events: none;
 }
 
-// 通用淡入淡出动画（Modal + Launcher 共用，纯 opacity 无位移）
 @keyframes palo-dialog-fade-in {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -670,16 +651,26 @@ dialog.launcher.closing {
   to   { opacity: 0; }
 }
 
+@keyframes palo-backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes palo-backdrop-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   dialog.modal[open],
   dialog.launcher[open] {
-    animation: palo-dialog-fade-in 0.25s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+    animation: palo-dialog-fade-in var(--animation-speed-medium) var(--cubic-bezier) forwards;
     will-change: opacity, transform;
   }
 
   dialog.modal.closing,
   dialog.launcher.closing {
-    animation: palo-dialog-fade-out 0.25s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+    animation: palo-dialog-fade-out var(--animation-speed-medium) var(--cubic-bezier) forwards;
   }
 }
 }

@@ -98,11 +98,11 @@ fieldset.fieldset {
   pointer-events: auto;
   transform-origin: left center;
   transition:
-    inset-block-start 0.2s var(--cubic-bezier),
-    transform 0.2s var(--cubic-bezier),
-    color 0.2s var(--cubic-bezier),
-    background-color 0.2s var(--cubic-bezier),
-    padding-inline 0.2s var(--cubic-bezier);
+    inset-block-start var(--animation-speed-fast) var(--cubic-bezier),
+    transform var(--animation-speed-fast) var(--cubic-bezier),
+    color var(--animation-speed-fast) var(--cubic-bezier),
+    background-color var(--animation-speed-fast) var(--cubic-bezier),
+    padding-inline var(--animation-speed-fast) var(--cubic-bezier);
 }
 
 .input-group label {

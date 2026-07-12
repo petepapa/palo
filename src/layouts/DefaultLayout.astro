@@ -637,8 +637,8 @@ const themeVariablesCss = `
   --launcher-font-size-md: clamp(0.8331rem, 0.8099rem + 0.1163vw, 0.9rem);
   --launcher-space-xs: clamp(0.25rem, 0.2283rem + 0.1087vw, 0.3125rem);
   --launcher-space-sm: clamp(0.5rem, 0.4783rem + 0.1087vw, 0.5625rem);
-  --launcher-animation-duration: 0.2s;
-  --launcher-animation-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --launcher-animation-duration: var(--animation-speed-fast);
+  --launcher-animation-timing: var(--cubic-bezier);
   font-size: ${typography.baseFontSize};
   --m-scale: ${mobileScale};
   --d-scale: ${desktopScale};
@@ -1715,7 +1715,7 @@ ${bodyLineHeights}
             var(--color-neutral-200, #e5e5e5) 75%
           );
           background-size: 200% 100%;
-          animation: toc-skeleton-shimmer 1.5s ease-in-out infinite;
+          animation: toc-skeleton-shimmer 1.5s linear infinite;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -1976,14 +1976,14 @@ ${bodyLineHeights}
           pointer-events: none;
           z-index: 999999;
           will-change: transform;
-          transition: width 0.15s cubic-bezier(0.4, 0, 0.9, 0.4), height 0.15s cubic-bezier(0.4, 0, 0.9, 0.4), opacity 0.2s ease-out;
+          transition: width var(--animation-speed-instant) var(--cubic-bezier), height var(--animation-speed-instant) var(--cubic-bezier), opacity var(--animation-speed-fast) var(--cubic-bezier);
           transform: translate3d(-100px, -100px, 0);
         }
 
         .palo-custom-cursor.is-hovering {
           width: 3rem;
           height: 3rem;
-          transition: width 0.3s cubic-bezier(0, 0, 0.2, 1), height 0.3s cubic-bezier(0, 0, 0.2, 1);
+          transition: width var(--animation-speed-medium) var(--cubic-bezier), height var(--animation-speed-medium) var(--cubic-bezier);
         }
 
         @media (hover: none) {
@@ -2001,7 +2001,7 @@ ${bodyLineHeights}
 
         @media (prefers-reduced-motion: reduce) {
           .palo-custom-cursor {
-            transition: width 0.1s linear, height 0.1s linear;
+            transition: width var(--animation-speed-instant) linear, height var(--animation-speed-instant) linear;
           }
         }
       </style>
@@ -2026,7 +2026,7 @@ ${bodyLineHeights}
         .markdown-content img:not(.progressive-img-inner),
         article img:not(.progressive-img-inner) {
           opacity: 0;
-          transition: opacity 0.5s ease-out !important;
+          transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;
         }
 
         .prose img:not(.progressive-img-inner).is-markdown-loaded,
@@ -2226,7 +2226,7 @@ ${bodyLineHeights}
           const startTransition = () => {
             content.style.transition = prefersReducedMotion
               ? 'none'
-              : 'max-height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)'
+              : 'max-height var(--animation-speed-medium) var(--cubic-bezier), opacity var(--animation-speed-medium) var(--cubic-bezier)'
           }
 
           const resetToClosedState = () => {
@@ -2450,17 +2450,50 @@ ${bodyLineHeights}
             var openModal = document.querySelector('.modal[open]:not(.closing)')
             if (openModal) {
               var self = this
-              window.paloCloseDialog(openModal)
+              var launcherOpened = false
+              function openLauncherNow() {
+                if (launcherOpened) return
+                launcherOpened = true
+                paloShowDialog(self)
+              }
+              // 使用包装后的 closeModal，确保 Modal 库状态正确清理
+              if (typeof window.closeModal === 'function') {
+                window.closeModal()
+              } else {
+                window.paloCloseDialog(openModal)
+              }
               // 等 modal 关闭动画结束后再打开 launcher
               openModal.addEventListener('animationend', function onCloseEnd(e) {
                 if (e.target !== openModal) return
                 openModal.removeEventListener('animationend', onCloseEnd)
-                paloShowDialog(self)
+                openLauncherNow()
               })
-              // 兜底：300ms 后强制打开（防止 animationend 不触发）
-              setTimeout(function() {
-                if (!self.open) paloShowDialog(self)
-              }, 300)
+              // 兜底：350ms 后强制打开（防止 animationend 不触发）
+              setTimeout(openLauncherNow, 350)
+              return
+            }
+          }
+
+          // 如果打开的是 modal，且当前有 launcher 打开，
+          // 先关闭 launcher，等动画结束后再打开 modal
+          if (this.classList.contains('modal')) {
+            var openLauncher = document.querySelector('.launcher[open]:not(.closing)')
+            if (openLauncher) {
+              var self2 = this
+              var modalOpened = false
+              function openModalNow() {
+                if (modalOpened) return
+                modalOpened = true
+                paloShowDialog(self2)
+              }
+              window.paloCloseDialog(openLauncher)
+              // 等 launcher 关闭后再打开 modal
+              openLauncher.addEventListener('close', function onLauncherClosed() {
+                openLauncher.removeEventListener('close', onLauncherClosed)
+                openModalNow()
+              })
+              // 兜底：400ms 后强制打开
+              setTimeout(openModalNow, 400)
               return
             }
           }
@@ -2478,6 +2511,8 @@ ${bodyLineHeights}
         window.paloCloseDialog = function(dialog, fallbackClose) {
           if (!dialog || dialog.classList.contains('closing')) return
           dialog.classList.add('closing')
+
+          paloFadeOutBackdrop(dialog)
 
           var finish = function() {
             dialog.classList.remove('closing')
@@ -2580,7 +2615,7 @@ ${bodyLineHeights}
               const mod = isMac ? e.metaKey : e.ctrlKey
               if (mod && e.key.toLowerCase() === 'k') {
                 const launcher = document.querySelector('.launcher[open]')
-                if (launcher) {
+                if (launcher && !launcher.classList.contains('closing')) {
                   e.preventDefault()
                   e.stopPropagation()
                   window.paloCloseDialog(launcher)

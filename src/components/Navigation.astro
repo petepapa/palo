@@ -448,9 +448,6 @@ const navStyle = [
   @use 'scss/base/breakpoint' as *;
 
   #main-navigation {
-    --mobile-menu-duration: 0.18s;
-    --mobile-menu-fade-duration: 0.14s;
-    --mobile-menu-easing: cubic-bezier(0.2, 0, 0, 1);
 
     display: flex;
     flex-direction: column;
@@ -487,8 +484,8 @@ const navStyle = [
       border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
       background-color: var(--background-color);
       transition:
-        height var(--mobile-menu-duration) var(--mobile-menu-easing),
-        opacity var(--mobile-menu-fade-duration) ease-out;
+        height var(--animation-speed-fast) var(--cubic-bezier),
+        opacity var(--animation-speed-instant) var(--cubic-bezier);
       padding-inline: var(--grid-gutter);
       padding-block-start: 0;
       padding-block-end: 0;
@@ -954,9 +951,9 @@ const navStyle = [
         word-break: break-word;
 
         transition:
-          opacity var(--animation-speed-fast) var(--cubic-bezier),
-          transform var(--animation-speed-fast) var(--cubic-bezier),
-          visibility 0s linear var(--animation-speed-fast);
+          opacity var(--animation-speed-medium) var(--cubic-bezier),
+          transform var(--animation-speed-medium) var(--cubic-bezier),
+          visibility 0s linear var(--animation-speed-medium);
       }
 
       > button.show ~ ul {
@@ -989,7 +986,7 @@ const navStyle = [
       overflow: hidden;
       will-change: height;
       transition:
-        height var(--mobile-menu-duration) var(--mobile-menu-easing);
+        height var(--animation-speed-fast) var(--cubic-bezier);
 
       a {
         inline-size: 100%;

@@ -265,8 +265,8 @@ const onImgReady =
     overflow: hidden;
     /* 使用 longhand 避免 transition 简写覆盖消费组件（如 PostCard/ProjectCard）注入的 transform transition */
     transition-property: background-color;
-    transition-duration: 0.4s;
-    transition-timing-function: ease-out;
+    transition-duration: var(--animation-speed-slow);
+    transition-timing-function: var(--cubic-bezier);
 
     /* 防线 ①：默认 / 正文流兜底 —— 用图片原始比例撑开占位块 */
     aspect-ratio: var(--img-original-ratio, 16 / 9);
@@ -321,7 +321,7 @@ const onImgReady =
     height: 100%;
     z-index: 1;
     opacity: 0;
-    transition: opacity 0.45s ease-out !important;
+    transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;
   }
 
   .progressive-img-inner img,

@@ -301,7 +301,7 @@ const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined 
         max-block-size: calc(100vh - var(--space-l));
         overflow-x: hidden;
         overflow-y: auto;
-        transition: inset-block-start 0.6s cubic-bezier(0.075, 0.82, 0.165, 1);
+        transition: inset-block-start var(--animation-speed-slow) var(--cubic-bezier);
       }
     }
 

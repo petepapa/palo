@@ -9,7 +9,7 @@
  * - Outline: transparent bg, theme-driven text (black/white), type-specific border
  * - Hover (solid): swap background-color ↔ color
  * - Hover (outlined): bg becomes border color, text becomes white
- * - Smooth transition: background 0.3s ease, color 0.3s ease
+ * - Smooth transition: background/color/border-color use --animation-speed-medium + --cubic-bezier
  */
 
 /* ============================================================
@@ -73,7 +73,10 @@ button.button .button-content {
    ============================================================ */
 
 :where(.button) {
-  transition: background 0.3s ease, color 0.3s ease !important;
+  transition:
+    background var(--animation-speed-medium) var(--cubic-bezier),
+    color var(--animation-speed-medium) var(--cubic-bezier),
+    border-color var(--animation-speed-medium) var(--cubic-bezier) !important;
 }
 
 /* ============================================================

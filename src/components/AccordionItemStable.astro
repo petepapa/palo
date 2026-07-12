@@ -154,7 +154,7 @@ const panelId = `${uid}-panel`
         content.style.transition = 'none'
       } else {
         content.style.transition =
-          'max-height 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.3s cubic-bezier(0.165, 0.84, 0.44, 1)'
+          'max-height var(--animation-speed-medium) var(--cubic-bezier), opacity var(--animation-speed-medium) var(--cubic-bezier)'
       }
 
       if (wrapper.dataset.open === 'true') {
@@ -234,8 +234,8 @@ const panelId = `${uid}-panel`
 <style>
   @layer components {
     :where(.wrapper) {
-      --transition-duration: 0.3s;
-      --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
+      --transition-duration: var(--animation-speed-medium);
+      --transition-easing: var(--cubic-bezier);
 
       border-block-start: var(--border-width-accordion, 2px) solid light-dark(hsl(0 0% 13%), hsl(0 0% 87%));
       padding-block: 0;
@@ -310,7 +310,7 @@ const panelId = `${uid}-panel`
       transform: translateY(-50%);
       inset-block-start: 50%;
       inset-inline-start: 50%;
-      transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+      transition: all var(--animation-speed-medium) var(--cubic-bezier);
     }
 
     :where(.icon-chevron) {
@@ -318,7 +318,7 @@ const panelId = `${uid}-panel`
     }
 
     :where(.icon-chevron svg) {
-      transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+      transition: transform var(--animation-speed-medium) var(--cubic-bezier);
     }
 
     :where(.content a) {

@@ -129,9 +129,9 @@ const mediaBgStyle = `background-color: ${bgColor};`
     :global(.project-card__image.progressive-img-container) {
       display: block;
       transition:
-        background-color 0.4s ease-out,
-        transform var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease),
-        filter var(--animation-speed-slow, 500ms) var(--cubic-bezier, ease) !important;
+        background-color var(--animation-speed-slow) var(--cubic-bezier),
+        transform var(--animation-speed-slow) var(--cubic-bezier),
+        filter var(--animation-speed-slow) var(--cubic-bezier) !important;
       inline-size: 100%;
       block-size: 100%;
       object-fit: cover;
@@ -140,7 +140,7 @@ const mediaBgStyle = `background-color: ${bgColor};`
 
       .project-card__title {
         margin: 0;
-        transition: color 300ms ease;
+        transition: color var(--animation-speed-medium) var(--cubic-bezier);
         color: inherit;
         font-size: var(--text-lg, 1.125rem);
         line-height: var(--text-lg--line-height, 1.25);
@@ -245,8 +245,8 @@ const mediaBgStyle = `background-color: ${bgColor};`
         opacity: 0;
         transform: translateY(0.5rem);
         transition:
-          opacity var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease),
-          transform var(--animation-speed-fast, 200ms) var(--cubic-bezier, ease);
+          opacity var(--animation-speed-fast) var(--cubic-bezier),
+          transform var(--animation-speed-fast) var(--cubic-bezier);
         border-radius: inherit;
         background: linear-gradient(to top, rgb(0 0 0 / 0.9), rgb(0 0 0 / 0.45), transparent);
         padding: clamp(1rem, 4vw, 1.5rem);

@@ -164,7 +164,7 @@ const { fields, dynamicSections } = contactFormConfig
   /* ── 3. 修复 Textarea 标题与 Placeholder 重合 ── */
   #contact-form .textarea-group textarea::placeholder {
     color: transparent;
-    transition: color 0.2s ease;
+    transition: color var(--animation-speed-fast) var(--cubic-bezier);
   }
   #contact-form .textarea-group textarea:focus::placeholder {
     color: color-mix(in oklab, var(--foreground-color) 50%, transparent);

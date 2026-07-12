@@ -83,9 +83,9 @@
     // ── 4. TOC 专属：释放轻量工业阻尼过渡动画 ──────────────────────
     &[data-context='toc'] a {
       transition:
-        color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        text-decoration-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-        font-weight 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        color var(--animation-speed-fast) var(--cubic-bezier),
+        text-decoration-color var(--animation-speed-fast) var(--cubic-bezier),
+        font-weight var(--animation-speed-instant) var(--cubic-bezier);
     }
 
     // ── 5. Hover / Focus：展示下划线 ──────────────────────────────

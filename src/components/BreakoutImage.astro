@@ -153,8 +153,8 @@ const containerInlineStyle = [
 ---
 
 <div
-  class:list={['relative', 'my-8', 'breakout-image-container', 'overflow-hidden', 'transition-colors', 'duration-500', 'ease-out']}
-  style={containerInlineStyle || undefined}
+  class:list={['relative', 'my-8', 'breakout-image-container', 'overflow-hidden']}
+  style={(containerInlineStyle || '') + 'transition-property: background-color, aspect-ratio; transition-duration: var(--animation-speed-slow); transition-timing-function: var(--cubic-bezier);'}
   data-layout={resolvedLayout}
   data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
 >
@@ -163,7 +163,8 @@ const containerInlineStyle = [
       src={imageSrc}
       alt={altText}
       widths={[560, 840, 1120, 1400, 1680]}
-      class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0 transition-opacity duration-500 ease-out']}
+      class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0']}
+      style="transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;"
       loading="lazy"
       decoding="async"
       onload="this.setAttribute('data-loaded','true');var c=this.closest('.breakout-image-container');this.classList.remove('opacity-0');if(c){c.setAttribute('data-loaded','true')}"
@@ -172,10 +173,11 @@ const containerInlineStyle = [
     <img
       src={imageSrc}
       alt={altText}
-      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-out']}
+      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0']}
+      style="transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;"
       loading="eager"
       decoding="async"
-      onload="var i=this;i.setAttribute('data-loaded','true');i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c){c.setAttribute('data-loaded','true');var w=i.naturalWidth;var h=i.naturalHeight;if(w&&h){c.style.transition='aspect-ratio .4s';c.style.aspectRatio=w+' / '+h}}"
+      onload="var i=this;i.setAttribute('data-loaded','true');i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c){c.setAttribute('data-loaded','true');var w=i.naturalWidth;var h=i.naturalHeight;if(w&&h){c.style.transition='aspect-ratio var(--animation-speed-slow) var(--cubic-bezier), background-color var(--animation-speed-slow) var(--cubic-bezier)';c.style.aspectRatio=w+' / '+h}}"
     />
   )}
   <style is:global>
@@ -287,7 +289,7 @@ const containerInlineStyle = [
         var w = img.naturalWidth;
         var h = img.naturalHeight;
         if (w && h) {
-          container.style.transition = 'aspect-ratio .4s';
+          container.style.transition = 'aspect-ratio var(--animation-speed-slow) var(--cubic-bezier)';
           container.style.aspectRatio = w + ' / ' + h;
         }
       } else {
@@ -299,7 +301,7 @@ const containerInlineStyle = [
           var w = img.naturalWidth;
           var h = img.naturalHeight;
           if (w && h) {
-            container.style.transition = 'aspect-ratio .4s';
+            container.style.transition = 'aspect-ratio var(--animation-speed-slow) var(--cubic-bezier)';
             container.style.aspectRatio = w + ' / ' + h;
           }
         });

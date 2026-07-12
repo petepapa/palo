@@ -169,7 +169,9 @@ const sectionStyle = {
       /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */
       background-color: var(--section-bg, transparent);
       color: var(--section-color, var(--color-default-text));
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition:
+        background-color var(--animation-speed-medium) var(--cubic-bezier),
+        color var(--animation-speed-medium) var(--cubic-bezier);
     }
 
     .creative-section.has-fixed-background {

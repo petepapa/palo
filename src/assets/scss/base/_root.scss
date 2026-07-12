@@ -157,10 +157,15 @@
 
   --animation-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
   --cubic-bezier: var(--animation-timing);
+  --animation-easing: var(--animation-timing);
   --animation-speed-slow: 0.4s;
   --animation-speed-medium: 0.3s;
   --animation-speed-fast: 0.2s;
   --animation-speed-instant: 0.1s;
+
+  /* Accessible Astro Components library aliases — keep library animations in sync with project tokens */
+  --transition-duration: var(--animation-speed-fast);
+  --transition-easing: var(--cubic-bezier);
 
   --line-clamp: 3;
   --target-size-min: 24px;

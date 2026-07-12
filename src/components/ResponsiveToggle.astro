@@ -169,7 +169,7 @@ const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
         const speedY = timeDiff > 0 ? finalDiffY / timeDiff : 0
 
         // 恢复过渡动画
-        mobileNavigation.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+        mobileNavigation.style.transition = 'transform var(--animation-speed-slow) var(--cubic-bezier)'
 
         // 阈值判定：拖拽距离 > 80px 或 爆发速度 > 0.5 px/ms
         if (pullDistance > 80 || speedY > 0.5) {
@@ -272,9 +272,9 @@ const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
         background-color: var(--foreground-color);
         border-radius: 2px;
         transition:
-          translate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
-          rotate 0.25s cubic-bezier(0.165, 0.84, 0.44, 1),
-          opacity 0.2s ease-out;
+          translate var(--animation-speed-medium) var(--cubic-bezier),
+          rotate var(--animation-speed-medium) var(--cubic-bezier),
+          opacity var(--animation-speed-fast) var(--cubic-bezier);
         transform-origin: center;
       }
 

@@ -39,8 +39,8 @@ const resolvedTopNavigationTheme =
     backdrop-filter: blur(var(--header-bg-blur, 12px));
     -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
     transition:
-      background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
-      backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+      background-color var(--animation-speed-fast) var(--cubic-bezier),
+      backdrop-filter var(--animation-speed-fast) var(--cubic-bezier);
   }
 
   html:not([data-css-ready="true"]) header {
@@ -301,8 +301,8 @@ const resolvedTopNavigationTheme =
     backdrop-filter: blur(var(--header-bg-blur, 12px));
     -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
     transition:
-      background-color 0.18s cubic-bezier(0.2, 0, 0, 1),
-      backdrop-filter 0.18s cubic-bezier(0.2, 0, 0, 1);
+      background-color var(--animation-speed-fast) var(--cubic-bezier),
+      backdrop-filter var(--animation-speed-fast) var(--cubic-bezier);
   }
 
   html:not([data-css-ready="true"]) header {
