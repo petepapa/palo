@@ -120,6 +120,7 @@ const seoTitleTemplate =
   isHomeWithoutExplicitTitle && hasMetadataTitle ? undefined : !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
 const defaultTheme = themeConfig.site.defaultTheme ?? 'auto'
 const darkModeToggle = themeConfig.site.darkModeToggle
+const enableCustomCursor = themeConfig.site.enableCustomCursor ?? false
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -809,6 +810,15 @@ ${bodyLineHeights}
         // Keep the static light theme if browser storage or media queries are unavailable.
       }
     </script>
+
+    {enableCustomCursor && (
+      <script is:inline>
+        document.documentElement.classList.add('has-custom-cursor')
+        document.addEventListener('astro:after-swap', function () {
+          document.documentElement.classList.add('has-custom-cursor')
+        })
+      </script>
+    )}
 
     <!-- ═══════════════════════════════════════════════════════════════
          Anti-FOUC Shield / 刚性尺寸锚定版
@@ -1943,8 +1953,68 @@ ${bodyLineHeights}
         }
       }
     </style>
+
+    {enableCustomCursor && (
+      <style is:global>
+        html.has-custom-cursor,
+        html.has-custom-cursor *,
+        html.has-custom-cursor *::before,
+        html.has-custom-cursor *::after {
+          cursor: none !important;
+        }
+
+        .palo-custom-cursor {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+          background-color: #ffffff;
+          mix-blend-mode: difference;
+          pointer-events: none;
+          z-index: 999999;
+          will-change: transform;
+          transition: width 0.15s cubic-bezier(0.4, 0, 0.9, 0.4), height 0.15s cubic-bezier(0.4, 0, 0.9, 0.4), opacity 0.2s ease-out;
+          transform: translate3d(-100px, -100px, 0);
+        }
+
+        .palo-custom-cursor.is-hovering {
+          width: 3rem;
+          height: 3rem;
+          transition: width 0.3s cubic-bezier(0, 0, 0.2, 1), height 0.3s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        @media (hover: none) {
+          .palo-custom-cursor {
+            display: none !important;
+          }
+
+          html.has-custom-cursor,
+          html.has-custom-cursor *,
+          html.has-custom-cursor *::before,
+          html.has-custom-cursor *::after {
+            cursor: auto !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .palo-custom-cursor {
+            transition: width 0.1s linear, height 0.1s linear;
+          }
+        }
+      </style>
+    )}
   </head>
   <body>
+    {enableCustomCursor && (
+      <>
+        <div class="palo-custom-cursor" aria-hidden="true"></div>
+        <noscript>
+          <style>.palo-custom-cursor { display: none !important; }</style>
+        </noscript>
+      </>
+    )}
     <Header topNavigationTheme={topNavigationTheme} />
     <main id="main-content" transition:animate="fade" style={`padding-top: ${mainPaddingTop} !important;`}>
       <slot />
@@ -2313,100 +2383,152 @@ ${bodyLineHeights}
     </script>
     <script is:inline>
       /**
-       * Modal 淡出动画
-       * 拦截组件原生 closeModal，先播放 .closing 动画再真正关闭
-       * Escape 由 capture 阶段 keydown 统一处理（见下方）
+       * 全局拦截 showModal / close：统一使用 show() + 自定义 backdrop
+       * 在 HTMLDialogElement.prototype 层面重写，确保任何 dialog 都无法绕过，
+       * 避免原生 ::backdrop 与自定义 backdrop 叠加导致背景过暗。
        */
-      let __origCloseModal = null
+      ;(function() {
+        if (window.__paloShowModalPatched) return
+        window.__paloShowModalPatched = true
 
-      function paloInitModalAnimation() {
-        const dialogs = document.querySelectorAll('.modal')
-        if (!dialogs.length) return
+        var originalShowModal = HTMLDialogElement.prototype.showModal
+        var originalShow = HTMLDialogElement.prototype.show
+        var originalClose = HTMLDialogElement.prototype.close
 
-        // 保存原始 closeModal（Escape 和后续使用）
-        if (typeof window.closeModal === 'function' && !__origCloseModal) {
-          __origCloseModal = window.closeModal
+        function paloGetBackdropClass(dialog) {
+          if (dialog.classList.contains('launcher')) return 'palo-dialog-backdrop--launcher'
+          if (dialog.classList.contains('modal')) return 'palo-dialog-backdrop--modal'
+          return 'palo-dialog-backdrop--default'
         }
 
-        // 包装全局 closeModal（关闭按钮 + 遮罩点击）
-        if (typeof window.closeModal === 'function') {
-          const origClose = window.closeModal
-          window.closeModal = () =>
-            closeWithAnimation(document.querySelector('.modal[open]'), origClose)
+        function paloEnsureBackdrop(dialog) {
+          if (dialog._paloBackdrop) return dialog._paloBackdrop
+          var backdrop = document.createElement('div')
+          backdrop.className = 'palo-dialog-backdrop ' + paloGetBackdropClass(dialog)
+          backdrop.setAttribute('aria-hidden', 'true')
+          document.body.appendChild(backdrop)
+          dialog._paloBackdrop = backdrop
+          backdrop.addEventListener('click', function() {
+            window.paloCloseDialog(dialog)
+          })
+          return backdrop
         }
 
-        // 处理每个 Modal
-        dialogs.forEach((dialog) => {
-          // 监听 cancel 事件防止原生关闭行为
-          dialog.addEventListener('cancel', (e) => {
-            e.preventDefault()
-          }, { capture: true })
-
-          // 监听原生 open 方法，在打开前清理 closing 类
-          const originalShowModal = dialog.showModal.bind(dialog)
-          dialog.showModal = function() {
-            dialog.classList.remove('closing')
-            originalShowModal()
+        function paloFadeOutBackdrop(dialog) {
+          if (!dialog._paloBackdrop) return
+          var backdrop = dialog._paloBackdrop
+          dialog._paloBackdrop = null
+          backdrop.classList.remove('is-visible')
+          var removed = false
+          function removeIt() {
+            if (removed) return
+            removed = true
+            if (backdrop.parentNode) backdrop.remove()
           }
-        })
-      }
-
-      function closeWithAnimation(dialog, fallbackClose) {
-        if (!dialog || dialog.classList.contains('closing')) return
-
-        dialog.classList.add('closing')
-
-        const finish = () => {
-          dialog.classList.remove('closing')
-          if (fallbackClose) fallbackClose()
-          else dialog.close()
+          backdrop.addEventListener('animationend', removeIt, { once: true })
+          setTimeout(removeIt, 300)
         }
 
-        // 只监听 dialog 自身 fade-out，忽略 ::backdrop 冒泡上来的 animationend
-        dialog.addEventListener('animationend', (e) => {
-          if (e.target === dialog) finish()
-        }, { once: true })
-        // fallback：确保动画异常时也能关闭
-        setTimeout(finish, 300)
-      }
+        function paloShowDialog(dialog) {
+          dialog.classList.remove('closing')
+          document.body.appendChild(dialog)
+          var backdrop = paloEnsureBackdrop(dialog)
+          backdrop.offsetHeight
+          backdrop.classList.add('is-visible')
+          return originalShow.apply(dialog)
+        }
 
-      document.addEventListener('astro:page-load', paloInitModalAnimation)
-      document.addEventListener('astro:after-swap', paloInitModalAnimation)
-      paloInitModalAnimation()
+        HTMLDialogElement.prototype.showModal = function() {
+          if (arguments.length > 0 && arguments[0] === '__paloNative__') {
+            return originalShowModal.apply(this, Array.prototype.slice.call(arguments, 1))
+          }
+
+          // 如果打开的是 launcher，且当前有 modal 打开，
+          // 先关闭 modal，等动画结束后再打开 launcher
+          if (this.classList.contains('launcher')) {
+            var openModal = document.querySelector('.modal[open]:not(.closing)')
+            if (openModal) {
+              var self = this
+              window.paloCloseDialog(openModal)
+              // 等 modal 关闭动画结束后再打开 launcher
+              openModal.addEventListener('animationend', function onCloseEnd(e) {
+                if (e.target !== openModal) return
+                openModal.removeEventListener('animationend', onCloseEnd)
+                paloShowDialog(self)
+              })
+              // 兜底：300ms 后强制打开（防止 animationend 不触发）
+              setTimeout(function() {
+                if (!self.open) paloShowDialog(self)
+              }, 300)
+              return
+            }
+          }
+
+          return paloShowDialog(this)
+        }
+
+        HTMLDialogElement.prototype.close = function() {
+          var result = originalClose.apply(this, arguments)
+          paloFadeOutBackdrop(this)
+          return result
+        }
+
+        // 通用关闭动画函数（Modal + Launcher 共用）
+        window.paloCloseDialog = function(dialog, fallbackClose) {
+          if (!dialog || dialog.classList.contains('closing')) return
+          dialog.classList.add('closing')
+
+          var finish = function() {
+            dialog.classList.remove('closing')
+            if (fallbackClose) fallbackClose()
+            else dialog.close()
+          }
+          var done = false
+          dialog.addEventListener('animationend', function(e) {
+            if (done || e.target !== dialog) return
+            done = true
+            finish()
+          }, { once: true })
+          setTimeout(function() {
+            if (!done) {
+              done = true
+              finish()
+            }
+          }, 300)
+        }
+      })()
     </script>
     <script is:inline>
       /**
-       * Launcher 淡入淡出动画
-       * 使用 capture 阶段拦截全部关闭路径（关闭按钮、遮罩、Cmd+K），
+       * Modal + Launcher 淡入淡出动画
+       * 使用 capture 阶段拦截全部关闭路径（关闭按钮、遮罩、快捷键），
        * 先播放 .closing 动画再真正 close。
        * Escape 由 capture 阶段 keydown 统一处理（见下方）。
        * Safari 兼容：capture 事件、keydown、keyframes—均广泛支持。
        */
-      function paloInitLauncherAnimation() {
-        const dialogs = document.querySelectorAll('.launcher')
+
+      // 通用 dialog 动画初始化（Modal + Launcher 共用）
+      function paloInitDialogAnimation(selector, closeBtnSelector, boundFlag) {
+        const dialogs = document.querySelectorAll(selector)
         if (!dialogs.length) return
 
         dialogs.forEach((dialog) => {
+          if (dialog.dataset[boundFlag]) return
+          dialog.dataset[boundFlag] = '1'
+
           // 监听 cancel 事件防止原生关闭行为
           dialog.addEventListener('cancel', (e) => {
             e.preventDefault()
           }, { capture: true })
 
-          // 监听原生 open 方法，在打开前清理 closing 类
-          const originalShowModal = dialog.showModal.bind(dialog)
-          dialog.showModal = function() {
-            dialog.classList.remove('closing')
-            originalShowModal()
-          }
-
           // 1) 关闭按钮 — capture 阶段拦截，阻止组件 bubbling handler
-          const closeBtn = dialog.querySelector('.close')
+          const closeBtn = dialog.querySelector(closeBtnSelector)
           if (closeBtn) {
             closeBtn.addEventListener(
               'click',
               (e) => {
                 e.stopPropagation()
-                closeLauncher(dialog)
+                window.paloCloseDialog(dialog)
               },
               { capture: true },
             )
@@ -2418,46 +2540,60 @@ ${bodyLineHeights}
             (e) => {
               if (e.target === dialog) {
                 e.stopPropagation()
-                closeLauncher(dialog)
+                window.paloCloseDialog(dialog)
               }
             },
             { capture: true },
           )
         })
-
-        // 3) Cmd+K / Ctrl+K 快捷键 — capture 阶段提前拦截
-        document.addEventListener(
-          'keydown',
-          (e) => {
-            const isMac = navigator.userAgent.toLowerCase().includes('mac')
-            const mod = isMac ? e.metaKey : e.ctrlKey
-            if (mod && e.key.toLowerCase() === 'k') {
-              const launcher = document.querySelector('.launcher[open]')
-              if (launcher) {
-                e.preventDefault()
-                e.stopPropagation()
-                closeLauncher(launcher)
-              }
-            }
-          },
-          { capture: true },
-        )
       }
 
-      function closeLauncher(dialog) {
-        if (!dialog || dialog.classList.contains('closing')) return
-        dialog.classList.add('closing')
+      function paloInitModalAnimation() {
+        const dialogs = document.querySelectorAll('.modal')
+        if (!dialogs.length) return
 
-        const finish = () => {
-          dialog.classList.remove('closing')
-          dialog.close()
+        // 保存并包装全局 closeModal（只执行一次）
+        if (typeof window.closeModal === 'function' && !window.__paloOrigCloseModal) {
+          window.__paloOrigCloseModal = window.closeModal
+          const origClose = window.closeModal
+          window.closeModal = () =>
+            window.paloCloseDialog(document.querySelector('.modal[open]'), origClose)
         }
-        // 只监听 dialog 自身 fade-out，忽略 ::backdrop 冒泡上来的 animationend
-        dialog.addEventListener('animationend', (e) => {
-          if (e.target === dialog) finish()
-        }, { once: true })
-        setTimeout(finish, 300)
+
+        paloInitDialogAnimation('.modal', '.modal-close button', 'paloModalBound')
       }
+
+      function paloInitLauncherAnimation() {
+        const dialogs = document.querySelectorAll('.launcher')
+        if (!dialogs.length) return
+
+        paloInitDialogAnimation('.launcher', '.close', 'paloLauncherBound')
+
+        // Cmd+K / Ctrl+K 快捷键 — capture 阶段提前拦截（只注册一次）
+        if (!window.__paloLauncherKeyBound) {
+          window.__paloLauncherKeyBound = true
+          document.addEventListener(
+            'keydown',
+            (e) => {
+              const isMac = navigator.userAgent.toLowerCase().includes('mac')
+              const mod = isMac ? e.metaKey : e.ctrlKey
+              if (mod && e.key.toLowerCase() === 'k') {
+                const launcher = document.querySelector('.launcher[open]')
+                if (launcher) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  window.paloCloseDialog(launcher)
+                }
+              }
+            },
+            { capture: true },
+          )
+        }
+      }
+
+      document.addEventListener('astro:page-load', paloInitModalAnimation)
+      document.addEventListener('astro:after-swap', paloInitModalAnimation)
+      paloInitModalAnimation()
 
       document.addEventListener('astro:page-load', paloInitLauncherAnimation)
       document.addEventListener('astro:after-swap', paloInitLauncherAnimation)
@@ -2478,7 +2614,7 @@ ${bodyLineHeights}
           if (launcher && !launcher.classList.contains('closing')) {
             e.preventDefault()
             e.stopPropagation()
-            closeLauncher(launcher)
+            window.paloCloseDialog(launcher)
             return
           }
 
@@ -2487,7 +2623,7 @@ ${bodyLineHeights}
           if (modal && !modal.classList.contains('closing')) {
             e.preventDefault()
             e.stopPropagation()
-            closeWithAnimation(modal, __origCloseModal)
+            window.paloCloseDialog(modal, window.__paloOrigCloseModal)
           }
         },
         { capture: true },
@@ -2519,7 +2655,7 @@ ${bodyLineHeights}
 
         html,
         body {
-          height: 100%;
+          min-height: 100%;
           overflow-x: clip;
         }
 
@@ -2551,8 +2687,6 @@ ${bodyLineHeights}
     </style>
 
     <script>
-      const MODAL_CLOSING_DURATION = 250
-
       const easeOutExpo = (t: number): number => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
 
       const calculateDuration = (distance: number): number => {
@@ -2634,59 +2768,6 @@ ${bodyLineHeights}
         })
       }
 
-      const animateAndCloseModal = (modal: HTMLDialogElement) => {
-        if (modal.classList.contains('closing')) return
-        modal.classList.add('closing')
-        setTimeout(() => {
-          modal.close()
-          modal.classList.remove('closing')
-        }, MODAL_CLOSING_DURATION)
-      }
-
-      const setupModalClosingAnimation = () => {
-        document.addEventListener(
-          'cancel',
-          (e) => {
-            const target = e.target
-            if (target instanceof HTMLDialogElement && target.classList.contains('modal')) {
-              e.preventDefault()
-              animateAndCloseModal(target)
-            }
-          },
-          { capture: true },
-        )
-
-        document.addEventListener(
-          'click',
-          (e) => {
-            const target = e.target
-            if (!(target instanceof Element)) return
-            const modalEl = target.closest('dialog.modal')
-            if (!(modalEl instanceof HTMLDialogElement)) return
-            const modal = modalEl as HTMLDialogElement
-            if (!modal.open) return
-
-            if (target.closest('.modal-close button')) {
-              e.stopPropagation()
-              animateAndCloseModal(modal)
-              return
-            }
-
-            if (target === modal) {
-              e.stopPropagation()
-              animateAndCloseModal(modal)
-            }
-          },
-          { capture: true },
-        )
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', setupModalClosingAnimation)
-      } else {
-        setupModalClosingAnimation()
-      }
-
       document.addEventListener('astro:page-load', initHashScroll)
       document.addEventListener('astro:after-swap', initHashScroll)
       if (document.readyState !== 'loading') {
@@ -2762,5 +2843,112 @@ ${bodyLineHeights}
         initElasticSidebarScroll()
       }
     </script>
+
+    {enableCustomCursor && (
+      <script is:inline>
+        (function () {
+          var targetX = window.innerWidth / 2
+          var targetY = window.innerHeight / 2
+          var currentX = targetX
+          var currentY = targetY
+          var rafId = null
+          var isHovering = false
+
+          var HOVER_SELECTOR = 'a, button, .clickable, [role="button"], summary, label, input[type="checkbox"], input[type="radio"]'
+
+          // 检测 Safari：只有 Safari 的 position:fixed 在 pinch-zoom 时
+          // 相对于 layout viewport 定位，需要 visualViewport offset 补偿
+          // Chrome/Firefox 的 fixed 相对于 visual viewport，直接用 clientX/Y 即可
+          var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+
+          function getCursor() {
+            return document.querySelector('.palo-custom-cursor')
+          }
+
+          // 获取 visualViewport 偏移（仅 Safari 需要）
+          function getViewportOffset() {
+            if (!isSafari || !window.visualViewport) return { offsetX: 0, offsetY: 0 }
+            var vv = window.visualViewport
+            return { offsetX: vv.offsetLeft, offsetY: vv.offsetTop }
+          }
+
+          function update() {
+            var cursor = getCursor()
+            if (!cursor) {
+              rafId = null
+              return
+            }
+
+            currentX += (targetX - currentX) * 0.5
+            currentY += (targetY - currentY) * 0.5
+
+            var vp = getViewportOffset()
+            var x = currentX + vp.offsetX
+            var y = currentY + vp.offsetY
+
+            cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)'
+
+            if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
+              rafId = requestAnimationFrame(update)
+            } else {
+              rafId = null
+            }
+          }
+
+          function scheduleUpdate() {
+            if (rafId === null) {
+              rafId = requestAnimationFrame(update)
+            }
+          }
+
+          function onMouseMove(e) {
+            targetX = e.clientX
+            targetY = e.clientY
+            scheduleUpdate()
+          }
+
+          function onMouseOver(e) {
+            var target = e.target
+            if (!(target instanceof Element)) return
+            var interactive = target.closest(HOVER_SELECTOR)
+            if (isHovering !== !!interactive) {
+              isHovering = !!interactive
+              var cursor = getCursor()
+              if (cursor) cursor.classList.toggle('is-hovering', isHovering)
+            }
+          }
+
+          // Safari 缩放/滚动时立即重新定位，避免指针停留在旧位置
+          function onViewportChange() {
+            scheduleUpdate()
+          }
+
+          function init() {
+            var cursor = getCursor()
+            if (!cursor) return
+
+            targetX = currentX = window.innerWidth / 2
+            targetY = currentY = window.innerHeight / 2
+
+            var vp = getViewportOffset()
+            var x = currentX + vp.offsetX
+            var y = currentY + vp.offsetY
+            cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)'
+          }
+
+          document.addEventListener('mousemove', onMouseMove, { passive: true })
+          document.addEventListener('mouseover', onMouseOver)
+
+          // 只在 Safari 中监听 visualViewport 变化（pinch-zoom 补偿）
+          if (isSafari && window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onViewportChange)
+            window.visualViewport.addEventListener('scroll', onViewportChange)
+          }
+
+          init()
+          document.addEventListener('astro:page-load', init)
+        })()
+      </script>
+    )}
   </body>
 </html>

@@ -107,6 +107,7 @@ export interface SiteConfig {
   launcher: false | true | 'default' | 'gradientBorder'
   backToTop?: boolean
   backToTopText?: string
+  enableCustomCursor?: boolean
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }
