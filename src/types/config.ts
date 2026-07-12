@@ -239,7 +239,7 @@ export interface PortfolioTypePageConfig {
   columns?: PortfolioColumns
 }
 
-export interface PortfolioTagPageConfig {}
+export type PortfolioTagPageConfig = Record<string, never>
 
 export interface PortfolioFeaturedComponentConfig {
   limit: number

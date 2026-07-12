@@ -36,8 +36,8 @@ function resolveImagePath(imageInput: unknown): string | null {
     // ── 形态 1: Astro ESM 图片导入对象 ──
     if (isAstroImageModule(imageInput)) {
       // 1. 优先从 internal 的 fsPath 属性读取（Vite/Astro 在开发和构建时都会为 ESM 导入资产附加此属性）
-      if ('fsPath' in imageInput && typeof (imageInput as any).fsPath === 'string') {
-        const fsPath = (imageInput as any).fsPath
+      if ('fsPath' in imageInput && typeof imageInput.fsPath === 'string') {
+        const fsPath = imageInput.fsPath
         const absoluteFsPath = path.isAbsolute(fsPath) ? fsPath : path.resolve(process.cwd(), fsPath)
         if (fs.existsSync(absoluteFsPath)) {
           return absoluteFsPath

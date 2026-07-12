@@ -553,8 +553,9 @@ export function validateConfig(config: unknown): void {
 
     // Add contextual hints for common mistakes
     if (code === 'invalid_type') {
-      const received = (issue as any).received
-      const expected = (issue as any).expected
+      const zIssue = issue as { received?: string; expected?: string }
+      const received = zIssue.received
+      const expected = zIssue.expected
       message = `Expected ${expected}, received ${received}`
     }
 

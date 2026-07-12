@@ -34,14 +34,12 @@ const safeDateField = z
 
 /**
  * glob loader 配置说明：
- * - pattern: '**/[^_]*.{md,mdx}' 
- *   - `**/` 递归匹配所有子目录
- *   - `[^_]*` 排除以 _ 开头的文件（草稿文件）
- *   - `.{md,mdx}` 匹配 md 和 mdx 文件
- *   
+ * - pattern: 递归匹配所有子目录下，非 _ 开头的 .md/.mdx 文件
+ *   （排除草稿文件，支持 md 和 mdx 格式）
+ *
  * - base: './src/content/posts' / './src/content/projects'
  *   - 指定 collection 的根目录
- *   
+ *
  * 此配置完美兼容：
  *   1. 单文件模式：src/content/posts/my-post.md
  *   2. 文件夹模式：src/content/posts/my-post/index.mdx

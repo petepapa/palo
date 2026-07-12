@@ -23,6 +23,7 @@ export default [
       globals: {
         ...globals.node,
         ...globals.browser,
+        __PALO_TRAILING_SLASH__: 'readonly',
       },
       ecmaVersion: 'latest',
       sourceType: 'module',

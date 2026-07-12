@@ -43,22 +43,6 @@ function getLuminance(hex: string): number {
 }
 
 /**
- * 系统 neutral 色阶定义（HEX 参考值）
- * 实际使用时以 CSS 变量为准，这里用于亮度计算参考
- *
- * neutral-200: 95% 明度（浅色）
- * neutral-300: 90% 明度
- * neutral-700: 40% 明度（深色）
- * neutral-800: 30% 明度
- */
-const NEUTRAL_LUMINANCE = {
-  200: 0.88,
-  300: 0.78,
-  700: 0.28,
-  800: 0.18,
-}
-
-/**
  * 亮度分界阈值
  * 当主色调亮度 < 0.5 时认为是深色，反之是浅色
  */

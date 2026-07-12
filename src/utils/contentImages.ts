@@ -314,7 +314,7 @@ export interface SmartRenderOptions {
 }
 
 export async function smartRender(
-  entry: CollectionEntry<any>,
+  entry: CollectionEntry<ContentCollection>,
   options: SmartRenderOptions = {},
 ): Promise<RenderResult & { renderProps?: Record<string, unknown> }> {
   const {
@@ -354,7 +354,7 @@ export async function smartRender(
   throw lastError!
 }
 
-async function cleanupContentCache(collection: string, entryId: string): Promise<void> {
+async function cleanupContentCache(_collection: string, _entryId: string): Promise<void> {
   try {
     if (typeof window !== 'undefined') {
       const links = document.querySelectorAll('link[rel="stylesheet"], script[src]')

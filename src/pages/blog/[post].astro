@@ -110,13 +110,7 @@ try {
   fallbackHtml = getFallbackContentHtml(postId, renderError, isDev)
 }
 
-const { title, description, author, publishDate } = postEntry.data
-
-const formattedDate = publishDate?.toLocaleDateString('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
-})
+const { title, description, author } = postEntry.data
 
 const authorInfo = typeof author === 'object'
   ? {

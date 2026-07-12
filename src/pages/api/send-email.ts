@@ -82,12 +82,12 @@ export const POST: APIRoute = async ({ request }) => {
   //   2. process.env  RESEND_API_KEY          (Vercel runtime)
   //   3. import.meta.env  RESEND_API_KEY       (Astro/Vite fallback)
   // ═══════════════════════════════════════════════════════════════
-  const contact: ContactConfig | undefined = (config as any).contact
+  const contact: ContactConfig | undefined = config.contact
 
   const yamlKey = contact?.resendApiKey || ''
   const procKey =
-    typeof process !== 'undefined' ? (process.env as any)?.RESEND_API_KEY || '' : ''
-  const viteKey = (import.meta.env as any).RESEND_API_KEY || ''
+    typeof process !== 'undefined' ? process.env?.RESEND_API_KEY || '' : ''
+  const viteKey = import.meta.env.RESEND_API_KEY || ''
 
   const finalApiKey = yamlKey || procKey || viteKey
 

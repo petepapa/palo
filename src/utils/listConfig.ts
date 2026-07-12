@@ -1,7 +1,5 @@
 import config from '@config'
 
-type ListSortOrder = 'latest' | 'earliest' | 'oldest' | 'alphabetical'
-
 /**
  * Read pagination settings from config.yaml
  */
