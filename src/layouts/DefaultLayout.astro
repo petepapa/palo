@@ -821,6 +821,8 @@ ${bodyLineHeights}
       </script>
     )}
 
+    <style is:global set:html={`@layer tokens { ${themeVariablesCss} }`}></style>
+
     <!-- ═══════════════════════════════════════════════════════════════
          Anti-FOUC Shield / 刚性尺寸锚定版
          Slow 4G 下外部 CSS 到达前：
@@ -1550,8 +1552,6 @@ ${bodyLineHeights}
     )}
 
     {fontFaceCss && <style is:global set:html={`@layer base { ${fontFaceCss} }`} />}
-
-    <style is:global set:html={`@layer tokens { ${themeVariablesCss} }`}></style>
 
     <SEO
       title={seoTitle}
