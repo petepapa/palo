@@ -209,18 +209,25 @@ const { fields, dynamicSections } = contactFormConfig
     translate: 0 var(--font-cap-height-offset, -0.05em);
   }
 
-  /* ── 7. 选择区域紧凑双列布局 ── */
+  /* ── 7. 选择区域响应式布局：手机+平板单列，桌面端双列 ── */
   /*
-   * 覆盖组件默认的纵向 flex 排列，改为双列 grid。
-   * 1fr 1fr 让 Radio / Checkbox 选项形成简洁的双列视觉节奏，
+   * 覆盖组件默认的纵向 flex 排列，改为 grid。
+   * 手机和平板（<1024px）默认单列，确保可读性；
+   * lg（1024px）及以上切换为双列，形成简洁的视觉节奏。
    * 字体缩小到 13px 保持克制，不让表单纵向撑得过长。
    */
   #contact-form fieldset.fieldset > .fieldset-group {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     column-gap: var(--space-2xs);
     row-gap: var(--space-3xs);
     font-size: 0.8125rem;
+  }
+
+  @media (min-width: 1024px) {
+    #contact-form fieldset.fieldset > .fieldset-group {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
   /* ── 8. 提交按钮靠右对齐 ── */
