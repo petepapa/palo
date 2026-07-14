@@ -9,7 +9,8 @@ site:
   trailingSlash: false        # URL 尾部斜杠：false → /about, true → /about/
   defaultTheme: auto          # 默认主题：auto 跟随系统 / light 浅色 / dark 深色
   darkModeToggle: true       # 启用深色模式切换 / Enable dark mode toggle
-  launcher: true             # 启用快捷启动器 (Cmd+K / Ctrl+K)。可选值：false / true / default / gradientBorder
+  launcher: 'gradientBorder'          # 快捷启动器模式 (Cmd+K / Ctrl+K)。可选值：default / compact / gradientBorder / off
+  launcherIcon: 'ph:magnifying-glass' # 快捷启动器图标 / Launcher button icon
   backToTop: true            # 启用页脚"回到顶部"链接 / Enable "Back to Top" link in footer
   backToTopText: 'Back to Top'  # "回到顶部"链接文本 / Custom text for the back-to-top link
   enableCustomCursor: true   # 启用自定义圆形鼠标指针（反色 + 悬停放大）/ Enable custom circular cursor with color inversion and hover scaling

@@ -17,7 +17,11 @@ interface Props {
 }
 
 const { variant = 'all', includeLauncher = true } = Astro.props
-const launcherGradientBorder = themeConfig.site.launcher === 'gradientBorder'
+const launcherMode = themeConfig.site.launcher
+const launcherGradientBorder = launcherMode === 'gradientBorder'
+const launcherIsCompact = launcherMode === 'compact'
+const launcherIcon = themeConfig.site.launcherIcon ?? 'ph:lightning'
+const showLauncher = launcherMode !== 'off' && includeLauncher
 
 const primaryItems = navigationItems.filter((item) => !item.icon)
 const utilityItems = navigationItems.filter((item) => Boolean(item.icon))
@@ -77,14 +81,31 @@ const itemsToRender = variant === 'primary' ? primaryItems : variant === 'utilit
     )
   }
   {
-    variant !== 'primary' && includeLauncher && themeConfig.site.launcher && (
+    variant !== 'primary' && showLauncher && launcherIsCompact && (
+      <li class="menu-item type-icon animate-rotate menu-item--utility">
+        <button
+          type="button"
+          class="launcher-compact-toggle"
+          aria-haspopup="dialog"
+          data-launcher-target="site-launcher"
+          aria-label="Search"
+        >
+          <Icon name={launcherIcon} size="1em" aria-hidden="true" />
+        </button>
+      </li>
+    )
+  }
+  {
+    variant !== 'primary' && showLauncher && !launcherIsCompact && (
       <li class="menu-item menu-item--utility desktop-launcher">
         <LauncherTrigger
           launcherId="site-launcher"
           compact={true}
           gradientBorder={launcherGradientBorder}
+          icon={launcherIcon}
         />
       </li>
     )
   }
 </ul>
+

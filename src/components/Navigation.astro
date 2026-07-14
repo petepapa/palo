@@ -20,6 +20,9 @@ const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightSca
 const navDesktopDropdownLineHeightScale = themeConfig.navigation?.desktopDropdownLineHeightScale ?? 1
 const navMobileDropdownLineHeightScale = themeConfig.navigation?.mobileDropdownLineHeightScale ?? 1
 const launcherGradientBorder = site.launcher === 'gradientBorder'
+const launcherMode = site.launcher
+const launcherIcon = site.launcherIcon ?? 'ph:lightning'
+const showLauncher = launcherMode !== 'off'
 
 const navStyle = [
   navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
@@ -49,12 +52,13 @@ const navStyle = [
         </nav>
         <ResponsiveToggle />
         {
-          site.launcher && (
+          showLauncher && !(launcherMode === 'compact') && (
             <div class="mobile-launcher">
               <LauncherTrigger
                 launcherId="site-launcher"
                 iconOnly={true}
                 gradientBorder={launcherGradientBorder}
+                icon={launcherIcon}
               />
             </div>
           )
@@ -62,7 +66,7 @@ const navStyle = [
       </div>
     </div>
     <nav class="mobile-menu" aria-label="Main navigation mobile">
-      <NavigationItems includeLauncher={false} />
+      <NavigationItems includeLauncher={launcherMode === 'compact' && showLauncher} />
     </nav>
   </div>
 </div>
@@ -1028,7 +1032,8 @@ const navStyle = [
       margin-inline-start: 0;
     }
 
-    .darkmode-toggle {
+    .darkmode-toggle,
+    .launcher-compact-toggle {
       border: none;
       padding: 0;
 
@@ -1049,6 +1054,11 @@ const navStyle = [
           box-shadow: none;
         }
       }
+    }
+
+    .launcher-compact-toggle:focus-visible {
+      outline: none;
+      box-shadow: none;
     }
   }
 </style>

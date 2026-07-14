@@ -110,7 +110,8 @@ export interface SiteConfig {
   trailingSlash: boolean
   defaultTheme: 'auto' | 'light' | 'dark'
   darkModeToggle: boolean
-  launcher: false | true | 'default' | 'gradientBorder'
+  launcher: 'default' | 'compact' | 'gradientBorder' | 'off'
+  launcherIcon?: string
   backToTop?: boolean
   backToTopText?: string
   enableCustomCursor?: boolean
