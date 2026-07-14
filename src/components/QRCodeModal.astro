@@ -1,0 +1,133 @@
+---
+import { Heading } from 'accessible-astro-components'
+import type { SocialItem } from '../types/config'
+import { getQrCodeBaseId, getQrCodeModalId } from '@utils/qrcodeId'
+
+interface Props {
+  socialItem: SocialItem
+}
+
+const { socialItem } = Astro.props
+
+const baseId = getQrCodeBaseId(socialItem.label)
+const modalId = getQrCodeModalId(socialItem.label)
+const triggerId = `${baseId}-trigger`
+const cleanLabel = socialItem.label.replace(/\*\*/g, '')
+---
+
+<dialog
+  id={modalId}
+  class="qrcode-modal"
+  aria-labelledby={`${triggerId}-title`}
+  data-trigger-id={triggerId}
+>
+  <div class="modal-inner">
+    <div class="modal-content">
+      <Heading level="h3" size="h5" id={`${triggerId}-title`} tabindex="-1" autofocus>
+        {cleanLabel}
+      </Heading>
+      <div class="flex flex-col items-center justify-center text-center">
+        <div class="mb-4 w-full overflow-hidden rounded-lg">
+          <img src={socialItem.qrCode} alt={`${cleanLabel} QR Code`} class="w-full" loading="lazy" />
+        </div>
+        <p class="font-base" style="color: light-dark(var(--color-neutral-600), var(--color-neutral-400));">
+          Scan the QR code to connect on {cleanLabel}.
+        </p>
+      </div>
+    </div>
+    <div class="modal-close">
+      <button onclick="window.paloCloseQrCodeModal(event)">
+        <span class="modal-close-icon">
+          <svg width="20" height="2" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M20 .5v1H0v-1z" />
+          </svg>
+          <svg width="20" height="2" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="currentColor" d="M20 .5v1H0v-1z" />
+          </svg>
+        </span>
+        <span class="sr-only">Close</span>
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  :where(.qrcode-modal) {
+    --translate-offset-y: 7.5vh;
+    --transition-duration: 0.2s;
+    --transition-easing: cubic-bezier(0.165, 0.84, 0.44, 1);
+
+    border: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) solid var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800)));
+    border-radius: 0.5rem;
+    padding: 0;
+    background-color: transparent;
+    inline-size: min(80%, 450px);
+    overscroll-behavior-block: contain;
+  }
+
+  :where(.qrcode-modal .modal-content) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background-color: light-dark(hsl(204 20% 94%), hsl(215 25% 15%));
+    padding: 2rem;
+  }
+
+  :where(.qrcode-modal .modal-close) {
+    position: absolute;
+    align-self: flex-end;
+    inset-block-start: 1.5rem;
+    inset-inline-end: 1.5rem;
+  }
+
+  :where(.qrcode-modal .modal-close button) {
+    display: flex;
+    cursor: pointer;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: transparent;
+    padding: 0.5rem;
+  }
+
+  :where(.qrcode-modal .modal-close-icon) {
+    display: inline-block;
+    position: relative;
+    aspect-ratio: 1;
+    block-size: 20px;
+  }
+
+  :where(.qrcode-modal .modal-close-icon svg) {
+    position: absolute;
+    margin: auto;
+    inset: 0;
+  }
+
+  :where(.qrcode-modal .modal-close-icon svg:first-of-type) {
+    transform: rotate(45deg);
+  }
+
+  :where(.qrcode-modal .modal-close-icon svg:last-of-type) {
+    transform: rotate(-45deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :where(.qrcode-modal .modal-close-icon svg:last-of-type) {
+      transition: transform var(--transition-duration) var(--transition-easing);
+    }
+  }
+
+  :where(.qrcode-modal .modal-close button:hover) .modal-close-icon svg:first-of-type,
+  :where(.qrcode-modal .modal-close button:focus-visible) .modal-close-icon svg:first-of-type {
+    transform: rotate(0deg);
+  }
+
+  :where(.qrcode-modal .modal-close button:hover) .modal-close-icon svg:last-of-type,
+  :where(.qrcode-modal .modal-close button:focus-visible) .modal-close-icon svg:last-of-type {
+    transform: rotate(180deg);
+  }
+
+  :global(body:has(dialog[open])) {
+    overflow-y: clip;
+  }
+</style>

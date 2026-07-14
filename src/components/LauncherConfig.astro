@@ -9,7 +9,9 @@ import {
 import { Icon } from 'astro-icon/components'
 import { getCollection } from 'astro:content'
 import themeConfig from '@config'
-import { navigationItems, socialItems } from '../navigation'
+import { navigationItems, socialConfig } from '../navigation'
+import type { SocialItem } from '../types/config'
+import { getQrCodeBaseId, getQrCodeModalId } from '@utils/qrcodeId'
 
 /**
  * Launcher preferences for accessibility and theme.
@@ -99,19 +101,6 @@ const launcherNavigationItems = navigationItems.flatMap((item: any) => {
   return []
 })
 
-/**
- * Social items for the launcher, from the site-config social items.
- *
- * @type {Array<{ label: string, href: string, icon: string, external?: boolean }>}
- */
-const launcherSocialItems = socialItems.map((item: any) => ({
-  label: item.label,
-  href: item.href,
-  icon: item.icon,
-  external: item.external ?? false,
-}))
-
-
 ---
 
 <Launcher id="site-launcher">
@@ -157,17 +146,36 @@ const launcherSocialItems = socialItems.map((item: any) => ({
   }
   
   {
-    launcherSocialItems.length > 0 && (
-      <LauncherNav label="Socials">
-        {launcherSocialItems.map((item) => (
-          <LauncherLink
-            label={item.label}
-            href={item.href}
-            {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-          >
-            <Icon slot="icon" aria-hidden="true" name={item.icon} size="16" />
-          </LauncherLink>
-        ))}
+    socialConfig.items.length > 0 && (
+      <LauncherNav label={socialConfig.title}>
+        {socialConfig.items.map((item: SocialItem) => {
+          const cleanLabel = item.label.replace(/\*\*/g, '')
+          if (item.type === 'qrCode') {
+            const baseId = getQrCodeBaseId(item.label)
+            const modalId = getQrCodeModalId(item.label)
+            const triggerId = `${baseId}-trigger`
+            return (
+              <LauncherLink
+                label={cleanLabel}
+                href={`#${modalId}`}
+                id={triggerId}
+                data-qrcode-trigger="true"
+                data-qrcode-base={baseId}
+              >
+                <Icon slot="icon" aria-hidden="true" name={item.icon} size="16" />
+              </LauncherLink>
+            )
+          }
+          return (
+            <LauncherLink
+              label={cleanLabel}
+              href={item.href ?? '#'}
+              {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              <Icon slot="icon" aria-hidden="true" name={item.icon} size="16" />
+            </LauncherLink>
+          )
+        })}
       </LauncherNav>
     )
   }

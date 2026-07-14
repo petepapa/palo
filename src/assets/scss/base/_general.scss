@@ -563,9 +563,23 @@ kbd:not(.launcher-trigger kbd):not(.launcher kbd),
 dialog.modal {
   background-color: transparent !important;
   color: var(--foreground-color);
+  outline: none !important;
+  border-style: solid !important;
   border-width: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) !important;
   border-radius: var(--radius-modal, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
   border-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800))) !important;
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.12) !important;
+}
+
+:where(dialog.qrcode-modal) {
+  background-color: transparent !important;
+  color: var(--foreground-color);
+  outline: none !important;
+  border-style: solid !important;
+  border-width: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+  border-radius: var(--radius-modal, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  border-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800))) !important;
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.12) !important;
 }
 
 :where(dialog.modal) .modal-content {
@@ -586,7 +600,8 @@ dialog.modal {
 
 // 完全禁用原生 ::backdrop，统一使用自定义 .palo-dialog-backdrop
 dialog.launcher::backdrop,
-dialog.modal::backdrop {
+dialog.modal::backdrop,
+dialog.qrcode-modal::backdrop {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
@@ -597,7 +612,8 @@ dialog.modal::backdrop {
 
 // Modal + Launcher 通用定位（脱离父容器层叠上下文，确保全屏居中）
 dialog.modal,
-dialog.launcher {
+dialog.launcher,
+dialog.qrcode-modal {
   position: fixed !important;
   inset: auto !important;
   top: 50% !important;
@@ -637,7 +653,8 @@ dialog.launcher {
 
 // Modal + Launcher 关闭态（始终启用，确保 JS 能安全插入 closing 类）
 dialog.modal.closing,
-dialog.launcher.closing {
+dialog.launcher.closing,
+dialog.qrcode-modal.closing {
   pointer-events: none;
 }
 
@@ -663,13 +680,15 @@ dialog.launcher.closing {
 
 @media (prefers-reduced-motion: no-preference) {
   dialog.modal[open],
-  dialog.launcher[open] {
+  dialog.launcher[open],
+  dialog.qrcode-modal[open] {
     animation: palo-dialog-fade-in var(--animation-speed-medium) var(--cubic-bezier) forwards;
     will-change: opacity, transform;
   }
 
   dialog.modal.closing,
-  dialog.launcher.closing {
+  dialog.launcher.closing,
+  dialog.qrcode-modal.closing {
     animation: palo-dialog-fade-out var(--animation-speed-medium) var(--cubic-bezier) forwards;
   }
 }

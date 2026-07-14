@@ -92,10 +92,15 @@ export interface RadiusConfig {
   codeBlock?: string
 }
 
+export type SocialItemType = 'link' | 'email' | 'qrCode'
+
 export interface SocialItem {
   label: string
-  href: string
+  href?: string
   icon: string
+  type?: SocialItemType
+  external?: boolean
+  qrCode?: string
 }
 
 export interface SiteConfig {

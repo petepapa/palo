@@ -2398,7 +2398,7 @@ ${bodyLineHeights}
 
         function paloGetBackdropClass(dialog) {
           if (dialog.classList.contains('launcher')) return 'palo-dialog-backdrop--launcher'
-          if (dialog.classList.contains('modal')) return 'palo-dialog-backdrop--modal'
+          if (dialog.classList.contains('modal') || dialog.classList.contains('qrcode-modal')) return 'palo-dialog-backdrop--modal'
           return 'palo-dialog-backdrop--default'
         }
 
@@ -2585,7 +2585,7 @@ ${bodyLineHeights}
       }
 
       function paloInitModalAnimation() {
-        const dialogs = document.querySelectorAll('.modal')
+        const dialogs = document.querySelectorAll('.modal, .qrcode-modal')
         if (!dialogs.length) return
 
         // 保存并包装全局 closeModal（只执行一次）
@@ -2596,7 +2596,7 @@ ${bodyLineHeights}
             window.paloCloseDialog(document.querySelector('.modal[open]'), origClose)
         }
 
-        paloInitDialogAnimation('.modal', '.modal-close button', 'paloModalBound')
+        paloInitDialogAnimation('.modal, .qrcode-modal', '.modal-close button', 'paloModalBound')
       }
 
       function paloInitLauncherAnimation() {
@@ -2636,6 +2636,88 @@ ${bodyLineHeights}
       paloInitLauncherAnimation()
 
       // ═══════════════════════════════════════════
+      //  全局 QRCode 弹窗 trigger 绑定
+      //  同一个 QRCode modal 可能被多个位置的 trigger 触发（footer / contact / launcher），
+      //  Modal 库内置脚本只绑定 #${triggerId} 的第一个元素，后续位置的 trigger 点击无效。
+      //  本脚本统一接管所有带 data-qrcode-trigger="true" 的元素，
+      //  通过 data-qrcode-base 关联到对应 modal，确保任何位置都能打开 modal。
+      // ═══════════════════════════════════════════
+      function paloInitQrCodeTriggers() {
+        const triggers = document.querySelectorAll('[data-qrcode-trigger="true"]')
+        triggers.forEach((trigger) => {
+          if (trigger.dataset.paloQrcodeBound === 'true') return
+          trigger.dataset.paloQrcodeBound = 'true'
+
+          trigger.addEventListener(
+            'click',
+            (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              const baseId = trigger.dataset.qrcodeBase
+              if (!baseId) return
+              const modalEl = document.getElementById(baseId + '-modal')
+              if (!(modalEl instanceof HTMLDialogElement)) return
+
+              const onModalClose = () => {
+                modalEl.removeEventListener('close', onModalClose)
+                modalEl.removeEventListener('click', onClickBackdrop)
+                trigger.blur()
+                const launcherButton = document.querySelector('[data-launcher-target]')
+                if (launcherButton) launcherButton.blur()
+              }
+
+              const onClickBackdrop = (ev) => {
+                const rect = modalEl.getBoundingClientRect()
+                if (
+                  ev.clientX < rect.left ||
+                  ev.clientX > rect.right ||
+                  ev.clientY < rect.top ||
+                  ev.clientY > rect.bottom
+                ) {
+                  modalEl.close()
+                }
+              }
+
+              // 如果 launcher 开着，先关 launcher 再打开 qrcode modal
+              const openLauncher = document.querySelector('.launcher[open]:not(.closing)')
+              if (openLauncher) {
+                const tryOpen = function () {
+                  if (modalEl.open) return
+                  modalEl.addEventListener('close', onModalClose)
+                  modalEl.addEventListener('click', onClickBackdrop)
+                  modalEl.showModal()
+                }
+                openLauncher.addEventListener('close', function onLauncherClosed() {
+                  openLauncher.removeEventListener('close', onLauncherClosed)
+                  tryOpen()
+                })
+                // 兜底：400ms 后强制打开
+                setTimeout(tryOpen, 400)
+                window.paloCloseDialog(openLauncher)
+                return
+              }
+
+              modalEl.addEventListener('close', onModalClose)
+              modalEl.addEventListener('click', onClickBackdrop)
+              if (!modalEl.open) modalEl.showModal()
+            },
+            { capture: true },
+          )
+        })
+      }
+
+      // QRCodeModal dialog close handler (click on close button or backdrop)
+      function paloCloseQrCodeModal(event) {
+        if (event) event.stopPropagation()
+        const openModal = document.querySelector('.qrcode-modal[open]')
+        if (openModal) openModal.close()
+      }
+
+      document.addEventListener('astro:page-load', paloInitQrCodeTriggers)
+      document.addEventListener('astro:after-swap', paloInitQrCodeTriggers)
+      paloInitQrCodeTriggers()
+
+      // ═══════════════════════════════════════════
       //  Escape 统一处理（Modal + Launcher）
       //  使用 capture 阶段 keydown 在 dialog 原生处理之前拦截，
       //  解决 Safari 下 cancel 事件 preventDefault() 不可靠的问题。
@@ -2655,11 +2737,12 @@ ${bodyLineHeights}
           }
 
           // 检查 Modal
-          const modal = document.querySelector('.modal[open]')
+          const modal = document.querySelector('.modal[open], .qrcode-modal[open]')
           if (modal && !modal.classList.contains('closing')) {
+            const fallback = modal.classList.contains('modal') ? window.__paloOrigCloseModal : undefined
             e.preventDefault()
             e.stopPropagation()
-            window.paloCloseDialog(modal, window.__paloOrigCloseModal)
+            window.paloCloseDialog(modal, fallback)
           }
         },
         { capture: true },

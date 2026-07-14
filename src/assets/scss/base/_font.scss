@@ -88,6 +88,10 @@
     text-transform: var(--display-text-transform, none);
   }
 
+  :where(.font-medium, .font-semibold, .font-bold) {
+    color: inherit;
+  }
+
   :where(.card, .call-to-action, .page-header) :where(a.button, .button, .badge) {
     font-weight: var(--font-weight-accent, 400);
     text-transform: var(--display-text-transform, none);

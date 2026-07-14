@@ -55,15 +55,37 @@ export const navigationItems: NavigationItem[] = [
 /**
  * Social media links shown in the launcher and related UI.
  */
-export const socialItems: SocialItem[] = [
-  {
-    label: 'GitHub',
-    href: 'https://github.com/petepapa',
-    icon: 'ph:github-logo',
-  },
-  {
-    label: 'YouTube',
-    href: 'https://www.youtube.com/@petepatv',
-    icon: 'ph:youtube-logo',
-  },
-]
+export const socialConfig = {
+  title: 'Keep in touch :-)',
+  items: [
+    {
+      label: '**YouTube: **@petepatv',
+      href: 'https://www.youtube.com/@petepatv',
+      icon: 'ph:youtube-logo',
+      type: 'link',
+      external: true,
+    },
+    {
+      label: '**Douyin: **@petepa',
+      icon: 'ph:tiktok-logo',
+      type: 'qrCode',
+      qrCode: '/branding/douyin.JPG',
+    },
+    
+    {
+      label: '**GitHub: **@petepapa',
+      href: 'https://github.com/petepapa',
+      icon: 'ph:github-logo',
+      type: 'link',
+      external: true,
+    },
+    {
+      label: '**Email: **hello@petepa.com',
+      href: 'mailto:hello@petepa.com',
+      icon: 'ph:envelope',
+      type: 'email',
+    },
+  ],
+}
+
+export const socialItems = socialConfig.items

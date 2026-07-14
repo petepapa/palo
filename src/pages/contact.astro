@@ -14,8 +14,9 @@ import {
   Link,
 } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
-import { ensureTrailingSlash } from '@utils/trailingSlash'
 import { contactFormConfig } from '../contactForm'
+import { socialConfig } from '../navigation'
+import { getQrCodeBaseId, getQrCodeModalId, getQrCodeContactTriggerId } from '@utils/qrcodeId'
 
 const { fields, dynamicSections } = contactFormConfig
 ---
@@ -98,12 +99,23 @@ const { fields, dynamicSections } = contactFormConfig
 
       <!-- 右侧：联系信息 / Right: Contact info -->
       <div class="space-content">
-        <Heading level="h3">Contact</Heading>
+        <Heading level="h3">Keep in touch :-)</Heading>
         <p class="text-xl">
           Whether it's web, motion, or a full branding system, I build things that work and feel
           right. Have an idea, a complex product challenge, or just want to talk music and code? Drop
           a line.
         </p>
+
+
+        <!-- 电话号码 / Phone number -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:phone" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Phone:</span>
+            <Link href="tel:+8612312345678">+86 123 1234 5678</Link>
+            <span class="text-xs" style="color: light-dark(var(--color-neutral-500), var(--color-neutral-500));"> (example)</span>
+          </p>
+        </div>
 
         <!-- 邮箱地址 / Email address -->
         <div class="gap-2xs flex items-center">
@@ -114,35 +126,71 @@ const { fields, dynamicSections } = contactFormConfig
           </p>
         </div>
 
+        <!-- 地址 / Address -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:map-pin" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Location:</span>
+            Fengtai District, Beijing
+          </p>
+        </div>
+
         <!-- 工作节奏 / Work rhythm -->
         <div class="gap-2xs flex items-center">
           <Icon aria-hidden="true" name="ph:clock" size={20} class="flex-shrink-0" />
           <p>
-            <span class="font-bold">Work rhythm:</span>
-            Asynchronous by default. Usually fueled by music and dark mode.
+            <span class="font-bold">Business Hours:</span>
+            Monday - Friday, 9:00 AM - 5:00 PM EST
           </p>
         </div>
 
+        <br />
+
+
         <!-- 社交媒体链接 / Social media links -->
         <ul class="flex flex-wrap gap-2">
-          <li>
-            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop" class="button--icon-only">
-              <Icon aria-hidden="true" name="ph:facebook-logo" />
-              <span class="sr-only">Go to our Facebook page, opens in a new tab</span>
-            </Link>
-          </li>
-          <li>
-            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop" class="button--icon-only">
-              <Icon aria-hidden="true" name="ph:twitter-logo" />
-              <span class="sr-only">Go to our Twitter page, opens in a new tab</span>
-            </Link>
-          </li>
-          <li>
-            <Link href={ensureTrailingSlash('/')} isButton isExternal hideIcon animateOnHover animationType="boop" class="button--icon-only">
-              <Icon aria-hidden="true" name="ph:linkedin-logo" />
-              <span class="sr-only">Go to our LinkedIn page, opens in a new tab</span>
-            </Link>
-          </li>
+          {socialConfig.items.map((item) => {
+            const cleanLabel = item.label.replace(/\*\*/g, '')
+            if (item.type === 'qrCode') {
+              const baseId = getQrCodeBaseId(item.label)
+              const modalId = getQrCodeModalId(item.label)
+              const triggerId = getQrCodeContactTriggerId(item.label)
+              return (
+                <li>
+                  <Link
+                    href={`#${modalId}`}
+                    id={triggerId}
+                    data-qrcode-trigger="true"
+                    data-qrcode-base={baseId}
+                    isButton
+                    hideIcon
+                    animateOnHover
+                    animationType="boop"
+                    class="button--icon-only"
+                  >
+                    <Icon aria-hidden="true" name={item.icon} />
+                    <span class="sr-only">Open {cleanLabel} QR code</span>
+                  </Link>
+                </li>
+              )
+            }
+            return (
+              <li>
+                <Link
+                  href={item.href ?? '#'}
+                  isButton
+                  {...(item.external ? { isExternal: true } : {})}
+                  hideIcon
+                  animateOnHover
+                  animationType="boop"
+                  class="button--icon-only"
+                >
+                  <Icon aria-hidden="true" name={item.icon} />
+                  <span class="sr-only">{item.external ? `Go to ${cleanLabel}, opens in a new tab` : `Go to ${cleanLabel}`}</span>
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </div>
     </div>

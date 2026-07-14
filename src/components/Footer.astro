@@ -2,10 +2,15 @@
 import CreativeSection from './CreativeSection.astro'
 import Logo from './Logo.astro'
 import Slogan from './Slogan.astro'
+import QRCodeModal from './QRCodeModal.astro'
 import { Heading, Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
 import { ensureTrailingSlash } from '@utils/trailingSlash'
 import config from '@config'
+import { socialConfig } from '../navigation'
+import { getQrCodeBaseId, getQrCodeModalId, getQrCodeFooterTriggerId } from '@utils/qrcodeId'
+import { renderAccentLabel } from '@utils/parseAccentLabel'
 
 /**
  * Footer Component
@@ -17,78 +22,97 @@ const siteName = config.site.name
 const backToTopEnabled = config.site.backToTop !== false
 const backToTopText = config.site.backToTopText ?? 'Back to Top'
 const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
+
+// ── Footer 列表：动态获取 Featured Projects 和 Latest Posts ──
+const footerLimit = 5
+const featuredTitle = config.portfolio?.featuredComponent?.title ?? 'Featured Projects'
+const latestTitle = config.blog?.latestComponent?.title ?? 'Latest Posts'
+
+// Featured Projects
+const allProjects = (await getCollection('projects')).filter((p) => !p.data.draft)
+const featuredProjects = allProjects
+  .filter((p) => p.data.featuredOrder !== undefined)
+  .sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+const regularProjects = allProjects
+  .filter((p) => p.data.featuredOrder === undefined)
+  .sort((a, b) => (b.data.publishDate?.valueOf() ?? 0) - (a.data.publishDate?.valueOf() ?? 0))
+const footerProjects = [...featuredProjects, ...regularProjects].slice(0, footerLimit)
+
+// Latest Posts
+const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
+const featuredPosts = allPosts
+  .filter((p) => p.data.featuredOrder !== undefined)
+  .sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+const regularPosts = allPosts
+  .filter((p) => p.data.featuredOrder === undefined)
+  .sort((a, b) => (b.data.publishDate?.valueOf() ?? 0) - (a.data.publishDate?.valueOf() ?? 0))
+const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
 ---
 <footer>
   <section class="py-20 mt-24">
     <Heading level="h2" class="sr-only">Footer</Heading>
     <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
       <div class="flex flex-col gap-4">
-        <Heading level="h3" size="h6">Features</Heading>
+        <Heading level="h3" size="h6">{featuredTitle}</Heading>
         <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
-          <li><Link href={ensureTrailingSlash('/accessibility-statement')}>Accessibility statement</Link></li>
-          <li><Link href={ensureTrailingSlash('/accessible-components')}>Accessible components</Link></li>
-          <li><Link href={ensureTrailingSlash('/color-contrast-checker')}>Color contrast checker</Link></li>
-          <li><Link href={ensureTrailingSlash('/markdown-page')}>Markdown page</Link></li>
-          <li><Link href={ensureTrailingSlash('/mdx-page')}>MDX page</Link></li>
-          <li><Link href={ensureTrailingSlash('/404-page')}>404 page</Link></li>
-          <li><Link href={ensureTrailingSlash('/sitemap')}>Sitemap</Link></li>
+          {footerProjects.map((project) => (
+            <li><Link href={ensureTrailingSlash(`/portfolio/${project.id}`)}>{project.data.title}</Link></li>
+          ))}
         </ul>
       </div>
       <div class="flex flex-col gap-4">
-        <Heading level="h3" size="h6">Incluud projects</Heading>
+        <Heading level="h3" size="h6">{latestTitle}</Heading>
         <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
-          <li>
-            <Link isExternal href="https://accessible-astro-starter.incluud.dev">Accessible Astro Starter</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://accessible-astro-dashboard.incluud.dev">Accessible Astro Dashboard</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://accessible-astro-starter.incluud.dev/accessible-components"
-              >Accessible Astro Components</Link
-            >
-          </li>
-          <li>
-            <Link isExternal href="https://accessible-astro-docs.incluud.dev">Accessible Astro Docs</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://color-contrast.incluud.dev">Color Contrast Checker</Link>
-          </li>
+          {footerPosts.map((post) => (
+            <li><Link href={ensureTrailingSlash(`/blog/${post.id}`)}>{post.data.title}</Link></li>
+          ))}
         </ul>
       </div>
       <div class="flex flex-col gap-4">
-        <Heading level="h3" size="h6">Developer tools</Heading>
+        <Heading level="h3" size="h6">{socialConfig.title}</Heading>
         <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
-          <li>
-            <Link isExternal href="https://chrispederick.com/work/web-developer/">Web Developer Extension</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://accessibilityinsights.io/">Accessibility Insights</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://www.deque.com/axe/devtools/">axe DevTools</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://wave.webaim.org/extension/">WAVE Web Accessibility</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://www.w3.org/WAI/ARIA/apg/patterns/">ARIA Design Patterns</Link>
-          </li>
-          <li>
-            <Link isExternal href="https://aaardvarkaccessibility.com/wcag-plain-english/">WCAG Plain English</Link>
-          </li>
+          {socialConfig.items.map((item) => {
+            if (item.type === 'qrCode') {
+              const baseId = getQrCodeBaseId(item.label)
+              const modalId = getQrCodeModalId(item.label)
+              const triggerId = getQrCodeFooterTriggerId(item.label)
+              return (
+                <li>
+                  <Link
+                    href={`#${modalId}`}
+                    id={triggerId}
+                    class="link--external"
+                    data-qrcode-trigger="true"
+                    data-qrcode-base={baseId}
+                  >
+                    <Icon aria-hidden="true" name={item.icon} class="mr-2 inline-block" size="16" />
+                    <span set:html={renderAccentLabel(item.label)} />
+                  </Link>
+                </li>
+              )
+            }
+            return (
+              <li>
+                <Link href={item.href ?? '#'} class="link--external" {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  <Icon aria-hidden="true" name={item.icon} class="mr-2 inline-block" size="16" />
+                  <span set:html={renderAccentLabel(item.label)} />
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       </div>
       <div class="flex flex-col gap-4">
         <Logo loading="lazy" />
-        <p class="leading-[1.75]">
-          Tip: always test for screen reader support. Press <kbd class="kbd">⌘</kbd> + <kbd class="kbd">F5</kbd> to start
-          VoiceOver or <kbd class="kbd">Win</kbd>
-          + <kbd class="kbd">Ctrl</kbd> + <kbd class="kbd">Enter</kbd> for Narrator.
-        </p>
-        <p>Cute astronaut image by <Link href="https://unsplash.com/@kobbymendez">Kobby Mendez</Link> on Unsplash.</p>
+        <p class="leading-[1.75]">{config.metadata.description}</p>
+        <p>Built upon <Link isExternal href="https://accessible-astro-starter.incluud.dev">Accessible Astro Starter</Link>.</p>
       </div>
     </div>
+    {
+      socialConfig.items.filter((item) => item.type === 'qrCode').map((item) => (
+        <QRCodeModal socialItem={item} />
+      ))
+    }
   </section>
   <section class="py-8">
     <div class="container flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
