@@ -340,6 +340,12 @@ img.rounded-lg,
   top: calc(var(--font-cap-height-offset, -0.05em) * -1.5);
 }
 
+/* Notification 内列表：圆点与标题文字左对齐 */
+.notification :where(ul, ol) {
+  padding-inline-start: 0;
+  list-style-position: inside;
+}
+
 .badge.circular {
   box-sizing: border-box;
   display: inline-flex;
