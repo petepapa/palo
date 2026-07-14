@@ -2,6 +2,7 @@
 import { Link } from 'accessible-astro-components'
 import themeConfig from '@config'
 import { getLogoSvg, isSvgPath, isRasterPath } from '@utils/logoInline'
+import { renderAccentLabel } from '@utils/parseAccentLabel'
 
 /**
  * Logo Component — Build-Time SVG Inline Edition
@@ -27,10 +28,12 @@ const logoLight = (branding.logoLight || '').trim()
 const logoDark = (branding.logoDark || '').trim()
 const logoSize = branding.logoSize || '40px'
 const siteName = site.name
+const textLogo = (branding.textLogo || '').trim()
 
 const hasLight = !!logoLight
 const hasDark = !!logoDark
 const hasAnyLogo = hasLight || hasDark
+const displayTextLogo = textLogo || siteName
 
 // ── Format classification ────────────────────────────────────────────
 const lightIsSvg = hasLight && isSvgPath(logoLight)
@@ -108,13 +111,12 @@ function slotClass(base: string, variant: 'light' | 'dark', hasOther: boolean): 
         class="logo-text"
         style={`
           ${logoStyle}
-          font-weight: var(--font-weight-heading, ${branding.font.weights.heading});
+          font-weight: var(--font-weight-body, ${branding.font.weights.body});
           font-size: var(--logo-size, 1rem);
           text-transform: none;
         `}
-      >
-        {siteName}
-      </span>
+        set:html={renderAccentLabel(displayTextLogo)}
+      />
     )
   }
 </Link>
@@ -218,11 +220,17 @@ function slotClass(base: string, variant: 'light' | 'dark', hasOther: boolean): 
        Text Fallback Channel
        ================================================================ */
     .logo-link .logo-text {
-      font-weight: var(--font-weight-heading, 600);
+      font-weight: var(--font-weight-body, 300);
       font-size: var(--logo-size, 2.5rem);
       line-height: 1;
       text-transform: none;
       white-space: nowrap;
+    }
+    .logo-link .logo-text .font-medium {
+      font-weight: var(--font-weight-heading, 600);
+    }
+    .logo-link .logo-text .font-accent {
+      font-weight: var(--font-weight-accent, 500);
     }
   }
 </style>

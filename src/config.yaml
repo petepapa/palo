@@ -36,9 +36,11 @@ metadata:
 
 branding:
   # Logo：两个都留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
-  logoLight: '/branding/logo-light.svg' # 浅色主题 Logo
-  logoDark: '/branding/logo-dark.svg'   # 深色主题 Logo
-  logoSize: '40px'  # 文字为字号，图片为高度
+  # Logo: both empty → text logo; fill path → image logo (put in /public)
+  logoLight: '/branding/logo-light.svg' # 浅色主题 Logo / Light theme logo
+  logoDark: '/branding/logo-dark.svg'   # 深色主题 Logo / Dark theme logo
+  textLogo: 'Pa**lo**'    # 文字 Logo，支持 **bold**/*accent* 字重语法 / Text logo with **bold**/*accent* weight syntax
+  logoSize: '40px'  # 文字为字号，图片为高度 / Font size for text, height for image
 
   # ── 颜色 / Colors ────────────────────────────────────────────
   colors:
