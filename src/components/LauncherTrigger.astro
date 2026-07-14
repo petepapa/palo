@@ -118,10 +118,20 @@ const {
     white-space: nowrap;
   }
 
-  :where(.trigger:hover),
-  :where(.trigger:focus-visible) {
+  .trigger:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--launcher-inner-border-color);
+  }
+
+  .trigger:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
     border-color: var(--launcher-border-interaction-color);
-    outline: none;
+  }
+
+  .trigger:hover {
+    border-color: var(--launcher-border-interaction-color);
   }
 
   :where(.trigger.compact) {

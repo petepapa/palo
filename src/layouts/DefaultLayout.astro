@@ -2656,6 +2656,41 @@ ${bodyLineHeights}
 
         paloInitDialogAnimation('.launcher', '.close', 'paloLauncherBound')
 
+        // 点击外链后清除 trigger 焦点
+        // Launcher 库的 closeLauncher 会在 dialog.close() 后调用 trigger.focus()，
+        // 导致点击外链（target="_blank"）后按钮残留 :focus/:focus-visible 状态，
+        // gradientBorder 模式下会触发彩虹动画（形似 hover）。
+        // 此处 capture 阶段标记外链点击，close 事件后用 setTimeout 在库的 focus() 之后 blur()。
+        dialogs.forEach((dialog) => {
+          if (dialog.dataset.paloLauncherFocusCleanup) return
+          dialog.dataset.paloLauncherFocusCleanup = '1'
+
+          let externalLinkClicked = false
+
+          dialog.addEventListener(
+            'click',
+            (e) => {
+              const link = e.target.closest('.launcher-link')
+              if (!link) return
+              if (link.target === '_blank') {
+                externalLinkClicked = true
+              }
+            },
+            { capture: true },
+          )
+
+          dialog.addEventListener('close', () => {
+            if (!externalLinkClicked) return
+            externalLinkClicked = false
+            setTimeout(() => {
+              const active = document.activeElement
+              if (active && active.hasAttribute('data-launcher-target')) {
+                active.blur()
+              }
+            }, 0)
+          })
+        })
+
         // Cmd+K / Ctrl+K 快捷键 — capture 阶段提前拦截（只注册一次）
         if (!window.__paloLauncherKeyBound) {
           window.__paloLauncherKeyBound = true
