@@ -1,4 +1,4 @@
-import type { NavigationItem, SocialItem } from './types/config'
+import type { NavigationItem } from './types/config'
 import { projectTypes } from './projectTypes'
 
 /**
@@ -59,28 +59,34 @@ export const socialConfig = {
   title: 'Keep in touch :-)',
   items: [
     {
-      label: '**YouTube: **@petepatv',
+      label: '*WeChat: *@pp71270371',
+      icon: 'fa6-brands:weixin',
+      type: 'qrCode',
+      qrCode: '/branding/wechat.JPG',
+    },
+    {
+      label: '*Douyin: *@petepa',
+      icon: 'ph:tiktok-logo',
+      type: 'qrCode',
+      qrUrl: 'https://v.douyin.com/F7SeXJTTMGA/',
+    },
+    {
+      label: '*YouTube: *@petepatv',
       href: 'https://www.youtube.com/@petepatv',
       icon: 'ph:youtube-logo',
       type: 'link',
       external: true,
     },
-    {
-      label: '**Douyin: **@petepa',
-      icon: 'ph:tiktok-logo',
-      type: 'qrCode',
-      qrCode: '/branding/douyin.JPG',
-    },
     
     {
-      label: '**GitHub: **@petepapa',
+      label: '*GitHub: *@petepapa',
       href: 'https://github.com/petepapa',
       icon: 'ph:github-logo',
       type: 'link',
       external: true,
     },
     {
-      label: '**Email: **hello@petepa.com',
+      label: '*Email: *hello@petepa.com',
       href: 'mailto:hello@petepa.com',
       icon: 'ph:envelope',
       type: 'email',

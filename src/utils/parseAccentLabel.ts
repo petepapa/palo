@@ -79,18 +79,20 @@ function parseAccentParts(text: string): LabelSegment[] {
  * 中不被折叠，同时 hover 时不显示下划线。
  */
 export function renderAccentLabel(label: string): string {
-  if (!label.includes('*')) return label
-
   const wrapWithClass = (text: string, className: string) => {
     const safeText = text.replace(/ $/, '&nbsp;')
     return `<span class="${className}">${safeText}</span>`
+  }
+
+  if (!label.includes('*')) {
+    return wrapWithClass(label, 'font-body')
   }
 
   return parseAccentLabel(label)
     .map((seg) => {
       if (seg.bold) return wrapWithClass(seg.text, 'font-medium')
       if (seg.accent) return wrapWithClass(seg.text, 'font-accent')
-      return seg.text
+      return wrapWithClass(seg.text, 'font-body')
     })
     .join('')
 }

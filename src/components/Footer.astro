@@ -81,11 +81,10 @@ const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
                   <Link
                     href={`#${modalId}`}
                     id={triggerId}
-                    class="link--external"
                     data-qrcode-trigger="true"
                     data-qrcode-base={baseId}
                   >
-                    <Icon aria-hidden="true" name={item.icon} class="mr-2 inline-block" size="16" />
+                    <Icon aria-hidden="true" name={item.icon} />
                     <span set:html={renderAccentLabel(item.label)} />
                   </Link>
                 </li>
@@ -93,8 +92,8 @@ const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
             }
             return (
               <li>
-                <Link href={item.href ?? '#'} class="link--external" {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                  <Icon aria-hidden="true" name={item.icon} class="mr-2 inline-block" size="16" />
+                <Link href={item.href ?? '#'} {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  <Icon aria-hidden="true" name={item.icon} />
                   <span set:html={renderAccentLabel(item.label)} />
                 </Link>
               </li>

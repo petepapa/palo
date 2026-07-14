@@ -149,7 +149,7 @@ const launcherNavigationItems = navigationItems.flatMap((item: any) => {
     socialConfig.items.length > 0 && (
       <LauncherNav label={socialConfig.title}>
         {socialConfig.items.map((item: SocialItem) => {
-          const cleanLabel = item.label.replace(/\*\*/g, '')
+          const cleanLabel = item.label.replace(/[*]/g, '')
           if (item.type === 'qrCode') {
             const baseId = getQrCodeBaseId(item.label)
             const modalId = getQrCodeModalId(item.label)

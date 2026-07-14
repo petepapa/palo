@@ -1,6 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components'
-import { Link, Modal } from 'accessible-astro-components'
+import { Link } from 'accessible-astro-components'
+import QRCodeModal from '@components/QRCodeModal.astro'
 import { shareConfig } from '../shareConfig'
 
 interface Props {
@@ -15,9 +16,6 @@ const {
   description = '',
 } = Astro.props
 
-const qrCodeApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}`
-
-const wechatModalId = 'palo-wechat-share-modal'
 const wechatTriggerId = 'palo-wechat-share-trigger'
 ---
 
@@ -50,6 +48,8 @@ const wechatTriggerId = 'palo-wechat-share-trigger'
             <Link
               href="javascript:void(0)"
               id={wechatTriggerId}
+              data-qrcode-trigger="true"
+              data-qrcode-base={wechatTriggerId}
               isButton
               hideIcon
               animateOnHover
@@ -68,13 +68,8 @@ const wechatTriggerId = 'palo-wechat-share-trigger'
   }
 </ul>
 
-<Modal triggerId={wechatTriggerId} id={wechatModalId} title="Share on WeChat" headingSize="h5">
-  <div class="flex flex-col items-center justify-center px-4 pb-16 pt-16 text-center">
-      <div class="mb-4 overflow-hidden rounded-lg border bg-white p-2" style="border-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));">
-        <img src={qrCodeApiUrl} alt="WeChat QR Code" class="h-[180px] w-[180px]" loading="lazy" />
-      </div>
-      <p class="font-base" style="color: light-dark(var(--color-neutral-600), var(--color-neutral-400));">
-        Open WeChat, scan the QR code to share this page with friends or moments.
-      </p>
-    </div>
-</Modal>
+<QRCodeModal 
+  title="Share on WeChat" 
+  qrUrl={url}
+  triggerId={wechatTriggerId}
+/>

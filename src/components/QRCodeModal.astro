@@ -2,36 +2,74 @@
 import { Heading } from 'accessible-astro-components'
 import type { SocialItem } from '../types/config'
 import { getQrCodeBaseId, getQrCodeModalId } from '@utils/qrcodeId'
+import qrcode from 'qrcode'
 
 interface Props {
-  socialItem: SocialItem
+  socialItem?: SocialItem
+  title?: string
+  qrUrl?: string
+  qrCode?: string
+  triggerId?: string
 }
 
-const { socialItem } = Astro.props
+const { socialItem, title, qrUrl: externalQrUrl, qrCode: externalQrCode, triggerId: externalTriggerId } = Astro.props
 
-const baseId = getQrCodeBaseId(socialItem.label)
-const modalId = getQrCodeModalId(socialItem.label)
-const triggerId = `${baseId}-trigger`
-const cleanLabel = socialItem.label.replace(/\*\*/g, '')
+const isShareMode = !!title && !socialItem
+const cleanLabel = title || socialItem?.label?.replace(/\*\*/g, '') || ''
+
+let computedTriggerId: string
+let modalId: string
+
+if (isShareMode && externalTriggerId) {
+  computedTriggerId = externalTriggerId
+  modalId = `${externalTriggerId}-modal`
+} else if (socialItem) {
+  const baseId = getQrCodeBaseId(socialItem.label)
+  modalId = getQrCodeModalId(socialItem.label)
+  computedTriggerId = `${baseId}-trigger`
+} else {
+  computedTriggerId = 'palo-qrcode-trigger'
+  modalId = 'palo-qrcode-modal'
+}
+
+const qrUrl = externalQrUrl || socialItem?.qrUrl?.trim()
+const qrCodePath = externalQrCode || socialItem?.qrCode?.trim()
+
+let qrSvgContent = ''
+if (qrUrl) {
+  const svg = await qrcode.toString(qrUrl, {
+    type: 'svg',
+    width: 180,
+    margin: 0,
+    color: {
+      dark: '#1a1a1a',
+      light: '#ffffff',
+    },
+  })
+  qrSvgContent = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+}
 ---
 
 <dialog
   id={modalId}
   class="qrcode-modal"
-  aria-labelledby={`${triggerId}-title`}
-  data-trigger-id={triggerId}
+  aria-labelledby={`${computedTriggerId}-title`}
+  data-trigger-id={computedTriggerId}
 >
   <div class="modal-inner">
     <div class="modal-content">
-      <Heading level="h3" size="h5" id={`${triggerId}-title`} tabindex="-1" autofocus>
+      <Heading level="h3" size="h5" id={`${computedTriggerId}-title`} tabindex="-1" autofocus>
         {cleanLabel}
       </Heading>
-      <div class="flex flex-col items-center justify-center text-center">
-        <div class="mb-4 w-full overflow-hidden rounded-lg">
-          <img src={socialItem.qrCode} alt={`${cleanLabel} QR Code`} class="w-full" loading="lazy" />
+      <div class="flex flex-col items-center justify-center px-4 pb-16 pt-16 text-center w-full">
+        <div class="mb-4 max-w-[256px] overflow-hidden rounded-lg border bg-white p-2" style="border-color: light-dark(var(--color-neutral-200), var(--color-neutral-700));">
+          <img src={qrSvgContent || qrCodePath} alt={`${cleanLabel} QR Code`} class="w-full h-auto" loading="lazy" />
         </div>
         <p class="font-base" style="color: light-dark(var(--color-neutral-600), var(--color-neutral-400));">
-          Scan the QR code to connect on {cleanLabel}.
+          {isShareMode 
+            ? `Open WeChat, scan the QR code to share this page with friends or moments.` 
+            : `Scan the QR code to connect on ${cleanLabel}.`
+          }
         </p>
       </div>
     </div>
@@ -68,7 +106,7 @@ const cleanLabel = socialItem.label.replace(/\*\*/g, '')
   :where(.qrcode-modal .modal-content) {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.75rem;
     background-color: light-dark(hsl(204 20% 94%), hsl(215 25% 15%));
     padding: 2rem;

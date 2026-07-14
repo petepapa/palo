@@ -14,15 +14,28 @@
 
 @use '../base/mixins' as *;
 
+// ── 共享下划线样式占位符（避免 hover / 5b 段重复）───────────────
+%nav-list-underline {
+  text-decoration: underline !important;
+  text-decoration-style: solid !important;
+  text-decoration-color: currentColor !important;
+  text-decoration-thickness: 0.125em !important;
+  text-underline-offset: 0.25em !important;
+  text-decoration-skip-ink: none !important;
+  transition: none !important;
+}
+
 @layer components {
   .palo-nav-list {
     // ── 0. 排版计算令牌 ─────────────────────────────────────────
     //    垂直间隙 = 1em × 正文行高 × 用户缩放系数
     --palo-nav-vertical-space: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1));
+    //    列表项行高 = 1em × 正文行高（统一基线，带图标和纯文本自然等高）
+    --palo-nav-item-line-height: calc(1em * var(--line-height-body, 1.5));
     //    ⚠️  不在此处重新声明 --palo-nav-horizontal-space，直接从 :root 继承避免自引用
 
     // ── 0b. 容器内政仅清 list-style，外交边界绝不插手 ─────────
-    list-style: none !important;
+    list-style: none;
 
     // ── 1. 默认：清空下划线，字重跟随正文，长文本换行 ────────────
     a {
@@ -36,7 +49,15 @@
       hyphens: auto;
       text-decoration-skip-ink: none;
 
-      :where(.font-medium, .font-semibold, .font-bold) {
+      // **text** → heading 字重（不改变大小写）
+      .font-medium {
+        font-weight: var(--font-weight-heading, 600);
+        text-transform: none;
+        color: inherit;
+      }
+
+      // *text* → accent 字重
+      .font-accent {
         font-weight: var(--font-weight-accent, 500);
         color: inherit;
       }
@@ -85,13 +106,30 @@
         margin-bottom: 0 !important;
         padding-top: 0 !important;
         padding-bottom: 0 !important;
-        line-height: var(--line-height-body, 1.5) !important;
       }
 
       a {
         display: flex;
         align-items: center;
         width: 100%;
+        min-height: var(--palo-nav-item-line-height);
+        line-height: var(--line-height-body, 1.5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        svg {
+          flex-shrink: 0;
+          height: 1em;
+          width: 1em;
+          margin-inline-end: var(--space-2xs, 0.5rem);
+        }
+
+        span {
+          flex-shrink: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
       }
     }
 
@@ -103,19 +141,26 @@
         font-weight var(--animation-speed-instant) var(--cubic-bezier);
     }
 
-    // ── 5. Hover / Focus：展示下划线 ──────────────────────────────
+    // ── 5. Hover / Focus：展示下划线（覆盖 footer a 的 mixin）───
     a:hover,
     a:focus-visible {
-      text-decoration: underline;
-      text-decoration-thickness: 0.125em;
-      text-underline-offset: 0.25em;
+      @extend %nav-list-underline;
+    }
 
-      .font-medium,
-      .font-semibold,
-      .font-bold {
-        text-decoration: none;
-        display: inline-block;
-      }
+    a:hover svg,
+    a:focus-visible svg {
+      text-decoration: none !important;
+    }
+
+    // ── 5b. 含 accent/heading 字重的列表项（social 列表）：仅在 body 字重文字上展示下划线 ──
+    a:has(.font-medium, .font-accent):hover,
+    a:has(.font-medium, .font-accent):focus-visible {
+      text-decoration: none !important;
+    }
+
+    a:has(.font-medium, .font-accent):hover .font-body,
+    a:has(.font-medium, .font-accent):focus-visible .font-body {
+      @extend %nav-list-underline;
     }
 
     // ═══════════════════════════════════════════════════════════

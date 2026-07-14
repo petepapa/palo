@@ -739,6 +739,7 @@ const themeVariablesCss = `
   --navigation-dropdown-mobile-font-size: ${navigationDropdownMobileFontSize};
   --palo-nav-horizontal-space: ${navListHorizontalGapRem};
   --palo-nav-vertical-scale: ${navListVerticalScale};
+  --palo-nav-heading-gap: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1) * 1.5);
   --line-height-body: calc(1.6 * var(--line-height-scale));
   --logo-size: ${logoSize};
   --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
@@ -1755,6 +1756,22 @@ ${bodyLineHeights}
           text-decoration: none;
         }
 
+        /* ── Footer / Tags / TOC：标题与第一行的间距统一跟随 verticalScale ── */
+        :is(
+          footer .flex.flex-col:has(>.palo-nav-list),
+          .tags-filter,
+          .article-toc
+        ) {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: var(--palo-nav-heading-gap) !important;
+        }
+
+        .tags-filter .heading,
+        .article-toc > * {
+          margin-block: 0 !important;
+        }
+
         @media (min-width: 768px) {
           .article-content--with-toc {
             grid-template-columns: minmax(0, 1fr) 280px;
@@ -2444,10 +2461,10 @@ ${bodyLineHeights}
             return originalShowModal.apply(this, Array.prototype.slice.call(arguments, 1))
           }
 
-          // 如果打开的是 launcher，且当前有 modal 打开，
+          // 如果打开的是 launcher，且当前有 modal 或 qrcode-modal 打开，
           // 先关闭 modal，等动画结束后再打开 launcher
           if (this.classList.contains('launcher')) {
-            var openModal = document.querySelector('.modal[open]:not(.closing)')
+            var openModal = document.querySelector('.modal[open]:not(.closing), .qrcode-modal[open]:not(.closing)')
             if (openModal) {
               var self = this
               var launcherOpened = false
@@ -2457,7 +2474,9 @@ ${bodyLineHeights}
                 paloShowDialog(self)
               }
               // 使用包装后的 closeModal，确保 Modal 库状态正确清理
-              if (typeof window.closeModal === 'function') {
+              if (openModal.classList.contains('qrcode-modal')) {
+                window.paloCloseQrCodeModal()
+              } else if (typeof window.closeModal === 'function') {
                 window.closeModal()
               } else {
                 window.paloCloseDialog(openModal)
@@ -2474,9 +2493,9 @@ ${bodyLineHeights}
             }
           }
 
-          // 如果打开的是 modal，且当前有 launcher 打开，
+          // 如果打开的是 modal 或 qrcode-modal，且当前有 launcher 打开，
           // 先关闭 launcher，等动画结束后再打开 modal
-          if (this.classList.contains('modal')) {
+          if (this.classList.contains('modal') || this.classList.contains('qrcode-modal')) {
             var openLauncher = document.querySelector('.launcher[open]:not(.closing)')
             if (openLauncher) {
               var self2 = this
@@ -2494,6 +2513,38 @@ ${bodyLineHeights}
               })
               // 兜底：400ms 后强制打开
               setTimeout(openModalNow, 400)
+              return
+            }
+          }
+
+          // 如果打开的是 modal 或 qrcode-modal，且当前有其他 modal 或 qrcode-modal 已打开，
+          // 先关闭已有的，等动画结束后再打开新的
+          if (this.classList.contains('modal') || this.classList.contains('qrcode-modal')) {
+            var openOtherModal = document.querySelector('.modal[open]:not(.closing), .qrcode-modal[open]:not(.closing)')
+            if (openOtherModal && openOtherModal !== this) {
+              var self3 = this
+              var newModalOpened = false
+              function openNewModalNow() {
+                if (newModalOpened) return
+                newModalOpened = true
+                paloShowDialog(self3)
+              }
+              // 根据类型选择正确的关闭函数
+              if (openOtherModal.classList.contains('qrcode-modal')) {
+                window.paloCloseQrCodeModal()
+              } else if (typeof window.closeModal === 'function') {
+                window.closeModal()
+              } else {
+                window.paloCloseDialog(openOtherModal)
+              }
+              // 等已有 modal 关闭动画结束后再打开新的
+              openOtherModal.addEventListener('animationend', function onCloseEnd(e) {
+                if (e.target !== openOtherModal) return
+                openOtherModal.removeEventListener('animationend', onCloseEnd)
+                openNewModalNow()
+              })
+              // 兜底：350ms 后强制打开
+              setTimeout(openNewModalNow, 350)
               return
             }
           }

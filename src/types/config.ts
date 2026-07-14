@@ -101,6 +101,7 @@ export interface SocialItem {
   type?: SocialItemType
   external?: boolean
   qrCode?: string
+  qrUrl?: string
 }
 
 export interface SiteConfig {
