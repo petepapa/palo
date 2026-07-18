@@ -15,7 +15,7 @@ interface Props {
 const { socialItem, title, qrUrl: externalQrUrl, qrCode: externalQrCode, triggerId: externalTriggerId } = Astro.props
 
 const isShareMode = !!title && !socialItem
-const cleanLabel = title || socialItem?.label?.replace(/\*\*/g, '') || ''
+const cleanLabel = (title || socialItem?.label || '').replace(/[*]/g, '')
 
 let computedTriggerId: string
 let modalId: string
