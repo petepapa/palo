@@ -113,11 +113,19 @@
     // ──────────────────────────────────────────────
     // 6. TABLES (STYLING ELEMENTS FOR RESPONSIVENESS)
     // ──────────────────────────────────────────────
+    // ── 核心修复：裸 table / pre 必须自带溢出约束，不依赖客户端脚本包装时机 ──
+    // 否则 releaseShield(~16ms) 和 initProseEnhancementsBlog(100ms+) 之间的时间窗口，
+    // 在 iOS Safari 上会瞬间撑破视口宽度，污染 scrollWidth 导致右侧永久空白。
     table {
       inline-size: 100%;
+      max-inline-size: 100%;
       border-collapse: collapse;
       font-size: var(--text-sm);
       text-align: inline-start;
+      display: block;            /* 关键：block 化才能让 overflow-x 生效 */
+      overflow-x: auto;          /* 关键：自带横向滚动容器，不依赖 JS 包装 */
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
 
       th {
         background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
@@ -143,6 +151,26 @@
       tr:hover td {
         background-color: light-dark(rgba(0, 0, 0, 0.03), rgba(255, 255, 255, 0.03));
       }
+    }
+
+    /* 被 JS 包装后的 table：移除自身 display:block，完全由 .table-wrapper 控制溢出
+       这样边框/阴影/圆角可以落在 wrapper 上，table 内部无缝对接 */
+    .table-wrapper > table {
+      display: table;
+      overflow: visible;
+      margin-block: 0;
+      box-shadow: none;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+
+    // ── pre 代码块同理，自带横向滚动兜底 ──
+    pre {
+      max-inline-size: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
     }
 
     // Horizontal Scroll Wrapper styling for tables (injected via client-side script)

@@ -1320,6 +1320,60 @@ ${bodyLineHeights}
         }
       }
 
+      /* ── 关键修复：Shield 阶段刚性宽度锚定 ──
+         在 prose 增强脚本执行前（表格尚未被 .table-wrapper 包裹），
+         防止宽表格 / 代码块 / BreakoutImage 撑破视口，
+         避免 iOS Safari 文档宽度被污染，造成 Shield 骨架横向拉伸错乱。 */
+      html:not([data-css-ready="true"]),
+      html:not([data-css-ready="true"]) body {
+        overflow-x: clip !important;
+      }
+
+      html:not([data-css-ready="true"]) main,
+      html:not([data-css-ready="true"]) .container,
+      html:not([data-css-ready="true"]) .prose,
+      html:not([data-css-ready="true"]) .article-content,
+      html:not([data-css-ready="true"]) .article-content__main,
+      html:not([data-css-ready="true"]) section > .container,
+      html:not([data-css-ready="true"]) #main-content > * {
+        max-width: 100% !important;
+        overflow-x: clip !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Shield 阶段裸表格 / 代码块强制不撑破父容器
+         注意：不再使用 table-layout: fixed / td max-width:0 这种过激规则，
+         因为 _prose.scss 已给裸 table 加了 display:block + overflow-x:auto 的永久兜底，
+         过激规则会导致 Shield→正常态切换时出现瞬间布局跳动，反而让 iOS Safari 计算错乱 */
+      html:not([data-css-ready="true"]) .prose table,
+      html:not([data-css-ready="true"]) .prose pre,
+      html:not([data-css-ready="true"]) .prose blockquote {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      html:not([data-css-ready="true"]) .prose code,
+      html:not([data-css-ready="true"]) .prose pre code {
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+      }
+
+      /* Shield 阶段 BreakoutImage 不参与横向突破，防止 100vw fallback 撑破 iOS Safari */
+      html:not([data-css-ready="true"]) .breakout-image,
+      html:not([data-css-ready="true"]) [data-breakout-image],
+      html:not([data-css-ready="true"]) .breakout-image-wrapper,
+      html:not([data-css-ready="true"]) .breakout {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        overflow: hidden !important;
+      }
+
     </style>
 
     <script is:inline>

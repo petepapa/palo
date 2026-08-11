@@ -163,6 +163,171 @@ const authorImageResolved = resolveAuthorImageResolved(authorInfo.image, postId,
   </section>
 </DefaultLayout>
 
+<script is:inline>
+  // ── Prose 增强：表格响应式滚动包装 + Mermaid 渲染（与 MarkdownLayout 对齐） ──
+  const initProseEnhancementsBlog = async () => {
+    const DEBUG = document.documentElement.dataset.paloDebug === 'true'
+    // 1. Table responsive wrapping
+    document.querySelectorAll('.prose table').forEach((table) => {
+      if (table.parentElement?.classList.contains('table-wrapper')) return
+      
+      const wrapper = document.createElement('div')
+      wrapper.className = 'table-wrapper overflow-x-auto my-6 max-w-full rounded-lg'
+      
+      table.parentNode?.insertBefore(wrapper, table)
+      wrapper.appendChild(table)
+    })
+
+    // 2. Dynamic client-side Mermaid rendering
+    const allMermaidBlocks = []
+    document.querySelectorAll('.prose pre').forEach((pre) => {
+      if (pre.dataset.paloMermaidProcessed === 'true') return
+      
+      const code = pre.querySelector('code')
+      if (!code) return
+      
+      // Check if it's a mermaid block - check multiple possible locations
+      const isMermaid = pre.dataset.language === 'mermaid' ||
+                        code.classList.contains('language-mermaid') || 
+                        code.classList.contains('lang-mermaid') ||
+                        /\blanguage-mermaid\b|\blang-mermaid\b/.test(pre.className)
+      
+      if (isMermaid) {
+        if (DEBUG) console.log('Found Mermaid block:', pre)
+        allMermaidBlocks.push(pre)
+      }
+    })
+
+    if (allMermaidBlocks.length > 0 && typeof mermaid !== 'undefined') {
+      try {
+        if (DEBUG) console.log('Found', allMermaidBlocks.length, 'Mermaid block(s)')
+
+        for (let i = 0; i < allMermaidBlocks.length; i++) {
+          const pre = allMermaidBlocks[i]
+          const code = pre.querySelector('code')
+          const content = code?.textContent || pre.textContent || ''
+          
+          const container = document.createElement('div')
+          container.className = 'mermaid-container'
+          container.dataset.originalCode = content.trim()
+          
+          const mermaidInner = document.createElement('div')
+          mermaidInner.className = 'mermaid'
+          mermaidInner.id = 'mermaid-' + Date.now() + '-' + i
+          mermaidInner.textContent = content.trim()
+          
+          container.appendChild(mermaidInner)
+          
+          pre.dataset.paloMermaidProcessed = 'true'
+          pre.replaceWith(container)
+        }
+
+        await renderMermaidWithThemeBlog()
+        if (DEBUG) console.log('Mermaid render complete')
+      } catch (err) {
+        console.error('Failed to load or render Mermaid:', err)
+      }
+    }
+  }
+
+  const renderMermaidWithThemeBlog = async () => {
+    if (typeof mermaid === 'undefined') return
+    const DEBUG = document.documentElement.dataset.paloDebug === 'true'
+
+    const containers = document.querySelectorAll('.mermaid-container')
+    if (containers.length === 0) return
+
+    const isDark = document.documentElement.classList.contains('darkmode')
+
+    try {
+      const cs = getComputedStyle(document.documentElement)
+      const fg = cs.getPropertyValue('--foreground-color')?.trim() || (isDark ? '#fff' : '#111')
+      const bg = cs.getPropertyValue('--background-color')?.trim() || (isDark ? '#111' : '#fff')
+      const primary = cs.getPropertyValue('--link-color')?.trim() || cs.getPropertyValue('--color-primary-400')?.trim() || '#4f46e5'
+      const border = cs.getPropertyValue('--border-color')?.trim() || '#888'
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
+        themeVariables: {
+          background: bg,
+          textColor: fg,
+          primaryColor: primary,
+          lineColor: border,
+        },
+      })
+    } catch (errTheme) {
+      mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default', securityLevel: 'loose' })
+    }
+
+    containers.forEach((container) => {
+      const rawCode = container.dataset.originalCode
+      if (!rawCode) return
+
+      container.innerHTML = ''
+
+      const newId = `mermaid-${Math.random().toString(36).substr(2, 9)}`
+      const newDiv = document.createElement('div')
+      newDiv.className = 'mermaid'
+      newDiv.id = newId
+      newDiv.textContent = rawCode
+
+      container.appendChild(newDiv)
+    })
+
+    try {
+      await mermaid.run()
+      if (DEBUG) console.log('[Mermaid] Re-render complete (theme:', isDark ? 'dark' : 'light', ')')
+    } catch (err) {
+      console.error('[Mermaid] Re-render failed:', err)
+    }
+  }
+
+  const paloInitMermaidThemeWatcherBlog = () => {
+    if (document.querySelectorAll('.mermaid-container').length === 0) return
+
+    let pending = false
+    const observer = new MutationObserver(() => {
+      if (pending) return
+      pending = true
+
+      requestAnimationFrame(() => {
+        pending = false
+        renderMermaidWithThemeBlog()
+      })
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+  }
+
+  document.addEventListener('astro:page-load', initProseEnhancementsBlog)
+  document.addEventListener('astro:after-swap', initProseEnhancementsBlog)
+  
+  const paloInitMermaidWatcherWithDelayBlog = () => {
+    setTimeout(paloInitMermaidThemeWatcherBlog, 200)
+  }
+
+  document.addEventListener('astro:page-load', paloInitMermaidWatcherWithDelayBlog)
+  document.addEventListener('astro:after-swap', paloInitMermaidWatcherWithDelayBlog)
+  
+  if (document.readyState === 'loading') {
+    // DOMContentLoaded 是同步触发的，此时 releaseShield 的 requestAnimationFrame
+    // 还没到执行时机，所以包装一定先完成，Shield 释放时就已经是包装好的表格
+    document.addEventListener('DOMContentLoaded', initProseEnhancementsBlog)
+    document.addEventListener('DOMContentLoaded', paloInitMermaidWatcherWithDelayBlog)
+  } else {
+    // readyState 已经是 interactive/complete 时，直接同步执行，避免 100ms 空窗
+    // CSS 层面 (_prose.scss table display:block + overflow-x:auto) 也已经兜底，
+    // 即使这里执行时 releaseShield 已经先触发，也不会撑破视口
+    initProseEnhancementsBlog()
+    paloInitMermaidThemeWatcherBlog()
+  }
+</script>
+
 <style lang="scss" is:global>
   @layer components {
     .article-content {
