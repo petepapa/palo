@@ -1323,10 +1323,17 @@ ${bodyLineHeights}
       /* ── 关键修复：Shield 阶段刚性宽度锚定 ──
          在 prose 增强脚本执行前（表格尚未被 .table-wrapper 包裹），
          防止宽表格 / 代码块 / BreakoutImage 撑破视口，
-         避免 iOS Safari 文档宽度被污染，造成 Shield 骨架横向拉伸错乱。 */
+         避免 iOS Safari 文档宽度被污染，造成 Shield 骨架横向拉伸错乱。
+
+         ⚠️ 兼容性注意：
+         - 用 overflow-x: hidden 而不是 clip：clip 在 iOS Safari <16 支持不一致，
+           可能降级为 visible，完全失去作用。hidden 更保守、更可靠。
+         - contain: layout paint size：强制 iOS Safari 在计算视口宽度时
+           忽略子元素溢出尺寸，真正把宽度锁死。 */
       html:not([data-css-ready="true"]),
       html:not([data-css-ready="true"]) body {
-        overflow-x: clip !important;
+        overflow-x: hidden !important;
+        contain: layout paint;
       }
 
       html:not([data-css-ready="true"]) main,
@@ -1337,8 +1344,9 @@ ${bodyLineHeights}
       html:not([data-css-ready="true"]) section > .container,
       html:not([data-css-ready="true"]) #main-content > * {
         max-width: 100% !important;
-        overflow-x: clip !important;
+        overflow-x: hidden !important;
         box-sizing: border-box !important;
+        min-width: 0 !important;
       }
 
       /* Shield 阶段裸表格 / 代码块强制不撑破父容器

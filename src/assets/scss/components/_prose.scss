@@ -2,6 +2,29 @@
 
 @layer components {
   .prose {
+    // ── iOS Safari 横向溢出终极防御 ──
+    // 在 prose 根级直接把溢出和宽度锁死，让所有子元素（表格、代码块、图片、长单词）
+    // 都无法撑开 .prose 容器。这是 iOS Safari 右侧空白最可靠的终极保险。
+    max-inline-size: 100%;
+    overflow-wrap: break-word;     /* 长单词/URL 强制断行 */
+    word-break: break-word;        /* 兼容性备用 */
+    hyphens: auto;                 /* 长单词连字符断词（可选优化）*/
+
+    // prose 内部任何元素，宽度永远不超过 prose 容器自身
+    // （这包括 table pre blockquote iframe video canvas svg 等所有可能溢出的元素）
+    > *,
+    table,
+    pre,
+    blockquote,
+    iframe,
+    video,
+    canvas,
+    svg,
+    form,
+    fieldset {
+      max-inline-size: 100%;
+    }
+
     // ──────────────────────────────────────────────
     // 1. INLINE CODE (CRITICAL)
     // ──────────────────────────────────────────────
@@ -14,6 +37,8 @@
       border: 1px solid light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08)) !important;
       color: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
       word-break: break-word;
+      overflow-wrap: anywhere;       /* 长类名/长URL一定断行，不能把 prose 撑宽 */
+      white-space: normal;
       box-shadow: none !important;
     }
 
