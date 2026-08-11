@@ -31,6 +31,32 @@ function isAstroImageModule(value: unknown): value is { src: string; width: numb
  *
  * 返回绝对路径，或 null（表示无法解析）。
  */
+function resolvePublicAssetPath(inputPath: string): string | null {
+  if (!inputPath.startsWith('/')) {
+    return null
+  }
+
+  if (inputPath.startsWith('/@fs/')) {
+    const cleanPath = inputPath.substring(4).split('?')[0]
+    if (fs.existsSync(cleanPath)) {
+      return cleanPath
+    }
+  }
+
+  const relative = inputPath.slice(1)
+  const candidate = path.resolve(process.cwd(), 'public', relative)
+  if (fs.existsSync(candidate)) {
+    return candidate
+  }
+
+  const fallbackCandidate = path.resolve(process.cwd(), relative)
+  if (fs.existsSync(fallbackCandidate)) {
+    return fallbackCandidate
+  }
+
+  return null
+}
+
 function resolveImagePath(imageInput: unknown): string | null {
   try {
     // ── 形态 1: Astro ESM 图片导入对象 ──
@@ -46,7 +72,6 @@ function resolveImagePath(imageInput: unknown): string | null {
 
       const srcPath = imageInput.src
 
-      // 2. 如果 src 是以 /@fs/ 开头的 dev server 虚拟绝对路径，剔除该前缀和 query 参数
       if (srcPath.startsWith('/@fs/')) {
         const cleanPath = srcPath.substring(4).split('?')[0]
         if (fs.existsSync(cleanPath)) {
@@ -54,11 +79,17 @@ function resolveImagePath(imageInput: unknown): string | null {
         }
       }
 
-      // 3. 原有逻辑与相对路径解析兜底，并排除虚拟 /_astro/ 路径
+      if (!srcPath.startsWith('/_astro/')) {
+        const publicResolved = resolvePublicAssetPath(srcPath)
+        if (publicResolved) {
+          return publicResolved
+        }
+      }
+
       if (path.isAbsolute(srcPath) && !srcPath.startsWith('/_astro/')) {
         return srcPath
       }
-      
+
       if (!srcPath.startsWith('/_astro/')) {
         const absolute = path.resolve(process.cwd(), srcPath)
         if (fs.existsSync(absolute)) {
@@ -77,24 +108,9 @@ function resolveImagePath(imageInput: unknown): string | null {
 
     // ── 形态 2: 绝对虚拟路径（以 / 开头） ──
     if (inputPath.startsWith('/')) {
-      // 2a. /@fs/ 前缀：Vite dev server 虚拟绝对路径，直接剔除前缀
-      if (inputPath.startsWith('/@fs/')) {
-        const cleanPath = inputPath.substring(4).split('?')[0]
-        if (fs.existsSync(cleanPath)) {
-          return cleanPath
-        }
-      }
-
-      // 2b. 去除开头的 /，拼上 ./public/
-      const relative = inputPath.slice(1)
-      const candidate = path.resolve(process.cwd(), 'public', relative)
-      if (fs.existsSync(candidate)) {
-        return candidate
-      }
-      // 再试一次不带 public 前缀（某些场景下路径已经是完整的）
-      const fallbackCandidate = path.resolve(process.cwd(), relative)
-      if (fs.existsSync(fallbackCandidate)) {
-        return fallbackCandidate
+      const publicResolved = resolvePublicAssetPath(inputPath)
+      if (publicResolved) {
+        return publicResolved
       }
       return null
     }

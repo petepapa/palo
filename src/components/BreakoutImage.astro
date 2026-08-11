@@ -38,12 +38,23 @@ const contentImageGlob = import.meta.glob(
   { eager: true }
 )
 
-const imageByFilename: Record<string, ImageMetadata> = {}
+type ResolvedImageEntry = {
+  metadata: ImageMetadata
+  publicPath: string
+}
+
+const imageByFilename: Record<string, ResolvedImageEntry> = {}
 for (const [filePath, mod] of Object.entries(contentImageGlob)) {
   const metadata = (mod as { default: unknown }).default
   if (isImageMetadata(metadata)) {
     const filename = filePath.split('/').pop()!
-    imageByFilename[filename] = metadata
+    const publicPath = filePath.includes('/src/content/posts/')
+      ? `/posts/${filePath.replace('/src/content/posts/', '')}`
+      : filePath.includes('/src/content/projects/')
+        ? `/projects/${filePath.replace('/src/content/projects/', '')}`
+        : metadata.src
+
+    imageByFilename[filename] = { metadata, publicPath }
   }
 }
 
@@ -58,7 +69,18 @@ function resolveImageSrc(rawSrc: string | ImageMetadata): string | ImageMetadata
   if (!isRelativeContentImage(rawSrc)) return rawSrc
 
   const filename = rawSrc.replace(/^\.\//, '').split('/').pop()!
-  return imageByFilename[filename] ?? rawSrc
+  const match = imageByFilename[filename]
+
+  if (!match) return rawSrc
+
+  if (import.meta.env.DEV) {
+    return {
+      ...match.metadata,
+      src: match.publicPath,
+    }
+  }
+
+  return match.metadata
 }
 
 type Props = {
@@ -112,6 +134,9 @@ if (import.meta.env.DEV && typeof imageSrc === 'string' && imageSrc.startsWith('
   imageSrc = `${imageSrc}?palo-breakout-bypass=${Date.now()}`
 }
 
+const imageWidth = isImageMetadata(resolvedSrc) ? resolvedSrc.width : undefined
+const imageHeight = isImageMetadata(resolvedSrc) ? resolvedSrc.height : undefined
+
 // Determine layout style, supporting backward compatibility with fullWidth
 // Default: 'full' — applies when layout is undefined or empty
 let resolvedLayout: 'full' | 'wide' | 'contained' = 'full'
@@ -160,8 +185,10 @@ const containerInlineStyle = [
 >
   {isImageMetadata(resolvedSrc) ? (
     <Image
-      src={imageSrc}
+      src={resolvedSrc}
       alt={altText}
+      width={imageWidth!}
+      height={imageHeight!}
       widths={[560, 840, 1120, 1400, 1680]}
       class:list={['progressive-img-inner', 'h-auto w-full object-cover opacity-0']}
       style="transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;"
@@ -171,7 +198,7 @@ const containerInlineStyle = [
     />
   ) : (
     <img
-      src={imageSrc}
+      src={typeof imageSrc === 'string' ? imageSrc : ''}
       alt={altText}
       class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0']}
       style="transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;"

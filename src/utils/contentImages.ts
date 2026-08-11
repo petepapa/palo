@@ -144,6 +144,19 @@ export function resolveRelativeImagePath(
  *
  * 返回 null 表示 glob 未命中（如纯 public/ 图片），调用方应回退到字符串路径。
  */
+function buildContentImageMetadata(metadata: ImageMetadata, filePath: string): ImageMetadata {
+  const publicPath = filePath.includes('/src/content/posts/')
+    ? `/posts/${filePath.replace('/src/content/posts/', '')}`
+    : filePath.includes('/src/content/projects/')
+      ? `/projects/${filePath.replace('/src/content/projects/', '')}`
+      : metadata.src
+
+  return {
+    ...metadata,
+    src: publicPath,
+  }
+}
+
 function resolveImageFromGlob(
   imagePath: string,
   contentId?: string,
@@ -171,7 +184,9 @@ function resolveImageFromGlob(
       : `/src/content/${basePath}/${normalizedImagePath}`
 
     const exactMatch = allGlobImages[fsPath]
-    if (exactMatch) return exactMatch
+    if (exactMatch) {
+      return import.meta.env.DEV ? buildContentImageMetadata(exactMatch, fsPath) : exactMatch
+    }
 
     // ── 文件名回退匹配 ──
     // 当精确路径推算偏差（如 contentDir 与实际目录结构不一致）时，
@@ -181,14 +196,14 @@ function resolveImageFromGlob(
       if (globKey.endsWith('/' + filename) || globKey.split('/').pop() === filename) {
         // 优先匹配与 collection 相关的路径
         if (globKey.includes(`/content/${basePath}/`)) {
-          return metadata
+          return import.meta.env.DEV ? buildContentImageMetadata(metadata, globKey) : metadata
         }
       }
     }
     // 放宽约束：跨 collection 也接受（作为最终回退）
     for (const [globKey, metadata] of Object.entries(allGlobImages)) {
       if (globKey.split('/').pop() === filename) {
-        return metadata
+        return import.meta.env.DEV ? buildContentImageMetadata(metadata, globKey) : metadata
       }
     }
   }
@@ -239,24 +254,21 @@ export function resolveContentImage(
         ? `src/content/${baseContentPath}/${contentDir}/${normalizedImagePath}`
         : `src/content/${baseContentPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
 
-      // Dev 模式：通过 /@fs/ 直接从源码目录提供 co-located 图片
-      // 避免依赖 public/ 下的复制（copy-colocated-images.mjs 仅在 build 时执行）
-      if (import.meta.env.DEV) {
-        const absolutePath = path.resolve(process.cwd(), fsContentPath)
-        if (fs.existsSync(absolutePath)) {
-          return `/@fs/${absolutePath}`
-        }
-        // /@fs/ fallback 失败时继续走 public 路径兜底
-        console.warn(
-          `[contentImages] Dev 模式 co-located 图片不存在：${fsContentPath}，回退到 public 路径`
-        )
-      }
-
-      // 非 dev 模式或文件不存在：构造 public 路径（依赖 copy-colocated-images.mjs 或构建）
       const basePublicPath = collection === 'posts' ? '/posts' : '/projects'
       const resolvedPath = contentDir
         ? `${basePublicPath}/${contentDir}/${normalizedImagePath}`
         : `${basePublicPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
+
+      // Dev 模式：优先使用与生产一致的 public 路径，避免源码级 /@fs/ 链路引入环境差异。
+      if (import.meta.env.DEV) {
+        const absolutePath = path.resolve(process.cwd(), fsContentPath)
+        if (fs.existsSync(absolutePath)) {
+          return resolvedPath
+        }
+        console.warn(
+          `[contentImages] Dev 模式 co-located 图片不存在：${fsContentPath}，回退到 public 路径`
+        )
+      }
 
       return resolvedPath
     }
