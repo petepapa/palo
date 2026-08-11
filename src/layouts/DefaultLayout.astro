@@ -1999,6 +1999,11 @@ ${bodyLineHeights}
           transition: width var(--animation-speed-medium) var(--cubic-bezier), height var(--animation-speed-medium) var(--cubic-bezier);
         }
 
+        .palo-custom-cursor.is-hidden {
+          opacity: 0;
+          visibility: hidden;
+        }
+
         @media (hover: none) {
           .palo-custom-cursor {
             display: none !important;
@@ -3061,8 +3066,11 @@ ${bodyLineHeights}
           var targetY = window.innerHeight / 2
           var currentX = targetX
           var currentY = targetY
+          var hasLastPointerPosition = false
           var rafId = null
           var isHovering = false
+          var isHidden = true
+          var CURSOR_POSITION_STORAGE_KEY = 'palo-custom-cursor-position'
 
           var HOVER_SELECTOR = 'a, button, .clickable, [role="button"], summary, label, input[type="checkbox"], input[type="radio"]'
 
@@ -3089,6 +3097,11 @@ ${bodyLineHeights}
               return
             }
 
+            if (isHidden) {
+              rafId = null
+              return
+            }
+
             currentX += (targetX - currentX) * 0.5
             currentY += (targetY - currentY) * 0.5
 
@@ -3106,14 +3119,75 @@ ${bodyLineHeights}
           }
 
           function scheduleUpdate() {
+            if (isHidden) return
             if (rafId === null) {
               rafId = requestAnimationFrame(update)
+            }
+          }
+
+          function showCursor() {
+            var cursor = getCursor()
+            if (!cursor) return
+            isHidden = false
+            cursor.classList.remove('is-hidden')
+            cursor.style.opacity = '1'
+            cursor.style.visibility = 'visible'
+          }
+
+          function hideCursor() {
+            var cursor = getCursor()
+            if (!cursor) return
+            isHidden = true
+            if (rafId !== null) {
+              cancelAnimationFrame(rafId)
+              rafId = null
+            }
+            cursor.classList.add('is-hidden')
+            cursor.style.opacity = '0'
+            cursor.style.visibility = 'hidden'
+            cursor.style.transform = 'translate3d(-200px, -200px, 0) translate(-50%, -50%)'
+          }
+
+          function isInsideViewport(x, y) {
+            return x >= 0 && x <= window.innerWidth && y >= 0 && y <= window.innerHeight
+          }
+
+          function savePointerPosition(x, y) {
+            try {
+              window.sessionStorage.setItem(CURSOR_POSITION_STORAGE_KEY, JSON.stringify({ x: x, y: y }))
+            } catch (e) {
+              // Ignore storage errors.
+            }
+          }
+
+          function restorePointerPosition() {
+            try {
+              var raw = window.sessionStorage.getItem(CURSOR_POSITION_STORAGE_KEY)
+              if (!raw) return false
+              var parsed = JSON.parse(raw)
+              if (!parsed || typeof parsed.x !== 'number' || typeof parsed.y !== 'number') return false
+              if (!isInsideViewport(parsed.x, parsed.y)) return false
+              targetX = currentX = parsed.x
+              targetY = currentY = parsed.y
+              hasLastPointerPosition = true
+              return true
+            } catch (e) {
+              return false
             }
           }
 
           function onMouseMove(e) {
             targetX = e.clientX
             targetY = e.clientY
+            hasLastPointerPosition = true
+            savePointerPosition(targetX, targetY)
+
+            if (!isInsideViewport(targetX, targetY)) {
+              hideCursor()
+              return
+            }
+
+            showCursor()
             scheduleUpdate()
           }
 
@@ -3128,6 +3202,26 @@ ${bodyLineHeights}
             }
           }
 
+          function onMouseEnter() {
+            showCursor()
+          }
+
+          function onMouseLeave() {
+            hideCursor()
+          }
+
+          function onMouseOut(e) {
+            var related = e.relatedTarget
+            if (!related || !(related instanceof Node)) {
+              hideCursor()
+              return
+            }
+
+            if (!document.documentElement.contains(related)) {
+              hideCursor()
+            }
+          }
+
           // Safari 缩放/滚动时立即重新定位，避免指针停留在旧位置
           function onViewportChange() {
             scheduleUpdate()
@@ -3137,17 +3231,40 @@ ${bodyLineHeights}
             var cursor = getCursor()
             if (!cursor) return
 
-            targetX = currentX = window.innerWidth / 2
-            targetY = currentY = window.innerHeight / 2
+            if (!restorePointerPosition()) {
+              targetX = currentX = window.innerWidth / 2
+              targetY = currentY = window.innerHeight / 2
+            }
 
             var vp = getViewportOffset()
             var x = currentX + vp.offsetX
             var y = currentY + vp.offsetY
             cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)'
+            cursor.classList.remove('is-hidden')
+            cursor.style.opacity = '1'
+            cursor.style.visibility = 'visible'
+            isHidden = false
+
+            requestAnimationFrame(function () {
+              showCursor()
+              scheduleUpdate()
+            })
           }
 
           document.addEventListener('mousemove', onMouseMove, { passive: true })
           document.addEventListener('mouseover', onMouseOver)
+          document.documentElement.addEventListener('mouseenter', onMouseEnter, { passive: true })
+          document.documentElement.addEventListener('mouseleave', onMouseLeave, { passive: true })
+          document.addEventListener('mouseout', onMouseOut)
+          window.addEventListener('blur', onMouseLeave)
+          window.addEventListener('focus', onMouseEnter)
+          window.addEventListener('pageshow', init)
+          window.addEventListener('load', init)
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+              init()
+            }
+          })
 
           // 只在 Safari 中监听 visualViewport 变化（pinch-zoom 补偿）
           if (isSafari && window.visualViewport) {
@@ -3157,6 +3274,8 @@ ${bodyLineHeights}
 
           init()
           document.addEventListener('astro:page-load', init)
+          document.addEventListener('astro:after-swap', init)
+          document.addEventListener('astro:before-swap', hideCursor)
         })()
       </script>
     )}
