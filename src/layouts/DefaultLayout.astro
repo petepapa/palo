@@ -1328,12 +1328,11 @@ ${bodyLineHeights}
          ⚠️ 兼容性注意：
          - 用 overflow-x: hidden 而不是 clip：clip 在 iOS Safari <16 支持不一致，
            可能降级为 visible，完全失去作用。hidden 更保守、更可靠。
-         - contain: layout paint size：强制 iOS Safari 在计算视口宽度时
-           忽略子元素溢出尺寸，真正把宽度锁死。 */
+         - 不使用 contain: layout paint：它会创建新的包含块，破坏 position:fixed
+           元素（如 Header 导航），并影响 Shield 骨架期的布局计算。 */
       html:not([data-css-ready="true"]),
       html:not([data-css-ready="true"]) body {
         overflow-x: hidden !important;
-        contain: layout paint;
       }
 
       html:not([data-css-ready="true"]) main,
@@ -1346,7 +1345,6 @@ ${bodyLineHeights}
         max-width: 100% !important;
         overflow-x: hidden !important;
         box-sizing: border-box !important;
-        min-width: 0 !important;
       }
 
       /* Shield 阶段裸表格 / 代码块强制不撑破父容器
@@ -1593,6 +1591,32 @@ ${bodyLineHeights}
           syncHeaderThemeFromMain();
           releaseShield();
         });
+
+        // ── SPA 导航后重新播放背景视频 ──
+        // Astro ClientRouter 替换 DOM 后，新 <video autoplay> 不会自动播放，原因有二：
+        // 1. muted 属性反射 bug：HTML muted 属性不反映到 video.muted IDL 属性
+        // 2. 新 video 元素未自动开始加载：需显式 load() 启动，canplay 才会触发
+        function replayAutoplayVideos() {
+          document.querySelectorAll('video[autoplay]').forEach(function (video) {
+            video.muted = true
+            // 先尝试直接播放（如果视频已就绪或浏览器会自动加载）
+            var playPromise = video.play()
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise.catch(function () {
+                // play() 被拒绝：视频未就绪且未开始加载
+                // 显式 load() 强制启动加载，canplay 触发后再播放
+                video.addEventListener('canplay', function () {
+                  video.muted = true
+                  video.play().catch(function () {})
+                }, { once: true })
+                video.load()
+              })
+            }
+          })
+        }
+
+        document.addEventListener('astro:after-swap', replayAutoplayVideos)
+        document.addEventListener('astro:page-load', replayAutoplayVideos)
       })();
     </script>
 

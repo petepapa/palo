@@ -2,10 +2,9 @@
 
 @layer components {
   .prose {
-    // ── iOS Safari 横向溢出终极防御 ──
-    // 在 prose 根级直接把溢出和宽度锁死，让所有子元素（表格、代码块、图片、长单词）
-    // 都无法撑开 .prose 容器。这是 iOS Safari 右侧空白最可靠的终极保险。
+    // ── iOS Safari 横向溢出防御 ──
     max-inline-size: 100%;
+    min-width: 0;                  /* Grid/Flex 子项防撑开，仅限 prose 容器 */
     overflow-wrap: break-word;     /* 长单词/URL 强制断行 */
     word-break: break-word;        /* 兼容性备用 */
     hyphens: auto;                 /* 长单词连字符断词（可选优化）*/

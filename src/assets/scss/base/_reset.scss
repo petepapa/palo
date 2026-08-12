@@ -12,14 +12,6 @@
     box-sizing: inherit;
   }
 
-  /* ── iOS Safari 横向溢出终极防御 ──
-     Grid/Flex 子项默认 min-width:auto，会被内容（长表格/长代码）撑开。
-     这是导致"桌面缩小窗口没问题但真机 iOS 出错"的最经典原因之一。
-     所有潜在容器默认 min-width:0，让 overflow-x 约束真正生效。 */
-  * {
-    min-width: 0;
-  }
-
   body {
     /* 与 html 配套：再锁一层 overflow，防止 100vw 等回退撑破 */
     overflow-x: hidden;
