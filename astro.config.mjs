@@ -65,6 +65,52 @@ function yamlPlugin() {
   }
 }
 
+/**
+ * Astro Integration: CSS Preload Injector
+ * 构建完成后扫描 dist 目录所有 HTML 文件，在 <head> 最前面注入
+ * <link rel="preload" as="style"> 标签，让浏览器在解析 HTML 时
+ * 第一时间发现并并行下载外链 CSS，而不是等到 HTML 解析到
+ * <link rel="stylesheet"> 才开始。低速网络下可节省 0.5-1 秒阻塞时间。
+ */
+function cssPreloadIntegration() {
+  return {
+    name: 'palo-css-preload',
+    hooks: {
+      'astro:build:done': async ({ dir }) => {
+        const { readdirSync, readFileSync, writeFileSync, statSync } = await import('node:fs')
+        const { join } = await import('node:path')
+        const distDir = fileURLToPath(dir)
+
+        function processHtmlFiles(dirPath) {
+          for (const entry of readdirSync(dirPath)) {
+            const fullPath = join(dirPath, entry)
+            const stat = statSync(fullPath)
+            if (stat.isDirectory()) {
+              processHtmlFiles(fullPath)
+              continue
+            }
+            if (!entry.endsWith('.html')) continue
+
+            let html = readFileSync(fullPath, 'utf-8')
+            // 查找 Astro 自动注入的外链 CSS
+            const cssMatch = html.match(/<link[^>]*href=(\/_astro\/[^"\s>]+\.css)[^>]*rel=stylesheet[^>]*>/)
+            if (!cssMatch) continue
+            const cssUrl = cssMatch[1]
+            const preloadTag = `<link rel="preload" href="${cssUrl}" as="style">`
+            // 避免重复注入
+            if (html.includes(preloadTag)) continue
+            // 注入到 <head> 之后的第一位
+            html = html.replace(/<head([^>]*)>/, `<head$1>${preloadTag}`)
+            writeFileSync(fullPath, html)
+          }
+        }
+
+        processHtmlFiles(distDir)
+      },
+    },
+  }
+}
+
 // Vite configuration with path aliases, YAML plugin, and SCSS settings
 const viteConfig = {
   define: {
@@ -110,7 +156,7 @@ console.log('[Build Config] URL policy is controlled by config.yaml -> Astro tra
 console.log('[Build Config] ==========================================\n')
 
 // https://astro.build/config
-const integrations = [compress(), icon({ include: { ph: ['*'], 'fa6-brands': ['*'] } }), mdx()]
+const integrations = [compress(), icon({ include: { ph: ['*'], 'fa6-brands': ['*'] } }), mdx(), cssPreloadIntegration()]
 if (siteUrl) integrations.push(sitemap())
 
 export default defineConfig({

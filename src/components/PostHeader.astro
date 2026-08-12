@@ -181,7 +181,7 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
 >
   {isCoverImageTop && (
     <div class="post-header__image" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fetchPriority="high" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
     </div>
   )}
 
@@ -227,7 +227,7 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
 
   {isCoverImageHead && (
     <div class="post-header__image post-header__image--head" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fetchPriority="high" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
     </div>
   )}
 
@@ -277,7 +277,7 @@ const coverImageBgStyle = `background-color: ${bgColor} !important;`
 
   {isCoverImageBottom && (
     <div class="post-header__image post-header__image--bottom" style={coverImageBgStyle}>
-      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
+      <ContentImage src={finalImage} alt="" width={1600} height={900} class={coverImageClass} loading="eager" decoding="async" fetchPriority="high" fadeIn={true} bgColor={bgColor} loadedBgColor={loadedBgColor} />
     </div>
   )}
 </section>

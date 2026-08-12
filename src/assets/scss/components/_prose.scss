@@ -12,7 +12,9 @@
 
     // prose 内部任何元素，宽度永远不超过 prose 容器自身
     // （这包括 table pre blockquote iframe video canvas svg 等所有可能溢出的元素）
-    > *,
+    // ⚠️ 排除 breakout-image-container 及 breakout 相关元素：
+    //    BreakoutImage 的 full/wide 布局需要突破 prose 容器宽度限制
+    > *:not(.breakout-image-container):not(.breakout-image-wrapper):not([data-breakout-image]):not(.breakout),
     table,
     pre,
     blockquote,
