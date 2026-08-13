@@ -102,10 +102,10 @@ Due to the rendering mechanics of web fonts, Markdown italic syntax (*text* or _
 
 ## Images
 
-![This is an alt text.](/123.jpeg "This is a sample image.")
+![This is an alt text.](/sample.jpg "This is a sample image.")
 
 ```markdown
-![This is an alt text.](/123.jpeg "This is a sample image.")
+![This is an alt text.](/sample.jpg "This is a sample image.")
 ```
 
 ---
