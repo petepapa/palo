@@ -14,7 +14,7 @@ import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 import config from '@config'
-import { buildColumnsClass } from '../../../../types/config'
+import { buildProjectListStyle } from '../../../../types/config'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
@@ -28,14 +28,7 @@ const GAP_TO_REM: Record<string, string> = {'gap-0':'0','gap-px':'1px','gap-1':'
 const navListHorizontalGapRem = GAP_TO_REM[config.navigation?.navList?.horizontalGap ?? 'gap-4'] ?? '1rem'
 const navListVerticalScale = config.navigation?.navList?.verticalScale ?? 1
 
-// 构建 columns 类名（tagPage.columns 为空对象 {} 或无值时继承 defaults.columns）
-const tagPageColumns = portfolioTagPage.columns
-const effectiveColumns = tagPageColumns !== undefined && Object.keys(tagPageColumns).length > 0
-  ? tagPageColumns
-  : portfolioDefaults.columns
-const defaultColumns = effectiveColumns
-  ? buildColumnsClass(effectiveColumns)
-  : 'columns-[1] sm:columns-[2] lg:columns-[3] xl:columns-[3]'
+// 列参数：tagPage.columns 与 defaults.columns 合并（{} 表示完全继承 defaults）
 
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
@@ -51,7 +44,6 @@ const pageConfig = {
   layout: portfolioTagPage.layout ?? portfolioDefaults.layout ?? 'overlay',
   width: (portfolioTagPage.width ?? portfolioDefaults.width ?? 'full') as ProjectListWidth,
   gap: portfolioTagPage.gap ?? portfolioDefaults.gap ?? 'gap-5',
-  colsClass: defaultColumns,
 
   // ── 细粒度排版微调 / Typography Fine-Tuning (tagPage → defaults) ──
   tagsHeading: portfolioTagPage.tagsHeading ?? portfolioDefaults.tagsHeading ?? 'h5',
@@ -135,6 +127,7 @@ const { page, currentTag, uniqueTags } = Astro.props
 // 派生计算属性
 const projectListWidthClass = getProjectListWidthClass(pageConfig.width)
 const projectListGapSize = resolveTailwindGapClass(pageConfig.gap)
+const projectListStyle = buildProjectListStyle(projectListGapSize, portfolioTagPage.columns, portfolioDefaults.columns)
 const isFullWidthList = pageConfig.width === 'full'
 const resolvedMetaTitle = pageConfig.metaTitle || `Portfolio - ${currentTag.label}`
 const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered by ${currentTag.label} tag. Discover our work in ${currentTag.label} and related technologies.`
@@ -179,8 +172,8 @@ const resolvedMetaDescription = pageConfig.metaDescription || `Projects filtered
 
     <div class={isFullWidthList ? "w-full" : "container"}>
       <ul
-        class:list={['project-masonry mt-3', projectListWidthClass, pageConfig.colsClass]}
-        style={`--project-list-gap: ${projectListGapSize}`}
+        class:list={['project-masonry mt-3', projectListWidthClass]}
+        style={projectListStyle}
       >
         {
           page.data.map((project) => (

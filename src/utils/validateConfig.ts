@@ -390,25 +390,31 @@ const portfolioDefaultsSchema = z
   })
   .strip()
 
-const portfolioTypePageSchema = z
+const portfolioScenePageSchema = z
   .object({
-    layout: z.string().optional(),
-    width: z.string().optional(),
+    layout: z.enum(['overlay', 'standard']).optional(),
+    width: z.enum(['full', 'container']).optional(),
     gap: z.string().optional(),
     columns: portfolioColumnsSchema.optional(),
+    showTags: z.boolean().optional(),
+    showStats: z.boolean().optional(),
+    tagsHeading: z.string().optional(),
+    projectHeadingLevel: z.string().optional(),
+    projectDescClass: z.string().optional(),
   })
   .strip()
 
-const portfolioListPageSchema = z
-  .object({
+const portfolioTypePageSchema = portfolioScenePageSchema
+
+const portfolioListPageSchema = portfolioScenePageSchema
+  .extend({
     title: z.string().optional(),
     subtitle: z.string().optional(),
+    allLabel: z.string().optional(),
   })
   .strip()
 
-const portfolioTagPageSchema = z
-  .object({})
-  .strip()
+const portfolioTagPageSchema = portfolioScenePageSchema
 
 const portfolioFeaturedComponentSchema = z
   .object({

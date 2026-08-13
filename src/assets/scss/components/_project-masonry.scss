@@ -1,14 +1,41 @@
 @layer components {
-  /* Multi-column masonry for overlay project cards */
-  /* column-count is driven by Tailwind responsive classes (columns-*), not hardcoded here */
+  /*
+   * Multi-column masonry for portfolio project cards.
+   * Column counts come from config via --project-list-cols-* (see buildProjectListStyle).
+   */
   .project-masonry {
-    column-fill: balance;
+    container-type: inline-size;
     column-gap: var(--project-list-gap, var(--space-m, 1.5rem));
+    column-fill: balance;
     list-style: none;
     margin: 0;
     padding: 0;
     inline-size: 100%;
     max-inline-size: 100%;
+    column-count: var(--project-list-cols-initial, 1);
+
+    @media (min-width: 640px) {
+      column-count: var(--project-list-cols-sm, 2);
+    }
+
+    @media (min-width: 1024px) {
+      column-count: var(--project-list-cols-lg, 3);
+    }
+
+    @media (min-width: 1280px) {
+      column-count: var(--project-list-cols-xl, 3);
+    }
+  }
+
+  /*
+   * Short homogeneous lists (e.g. type pages with few same-ratio cards):
+   * column-fill: balance stacks 2+1 instead of 1+1+1. auto + constrained
+   * block-size distributes one item per column when heights are uniform.
+   */
+  .project-masonry--short-list {
+    column-fill: auto;
+    block-size: var(--project-masonry-short-list-height);
+    height: var(--project-masonry-short-list-height);
   }
 
   /* Safari ignores margin-bottom on column items; use padding + inline-block instead */

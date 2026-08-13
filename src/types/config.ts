@@ -234,20 +234,28 @@ export interface PortfolioDefaults {
   projectDescClass: string
 }
 
-export interface PortfolioListPageConfig {
+/** Shared visual overrides available on listPage / typePage / tagPage */
+export interface PortfolioScenePageConfig {
+  layout?: 'overlay' | 'standard'
+  width?: 'full' | 'container'
+  gap?: string
+  columns?: Partial<PortfolioColumns>
+  showTags?: boolean
+  showStats?: boolean
+  tagsHeading?: string
+  projectHeadingLevel?: string
+  projectDescClass?: string
+}
+
+export interface PortfolioListPageConfig extends PortfolioScenePageConfig {
   title?: string
   subtitle?: string
   allLabel?: string
 }
 
-export interface PortfolioTypePageConfig {
-  layout?: string
-  width?: string
-  gap?: string
-  columns?: PortfolioColumns
-}
+export type PortfolioTypePageConfig = PortfolioScenePageConfig
 
-export type PortfolioTagPageConfig = Record<string, never>
+export type PortfolioTagPageConfig = PortfolioScenePageConfig
 
 export interface PortfolioFeaturedComponentConfig {
   limit: number
@@ -337,6 +345,40 @@ export interface PaloConfig {
 }
 
 /**
+ * Default responsive column counts for portfolio list/grid layouts.
+ * Breakpoints match Tailwind (sm: 640px, lg: 1024px, xl: 1280px).
+ */
+export const DEFAULT_PORTFOLIO_COLUMNS: PortfolioColumns = {
+  initial: 1,
+  sm: 2,
+  lg: 3,
+  xl: 3,
+}
+
+/**
+ * Merge scene-level column overrides into defaults.
+ * An empty `{}` override inherits defaults entirely; partial overrides merge per breakpoint.
+ */
+export function resolvePortfolioColumns(
+  override?: Partial<PortfolioColumns> | null,
+  defaults?: Partial<PortfolioColumns> | null,
+): PortfolioColumns {
+  const base: PortfolioColumns = {
+    ...DEFAULT_PORTFOLIO_COLUMNS,
+    ...(defaults ?? {}),
+  }
+
+  if (!override || Object.keys(override).length === 0) {
+    return base
+  }
+
+  return {
+    ...base,
+    ...override,
+  }
+}
+
+/**
  * Helper: convert responsive columns object to Tailwind CSS column class string
  *
  * Uses standard class syntax (columns-{n}) to match the safety list declared in
@@ -353,4 +395,30 @@ export function buildColumnsClass(columns: PortfolioColumns): string {
   if (columns.xl !== undefined) parts.push(`xl:columns-${columns.xl}`)
   return parts.join(' ')
 }
+
+/**
+ * Helper: convert responsive columns object to CSS custom properties for `.project-masonry`.
+ * Matches Tailwind column breakpoints (sm: 640px, lg: 1024px, xl: 1280px).
+ */
+export function buildListColumnsStyle(columns: PortfolioColumns): string {
+  return [
+    `--project-list-cols-initial: ${columns.initial}`,
+    `--project-list-cols-sm: ${columns.sm}`,
+    `--project-list-cols-lg: ${columns.lg}`,
+    `--project-list-cols-xl: ${columns.xl}`,
+  ].join('; ')
+}
+
+/** Inline style for portfolio list `<ul>`: gap + responsive column CSS variables. */
+export function buildProjectListStyle(
+  gapRem: string,
+  override?: Partial<PortfolioColumns> | null,
+  defaults?: Partial<PortfolioColumns> | null,
+): string {
+  const columns = resolvePortfolioColumns(override, defaults)
+  return `--project-list-gap: ${gapRem}; ${buildListColumnsStyle(columns)}`
+}
+
+/** @deprecated Renamed to buildProjectListStyle */
+export const buildProjectGridListStyle = buildProjectListStyle
 

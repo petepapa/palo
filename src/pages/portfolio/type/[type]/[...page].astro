@@ -15,7 +15,8 @@ import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectL
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import { PAGE_SIZE } from '@utils/listConfig'
 import config from '@config'
-import { buildColumnsClass } from '../../../../types/config'
+import { buildProjectListStyle, resolvePortfolioColumns } from '../../../../types/config'
+import { getShortListMasonryHeight, shouldUseShortListMasonry } from '@utils/portfolioMasonry'
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
@@ -28,38 +29,27 @@ const GAP_TO_REM: Record<string, string> = {'gap-0':'0','gap-px':'1px','gap-1':'
 const navListHorizontalGapRem = GAP_TO_REM[config.navigation?.navList?.horizontalGap ?? 'gap-4'] ?? '1rem'
 const navListVerticalScale = config.navigation?.navList?.verticalScale ?? 1
 
-// 列参数：typePage.columns 覆盖 defaults.columns（仅当 typePage.columns 非空时）
-const resolvedColumns = portfolioTypePage.columns &&
-  Object.keys(portfolioTypePage.columns).length > 0
-  ? portfolioTypePage.columns
-  : portfolioDefaults.columns
-
-const defaultColumns = resolvedColumns
-  ? buildColumnsClass(resolvedColumns)
-  : 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3'
-
 const pageConfig = {
   // ── 文案与 SEO / Copywriting & SEO ──
   metaTitle: '',
   metaDescription: '',
 
-  // ── 功能开关中心 / Feature Toggles (源自 defaults) ──
-  showTags: portfolioDefaults.showTags ?? true,
-  showStats: portfolioDefaults.showStats ?? true,
+  // ── 功能开关中心 / Feature Toggles (typePage → defaults) ──
+  showTags: portfolioTypePage.showTags ?? portfolioDefaults.showTags ?? true,
+  showStats: portfolioTypePage.showStats ?? portfolioDefaults.showStats ?? true,
 
-  // ── 列表布局参数 / List Layout Settings (typePage 覆盖 defaults) ──
-  layout: portfolioTypePage.layout ?? portfolioDefaults.layout ?? 'standard',
+  // ── 列表布局参数 / List Layout Settings (typePage → defaults) ──
+  layout: (portfolioTypePage.layout ?? portfolioDefaults.layout ?? 'standard') as 'overlay' | 'standard',
   width: (portfolioTypePage.width ?? portfolioDefaults.width ?? 'container') as ProjectListWidth,
   gap: portfolioTypePage.gap ?? portfolioDefaults.gap ?? 'gap-6',
-  colsClass: defaultColumns,
 
   // ── 文案与标签 / Copywriting & Labels ──
   allLabel: portfolioListPage.allLabel ?? 'All Projects',
 
-  // ── 细粒度排版微调 / Typography Fine-Tuning ──
-  tagsHeading: portfolioDefaults.tagsHeading ?? 'h5',
-  projectHeadingLevel: portfolioDefaults.projectHeadingLevel ?? 'h5',
-  projectDescClass: portfolioDefaults.projectDescClass ?? 'text-base',
+  // ── 细粒度排版微调 / Typography Fine-Tuning (typePage → defaults) ──
+  tagsHeading: portfolioTypePage.tagsHeading ?? portfolioDefaults.tagsHeading ?? 'h5',
+  projectHeadingLevel: portfolioTypePage.projectHeadingLevel ?? portfolioDefaults.projectHeadingLevel ?? 'h5',
+  projectDescClass: portfolioTypePage.projectDescClass ?? portfolioDefaults.projectDescClass ?? 'text-base',
 } as const
 
 // 派生计算属性
@@ -132,6 +122,18 @@ const { page, currentType, uniqueTags } = Astro.props as Props
 const currentTypeUrl = `/portfolio/type/${currentType.id}`
 const projectListWidthClass = getProjectListWidthClass(pageConfig.width)
 const projectListGapSize = resolveTailwindGapClass(pageConfig.gap)
+const resolvedColumns = resolvePortfolioColumns(portfolioTypePage.columns, portfolioDefaults.columns)
+const typeDefinition = getProjectTypeDefinition(currentType.id)
+const isShortList = shouldUseShortListMasonry(page.data.length, resolvedColumns.lg)
+let projectListStyle = buildProjectListStyle(projectListGapSize, portfolioTypePage.columns, portfolioDefaults.columns)
+if (isShortList) {
+  projectListStyle += `; --project-masonry-short-list-height: ${getShortListMasonryHeight({
+    columnCount: resolvedColumns.lg,
+    gapRem: projectListGapSize,
+    aspectRatio: typeDefinition.aspectRatio,
+    layout: pageConfig.layout,
+  })}`
+}
 const resolvedMetaTitle = pageConfig.metaTitle || `Portfolio - ${currentType.label}`
 const resolvedMetaDescription = pageConfig.metaDescription || `${currentType.label} portfolio projects using the ${currentType.ratioLabel} thumbnail ratio.`
 const pageHeading = `${currentType.label} Projects`
@@ -166,8 +168,12 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
 
     <div class:list={[isFullWidthList ? "w-full" : "container"]}>
       <ul
-        class:list={['project-masonry mt-3', projectListWidthClass, pageConfig.colsClass]}
-        style={`--project-list-gap: ${projectListGapSize}`}
+        class:list={[
+          'project-masonry mt-3',
+          projectListWidthClass,
+          isShortList && 'project-masonry--short-list',
+        ]}
+        style={projectListStyle}
       >
         {
           page.data.map((project) => (
@@ -188,20 +194,20 @@ const pageSubtitle = `${currentType.description} <a href="/portfolio">View all p
           ))
         }
       </ul>
-
-      {page.lastPage > 1 && (
-        <div class="mt-12 flex justify-center">
-          <Pagination
-            firstPage={page.url.prev ? ensureTrailingSlash(currentTypeUrl) : null}
-            previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
-            nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
-            lastPage={page.url.next ? ensureTrailingSlash(`${currentTypeUrl}/${page.lastPage}`) : null}
-            currentPage={`${page.currentPage}`}
-            totalPages={`${page.lastPage}`}
-            ariaLabel={`${currentType.label} portfolio pagination`}
-          />
-        </div>
-      )}
     </div>
+
+    {page.lastPage > 1 && (
+      <div class="mt-12 flex justify-center">
+        <Pagination
+          firstPage={page.url.prev ? ensureTrailingSlash(currentTypeUrl) : null}
+          previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+          nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+          lastPage={page.url.next ? ensureTrailingSlash(`${currentTypeUrl}/${page.lastPage}`) : null}
+          currentPage={`${page.currentPage}`}
+          totalPages={`${page.lastPage}`}
+          ariaLabel={`${currentType.label} portfolio pagination`}
+        />
+      </div>
+    )}
   </section>
 </DefaultLayout>

@@ -9,7 +9,7 @@ import { resolveCollectionCoverImage } from '@utils/contentImages'
 import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
 import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
 import config from '@config'
-import { buildColumnsClass } from '../types/config'
+import { buildProjectListStyle } from '../types/config'
 
 type FeaturedProjectLayout = 'standard' | 'overlay'
 
@@ -75,8 +75,8 @@ interface Props {
    */
   projectDescClass?: string
   /**
-   * Columns class for the grid layout (Tailwind Columns)
-   * @default "columns-1 sm:columns-2 lg:columns-3 xl:columns-3"
+   * @deprecated Column counts are driven by `config.yaml` → `portfolio.defaults.columns`.
+   *            This prop is kept for backward compatibility and has no effect.
    */
   colsClass?: string
   /**
@@ -96,11 +96,6 @@ const portfolioCfg = config.portfolio
 const featuredDefaults = portfolioCfg?.featuredComponent ?? {}
 const projectDefaults = portfolioCfg?.defaults ?? {}
 
-// 构建默认 columns 类名
-const defaultColumns = projectDefaults.columns
-  ? buildColumnsClass(projectDefaults.columns)
-  : 'columns-1 sm:columns-2 lg:columns-3 xl:columns-3'
-
 const {
   class: className,
   limit = featuredDefaults.limit ?? 3,
@@ -111,7 +106,6 @@ const {
   sortBy = 'latest',
   projectHeadingLevel = projectDefaults.projectHeadingLevel ?? 'h5',
   projectDescClass = projectDefaults.projectDescClass ?? 'text-base',
-  colsClass = defaultColumns,
   buttonAlign = (featuredDefaults.buttonAlign as ButtonAlign) ?? 'right',
   buttonText = featuredDefaults.buttonText ?? 'View all projects',
 } = Astro.props
@@ -120,16 +114,9 @@ const {
 const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
 const projectListWidthClass = getProjectListWidthClass(width)
 const projectListGapSize = resolveTailwindGapClass(gap)
-const isOverlayLayout = layout === 'overlay'
 const isFullWidthList = width === 'full'
-
-const listBaseClasses = [
-  colsClass,
-  isOverlayLayout
-    ? 'featured-projects__masonry'
-    : 'project-masonry list-none',
-  projectListWidthClass,
-]
+const listBaseClasses = ['project-masonry', projectListWidthClass]
+const listStyle = buildProjectListStyle(projectListGapSize, undefined, projectDefaults.columns)
 
 // Get projects from content collection (过滤草稿)
 const projects = (await getCollection('projects')).filter(
@@ -176,10 +163,10 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
         <div class="container">
           <Heading level="h2" class="mb-8">{title}</Heading>
         </div>
-        <ul class:list={listBaseClasses} style={`--featured-projects-gap: ${projectListGapSize}`}>
+        <ul class:list={listBaseClasses} style={listStyle}>
           {
             featuredProjects.map((project) => (
-              <li class:list={[isOverlayLayout ? 'featured-projects__masonry-item' : 'project-masonry__item break-inside-avoid']}>
+              <li class="project-masonry__item break-inside-avoid">
                 <ProjectCard
                   project={project}
                   image={project.featuredImage}
@@ -201,10 +188,10 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
     ) : (
       <div class="container">
         <Heading level="h2" class="mb-8">{title}</Heading>
-        <ul class:list={listBaseClasses} style={`--featured-projects-gap: ${projectListGapSize}`}>
+        <ul class:list={listBaseClasses} style={listStyle}>
           {
             featuredProjects.map((project) => (
-              <li class:list={[isOverlayLayout ? 'featured-projects__masonry-item' : 'project-masonry__item break-inside-avoid']}>
+              <li class="project-masonry__item break-inside-avoid">
                 <ProjectCard
                   project={project}
                   image={project.featuredImage}
@@ -226,37 +213,3 @@ const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
     )
   }
 </section>
-
-<style lang="scss">
-  @layer components {
-    .featured-projects__masonry {
-      /* column-count is driven by Tailwind responsive classes (columns-*), not hardcoded here */
-      column-gap: var(--featured-projects-gap, var(--space-m, 1.5rem));
-      column-fill: balance;
-      list-style: none;
-      margin: 0;
-      padding-block: 0;
-      max-inline-size: 100%;
-    }
-
-    .featured-projects__masonry-item {
-      display: inline-block;
-      box-sizing: border-box;
-      inline-size: 100%;
-      max-inline-size: 100%;
-      vertical-align: top;
-      break-inside: avoid;
-      -webkit-column-break-inside: avoid;
-      page-break-inside: avoid;
-      margin: 0;
-      padding-block: 0 var(--featured-projects-gap, var(--space-m, 1.5rem));
-      padding-inline: 0;
-      backface-visibility: hidden;
-    }
-
-    .featured-projects__masonry-item > .project-card {
-      inline-size: 100%;
-      max-inline-size: 100%;
-    }
-  }
-</style>

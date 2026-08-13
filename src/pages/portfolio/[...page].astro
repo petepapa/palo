@@ -13,7 +13,7 @@ import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectL
 import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
 import type { PaginateFunction, Page } from 'astro'
 import config from '@config'
-import { buildColumnsClass } from '../../types/config'
+import { buildProjectListStyle } from '../../types/config'
 
 const portfolioDefaults = config.portfolio?.defaults ?? {}
 const portfolioListPage = config.portfolio?.listPage ?? {}
@@ -22,14 +22,7 @@ const GAP_TO_REM: Record<string, string> = {'gap-0':'0','gap-px':'1px','gap-1':'
 const navListHorizontalGapRem = GAP_TO_REM[config.navigation?.navList?.horizontalGap ?? 'gap-4'] ?? '1rem'
 const navListVerticalScale = config.navigation?.navList?.verticalScale ?? 1
 
-// 构建默认 columns 类名（listPage.columns 为空对象 {} 或无值时继承 defaults.columns）
-const listPageColumns = portfolioListPage.columns
-const effectiveColumns = listPageColumns !== undefined && Object.keys(listPageColumns).length > 0
-  ? listPageColumns
-  : portfolioDefaults.columns
-const defaultColumns = effectiveColumns
-  ? buildColumnsClass(effectiveColumns)
-  : 'columns-[1] sm:columns-[2] lg:columns-[3] xl:columns-[3]'
+// 列参数：listPage.columns 与 defaults.columns 合并（{} 表示完全继承 defaults）
 
 // =========================================================================
 // 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
@@ -51,7 +44,6 @@ const pageConfig = {
   layout: portfolioListPage.layout ?? portfolioDefaults.layout ?? 'overlay',
   width: (portfolioListPage.width ?? portfolioDefaults.width ?? 'full') as ProjectListWidth,
   gap: portfolioListPage.gap ?? portfolioDefaults.gap ?? 'gap-5',
-  colsClass: defaultColumns,
 
   // ── 细粒度排版微调 / Typography Fine-Tuning (listPage → defaults) ──
   tagsHeading: portfolioListPage.tagsHeading ?? portfolioDefaults.tagsHeading ?? 'h5',
@@ -109,6 +101,7 @@ const { page } = Astro.props
 // 提取当前上下文所需的各种派生计算属性
 const projectListWidthClass = getProjectListWidthClass(pageConfig.width)
 const projectListGapSize = resolveTailwindGapClass(pageConfig.gap)
+const projectListStyle = buildProjectListStyle(projectListGapSize, portfolioListPage.columns, portfolioDefaults.columns)
 const isFullWidthList = pageConfig.width === 'full'
 const resolvedMetaTitle = pageConfig.metaTitle || pageConfig.title
 
@@ -148,8 +141,8 @@ if (pageConfig.showTags) {
 
     <div class={isFullWidthList ? "w-full" : "container"}>
       <ul
-        class:list={['project-masonry mt-3', projectListWidthClass, pageConfig.colsClass]}
-        style={`--project-list-gap: ${projectListGapSize}`}
+        class:list={['project-masonry mt-3', projectListWidthClass]}
+        style={projectListStyle}
       >
         {page.data.map((project: any) => (
           <li class="project-masonry__item break-inside-avoid">
