@@ -96,6 +96,28 @@ export function isRelativeContentImage(path: string): boolean {
   return path.startsWith('./') || path.startsWith('../')
 }
 
+/**
+ * Dev-only: mirror src/content image to public/ when missing or stale.
+ * Returns source file mtimeMs for cache-busting query params.
+ */
+export function syncCoLocatedPublicMirror(
+  globFilePath: string,
+  publicPath: string,
+): number {
+  const srcAbs = path.resolve(process.cwd(), globFilePath.replace(/^\//, ''))
+  if (!fs.existsSync(srcAbs)) return Date.now()
+
+  const pubAbs = path.resolve(process.cwd(), 'public', publicPath.slice(1))
+  const srcStat = fs.statSync(srcAbs)
+
+  if (!fs.existsSync(pubAbs) || fs.statSync(pubAbs).mtimeMs < srcStat.mtimeMs) {
+    fs.mkdirSync(path.dirname(pubAbs), { recursive: true })
+    fs.copyFileSync(srcAbs, pubAbs)
+  }
+
+  return srcStat.mtimeMs
+}
+
 export function resolveRelativeImagePath(
   relativePath: string,
   currentFilePath?: string
@@ -157,6 +179,61 @@ function buildContentImageMetadata(metadata: ImageMetadata, filePath: string): I
   }
 }
 
+/** Resolve co-located image paths from contentId + relative imagePath. */
+function getCoLocatedPaths(
+  imagePath: string,
+  contentId: string,
+  collection: ContentCollection,
+): { fsContentPath: string; publicPath: string } | null {
+  if (!isRelativeContentImage(imagePath)) return null
+
+  const normalizedImagePath = imagePath.replace(/^\.\//, '')
+  const baseContentPath = collection === 'posts' ? 'posts' : 'projects'
+  const basePublicPath = collection === 'posts' ? '/posts' : '/projects'
+
+  const contentDir = contentId.includes('/')
+    ? contentId.substring(0, contentId.lastIndexOf('/'))
+    : ''
+
+  const slug = contentId.replace(/\.(md|mdx)$/, '')
+
+  const fsContentPath = contentDir
+    ? `src/content/${baseContentPath}/${contentDir}/${normalizedImagePath}`
+    : `src/content/${baseContentPath}/${slug}/${normalizedImagePath}`
+
+  const publicPath = contentDir
+    ? `${basePublicPath}/${contentDir}/${normalizedImagePath}`
+    : `${basePublicPath}/${slug}/${normalizedImagePath}`
+
+  return { fsContentPath, publicPath }
+}
+
+/**
+ * Dev-only: mirror src/content image to public/ when missing or stale,
+ * then return a cache-busted public URL so browser picks up replacements immediately.
+ */
+function resolveDevCoLocatedUrl(
+  imagePath: string,
+  contentId: string,
+  collection: ContentCollection,
+): string | null {
+  const paths = getCoLocatedPaths(imagePath, contentId, collection)
+  if (!paths) return null
+
+  const srcAbs = path.resolve(process.cwd(), paths.fsContentPath)
+  if (!fs.existsSync(srcAbs)) return null
+
+  const pubAbs = path.resolve(process.cwd(), 'public', paths.publicPath.slice(1))
+  const srcStat = fs.statSync(srcAbs)
+
+  if (!fs.existsSync(pubAbs) || fs.statSync(pubAbs).mtimeMs < srcStat.mtimeMs) {
+    fs.mkdirSync(path.dirname(pubAbs), { recursive: true })
+    fs.copyFileSync(srcAbs, pubAbs)
+  }
+
+  return `${paths.publicPath}?v=${Math.round(srcStat.mtimeMs)}`
+}
+
 function resolveImageFromGlob(
   imagePath: string,
   contentId?: string,
@@ -179,9 +256,10 @@ function resolveImageFromGlob(
       ? contentId.substring(0, contentId.lastIndexOf('/'))
       : null
 
+    const contentSlug = contentId.replace(/\.(md|mdx)$/, '')
     const fsPath = contentDir
       ? `/src/content/${basePath}/${contentDir}/${normalizedImagePath}`
-      : `/src/content/${basePath}/${normalizedImagePath}`
+      : `/src/content/${basePath}/${contentSlug}/${normalizedImagePath}`
 
     const exactMatch = allGlobImages[fsPath]
     if (exactMatch) {
@@ -230,6 +308,13 @@ export function resolveContentImage(
   }
 
   if (typeof imagePath === 'string') {
+    // ── Dev Phase 0: co-located ./ paths → sync public mirror + cache-busted URL ──
+    // Runs before glob so new/replaced covers work without restarting dev.
+    if (import.meta.env.DEV && isRelativeContentImage(imagePath) && contentId && collection) {
+      const devUrl = resolveDevCoLocatedUrl(imagePath, contentId, collection)
+      if (devUrl) return devUrl
+    }
+
     // ── Phase 1: Glob 优先解析 → ImageMetadata（触发 C++ Sharp 管道）──
     const globMetadata = resolveImageFromGlob(imagePath, contentId, collection)
     if (globMetadata) {
@@ -243,34 +328,16 @@ export function resolveContentImage(
 
     // ── Phase 3: 相对路径兜底 → 构造可访问路径（当 glob 未命中时）──
     if (isRelativeContentImage(imagePath) && contentId && collection) {
-      const normalizedImagePath = imagePath.replace(/^\.\//, '')
-      const baseContentPath = collection === 'posts' ? 'posts' : 'projects'
-
-      const contentDir = contentId.includes('/')
-        ? contentId.substring(0, contentId.lastIndexOf('/'))
-        : ''
-
-      const fsContentPath = contentDir
-        ? `src/content/${baseContentPath}/${contentDir}/${normalizedImagePath}`
-        : `src/content/${baseContentPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
-
-      const basePublicPath = collection === 'posts' ? '/posts' : '/projects'
-      const resolvedPath = contentDir
-        ? `${basePublicPath}/${contentDir}/${normalizedImagePath}`
-        : `${basePublicPath}/${contentId.replace(/\.(md|mdx)$/, '')}/${normalizedImagePath}`
-
-      // Dev 模式：优先使用与生产一致的 public 路径，避免源码级 /@fs/ 链路引入环境差异。
-      if (import.meta.env.DEV) {
-        const absolutePath = path.resolve(process.cwd(), fsContentPath)
-        if (fs.existsSync(absolutePath)) {
-          return resolvedPath
-        }
+      const paths = getCoLocatedPaths(imagePath, contentId, collection)
+      if (paths && fs.existsSync(path.resolve(process.cwd(), paths.fsContentPath))) {
+        return paths.publicPath
+      }
+      if (import.meta.env.DEV && paths) {
         console.warn(
-          `[contentImages] Dev 模式 co-located 图片不存在：${fsContentPath}，回退到 public 路径`
+          `[contentImages] Dev 模式 co-located 图片不存在：${paths.fsContentPath}，回退到 public 路径`
         )
       }
-
-      return resolvedPath
+      if (paths) return paths.publicPath
     }
 
     return imagePath.startsWith('/') ? imagePath : fallback ?? imagePath

@@ -195,7 +195,7 @@ export interface PaloPageHeaderConfig {
 export interface PostHeaderConfig {
   headingLevel?: string
   descClass?: string
-  coverImagePosition?: 'head' | 'background' | 'side'
+  coverImagePosition?: 'top' | 'head' | 'bottom' | 'none'
   showBreadcrumbs?: boolean
   showShare?: boolean
   divider?: 'bottom' | 'top' | 'none'

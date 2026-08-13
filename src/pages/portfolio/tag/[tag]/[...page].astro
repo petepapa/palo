@@ -93,7 +93,7 @@ export const getStaticPaths = (async ({ paginate }) => {
 
     featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
 
-    if (SORT_BY.portfolio === 'earliest') {
+    if (SORT_BY.portfolio === 'oldest') {
       regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
     } else {
       regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))

@@ -19,7 +19,7 @@ type Author = {
 
 type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
 
-type CoverImagePosition = boolean | 'top' | 'head' | 'bottom'
+type CoverImagePosition = 'top' | 'head' | 'bottom' | 'none'
 
 type Props = {
   class?: string
@@ -98,7 +98,7 @@ const breadcrumbs = preferConfigOverZodCatch(rawBreadcrumbs, postHeaderDefaults.
 const rawDivider = resolveStringProp(_props.divider, postHeaderDefaults.divider, 'both') as DividerPlacement
 const divider = preferConfigOverZodCatch(rawDivider, postHeaderDefaults.divider, 'both')
 
-const rawCoverImagePosition = resolveStringProp(_props.coverImagePosition, postHeaderDefaults.coverImagePosition, 'head') as boolean | 'top' | 'head' | 'bottom'
+const rawCoverImagePosition = resolveStringProp(_props.coverImagePosition, postHeaderDefaults.coverImagePosition, 'head') as CoverImagePosition
 const coverImagePosition = preferConfigOverZodCatch(rawCoverImagePosition, postHeaderDefaults.coverImagePosition, 'head')
 
 const headingLevel = _props.headingLevel || postHeaderDefaults.headingLevel || 'h2'
@@ -122,8 +122,8 @@ const resolveDividerPlacement = (value: DividerPlacement = 'both'): 'top' | 'bot
   return 'bottom'
 }
 
-const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'head' | 'bottom' | false => {
-  if (value === false) return false
+const resolveCoverImagePosition = (value: CoverImagePosition = 'head'): 'top' | 'head' | 'bottom' | null => {
+  if (value === 'none') return null
   if (value === 'bottom') return 'bottom'
   if (value === 'head') return 'head'
   return 'top'
@@ -131,7 +131,7 @@ const resolveCoverImagePosition = (value: CoverImagePosition = true): 'top' | 'h
 
 const dividerPlacement = resolveDividerPlacement(divider)
 const coverImagePlacement = resolveCoverImagePosition(coverImagePosition)
-const shouldShowCoverImage = !!finalImage && !!coverImagePlacement
+const shouldShowCoverImage = !!finalImage && coverImagePlacement !== null
 const isCoverImageTop = shouldShowCoverImage && coverImagePlacement === 'top'
 const isCoverImageHead = shouldShowCoverImage && coverImagePlacement === 'head'
 const isCoverImageBottom = shouldShowCoverImage && coverImagePlacement === 'bottom'

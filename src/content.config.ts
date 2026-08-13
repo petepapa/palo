@@ -39,7 +39,10 @@ const posts = defineCollection({
       customBreadcrumbLabels: z.any().optional().catch(undefined),
       joinLastBreadcrumb: z.boolean().default(false).catch(false),
       divider: z.enum(['top', 'bottom', 'both', 'none']).default('both').catch('both'),
-      coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head').catch('head'),
+      coverImagePosition: z
+        .preprocess((val) => (val === false ? 'none' : val), z.enum(['top', 'head', 'bottom', 'none']))
+        .default('head')
+        .catch('head'),
       toc: z.boolean().default(true).catch(true),
       narrow: z.boolean().default(true).catch(true),
       updatedDate: safeDateField,
@@ -79,7 +82,10 @@ const projects = defineCollection({
       customBreadcrumbLabels: z.any().optional().catch(undefined),
       joinLastBreadcrumb: z.boolean().default(false).catch(false),
       divider: z.enum(['top', 'bottom', 'both', 'none']).default('both').catch('both'),
-      coverImagePosition: z.union([z.boolean(), z.enum(['top', 'head', 'bottom'])]).default('head').catch('head'),
+      coverImagePosition: z
+        .preprocess((val) => (val === false ? 'none' : val), z.enum(['top', 'head', 'bottom', 'none']))
+        .default('head')
+        .catch('head'),
       toc: z.boolean().default(true).catch(true),
       narrow: z.boolean().default(true).catch(true),
       publishDate: safeDateField,

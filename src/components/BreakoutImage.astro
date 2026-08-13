@@ -23,7 +23,7 @@
  */
 import { Image } from 'astro:assets'
 import type { ImageMetadata } from 'astro'
-import { isImageMetadata, isRelativeContentImage } from '@utils/contentImages'
+import { isImageMetadata, isRelativeContentImage, syncCoLocatedPublicMirror } from '@utils/contentImages'
 import { getDominantColor } from '@utils/imageColor'
 
 // ═══════════════════════════════════════════════════════════════════
@@ -41,6 +41,7 @@ const contentImageGlob = import.meta.glob(
 type ResolvedImageEntry = {
   metadata: ImageMetadata
   publicPath: string
+  filePath: string
 }
 
 const imageByFilename: Record<string, ResolvedImageEntry> = {}
@@ -54,33 +55,40 @@ for (const [filePath, mod] of Object.entries(contentImageGlob)) {
         ? `/projects/${filePath.replace('/src/content/projects/', '')}`
         : metadata.src
 
-    imageByFilename[filename] = { metadata, publicPath }
+    imageByFilename[filename] = { metadata, publicPath, filePath }
   }
 }
 
 /**
- * 解析 MDX 中传入的图片 src。
- * - 若已是 ImageMetadata 对象 → 原样返回
- * - 若为相对路径（./ 或 ../）→ 在 glob 缓存中以文件名查找对应的 ImageMetadata
- * - 其他字符串（如绝对路径）→ 原样返回
+ * Resolve MDX src to ImageMetadata (prod) or metadata + dev cache-busted public URL.
  */
-function resolveImageSrc(rawSrc: string | ImageMetadata): string | ImageMetadata {
-  if (typeof rawSrc !== 'string') return rawSrc
-  if (!isRelativeContentImage(rawSrc)) return rawSrc
+function resolveBreakoutImageSrc(rawSrc: string | ImageMetadata): {
+  resolvedSrc: string | ImageMetadata
+  devBustedPublicUrl?: string
+} {
+  if (typeof rawSrc !== 'string') {
+    return { resolvedSrc: rawSrc }
+  }
+  if (!isRelativeContentImage(rawSrc)) {
+    return { resolvedSrc: rawSrc }
+  }
 
   const filename = rawSrc.replace(/^\.\//, '').split('/').pop()!
   const match = imageByFilename[filename]
 
-  if (!match) return rawSrc
+  if (!match) {
+    return { resolvedSrc: rawSrc }
+  }
 
   if (import.meta.env.DEV) {
+    const mtime = syncCoLocatedPublicMirror(match.filePath, match.publicPath)
     return {
-      ...match.metadata,
-      src: match.publicPath,
+      resolvedSrc: match.metadata,
+      devBustedPublicUrl: `${match.publicPath}?v=${Math.round(mtime)}`,
     }
   }
 
-  return match.metadata
+  return { resolvedSrc: match.metadata }
 }
 
 type Props = {
@@ -121,16 +129,17 @@ type Props = {
 
 const { src, layout, fullWidth, decorative = false, alt = '' } = Astro.props
 
-// ── 解析 src：将 MDX 中传入的相对路径（如 ./cover.jpg）转换为 ImageMetadata ──
-const resolvedSrc = resolveImageSrc(src)
+const { resolvedSrc, devBustedPublicUrl } = resolveBreakoutImageSrc(src)
 
-// ═══════════════════════════════════════════════════════
-//  Dev 模式缓存破防：public/ 绝对路径强制附加时间戳后缀
-//  浏览器对固定路径的 304 强缓存会吞掉 <img> 的 onload 事件，
-//  动态后缀迫使浏览器发起完整 HTTP 请求，精准激活状态机。
-// ═══════════════════════════════════════════════════════
-let imageSrc: string | ImageMetadata = resolvedSrc
-if (import.meta.env.DEV && typeof imageSrc === 'string' && imageSrc.startsWith('/')) {
+// Dev: plain public URL with mtime cache-bust for co-located ./ paths
+// Prod: Astro Image pipeline via ImageMetadata
+let imageSrc: string | ImageMetadata = devBustedPublicUrl ?? resolvedSrc
+if (
+  import.meta.env.DEV &&
+  !devBustedPublicUrl &&
+  typeof imageSrc === 'string' &&
+  imageSrc.startsWith('/')
+) {
   imageSrc = `${imageSrc}?palo-breakout-bypass=${Date.now()}`
 }
 
@@ -183,7 +192,19 @@ const containerInlineStyle = [
   data-layout={resolvedLayout}
   data-fallback-ratio={isFallbackRatio ? 'true' : undefined}
 >
-  {isImageMetadata(resolvedSrc) ? (
+  {devBustedPublicUrl ? (
+    <img
+      src={devBustedPublicUrl}
+      alt={altText}
+      width={imageWidth}
+      height={imageHeight}
+      class:list={['progressive-img-inner', 'absolute inset-0 w-full h-full object-cover opacity-0']}
+      style="transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;"
+      loading="lazy"
+      decoding="async"
+      onload="var i=this;i.setAttribute('data-loaded','true');i.classList.remove('opacity-0');var c=i.closest('.breakout-image-container');if(c){c.setAttribute('data-loaded','true');var w=i.naturalWidth;var h=i.naturalHeight;if(w&&h){c.style.transition='aspect-ratio var(--animation-speed-slow) var(--cubic-bezier), background-color var(--animation-speed-slow) var(--cubic-bezier)';c.style.aspectRatio=w+' / '+h}}"
+    />
+  ) : isImageMetadata(resolvedSrc) ? (
     <Image
       src={resolvedSrc}
       alt={altText}

@@ -342,7 +342,7 @@ const postHeaderConfigSchema = z
   .object({
     headingLevel: z.string().optional(),
     descClass: z.string().optional(),
-    coverImagePosition: z.enum(['head', 'background', 'side']).optional(),
+    coverImagePosition: z.enum(['top', 'head', 'bottom', 'none']).optional(),
     showBreadcrumbs: z.boolean().optional(),
     showShare: z.boolean().optional(),
     divider: z.enum(['top', 'bottom', 'both', 'none']).optional(),

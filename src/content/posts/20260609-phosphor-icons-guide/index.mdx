@@ -7,7 +7,7 @@ author:
   image: "/branding/avatar.png"
   bio: "PetePa.com"
 tags: ['Documentation', 'Icons', 'Design']
-coverImage: ./test.png
+coverImage: ./cover.png
 coverImagePosition: head
 breadcrumbs: true
 customBreadcrumbLabels:
@@ -19,21 +19,79 @@ liveDemo: "https://palo.petepa.com/"
 divider: true
 toc: true
 featuredOrder: 3
-
 ---
 
 import { Icon } from 'astro-icon/components'
-
 import BreakoutImage from '@components/BreakoutImage.astro'
 
 <BreakoutImage src="./test.png" />
 
+<style is:global>{`
+  .icon-demo-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 1.25rem;
+    margin-block: 2rem;
+  }
+
+  .icon-demo-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.375rem;
+    padding: 1.5rem 0.375rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .icon-demo-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .icon-demo-code {
+    font-size: 0.625rem;
+    line-height: 1.3;
+    color: var(--color-neutral-500, #6b7280);
+    word-break: break-all;
+  }
+
+  .icon-demo-grid--sizes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-block: 2rem;
+  }
+
+  .icon-demo-grid--sizes .icon-demo-item {
+    flex: 0 0 auto;
+    min-width: 3.5rem;
+    border: none;
+    padding: 0;
+  }
+
+  @media (max-width: 768px) {
+    .icon-demo-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 480px) {
+    .icon-demo-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+`}</style>
 
 ### Introduction
 
 Icons are essential visual elements that help users understand and navigate your website. Palo integrates with Phosphor Icons, one of the most comprehensive and versatile icon libraries available.
 
-Icons 是帮助用户理解和浏览网站的基本视觉元素。Palo 与 Phosphor Icons 集成，这是目前最全面，最通用的图标库之一。
+Icons 是帮助用户理解和浏览网站的基本视觉元素。Palo 与 Phosphor Icons 集成，这是目前最全面、最通用的图标库之一。
 
 Phosphor Icons offers:
 - Thousands of icons in one unified family
@@ -47,9 +105,9 @@ Phosphor Icons offers:
 
 **Website**: [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/)
 
-Phosphor Icons is a flexible icon family for interfaces, diagrams, presentations, and more. It provides:
+Phosphor Icons is a flexible icon family for interfaces, diagrams, presentations, and more.
 
-Phosphor Icons 是一个灵活的图标系列，适用于界面、图表、演示等。它提供：
+Phosphor Icons 是一个灵活的图标系列，适用于界面、图表、演示等。
 
 #### Styles Available
 
@@ -64,8 +122,6 @@ Phosphor Icons 是一个灵活的图标系列，适用于界面、图表、演�
 
 #### Stroke Weights
 
-Phosphor offers multiple stroke weights that you can customize:
-
 | Weight | Stroke Size | Best For |
 |--------|-------------|----------|
 | Thin | 1px | Small icons, elegant designs |
@@ -76,119 +132,303 @@ Phosphor offers multiple stroke weights that you can customize:
 
 #### Icon Style Variations (Real Demo)
 
-Here's a real demonstration using the same icon (Heart) in all styles:
+Same icon in all six Phosphor styles — **Heart**:
 
-<div class="flex flex-wrap gap-4 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart" size="64" />
-    <span class="text-sm font-medium">Regular</span>
-    <code class="text-xs text-muted">ph:heart</code>
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
+    <Icon name="ph:heart" size="48" />
+    <span class="icon-demo-label">Regular</span>
+    <code class="icon-demo-code">ph:heart</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart-fill" size="64" />
-    <span class="text-sm font-medium">Fill</span>
-    <code class="text-xs text-muted">ph:heart-fill</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:heart-fill" size="48" />
+    <span class="icon-demo-label">Fill</span>
+    <code class="icon-demo-code">ph:heart-fill</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart-bold" size="64" />
-    <span class="text-sm font-medium">Bold</span>
-    <code class="text-xs text-muted">ph:heart-bold</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:heart-bold" size="48" />
+    <span class="icon-demo-label">Bold</span>
+    <code class="icon-demo-code">ph:heart-bold</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart-thin" size="64" />
-    <span class="text-sm font-medium">Thin</span>
-    <code class="text-xs text-muted">ph:heart-thin</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:heart-thin" size="48" />
+    <span class="icon-demo-label">Thin</span>
+    <code class="icon-demo-code">ph:heart-thin</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart-light" size="64" />
-    <span class="text-sm font-medium">Light</span>
-    <code class="text-xs text-muted">ph:heart-light</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:heart-light" size="48" />
+    <span class="icon-demo-label">Light</span>
+    <code class="icon-demo-code">ph:heart-light</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:heart-duotone" size="64" />
-    <span class="text-sm font-medium">Duotone</span>
-    <code class="text-xs text-muted">ph:heart-duotone</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:heart-duotone" size="48" />
+    <span class="icon-demo-label">Duotone</span>
+    <code class="icon-demo-code">ph:heart-duotone</code>
   </div>
 </div>
 
-And the same variations with another icon (Star):
+Same variations — **Star**:
 
-<div class="flex flex-wrap gap-4 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star" size="64" />
-    <span class="text-sm font-medium">Regular</span>
-    <code class="text-xs text-muted">ph:star</code>
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
+    <Icon name="ph:star" size="48" />
+    <span class="icon-demo-label">Regular</span>
+    <code class="icon-demo-code">ph:star</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star-fill" size="64" />
-    <span class="text-sm font-medium">Fill</span>
-    <code class="text-xs text-muted">ph:star-fill</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:star-fill" size="48" />
+    <span class="icon-demo-label">Fill</span>
+    <code class="icon-demo-code">ph:star-fill</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star-bold" size="64" />
-    <span class="text-sm font-medium">Bold</span>
-    <code class="text-xs text-muted">ph:star-bold</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:star-bold" size="48" />
+    <span class="icon-demo-label">Bold</span>
+    <code class="icon-demo-code">ph:star-bold</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star-thin" size="64" />
-    <span class="text-sm font-medium">Thin</span>
-    <code class="text-xs text-muted">ph:star-thin</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:star-thin" size="48" />
+    <span class="icon-demo-label">Thin</span>
+    <code class="icon-demo-code">ph:star-thin</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star-light" size="64" />
-    <span class="text-sm font-medium">Light</span>
-    <code class="text-xs text-muted">ph:star-light</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:star-light" size="48" />
+    <span class="icon-demo-label">Light</span>
+    <code class="icon-demo-code">ph:star-light</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:star-duotone" size="64" />
-    <span class="text-sm font-medium">Duotone</span>
-    <code class="text-xs text-muted">ph:star-duotone</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:star-duotone" size="48" />
+    <span class="icon-demo-label">Duotone</span>
+    <code class="icon-demo-code">ph:star-duotone</code>
   </div>
 </div>
 
-And one more example with (House) icon:
+Same variations — **House**:
 
-<div class="flex flex-wrap gap-4 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house" size="64" />
-    <span class="text-sm font-medium">Regular</span>
-    <code class="text-xs text-muted">ph:house</code>
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
+    <Icon name="ph:house" size="48" />
+    <span class="icon-demo-label">Regular</span>
+    <code class="icon-demo-code">ph:house</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house-fill" size="64" />
-    <span class="text-sm font-medium">Fill</span>
-    <code class="text-xs text-muted">ph:house-fill</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:house-fill" size="48" />
+    <span class="icon-demo-label">Fill</span>
+    <code class="icon-demo-code">ph:house-fill</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house-bold" size="64" />
-    <span class="text-sm font-medium">Bold</span>
-    <code class="text-xs text-muted">ph:house-bold</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:house-bold" size="48" />
+    <span class="icon-demo-label">Bold</span>
+    <code class="icon-demo-code">ph:house-bold</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house-thin" size="64" />
-    <span class="text-sm font-medium">Thin</span>
-    <code class="text-xs text-muted">ph:house-thin</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:house-thin" size="48" />
+    <span class="icon-demo-label">Thin</span>
+    <code class="icon-demo-code">ph:house-thin</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house-light" size="64" />
-    <span class="text-sm font-medium">Light</span>
-    <code class="text-xs text-muted">ph:house-light</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:house-light" size="48" />
+    <span class="icon-demo-label">Light</span>
+    <code class="icon-demo-code">ph:house-light</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg min-w-[100px]">
-    <Icon name="ph:house-duotone" size="64" />
-    <span class="text-sm font-medium">Duotone</span>
-    <code class="text-xs text-muted">ph:house-duotone</code>
+  <div class="icon-demo-item">
+    <Icon name="ph:house-duotone" size="48" />
+    <span class="icon-demo-label">Duotone</span>
+    <code class="icon-demo-code">ph:house-duotone</code>
   </div>
 </div>
 
 ---
 
+### Icons Outside Phosphor (Brand & Regional)
+
+Phosphor covers UI icons well, but **does not include every brand logo** — especially regional platforms like WeChat and Weibo. Palo ships a second icon set for these cases: **Font Awesome 6 Brands** (`fa6-brands`), loaded via [astro-icon](https://www.astroicon.dev/) and Iconify.
+
+Phosphor 擅长 UI 图标，但**并不包含所有品牌 Logo**——尤其是微信、微博等区域平台。Palo 为此内置了第二套图标库：**Font Awesome 6 Brands**（`fa6-brands`），通过 astro-icon 和 Iconify 加载。
+
+#### Already Used in Palo
+
+These icons are live in the site today — same syntax everywhere:
+
+以下图标已在站点中使用，语法完全一致：
+
+| Platform | Icon name | Used in |
+|----------|-----------|---------|
+| WeChat / 微信 | `fa6-brands:weixin` | Footer launcher (`src/navigation.ts`), SocialShares (`src/shareConfig.ts`) |
+| Weibo / 微博 | `fa6-brands:weibo` | SocialShares share bar |
+| Douyin / 抖音 | `ph:tiktok-logo` | Footer launcher *(Phosphor — no separate Douyin glyph)* |
+| GitHub | `ph:github-logo` | Navigation, Footer, SocialShares |
+| YouTube | `ph:youtube-logo` | Footer launcher |
+
+**Footer launcher example** (`src/navigation.ts`):
+
+```typescript
+{
+  label: '*WeChat: *@pp71270371',
+  icon: 'fa6-brands:weixin',
+  type: 'qrCode',
+  qrCode: '/branding/wechat.JPG',
+},
+{
+  label: '*Douyin: *@petepa',
+  icon: 'ph:tiktok-logo',
+  type: 'qrCode',
+  qrUrl: 'https://v.douyin.com/...',
+},
+```
+
+**Social share bar example** (`src/shareConfig.ts`):
+
+```typescript
+{
+  name: 'Weibo',
+  icon: 'fa6-brands:weibo',
+  actionType: 'link',
+  buildUrl: ({ url, title }) =>
+    `https://service.weibo.com/share/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}`,
+},
+{
+  name: 'WeChat',
+  icon: 'fa6-brands:weixin',
+  actionType: 'modal',
+  modalId: 'palo-wechat-share-modal',
+},
+```
+
+**In any Astro component or MDX:**
+
+```astro
+---
+import { Icon } from 'astro-icon/components'
+---
+
+<Icon name="fa6-brands:weixin" size="24" aria-hidden="true" />
+<Icon name="fa6-brands:weibo" size="24" aria-hidden="true" />
+```
+
+#### Commonly Needed fa6-brands Icons
+
+Browse the full set at [icon-sets.iconify.design/fa6-brands](https://icon-sets.iconify.design/fa6-brands/). Below are regional and brand icons Phosphor does **not** provide, ready to copy:
+
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:weixin" size="48" />
+    <span class="icon-demo-label">WeChat</span>
+    <code class="icon-demo-code">fa6-brands:weixin</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:weibo" size="48" />
+    <span class="icon-demo-label">Weibo</span>
+    <code class="icon-demo-code">fa6-brands:weibo</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:qq" size="48" />
+    <span class="icon-demo-label">QQ</span>
+    <code class="icon-demo-code">fa6-brands:qq</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:zhihu" size="48" />
+    <span class="icon-demo-label">Zhihu</span>
+    <code class="icon-demo-code">fa6-brands:zhihu</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:bilibili" size="48" />
+    <span class="icon-demo-label">Bilibili</span>
+    <code class="icon-demo-code">fa6-brands:bilibili</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:alipay" size="48" />
+    <span class="icon-demo-label">Alipay</span>
+    <code class="icon-demo-code">fa6-brands:alipay</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:tiktok" size="48" />
+    <span class="icon-demo-label">TikTok</span>
+    <code class="icon-demo-code">fa6-brands:tiktok</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:line" size="48" />
+    <span class="icon-demo-label">LINE</span>
+    <code class="icon-demo-code">fa6-brands:line</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:telegram" size="48" />
+    <span class="icon-demo-label">Telegram</span>
+    <code class="icon-demo-code">fa6-brands:telegram</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:whatsapp" size="48" />
+    <span class="icon-demo-label">WhatsApp</span>
+    <code class="icon-demo-code">fa6-brands:whatsapp</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:discord" size="48" />
+    <span class="icon-demo-label">Discord</span>
+    <code class="icon-demo-code">fa6-brands:discord</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:slack" size="48" />
+    <span class="icon-demo-label">Slack</span>
+    <code class="icon-demo-code">fa6-brands:slack</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:reddit" size="48" />
+    <span class="icon-demo-label">Reddit</span>
+    <code class="icon-demo-code">fa6-brands:reddit</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:medium" size="48" />
+    <span class="icon-demo-label">Medium</span>
+    <code class="icon-demo-code">fa6-brands:medium</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:apple" size="48" />
+    <span class="icon-demo-label">Apple</span>
+    <code class="icon-demo-code">fa6-brands:apple</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="fa6-brands:google" size="48" />
+    <span class="icon-demo-label">Google</span>
+    <code class="icon-demo-code">fa6-brands:google</code>
+  </div>
+</div>
+
+> **Not in any bundled set:** Xiaohongshu (小红书) and Douyin-specific glyphs are absent from both Phosphor and fa6-brands. Palo uses `ph:tiktok-logo` for Douyin, or a custom SVG in `public/branding/` for platforms with no Iconify entry.
+>
+> **暂无内置图标：** 小红书和抖音专属 Logo 在 Phosphor 和 fa6-brands 中均不存在。Palo 对抖音使用 `ph:tiktok-logo`，无 Iconify 条目的平台可改用 `public/branding/` 下的自定义 SVG。
+
+#### How to Register a New Icon Set
+
+Palo currently bundles `ph` and `fa6-brands` in `astro.config.mjs`:
+
+```js
+icon({ include: { ph: ['*'], 'fa6-brands': ['*'] } })
+```
+
+To add another Iconify collection (e.g. `simple-icons`):
+
+1. **Install** the JSON package:
+   ```bash
+   npm install @iconify-json/simple-icons
+   ```
+2. **Register** it in `astro.config.mjs`:
+   ```js
+   icon({ include: { ph: ['*'], 'fa6-brands': ['*'], 'simple-icons': ['*'] } })
+   ```
+3. **Use** with the same `<Icon>` component:
+   ```astro
+   <Icon name="simple-icons:github" size="24" />
+   ```
+
+Browse all Iconify sets at [icon-sets.iconify.design](https://icon-sets.iconify.design/) — prefix the icon name with the set ID (e.g. `fa6-brands:weibo`, `ph:heart`).
+
+---
+
 ### Search and Browse Icons
 
-Visit **[icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/)** to search and browse all available icons.
+Visit **[icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/)** for Phosphor, or **[icon-sets.iconify.design/fa6-brands](https://icon-sets.iconify.design/fa6-brands/)** for brand logos.
 
 You can:
-- Search by icon name (e.g., "github", "youtube", "home")
+- Search by icon name (e.g., "github", "weixin", "home")
 - Filter by style (stroke, fill, duotone)
 - Preview different sizes
 - Copy icon names directly
@@ -198,8 +438,6 @@ You can:
 ### How to Use Icons in Palo
 
 #### Basic Usage
-
-Import and use icons in your Astro components:
 
 ```astro
 ---
@@ -212,43 +450,39 @@ import { Icon } from 'astro-icon/components'
 <!-- With size -->
 <Icon name="ph:github-logo" size="24" />
 
+<!-- Brand icon outside Phosphor -->
+<Icon name="fa6-brands:weixin" size="24" />
+
 <!-- With custom color -->
-<Icon name="ph:youtube-logo" size="32" class="text-red-500" />
+<Icon name="ph:youtube-logo" size="48" class="text-red-500" />
 ```
 
 #### Using Different Styles
 
-Use style variants by changing the icon name:
-
 ```astro
-<!-- Regular (default) -->
-<Icon name="ph:heart" size="32" />
-
-<!-- Fill style -->
-<Icon name="ph:heart-fill" size="32" />
-
-<!-- Bold style -->
-<Icon name="ph:heart-bold" size="32" />
-
-<!-- Thin style -->
-<Icon name="ph:heart-thin" size="32" />
-
-<!-- Light style -->
-<Icon name="ph:heart-light" size="32" />
-
-<!-- Duotone style -->
-<Icon name="ph:heart-duotone" size="32" />
+<Icon name="ph:heart" size="48" />
+<Icon name="ph:heart-fill" size="48" />
+<Icon name="ph:heart-bold" size="48" />
+<Icon name="ph:heart-thin" size="48" />
+<Icon name="ph:heart-light" size="48" />
+<Icon name="ph:heart-duotone" size="48" />
 ```
 
 #### Using in Navigation
 
-Add icons to your navigation items in `src/navigation.ts`:
+Add icons to navigation items in `src/navigation.ts`:
 
 ```typescript
 {
   label: 'GitHub',
   href: 'https://github.com/your-username',
   icon: 'ph:github-logo',
+},
+{
+  label: 'WeChat',
+  icon: 'fa6-brands:weixin',
+  type: 'qrCode',
+  qrCode: '/branding/wechat.JPG',
 },
 ```
 
@@ -260,7 +494,6 @@ Add icons to your navigation items in `src/navigation.ts`:
   Search
 </button>
 
-<!-- Or use it standalone -->
 <div class="flex items-center gap-2">
   <Icon name="ph:envelope" size="24" />
   <span>contact@example.com</span>
@@ -271,123 +504,139 @@ Add icons to your navigation items in `src/navigation.ts`:
 
 ### Icon Showcase
 
-Here's a demonstration of different icon styles and sizes:
+#### Social Media Icons (Phosphor)
 
-#### Social Media Icons
-
-<div class="flex flex-wrap gap-6 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
     <Icon name="ph:github-logo" size="48" />
-    <span class="text-sm font-medium">GitHub</span>
-    <code class="text-xs text-muted">ph:github-logo</code>
+    <span class="icon-demo-label">GitHub</span>
+    <code class="icon-demo-code">ph:github-logo</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:youtube-logo" size="48" />
-    <span class="text-sm font-medium">YouTube</span>
-    <code class="text-xs text-muted">ph:youtube-logo</code>
+    <span class="icon-demo-label">YouTube</span>
+    <code class="icon-demo-code">ph:youtube-logo</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:x-logo" size="48" />
-    <span class="text-sm font-medium">X (Twitter)</span>
-    <code class="text-xs text-muted">ph:x-logo</code>
+    <span class="icon-demo-label">X</span>
+    <code class="icon-demo-code">ph:x-logo</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:linkedin-logo" size="48" />
-    <span class="text-sm font-medium">LinkedIn</span>
-    <code class="text-xs text-muted">ph:linkedin-logo</code>
+    <span class="icon-demo-label">LinkedIn</span>
+    <code class="icon-demo-code">ph:linkedin-logo</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="ph:facebook-logo" size="48" />
+    <span class="icon-demo-label">Facebook</span>
+    <code class="icon-demo-code">ph:facebook-logo</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="ph:instagram-logo" size="48" />
+    <span class="icon-demo-label">Instagram</span>
+    <code class="icon-demo-code">ph:instagram-logo</code>
   </div>
 </div>
 
 #### UI Icons
 
-<div class="flex flex-wrap gap-6 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
     <Icon name="ph:house" size="48" />
-    <span class="text-sm font-medium">Home</span>
-    <code class="text-xs text-muted">ph:house</code>
+    <span class="icon-demo-label">Home</span>
+    <code class="icon-demo-code">ph:house</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:magnifying-glass" size="48" />
-    <span class="text-sm font-medium">Search</span>
-    <code class="text-xs text-muted">ph:magnifying-glass</code>
+    <span class="icon-demo-label">Search</span>
+    <code class="icon-demo-code">ph:magnifying-glass</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:gear" size="48" />
-    <span class="text-sm font-medium">Settings</span>
-    <code class="text-xs text-muted">ph:gear</code>
+    <span class="icon-demo-label">Settings</span>
+    <code class="icon-demo-code">ph:gear</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:user" size="48" />
-    <span class="text-sm font-medium">User</span>
-    <code class="text-xs text-muted">ph:user</code>
+    <span class="icon-demo-label">User</span>
+    <code class="icon-demo-code">ph:user</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:envelope" size="48" />
-    <span class="text-sm font-medium">Email</span>
-    <code class="text-xs text-muted">ph:envelope</code>
+    <span class="icon-demo-label">Email</span>
+    <code class="icon-demo-code">ph:envelope</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:heart" size="48" />
-    <span class="text-sm font-medium">Heart</span>
-    <code class="text-xs text-muted">ph:heart</code>
+    <span class="icon-demo-label">Heart</span>
+    <code class="icon-demo-code">ph:heart</code>
   </div>
 </div>
 
 #### Action Icons
 
-<div class="flex flex-wrap gap-6 my-8">
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+<div class="icon-demo-grid">
+  <div class="icon-demo-item">
     <Icon name="ph:plus" size="48" />
-    <span class="text-sm font-medium">Plus</span>
-    <code class="text-xs text-muted">ph:plus</code>
+    <span class="icon-demo-label">Plus</span>
+    <code class="icon-demo-code">ph:plus</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:pencil" size="48" />
-    <span class="text-sm font-medium">Edit</span>
-    <code class="text-xs text-muted">ph:pencil</code>
+    <span class="icon-demo-label">Edit</span>
+    <code class="icon-demo-code">ph:pencil</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:trash" size="48" />
-    <span class="text-sm font-medium">Delete</span>
-    <code class="text-xs text-muted">ph:trash</code>
+    <span class="icon-demo-label">Delete</span>
+    <code class="icon-demo-code">ph:trash</code>
   </div>
-  <div class="flex flex-col items-center gap-2 p-4 rounded-lg">
+  <div class="icon-demo-item">
     <Icon name="ph:download" size="48" />
-    <span class="text-sm font-medium">Download</span>
-    <code class="text-xs text-muted">ph:download</code>
+    <span class="icon-demo-label">Download</span>
+    <code class="icon-demo-code">ph:download</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="ph:share-network" size="48" />
+    <span class="icon-demo-label">Share</span>
+    <code class="icon-demo-code">ph:share-network</code>
+  </div>
+  <div class="icon-demo-item">
+    <Icon name="ph:arrow-square-out" size="48" />
+    <span class="icon-demo-label">External</span>
+    <code class="icon-demo-code">ph:arrow-square-out</code>
   </div>
 </div>
 
 #### Different Sizes
 
-<div class="flex items-end gap-8 my-8">
-  <div class="flex flex-col items-center gap-2">
+<div class="icon-demo-grid--sizes">
+  <div class="icon-demo-item">
     <Icon name="ph:star" size="16" />
-    <span class="text-xs">16px</span>
+    <span class="icon-demo-label">16px</span>
   </div>
-  <div class="flex flex-col items-center gap-2">
+  <div class="icon-demo-item">
     <Icon name="ph:star" size="24" />
-    <span class="text-xs">24px</span>
+    <span class="icon-demo-label">24px</span>
   </div>
-  <div class="flex flex-col items-center gap-2">
+  <div class="icon-demo-item">
     <Icon name="ph:star" size="32" />
-    <span class="text-xs">32px</span>
+    <span class="icon-demo-label">32px</span>
   </div>
-  <div class="flex flex-col items-center gap-2">
+  <div class="icon-demo-item">
+    <Icon name="ph:star" size="40" />
+    <span class="icon-demo-label">40px</span>
+  </div>
+  <div class="icon-demo-item">
     <Icon name="ph:star" size="48" />
-    <span class="text-xs">48px</span>
-  </div>
-  <div class="flex flex-col items-center gap-2">
-    <Icon name="ph:star" size="64" />
-    <span class="text-xs">64px</span>
+    <span class="icon-demo-label">48px</span>
   </div>
 </div>
 
 ---
 
 ### Common Icon Names
-
-Here are some commonly used icons in Palo:
 
 #### Navigation & UI
 
@@ -404,13 +653,16 @@ Here are some commonly used icons in Palo:
 
 #### Social Media
 
-| Icon | Name |
-|------|------|
-| <Icon name="ph:github-logo" size="20" /> | `ph:github-logo` |
-| <Icon name="ph:youtube-logo" size="20" /> | `ph:youtube-logo` |
-| <Icon name="ph:x-logo" size="20" /> | `ph:x-logo` |
-| <Icon name="ph:linkedin-logo" size="20" /> | `ph:linkedin-logo` |
-| <Icon name="ph:chat-dots" size="20" /> | `ph:chat-dots` |
+| Icon | Name | Set |
+|------|------|-----|
+| <Icon name="ph:github-logo" size="20" /> | `ph:github-logo` | Phosphor |
+| <Icon name="ph:youtube-logo" size="20" /> | `ph:youtube-logo` | Phosphor |
+| <Icon name="ph:x-logo" size="20" /> | `ph:x-logo` | Phosphor |
+| <Icon name="ph:linkedin-logo" size="20" /> | `ph:linkedin-logo` | Phosphor |
+| <Icon name="fa6-brands:weixin" size="20" /> | `fa6-brands:weixin` | FA Brands |
+| <Icon name="fa6-brands:weibo" size="20" /> | `fa6-brands:weibo` | FA Brands |
+| <Icon name="fa6-brands:qq" size="20" /> | `fa6-brands:qq` | FA Brands |
+| <Icon name="fa6-brands:bilibili" size="20" /> | `fa6-brands:bilibili` | FA Brands |
 
 #### Actions
 
@@ -431,65 +683,20 @@ Here are some commonly used icons in Palo:
 2. **Size Matters**: Match icon sizes to text sizes for visual harmony
 3. **Accessibility**: Always include text labels or ARIA descriptions for screen readers
 4. **Color**: Use Tailwind classes like `text-primary` for easy color customization
+5. **Brand icons**: Reach for `fa6-brands:` when Phosphor has no logo — check [icon-sets.iconify.design](https://icon-sets.iconify.design/) first
 
 1. **一致性**：在整个网站中使用相同的图标风格
 2. **尺寸**：将图标尺寸与文字尺寸匹配以获得视觉和谐
 3. **无障碍**：始终为屏幕阅读器添加文字标签或 ARIA 描述
 4. **颜色**：使用 Tailwind 类如 `text-primary` 以便轻松自定义颜色
+5. **品牌图标**：Phosphor 没有 Logo 时使用 `fa6-brands:` — 先在 Iconify 搜索
 
 ---
 
 ### Conclusion
 
-Phosphor Icons provides everything you need for beautiful, consistent iconography in your Palo website. With multiple styles, weights, and thousands of icons to choose from, you can create a cohesive visual language for your project.
+Phosphor Icons provides everything you need for beautiful, consistent iconography in your Palo website. For regional brand logos, use the bundled `fa6-brands` set with the same `<Icon>` component — no extra import path required.
 
-Phosphor Icons 为您的 Palo 网站提供了美丽、一致的图标所需的一切。凭借多种风格、重量和数千种图标可供选择，您可以为您的项目创建统一的视觉语言。
+Phosphor Icons 为 Palo 网站提供了美观、一致的 UI 图标。区域品牌 Logo 使用内置的 `fa6-brands` 集合，语法与 Phosphor 完全相同。
 
-Remember to visit [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/) whenever you need to find a specific icon!
-
----
-
-## STRATEGIC ASSET LOADING PRIORITIZATION (ANTI-LAZY-DEADLOCK)
-
-To eliminate visual deadlocks where a user is stranded with a static solid color placeholder, Palo enforces a strict boundary between eager hero components and deferred content elements.
-为了根除用户因纯色块占位卡死而产生页面损坏的错觉，Palo 在首屏核心组件与延时非首屏元素之间，划定了极其严格的资源抢占界限。
-
-This technical partitioning alignment ensures that structural integrity is immediately followed by standard high-priority stream decoding.
-这种加载策略的对齐，确保了页面在完成大结构布局锁死之后，能够第一时间发起高优先级的数据流解码。
-
-### Hero and Header Eager Pipeline
-Any media assets dominating the initial folder screen viewpoint—such as `PostHeader` layouts or top-level `Hero` background modules—must actively bypass lazy-loading architecture.
-凡是主导首屏核心视觉焦点的媒介素材——如文章详情页头 `PostHeader` 或通栏 `Hero` 模块——必须绝对绕过任何形式的延迟初始化架构。
-
-* **Immediate Fetching Trigger**: These assets strictly implement `loading="eager"` and reject `loadStrategy="defer"` modifiers, prompting the server to download data instantly during the first browser HTML pass.
-  *即时捕获触发：此类资产严格声明 `loading="eager"` 并彻底剔除 `loadStrategy="defer"` 属性，强制浏览器在解析 HTML 第一帧时无条件启动并发网络请求。*
-* **Inline Height Isolation Constraints**: To shield against async runtime style delays, the underlying rendering box embeds raw inline height parameters directly within the markup tree.
-  *内联高度隔离约束：为了防御异步 CSS 文件在慢速网络下的到达延迟，底层媒介块会将 `height: 100%` 直接作为内联样式随 HTML 刺入文档树，避免首屏瞬间产生高度塌陷。*
-
-### Non-Hero Content Deferral
-The `loadStrategy="defer"` system remains fully active as a secondary runtime system tailored exclusively for standard body flows.
-`loadStrategy="defer"` 机制将退回为纯粹的辅助系统，全权接管标准文章正文流中非首屏的图片资产。
-
-* **Idle Callback Execution**: Images inside subsequent content markers or standard markdown bodies utilize `requestIdleCallback` to delay processing until core main-thread interactive tasks settle down.
-  *空闲回调执行：后置正文流或 Markdown 内部的普通插图将继续利用 `requestIdleCallback`，将线程压力推迟至主流程交互安全落盘之后。*
-
----
-
-## CRITICAL CSS INLINING (ANTI-FOUC SHIELD)
-
-To completely eliminate Flash of Unstyled Content (FOUC) during the volatile first few seconds on Slow 4G networks, Palo decouples above-the-fold layout architecture from external stylesheets.
-为了彻底消除低速 4G 网络下首屏前几秒惨烈的无样式内容闪烁（FOUC），Palo 将首屏核心布局骨架与外部大体积样式表进行了解耦。
-
-By immediately rendering crucial structural definitions, the framework provides an instant seamless dark viewport long before heavy style chunks arrive.
-通过即时渲染关键的结构定义，该框架在沉重的样式分块到达前，便能瞬间提供一个视觉无缝的暗色视口骨架。
-
-### Core Structural Inlining
-Essential flex-box boundaries, base layout heights, and foundational dark mode system background colors are injected directly via inline compilation tags.
-最核心的弹性盒边界、基础布局高度、以及全站底层的深色系统背景色，均通过内联编译标签直接刺入主文档流。
-
-* **Zero-Delay Shell Rendering**: The skeleton framework processes concurrently with raw HTML parsing, preventing navigation menus and header wrappers from rendering as misaligned plain text during asset streams.
-  *零延迟壳层渲染：骨架外壳与原始 HTML 解析完全同步生效，严防导航菜单与页头容器在外部资产下载期间退化为错位的纯文本排版。*
-* **Font Swap Synchronization**: All editorial typography enforces strict `font-display: swap` rules paired with strategic head preloading to mitigate sudden fallback shifts.
-  *字体平滑同步：所有社论版式字体强制执行严格的 `font-display: swap` 规则，并配合头部策略性预加载，以抹平字体文件突发性到达时的空间位移。*
-* **Navigation Link Hardening**: Base typography tokens—`font-family`, `font-weight`, `font-size`, `display: inline-flex`—are anchored directly to `#main-navigation` link selectors within the inline critical shield, ensuring navigation items never regress to browser-default serif stacking before external CSS arrives.
-  *导航链接硬化：基础排版令牌——`font-family`、`font-weight`、`font-size`、`display: inline-flex`——直接锚定到内联关键 CSS 中的 `#main-navigation` 链接选择器，确保在外部 CSS 到达前，导航项绝不会退化为浏览器默认衬线字体堆叠。*
+Remember to visit [icon-sets.iconify.design/ph](https://icon-sets.iconify.design/ph/) for UI icons, and [icon-sets.iconify.design/fa6-brands](https://icon-sets.iconify.design/fa6-brands/) for brand logos.

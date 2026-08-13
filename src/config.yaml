@@ -198,7 +198,7 @@ components:
   postHeader:
     headingLevel: "h2"    # 详情页大标题标签层级 (h2 ~ h6)
     descClass: "text-lg"  # 详情页摘要/引言的 Tailwind 类名
-    coverImagePosition: "head" # 封面图渲染位置: head (顶部通栏) | background (大背景) | side (侧边)
+    coverImagePosition: "head" # 封面图渲染位置: top | head | bottom | none
     divider: "both"     # 标题下方的分割线: top | bottom | both | none
     showBreadcrumbs: true # 是否默认显示面包屑导航 (True/False)
     showShare: true       # 是否默认显示社交分享按钮组 (True/False)
