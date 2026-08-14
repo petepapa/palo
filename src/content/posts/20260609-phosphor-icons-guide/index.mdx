@@ -22,70 +22,8 @@ featuredOrder: 3
 ---
 
 import { Icon } from 'astro-icon/components'
-import BreakoutImage from '@components/BreakoutImage.astro'
 
-<BreakoutImage src="./test.png" />
 
-<style is:global>{`
-  .icon-demo-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 1.25rem;
-    margin-block: 2rem;
-  }
-
-  .icon-demo-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.375rem;
-    padding: 1.5rem 0.375rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    min-width: 0;
-  }
-
-  .icon-demo-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.2;
-  }
-
-  .icon-demo-code {
-    font-size: 0.625rem;
-    line-height: 1.3;
-    color: var(--color-neutral-500, #6b7280);
-    word-break: break-all;
-  }
-
-  .icon-demo-grid--sizes {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: 1.5rem;
-    margin-block: 2rem;
-  }
-
-  .icon-demo-grid--sizes .icon-demo-item {
-    flex: 0 0 auto;
-    min-width: 3.5rem;
-    border: none;
-    padding: 0;
-  }
-
-  @media (max-width: 768px) {
-    .icon-demo-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 480px) {
-    .icon-demo-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-`}</style>
 
 ### Introduction
 
@@ -134,106 +72,106 @@ Phosphor Icons 是一个灵活的图标系列，适用于界面、图表、演�
 
 Same icon in all six Phosphor styles — **Heart**:
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart" size="48" />
-    <span class="icon-demo-label">Regular</span>
-    <code class="icon-demo-code">ph:heart</code>
+    <span class="text-xs font-medium leading-tight">Regular</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart-fill" size="48" />
-    <span class="icon-demo-label">Fill</span>
-    <code class="icon-demo-code">ph:heart-fill</code>
+    <span class="text-xs font-medium leading-tight">Fill</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart-fill</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart-bold" size="48" />
-    <span class="icon-demo-label">Bold</span>
-    <code class="icon-demo-code">ph:heart-bold</code>
+    <span class="text-xs font-medium leading-tight">Bold</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart-bold</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart-thin" size="48" />
-    <span class="icon-demo-label">Thin</span>
-    <code class="icon-demo-code">ph:heart-thin</code>
+    <span class="text-xs font-medium leading-tight">Thin</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart-thin</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart-light" size="48" />
-    <span class="icon-demo-label">Light</span>
-    <code class="icon-demo-code">ph:heart-light</code>
+    <span class="text-xs font-medium leading-tight">Light</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart-light</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart-duotone" size="48" />
-    <span class="icon-demo-label">Duotone</span>
-    <code class="icon-demo-code">ph:heart-duotone</code>
+    <span class="text-xs font-medium leading-tight">Duotone</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart-duotone</code>
   </div>
 </div>
 
 Same variations — **Star**:
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star" size="48" />
-    <span class="icon-demo-label">Regular</span>
-    <code class="icon-demo-code">ph:star</code>
+    <span class="text-xs font-medium leading-tight">Regular</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star-fill" size="48" />
-    <span class="icon-demo-label">Fill</span>
-    <code class="icon-demo-code">ph:star-fill</code>
+    <span class="text-xs font-medium leading-tight">Fill</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star-fill</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star-bold" size="48" />
-    <span class="icon-demo-label">Bold</span>
-    <code class="icon-demo-code">ph:star-bold</code>
+    <span class="text-xs font-medium leading-tight">Bold</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star-bold</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star-thin" size="48" />
-    <span class="icon-demo-label">Thin</span>
-    <code class="icon-demo-code">ph:star-thin</code>
+    <span class="text-xs font-medium leading-tight">Thin</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star-thin</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star-light" size="48" />
-    <span class="icon-demo-label">Light</span>
-    <code class="icon-demo-code">ph:star-light</code>
+    <span class="text-xs font-medium leading-tight">Light</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star-light</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:star-duotone" size="48" />
-    <span class="icon-demo-label">Duotone</span>
-    <code class="icon-demo-code">ph:star-duotone</code>
+    <span class="text-xs font-medium leading-tight">Duotone</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:star-duotone</code>
   </div>
 </div>
 
 Same variations — **House**:
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house" size="48" />
-    <span class="icon-demo-label">Regular</span>
-    <code class="icon-demo-code">ph:house</code>
+    <span class="text-xs font-medium leading-tight">Regular</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house-fill" size="48" />
-    <span class="icon-demo-label">Fill</span>
-    <code class="icon-demo-code">ph:house-fill</code>
+    <span class="text-xs font-medium leading-tight">Fill</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house-fill</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house-bold" size="48" />
-    <span class="icon-demo-label">Bold</span>
-    <code class="icon-demo-code">ph:house-bold</code>
+    <span class="text-xs font-medium leading-tight">Bold</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house-bold</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house-thin" size="48" />
-    <span class="icon-demo-label">Thin</span>
-    <code class="icon-demo-code">ph:house-thin</code>
+    <span class="text-xs font-medium leading-tight">Thin</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house-thin</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house-light" size="48" />
-    <span class="icon-demo-label">Light</span>
-    <code class="icon-demo-code">ph:house-light</code>
+    <span class="text-xs font-medium leading-tight">Light</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house-light</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house-duotone" size="48" />
-    <span class="icon-demo-label">Duotone</span>
-    <code class="icon-demo-code">ph:house-duotone</code>
+    <span class="text-xs font-medium leading-tight">Duotone</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house-duotone</code>
   </div>
 </div>
 
@@ -309,86 +247,86 @@ import { Icon } from 'astro-icon/components'
 
 Browse the full set at [icon-sets.iconify.design/fa6-brands](https://icon-sets.iconify.design/fa6-brands/). Below are regional and brand icons Phosphor does **not** provide, ready to copy:
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:weixin" size="48" />
-    <span class="icon-demo-label">WeChat</span>
-    <code class="icon-demo-code">fa6-brands:weixin</code>
+    <span class="text-xs font-medium leading-tight">WeChat</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:weixin</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:weibo" size="48" />
-    <span class="icon-demo-label">Weibo</span>
-    <code class="icon-demo-code">fa6-brands:weibo</code>
+    <span class="text-xs font-medium leading-tight">Weibo</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:weibo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:qq" size="48" />
-    <span class="icon-demo-label">QQ</span>
-    <code class="icon-demo-code">fa6-brands:qq</code>
+    <span class="text-xs font-medium leading-tight">QQ</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:qq</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:zhihu" size="48" />
-    <span class="icon-demo-label">Zhihu</span>
-    <code class="icon-demo-code">fa6-brands:zhihu</code>
+    <span class="text-xs font-medium leading-tight">Zhihu</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:zhihu</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:bilibili" size="48" />
-    <span class="icon-demo-label">Bilibili</span>
-    <code class="icon-demo-code">fa6-brands:bilibili</code>
+    <span class="text-xs font-medium leading-tight">Bilibili</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:bilibili</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:alipay" size="48" />
-    <span class="icon-demo-label">Alipay</span>
-    <code class="icon-demo-code">fa6-brands:alipay</code>
+    <span class="text-xs font-medium leading-tight">Alipay</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:alipay</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:tiktok" size="48" />
-    <span class="icon-demo-label">TikTok</span>
-    <code class="icon-demo-code">fa6-brands:tiktok</code>
+    <span class="text-xs font-medium leading-tight">TikTok</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:tiktok</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:line" size="48" />
-    <span class="icon-demo-label">LINE</span>
-    <code class="icon-demo-code">fa6-brands:line</code>
+    <span class="text-xs font-medium leading-tight">LINE</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:line</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:telegram" size="48" />
-    <span class="icon-demo-label">Telegram</span>
-    <code class="icon-demo-code">fa6-brands:telegram</code>
+    <span class="text-xs font-medium leading-tight">Telegram</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:telegram</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:whatsapp" size="48" />
-    <span class="icon-demo-label">WhatsApp</span>
-    <code class="icon-demo-code">fa6-brands:whatsapp</code>
+    <span class="text-xs font-medium leading-tight">WhatsApp</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:whatsapp</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:discord" size="48" />
-    <span class="icon-demo-label">Discord</span>
-    <code class="icon-demo-code">fa6-brands:discord</code>
+    <span class="text-xs font-medium leading-tight">Discord</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:discord</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:slack" size="48" />
-    <span class="icon-demo-label">Slack</span>
-    <code class="icon-demo-code">fa6-brands:slack</code>
+    <span class="text-xs font-medium leading-tight">Slack</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:slack</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:reddit" size="48" />
-    <span class="icon-demo-label">Reddit</span>
-    <code class="icon-demo-code">fa6-brands:reddit</code>
+    <span class="text-xs font-medium leading-tight">Reddit</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:reddit</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:medium" size="48" />
-    <span class="icon-demo-label">Medium</span>
-    <code class="icon-demo-code">fa6-brands:medium</code>
+    <span class="text-xs font-medium leading-tight">Medium</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:medium</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:apple" size="48" />
-    <span class="icon-demo-label">Apple</span>
-    <code class="icon-demo-code">fa6-brands:apple</code>
+    <span class="text-xs font-medium leading-tight">Apple</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:apple</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="fa6-brands:google" size="48" />
-    <span class="icon-demo-label">Google</span>
-    <code class="icon-demo-code">fa6-brands:google</code>
+    <span class="text-xs font-medium leading-tight">Google</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">fa6-brands:google</code>
   </div>
 </div>
 
@@ -506,131 +444,131 @@ Add icons to navigation items in `src/navigation.ts`:
 
 #### Social Media Icons (Phosphor)
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:github-logo" size="48" />
-    <span class="icon-demo-label">GitHub</span>
-    <code class="icon-demo-code">ph:github-logo</code>
+    <span class="text-xs font-medium leading-tight">GitHub</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:github-logo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:youtube-logo" size="48" />
-    <span class="icon-demo-label">YouTube</span>
-    <code class="icon-demo-code">ph:youtube-logo</code>
+    <span class="text-xs font-medium leading-tight">YouTube</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:youtube-logo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:x-logo" size="48" />
-    <span class="icon-demo-label">X</span>
-    <code class="icon-demo-code">ph:x-logo</code>
+    <span class="text-xs font-medium leading-tight">X</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:x-logo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:linkedin-logo" size="48" />
-    <span class="icon-demo-label">LinkedIn</span>
-    <code class="icon-demo-code">ph:linkedin-logo</code>
+    <span class="text-xs font-medium leading-tight">LinkedIn</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:linkedin-logo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:facebook-logo" size="48" />
-    <span class="icon-demo-label">Facebook</span>
-    <code class="icon-demo-code">ph:facebook-logo</code>
+    <span class="text-xs font-medium leading-tight">Facebook</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:facebook-logo</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:instagram-logo" size="48" />
-    <span class="icon-demo-label">Instagram</span>
-    <code class="icon-demo-code">ph:instagram-logo</code>
+    <span class="text-xs font-medium leading-tight">Instagram</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:instagram-logo</code>
   </div>
 </div>
 
 #### UI Icons
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:house" size="48" />
-    <span class="icon-demo-label">Home</span>
-    <code class="icon-demo-code">ph:house</code>
+    <span class="text-xs font-medium leading-tight">Home</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:house</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:magnifying-glass" size="48" />
-    <span class="icon-demo-label">Search</span>
-    <code class="icon-demo-code">ph:magnifying-glass</code>
+    <span class="text-xs font-medium leading-tight">Search</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:magnifying-glass</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:gear" size="48" />
-    <span class="icon-demo-label">Settings</span>
-    <code class="icon-demo-code">ph:gear</code>
+    <span class="text-xs font-medium leading-tight">Settings</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:gear</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:user" size="48" />
-    <span class="icon-demo-label">User</span>
-    <code class="icon-demo-code">ph:user</code>
+    <span class="text-xs font-medium leading-tight">User</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:user</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:envelope" size="48" />
-    <span class="icon-demo-label">Email</span>
-    <code class="icon-demo-code">ph:envelope</code>
+    <span class="text-xs font-medium leading-tight">Email</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:envelope</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:heart" size="48" />
-    <span class="icon-demo-label">Heart</span>
-    <code class="icon-demo-code">ph:heart</code>
+    <span class="text-xs font-medium leading-tight">Heart</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:heart</code>
   </div>
 </div>
 
 #### Action Icons
 
-<div class="icon-demo-grid">
-  <div class="icon-demo-item">
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-5 my-8">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:plus" size="48" />
-    <span class="icon-demo-label">Plus</span>
-    <code class="icon-demo-code">ph:plus</code>
+    <span class="text-xs font-medium leading-tight">Plus</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:plus</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:pencil" size="48" />
-    <span class="icon-demo-label">Edit</span>
-    <code class="icon-demo-code">ph:pencil</code>
+    <span class="text-xs font-medium leading-tight">Edit</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:pencil</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:trash" size="48" />
-    <span class="icon-demo-label">Delete</span>
-    <code class="icon-demo-code">ph:trash</code>
+    <span class="text-xs font-medium leading-tight">Delete</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:trash</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:download" size="48" />
-    <span class="icon-demo-label">Download</span>
-    <code class="icon-demo-code">ph:download</code>
+    <span class="text-xs font-medium leading-tight">Download</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:download</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:share-network" size="48" />
-    <span class="icon-demo-label">Share</span>
-    <code class="icon-demo-code">ph:share-network</code>
+    <span class="text-xs font-medium leading-tight">Share</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:share-network</code>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 px-1.5 py-6 rounded-lg text-center min-w-0">
     <Icon name="ph:arrow-square-out" size="48" />
-    <span class="icon-demo-label">External</span>
-    <code class="icon-demo-code">ph:arrow-square-out</code>
+    <span class="text-xs font-medium leading-tight">External</span>
+    <code class="text-[0.625rem] leading-tight text-[color:var(--color-neutral-500)] break-all">ph:arrow-square-out</code>
   </div>
 </div>
 
 #### Different Sizes
 
-<div class="icon-demo-grid--sizes">
-  <div class="icon-demo-item">
+<div class="flex flex-wrap items-end gap-6 my-8">
+  <div class="flex flex-col items-center gap-1.5 text-center flex-none min-w-[3.5rem] border-0 p-0">
     <Icon name="ph:star" size="16" />
-    <span class="icon-demo-label">16px</span>
+    <span class="text-xs font-medium leading-tight">16px</span>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 text-center flex-none min-w-[3.5rem] border-0 p-0">
     <Icon name="ph:star" size="24" />
-    <span class="icon-demo-label">24px</span>
+    <span class="text-xs font-medium leading-tight">24px</span>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 text-center flex-none min-w-[3.5rem] border-0 p-0">
     <Icon name="ph:star" size="32" />
-    <span class="icon-demo-label">32px</span>
+    <span class="text-xs font-medium leading-tight">32px</span>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 text-center flex-none min-w-[3.5rem] border-0 p-0">
     <Icon name="ph:star" size="40" />
-    <span class="icon-demo-label">40px</span>
+    <span class="text-xs font-medium leading-tight">40px</span>
   </div>
-  <div class="icon-demo-item">
+  <div class="flex flex-col items-center gap-1.5 text-center flex-none min-w-[3.5rem] border-0 p-0">
     <Icon name="ph:star" size="48" />
-    <span class="icon-demo-label">48px</span>
+    <span class="text-xs font-medium leading-tight">48px</span>
   </div>
 </div>
 
