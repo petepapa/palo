@@ -68,7 +68,7 @@ site:
   defaultTheme: auto          # auto | light | dark
   darkModeToggle: true
   launcher: 'gradientBorder'  # default | compact | gradientBorder | off
-  launcherIcon: 'ph:magnifying-glass'
+  launcherIcon: ''              # '' → default ph:lightning (⚡)
   backToTop: true
   backToTopText: 'Back to Top'
   enableCustomCursor: true    # Circular inverted cursor + hover scale
@@ -83,7 +83,7 @@ site:
 | `defaultTheme` | `auto` \| `light` \| `dark` | Initial color scheme |
 | `darkModeToggle` | boolean | Show theme toggle in header |
 | `launcher` | enum | Cmd+K / Ctrl+K quick launcher style; `off` disables |
-| `launcherIcon` | Phosphor icon id | Launcher button icon |
+| `launcherIcon` | Phosphor icon id \| `''` | Launcher button icon; empty → `ph:lightning` (⚡) |
 | `backToTop` | boolean | Footer "back to top" link |
 | `backToTopText` | string | Link label text |
 | `enableCustomCursor` | boolean | Custom circular cursor |

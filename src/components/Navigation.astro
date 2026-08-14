@@ -21,7 +21,7 @@ const navDesktopDropdownLineHeightScale = themeConfig.navigation?.desktopDropdow
 const navMobileDropdownLineHeightScale = themeConfig.navigation?.mobileDropdownLineHeightScale ?? 1
 const launcherGradientBorder = site.launcher === 'gradientBorder'
 const launcherMode = site.launcher
-const launcherIcon = site.launcherIcon ?? 'ph:lightning'
+const launcherIcon = site.launcherIcon || 'ph:lightning'
 const showLauncher = launcherMode !== 'off'
 
 const navStyle = [

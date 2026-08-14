@@ -20,7 +20,7 @@ const { variant = 'all', includeLauncher = true } = Astro.props
 const launcherMode = themeConfig.site.launcher
 const launcherGradientBorder = launcherMode === 'gradientBorder'
 const launcherIsCompact = launcherMode === 'compact'
-const launcherIcon = themeConfig.site.launcherIcon ?? 'ph:lightning'
+const launcherIcon = themeConfig.site.launcherIcon || 'ph:lightning'
 const showLauncher = launcherMode !== 'off' && includeLauncher
 
 const primaryItems = navigationItems.filter((item) => !item.icon)
