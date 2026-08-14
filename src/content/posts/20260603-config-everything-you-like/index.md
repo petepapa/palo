@@ -56,7 +56,7 @@ Palo 将几乎所有全站设计与行为集中在 **`src/config.yaml`** 中。�
 
 ---
 
-### `site`
+### site
 
 Basic identity and feature toggles.
 
@@ -91,7 +91,7 @@ site:
 
 ---
 
-### `metadata`
+### metadata
 
 SEO and social sharing defaults.
 
@@ -118,7 +118,7 @@ Individual pages override via layout props or frontmatter.
 
 ---
 
-### `branding`
+### branding
 
 Visual identity: logo, colors, typography.
 
@@ -158,7 +158,7 @@ Colors map to CSS custom properties site-wide. State colors (`info`, `success`, 
 
 ---
 
-### `navigation`
+### navigation
 
 Header appearance. **Menu items** are in `src/navigation.ts`.
 
@@ -201,7 +201,7 @@ navigation:
 
 ---
 
-### `layout`
+### layout
 
 ```yaml
 layout:
@@ -212,7 +212,7 @@ Max width for `.container` content areas.
 
 ---
 
-### `typography`
+### typography
 
 ```yaml
 typography:
@@ -237,7 +237,7 @@ Heading sizes follow a geometric scale: `h1 = 1rem × scale⁵`, `h2 = 1rem × s
 
 ---
 
-### `border`
+### border
 
 Global default + per-component overrides. **Empty string `''` = inherit global.**
 
@@ -263,7 +263,7 @@ border:
 
 ---
 
-### `radius`
+### radius
 
 Same inheritance pattern as `border`.
 
@@ -287,7 +287,7 @@ radius:
 
 ---
 
-### `components`
+### components
 
 Defaults for page headers when frontmatter / props are empty.
 
@@ -330,7 +330,7 @@ See [PostHeader Component](/blog/20260603-postheader-component).
 
 ---
 
-### `portfolio`
+### portfolio
 
 Portfolio lists, tag/type filters, and `FeaturedProjects`.
 
@@ -385,7 +385,7 @@ See [Projects List and FeaturedProjects](/blog/20260607-projects-list-and-featur
 
 ---
 
-### `blog`
+### blog
 
 Blog list, tag pages, and `LatestPosts`.
 
@@ -424,7 +424,7 @@ See [Blog List and LatestPosts](/blog/20260607-blog-list-and-latestposts-compone
 
 ---
 
-### `contact`
+### contact
 
 Resend-powered contact form (`/contact`).
 
