@@ -4,6 +4,7 @@ import Hero from '@components/Hero.astro'
 import CreativeSection from '@components/CreativeSection.astro'
 import FeaturedProjects from '@components/FeaturedProjects.astro'
 import LatestPosts from '@components/LatestPosts.astro'
+import Feature from '@components/Feature.astro'
 import { Link } from 'accessible-astro-components'
 import { Icon } from 'astro-icon/components'
 ---
@@ -60,11 +61,37 @@ import { Icon } from 'astro-icon/components'
   </Hero>
 
 
-  <section class="my-64">
+  <section class="my-32 md:my-48">
     <div class="container">
-      <h2 class="mb-8">Features</h2>
+      <h2 class="mb-12">Features</h2>
+
+      <div class="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
+        <Feature icon="ph:sliders-horizontal" title="One-file creative control">
+          Tune branding, typography, navigation, borders, portfolio grids, blog lists, and contact settings from
+          <a href="/blog/20260603-config-everything-you-like">one readable YAML file</a>.
+        </Feature>
+
+        <Feature icon="ph:image-square" title="Images live with the story">
+          Keep covers and article media beside each Markdown file, then use relative paths for responsive images and reliable content moves.
+        </Feature>
+
+        <Feature icon="ph:stack" title="Portfolio layouts with range">
+          Mix overlay galleries, standard cards, project types, tag pages, featured ordering, and responsive masonry without rebuilding templates.
+        </Feature>
+
+        <Feature icon="ph:browser" title="Immersive page sections">
+          Build full-screen hero areas, video sections, page headers, dividers, overlays, and fixed backgrounds with reusable Astro components.
+        </Feature>
+
+        <Feature icon="ph:person-arms-spread" title="Accessible by default">
+          Start from semantic navigation, keyboard-friendly controls, visible focus states, color contrast tooling, and reduced-motion-aware patterns.
+        </Feature>
+
+        <Feature icon="ph:paper-plane-tilt" title="Contact forms ready for launch">
+          Customize fields in code, send email through Resend, and keep production secrets in deployment environment variables.
+        </Feature>
+      </div>
     </div>
-    
   </section>
 
 

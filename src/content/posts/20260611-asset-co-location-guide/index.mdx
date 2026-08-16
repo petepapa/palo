@@ -113,6 +113,14 @@ You can also run `npm run copy-images` manually after adding or replacing images
 
 **复制范围：** 仅复制含有 `index.md` 或 `index.mdx` 的文件夹内的图片文件。支持格式：`.jpg`、`.jpeg`、`.png`、`.gif`、`.webp`、`.svg`、`.avif`。
 
+**Git policy / Git 提交规则：** the generated mirror folders `public/posts/{slug}/` and `public/projects/{slug}/` are ignored by `.gitignore`. Commit the original files under `src/content/...`, not the copied public mirrors.
+
+**Git 策略：** 自动生成的镜像目录 `public/posts/{slug}/` 和 `public/projects/{slug}/` 已被 `.gitignore` 忽略。请提交 `src/content/...` 下的源文件，而不是复制出来的 public 镜像。
+
+If you need to maintain manual static files in `public/posts` or `public/projects`, place them at the collection root, such as `public/posts/manual-download.pdf` or `public/projects/shared-preview.jpg`. Avoid adding hand-maintained files inside slug subdirectories, because those folders are treated as generated mirrors.
+
+如果确实需要在 `public/posts` 或 `public/projects` 中手动维护静态文件，请放在集合根目录，例如 `public/posts/manual-download.pdf` 或 `public/projects/shared-preview.jpg`。不要把手动文件放进 slug 子目录，因为这些子目录会被视为自动生成的镜像目录。
+
 ---
 
 ### How to Reference Co-located Images
@@ -425,6 +433,10 @@ For everyday post images and covers, co-location is the default. `public/` is th
 
 日常文章的配图与封面，一律使用同域混用模式。`public/` 是备选方案，不是默认起点。
 
+When you do add manual files under `public/posts` or `public/projects`, keep them at the root level. Slug subdirectories are reserved for generated co-located mirrors and are ignored by Git.
+
+当你确实要在 `public/posts` 或 `public/projects` 中手动添加文件时，请放在根目录。slug 子目录专门留给自动生成的同域镜像，并且会被 Git 忽略。
+
 ---
 
 ### Image Source Comparison
@@ -459,6 +471,7 @@ For everyday post images and covers, co-location is the default. `public/` is th
 | Inline (Image) | `import sample from './sample.jpg'` then `<Image src={sample} ... />` | Same folder or subdirectory |
 | Raw `<img>` tag | `src="/posts/.../sample.jpg"` | `public/` only (auto-copied on dev/build) |
 | Shared site asset | `@assets/images/logo.svg` | `src/assets/` |
+| Manual public file | `/posts/manual-download.pdf` | `public/posts/` root |
 
 | 场景 | 写法 | 资源位置 |
 |------|------|---------|
@@ -468,6 +481,7 @@ For everyday post images and covers, co-location is the default. `public/` is th
 | 内嵌配图 (Image) | `import sample from './sample.jpg'` 后 `<Image src={sample} ... />` | 同目录或子目录 |
 | 原生 `<img>` 标签 | `src="/posts/.../sample.jpg"` | 仅限 `public/`（dev/build 时自动复制） |
 | 站点共享资源 | `@assets/images/logo.svg` | `src/assets/` |
+| 手动 public 文件 | `/posts/manual-download.pdf` | `public/posts/` 根目录 |
 
 ---
 
