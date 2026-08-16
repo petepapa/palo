@@ -1,6 +1,6 @@
 # Palo
 
-![Palo theme cover](public/branding/hero-bg.png)
+![Palo theme cover](public/branding/social-preview-image.gif)
 
 **A minimalist Astro theme for creative portfolios.**  
 **为创作者作品集而生的极简 Astro 主题。**
