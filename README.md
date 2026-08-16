@@ -284,7 +284,7 @@ Palo is based on the Accessible Astro ecosystem and extends it into a creative p
 
 ## License
 
-MIT.
+MIT. Palo includes work derived from Accessible Astro Starter; upstream attribution is preserved in [LICENSE](LICENSE).
 
 Made for people who make things.  
 为创作者而做。

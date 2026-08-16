@@ -20,8 +20,8 @@ breadcrumbs:
 share: 
 
 # Status & External Links / 状态与外部链接
-draft: false
-featuredOrder: 1
+draft: true
+featuredOrder:
 source: "https://github.com/petepapa/palo"
 liveDemo: "https://palo.petepa.com/"
 ---

@@ -67,11 +67,11 @@ const siteUrl = rawSiteUrl.replace(/\/\/+$/, '')
 const hasSiteUrl = Boolean(siteUrl)
 /**
  * Ensure a path starts with '/'.
- * If path is empty or undefined, defaults to '/social-preview-image.png'.
+ * If path is empty or undefined, defaults to the Palo social preview image.
  */
 function ensureLeadingSlash(p: string): string {
   if (!p || p.trim() === '') {
-    return '/social-preview-image.png'
+    return '/branding/social-preview-image.gif'
   }
   return p.startsWith('/') ? p : `/${p}`
 }
@@ -81,7 +81,7 @@ function ensureLeadingSlash(p: string): string {
  * If siteUrl is not configured, return a site-relative path.
  */
 function buildImageUrl(img: ImageMetadata | string | null): string {
-  const path = !img ? '/social-preview-image.png' : typeof img === 'string' ? img : img.src
+  const path = !img ? '/branding/social-preview-image.gif' : typeof img === 'string' ? img : img.src
   const safePath = ensureLeadingSlash(path)
 
   if (!hasSiteUrl) {
