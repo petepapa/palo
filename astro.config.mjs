@@ -11,6 +11,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { enhanceConfigForWorkspace } from './scripts/workspace-config.js'
 import { paloConfigHmr } from './scripts/vite-plugin-palo-config.ts'
 import { paloCopyColocatedImages } from './scripts/vite-plugin-copy-colocated-images.ts'
+import { paloContactDevApi } from './scripts/vite-plugin-contact-dev-api.ts'
 import { validateConfig } from './src/utils/validateConfig.ts'
 
 // Read config.yaml for site settings (used at build-time for Astro config)
@@ -126,7 +127,7 @@ const viteConfig = {
       },
     },
   },
-  plugins: [tailwindcss(), paloConfigHmr(), paloCopyColocatedImages(), yamlPlugin()],
+  plugins: [tailwindcss(), paloConfigHmr(), paloCopyColocatedImages(), paloContactDevApi(), yamlPlugin()],
   resolve: {
     alias: {
       '@config': fileURLToPath(new URL('./src/config.yaml', import.meta.url)),
