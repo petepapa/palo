@@ -250,7 +250,7 @@ npm run build
 
 Production output is generated in `dist/`.
 
-The static site output is `dist/`, so Cloudflare Pages can use its default output-directory setting. On Cloudflare Pages, the included contact form is served by a Pages Function. Set your Resend key through the project environment variables:
+The static site output is `dist/`, so Cloudflare Pages can use its default output-directory setting. The included contact form is served by the deployment platform's serverless route: Cloudflare Pages Functions on Cloudflare and a Vercel Function on Vercel. Set your Resend key through the project environment variables:
 
 ```text
 RESEND_API_KEY=...
