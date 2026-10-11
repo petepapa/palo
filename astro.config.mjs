@@ -78,21 +78,19 @@ function cssPreloadIntegration() {
     name: 'palo-css-preload',
     hooks: {
       'astro:build:done': async ({ dir }) => {
-        const { readdirSync, readFileSync, writeFileSync, statSync } = await import('node:fs')
-        const { join } = await import('node:path')
         const distDir = fileURLToPath(dir)
 
         function processHtmlFiles(dirPath) {
-          for (const entry of readdirSync(dirPath)) {
-            const fullPath = join(dirPath, entry)
-            const stat = statSync(fullPath)
+          for (const entry of fs.readdirSync(dirPath)) {
+            const fullPath = path.join(dirPath, entry)
+            const stat = fs.statSync(fullPath)
             if (stat.isDirectory()) {
               processHtmlFiles(fullPath)
               continue
             }
             if (!entry.endsWith('.html')) continue
 
-            let html = readFileSync(fullPath, 'utf-8')
+            let html = fs.readFileSync(fullPath, 'utf-8')
             // 查找 Astro 自动注入的外链 CSS
             const cssMatch = html.match(/<link[^>]*href=(\/_astro\/[^"\s>]+\.css)[^>]*rel=stylesheet[^>]*>/)
             if (!cssMatch) continue
@@ -102,7 +100,7 @@ function cssPreloadIntegration() {
             if (html.includes(preloadTag)) continue
             // 注入到 <head> 之后的第一位
             html = html.replace(/<head([^>]*)>/, `<head$1>${preloadTag}`)
-            writeFileSync(fullPath, html)
+            fs.writeFileSync(fullPath, html)
           }
         }
 
