@@ -321,7 +321,7 @@ export interface ContactConfig {
   receiveEmail: string
   /** Resend 验证过的发件域名邮箱（留空则使用 receiveEmail） */
   resendFromEmail?: string
-  /** Resend API key（线上留空，走 Vercel 环境变量 RESEND_API_KEY） */
+  /** Resend API key（线上留空，走部署平台环境变量 RESEND_API_KEY） */
   resendApiKey?: string
 }
 
@@ -421,4 +421,3 @@ export function buildProjectListStyle(
 
 /** @deprecated Renamed to buildProjectListStyle */
 export const buildProjectGridListStyle = buildProjectListStyle
-

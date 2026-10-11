@@ -242,7 +242,7 @@ Palo ships with long-form posts that explain how the theme works. Useful startin
 
 ## Deployment
 
-Palo builds as a static Astro site and currently includes the Vercel adapter. It can be deployed to Vercel, Netlify, Cloudflare Pages, GitHub Pages, or any static hosting provider that supports Astro output.
+Palo builds as a standard static Astro site. It can be deployed to Vercel, Netlify, Cloudflare Pages, GitHub Pages, or any static hosting provider that supports Astro output.
 
 ```bash
 npm run build
@@ -250,13 +250,13 @@ npm run build
 
 Production output is generated in `dist/`.
 
-For contact forms, set your Resend key through deployment environment variables:
+The static site output is `dist/`, so Cloudflare Pages can use its default output-directory setting. On Cloudflare Pages, the included contact form is served by a Pages Function. Set your Resend key through the project environment variables:
 
 ```text
 RESEND_API_KEY=...
 ```
 
-Do not commit production secrets to `src/config.yaml`.
+Optionally set `CONTACT_TO_EMAIL` and `CONTACT_FROM_EMAIL` to customize the recipient and verified Resend sender. Do not commit production secrets to `src/config.yaml`.
 
 ---
 

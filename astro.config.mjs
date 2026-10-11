@@ -7,7 +7,6 @@ import compress from 'astro-compress'
 import icon from 'astro-icon'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
-import vercel from '@astrojs/vercel'
 import tailwindcss from '@tailwindcss/vite'
 import { enhanceConfigForWorkspace } from './scripts/workspace-config.js'
 import { paloConfigHmr } from './scripts/vite-plugin-palo-config.ts'
@@ -160,7 +159,6 @@ if (siteUrl) integrations.push(sitemap())
 
 export default defineConfig({
   output: 'static',
-  adapter: vercel(),
   compressHTML: true,
   site: siteUrl || undefined,
   trailingSlash: yamlConfig.site.trailingSlash ? 'always' : 'never',
