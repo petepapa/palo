@@ -98,13 +98,13 @@ export async function onRequestPost({ request, env }: PagesContext): Promise<Res
     body: JSON.stringify({
       from: `Palo Contact <${from}>`,
       to: [to],
-      reply_to: email,
       subject: `[Palo Contact] New Inquiry from ${name}`,
       html,
     }),
   })
 
   if (!resendResponse.ok) {
+    console.error('[contact] Resend returned', resendResponse.status, await resendResponse.text())
     return json({ error: 'Unable to send your message right now.' }, 502)
   }
 

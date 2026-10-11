@@ -93,13 +93,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     body: JSON.stringify({
       from: `Palo Contact <${from}>`,
       to: [to],
-      reply_to: email,
       subject: `[Palo Contact] New Inquiry from ${name}`,
       html,
     }),
   })
 
   if (!resendResponse.ok) {
+    console.error('[contact] Resend returned', resendResponse.status, await resendResponse.text())
     res.status(502).json({ error: 'Unable to send your message right now.' })
     return
   }

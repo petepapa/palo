@@ -123,14 +123,13 @@ export function paloContactDevApi(): Plugin {
           body: JSON.stringify({
             from: `Palo Contact <${from}>`,
             to: [to],
-            reply_to: email,
             subject: `[Palo Contact] New Inquiry from ${name}`,
             html,
           }),
         })
 
         if (!resendResponse.ok) {
-          console.error('[palo-contact-dev-api] Resend returned', resendResponse.status)
+          console.error('[palo-contact-dev-api] Resend returned', resendResponse.status, await resendResponse.text())
           respond(res, 502, { error: 'Unable to send your message right now.' })
           return
         }
