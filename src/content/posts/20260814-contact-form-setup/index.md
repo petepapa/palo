@@ -23,9 +23,9 @@ views: 0
 
 ### Introduction
 
-The Contact form is one of the few features in Palo that touches both **`src/contactForm.ts`** (field labels, choices) and **`src/config.yaml`** (email delivery via Resend). This guide walks through every customization point — from renaming labels to wiring up Resend on Vercel.
+The Contact form is one of the few features in Palo that touches both **`src/contactForm.ts`** (field labels, choices) and **`src/config.yaml`** (local email delivery settings). This guide walks through every customization point — from renaming labels to wiring up Resend on Vercel or Cloudflare Pages.
 
-Contact 表单是 Palo 中少数同时涉及 **`src/contactForm.ts`**（字段标签、选项）和 **`src/config.yaml`**（通过 Resend 发送邮件）的功能。本指南涵盖所有自定义点——从修改标签到在 Vercel 上配置 Resend。
+Contact 表单是 Palo 中少数同时涉及 **`src/contactForm.ts`**（字段标签、选项）和 **`src/config.yaml`**（本地邮件投递设置）的功能。本指南涵盖所有自定义点——从修改标签到在 Vercel 或 Cloudflare Pages 上配置 Resend。
 
 | What you want | Where to edit |
 |---------------|---------------|
@@ -33,7 +33,7 @@ Contact 表单是 Palo 中少数同时涉及 **`src/contactForm.ts`**（字段�
 | Add/remove radio or checkbox options | `src/contactForm.ts` → `dynamicSections` |
 | Hide a section entirely | `src/contactForm.ts` → `enable: false` |
 | Change recipient email | `src/config.yaml` → `contact.receiveEmail` |
-| Set up Resend API key | Vercel Dashboard → Environment Variables |
+| Set up Resend API key | Hosting platform → Environment Variables |
 
 | 想做什么 | 在哪修改 |
 |---------|---------|
@@ -41,7 +41,7 @@ Contact 表单是 Palo 中少数同时涉及 **`src/contactForm.ts`**（字段�
 | 增删单选/复选项 | `src/contactForm.ts` → `dynamicSections` |
 | 完全隐藏某个区域 | `src/contactForm.ts` → `enable: false` |
 | 修改收件邮箱 | `src/config.yaml` → `contact.receiveEmail` |
-| 配置 Resend API key | Vercel Dashboard → Environment Variables |
+| 配置 Resend API key | 部署平台 → 环境变量 |
 
 ---
 
@@ -54,22 +54,22 @@ The contact system has three moving parts:
 ```
 User fills form  →  Frontend validates  →  POST /api/send-email  →  Resend delivers email
      ↑                    ↑                    ↑                      ↑
-contact.astro     contactForm.ts         send-email.ts         config.yaml + Vercel Env
+contact.astro     contactForm.ts      platform route + shared module     platform env
 ```
 
 | Layer | File | Responsibility |
 |-------|------|---------------|
 | **UI** | `src/pages/contact.astro` | Renders form, client-side validation, AJAX submit |
 | **Config** | `src/contactForm.ts` | All labels, options, enable/disable toggles |
-| **API** | `src/pages/api/send-email.ts` | Server-side validation, Resend API call, HTML email building |
-| **Delivery** | `src/config.yaml` + Vercel env | Resend credentials, recipient email, sender email |
+| **API** | `api/send-email.ts`, `functions/api/send-email.ts`, `scripts/vite-plugin-contact-dev-api.ts` | Platform request adapters |
+| **Delivery** | `src/utils/contact-email.ts` + platform env | Shared validation, email building, Resend delivery |
 
 | 层级 | 文件 | 职责 |
 |------|------|------|
 | **UI** | `src/pages/contact.astro` | 渲染表单、客户端校验、AJAX 提交 |
 | **配置** | `src/contactForm.ts` | 所有标签、选项、开关 |
-| **API** | `src/pages/api/send-email.ts` | 服务端校验、调用 Resend、构建 HTML 邮件 |
-| **投递** | `src/config.yaml` + Vercel 环境变量 | Resend 凭证、收件邮箱、发件邮箱 |
+| **API** | `api/send-email.ts`、`functions/api/send-email.ts`、`scripts/vite-plugin-contact-dev-api.ts` | 各部署平台的请求入口 |
+| **投递** | `src/utils/contact-email.ts` + 平台环境变量 | 共用校验、邮件构建与 Resend 投递 |
 
 ---
 
@@ -219,31 +219,9 @@ identity: {
 
 选项如何流转到邮件中
 
-The `value` strings map to human-readable labels in the API layer via `IDENTITY_LABELS` and `TOPIC_LABELS` in `send-email.ts`:
+The shared delivery module reads labels directly from `src/contactForm.ts`. Adding, removing, or renaming an option updates the email automatically; a section set to `enable: false` is also omitted from the email.
 
-`value` 字符串通过 `send-email.ts` 中的 `IDENTITY_LABELS` 和 `TOPIC_LABELS` 映射为人类可读的标签：
-
-```typescript
-const IDENTITY_LABELS: Record<string, string> = {
-  creator: 'Content Creator',
-  designer: 'Designer / Artist',
-  musician: 'Musician / Band Leader',
-  dev: 'Passionate Dev',
-  kindred: 'Just a kindred spirit',
-}
-
-const TOPIC_LABELS: Record<string, string> = {
-  visual: 'Visual Identity & Branding',
-  web: 'Interactive Web Experiences',
-  motion: 'Motion Typography & Video',
-  audiovisual: 'Audio-Visual / Music Project',
-  chat: 'Coffee & Late-night chat',
-}
-```
-
-**If you add a new option** (e.g., `{ value: 'photographer', label: 'Photographer' }`), the email will fall back to displaying the `value` string (`photographer`) unless you also add it to the label maps in `send-email.ts`.
-
-**如果添加了新选项**（如 `{ value: 'photographer', label: 'Photographer' }`），邮件会回退显示 `value` 字符串（`photographer`），除非你同时在 `send-email.ts` 的标签映射中添加了对应条目。
+共用投递模块会直接读取 `src/contactForm.ts` 中的标签。新增、删除或重命名选项会自动反映在邮件中；设置为 `enable: false` 的区域也不会出现在邮件里。
 
 ---
 
@@ -254,10 +232,10 @@ Resend is the email delivery service Palo uses. Configuration lives in two place
 Resend 是 Palo 使用的邮件投递服务。配置分布在两个位置：
 
 1. **`src/config.yaml`** — for recipient email and local API key override
-2. **Vercel Environment Variables** — for the production API key (secure)
+2. **Vercel or Cloudflare Pages environment variables** — for the production API key (secure)
 
 1. **`src/config.yaml`** — 收件邮箱和本地 API key 覆盖
-2. **Vercel 环境变量** — 生产环境 API key（安全存储）
+2. **Vercel 或 Cloudflare Pages 环境变量** — 生产环境 API key（安全存储）
 
 #### config.yaml Settings
 
@@ -271,13 +249,13 @@ contact:
 | Key | Required | Description |
 |-----|----------|-------------|
 | `receiveEmail` | Yes | The inbox that receives contact form submissions |
-| `resendFromEmail` | Recommended | A verified email on your Resend domain — improves deliverability. Falls back to `receiveEmail` if empty. |
+| `resendFromEmail` | Recommended | A verified email on your Resend domain — improves deliverability. |
 | `resendApiKey` | Local only | **Only use for local testing.** Never commit this to a public repo. |
 
 | 键 | 必填 | 说明 |
 |----|------|------|
 | `receiveEmail` | 是 | 接收表单提交的邮箱地址 |
-| `resendFromEmail` | 推荐 | Resend 域名上已验证的发件邮箱——提高送达率。留空则使用 `receiveEmail`。 |
+| `resendFromEmail` | 推荐 | Resend 域名上已验证的发件邮箱——提高送达率。 |
 | `resendApiKey` | 仅本地 | **仅用于本地测试。** 切勿提交到公共仓库。 |
 
 #### API Key Resolution Order
@@ -288,13 +266,11 @@ The API resolves the key in this order (first match wins):
 
 API 按以下顺序解析 key（第一个匹配生效）：
 
-1. `config.yaml` → `contact.resendApiKey` (for local development)
-2. `process.env.RESEND_API_KEY` (Vercel serverless runtime)
-3. `import.meta.env.RESEND_API_KEY` (Astro/Vite fallback)
+1. Local development: `config.yaml` → `contact.resendApiKey`, then `process.env.RESEND_API_KEY`
+2. Vercel and Cloudflare Pages: the platform's `RESEND_API_KEY` environment variable
 
-1. `config.yaml` → `contact.resendApiKey`（本地开发用）
-2. `process.env.RESEND_API_KEY`（Vercel 无服务器运行时）
-3. `import.meta.env.RESEND_API_KEY`（Astro/Vite 回退）
+1. 本地开发：`config.yaml` → `contact.resendApiKey`，然后是 `process.env.RESEND_API_KEY`
+2. Vercel 与 Cloudflare Pages：平台中的 `RESEND_API_KEY` 环境变量
 
 ---
 
@@ -451,30 +427,22 @@ Check your inbox — the email should arrive within a few seconds.
 
 检查收件箱——邮件应在几秒内到达。
 
-#### 2. Production (Vercel)
+#### 2. Production (Vercel or Cloudflare Pages)
 
 1. Push your changes to GitHub
-2. Wait for Vercel to build and deploy
+2. Wait for the selected platform to build and deploy
 3. Visit your production URL → Contact page
 4. Submit a test form
 
-Watch Vercel logs for the `/api/send-email` route to confirm delivery.
+Watch the platform logs for the `/api/send-email` route to confirm delivery.
 
-查看 Vercel 的 `/api/send-email` 路由日志以确认投递状态。
+查看部署平台的 `/api/send-email` 路由日志以确认投递状态。
 
-#### 3. Debug Mode
+#### 3. Troubleshooting
 
-If emails aren't sending, open debug mode in `send-email.ts`:
+If delivery fails, check the Vercel Function or Cloudflare Pages Function log for the `/api/send-email` route. Resend's response is written there, but not exposed to site visitors.
 
-如果邮件无法发送，在 `send-email.ts` 中开启 debug 模式：
-
-```typescript
-const DEBUG = true  // Change from false to true
-```
-
-This returns detailed error information in the API response — useful for diagnosing API key issues, domain verification problems, or Resend account limits.
-
-这会在 API 响应中返回详细错误信息——用于诊断 API key 问题、域名验证问题或 Resend 账户限制。
+如果投递失败，请查看 Vercel Function 或 Cloudflare Pages Function 中 `/api/send-email` 路由的日志。Resend 的响应会记录在日志中，但不会暴露给网站访客。
 
 ---
 
@@ -525,9 +493,9 @@ After successful submission, the user is redirected to `/thank-you`. You can cus
 | Hide collaboration section | `src/contactForm.ts` | `dynamicSections.collaboration.enable: false` |
 | Change recipient | `src/config.yaml` | `contact.receiveEmail` |
 | Change sender | `src/config.yaml` | `contact.resendFromEmail` |
-| Set API key (prod) | Vercel Dashboard | `RESEND_API_KEY` env var |
+| Set API key (prod) | Vercel or Cloudflare Pages | `RESEND_API_KEY` env var |
 | Set API key (local) | `src/config.yaml` | `contact.resendApiKey` |
-| Add new label mapping | `src/pages/api/send-email.ts` | `IDENTITY_LABELS`, `TOPIC_LABELS` |
+| Change delivery behavior | `src/utils/contact-email.ts` | shared delivery module |
 
 | 任务 | 文件 | 键/属性 |
 |------|------|--------|
@@ -540,9 +508,9 @@ After successful submission, the user is redirected to `/thank-you`. You can cus
 | 隐藏协作区域 | `src/contactForm.ts` | `dynamicSections.collaboration.enable: false` |
 | 修改收件邮箱 | `src/config.yaml` | `contact.receiveEmail` |
 | 修改发件邮箱 | `src/config.yaml` | `contact.resendFromEmail` |
-| 设置 API key（生产） | Vercel 控制台 | `RESEND_API_KEY` 环境变量 |
+| 设置 API key（生产） | Vercel 或 Cloudflare Pages | `RESEND_API_KEY` 环境变量 |
 | 设置 API key（本地） | `src/config.yaml` | `contact.resendApiKey` |
-| 添加新标签映射 | `src/pages/api/send-email.ts` | `IDENTITY_LABELS`, `TOPIC_LABELS` |
+| 修改投递行为 | `src/utils/contact-email.ts` | 共用投递模块 |
 
 ---
 
@@ -558,7 +526,7 @@ You can describe changes in plain language and let AI edit the files for you:
 
 > "Change receiveEmail to 'hello@mydomain.com' and set resendFromEmail to match"
 
-> "Help me set up Resend on Vercel — walk me through the steps"
+> "Help me set up Resend on Vercel or Cloudflare Pages — walk me through the steps"
 
 ---
 
@@ -570,12 +538,12 @@ Palo 联系表单在**简洁性**（基本修改无需代码）和**灵活性**�
 
 - **`contactForm.ts`** controls what users see — labels, options, sections
 - **`config.yaml`** controls where emails go — recipient, sender, local API key
-- **Vercel Environment Variables** keep production credentials secure
+- **Vercel or Cloudflare Pages environment variables** keep production credentials secure
 - **Resend** handles delivery with a generous free tier (1 domain, 100 emails/day)
 
 - **`contactForm.ts`** 控制用户看到的内容——标签、选项、区域
 - **`config.yaml`** 控制邮件投递目标——收件人、发件人、本地 API key
-- **Vercel 环境变量** 保护生产环境凭证安全
+- **Vercel 或 Cloudflare Pages 环境变量** 保护生产环境凭证安全
 - **Resend** 负责邮件投递，免费版提供 1 个域名、每天 100 封邮件
 
 Happy emailing! 📧
