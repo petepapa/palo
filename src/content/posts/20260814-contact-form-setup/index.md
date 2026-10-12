@@ -61,15 +61,15 @@ contact.astro     contactForm.ts      platform route + shared module     platfor
 |-------|------|---------------|
 | **UI** | `src/pages/contact.astro` | Renders form, client-side validation, AJAX submit |
 | **Config** | `src/contactForm.ts` | All labels, options, enable/disable toggles |
-| **API** | `api/send-email.ts`, `functions/api/send-email.ts`, `scripts/vite-plugin-contact-dev-api.ts` | Platform request adapters |
-| **Delivery** | `src/utils/contact-email.ts` + platform env | Shared validation, email building, Resend delivery |
+| **API** | `api/send-email.ts`, `functions/api/send-email.ts`, `scripts/vite-plugin-contact-dev-api.ts` | Platform request adapters; Vercel's handler stays self-contained for its function runtime |
+| **Delivery** | `src/utils/contact-email.ts` + platform env | Shared validation, email building, and Resend delivery for Cloudflare Pages and local development |
 
 | 层级 | 文件 | 职责 |
 |------|------|------|
 | **UI** | `src/pages/contact.astro` | 渲染表单、客户端校验、AJAX 提交 |
 | **配置** | `src/contactForm.ts` | 所有标签、选项、开关 |
-| **API** | `api/send-email.ts`、`functions/api/send-email.ts`、`scripts/vite-plugin-contact-dev-api.ts` | 各部署平台的请求入口 |
-| **投递** | `src/utils/contact-email.ts` + 平台环境变量 | 共用校验、邮件构建与 Resend 投递 |
+| **API** | `api/send-email.ts`、`functions/api/send-email.ts`、`scripts/vite-plugin-contact-dev-api.ts` | 各部署平台的请求入口；Vercel 为兼容函数运行时保留自包含处理器 |
+| **投递** | `src/utils/contact-email.ts` + 平台环境变量 | Cloudflare Pages 与本地开发共用的校验、邮件构建和 Resend 投递 |
 
 ---
 
