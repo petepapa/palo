@@ -1,0 +1,339 @@
+---
+import { Image } from 'astro:assets'
+import type { ImageMetadata } from 'astro'
+import { isImageMetadata } from '@utils/contentImages'
+
+interface Props {
+  src: string | ImageMetadata
+  alt?: string
+  width: number
+  height: number
+  class?: string
+  loading?: 'lazy' | 'eager'
+  decoding?: 'async' | 'auto' | 'sync'
+  fadeIn?: boolean
+  bgColor?: string
+  aspectRatio?: string
+  /**
+   * 图片加载完成后，背景色是否淡出为透明
+   * 适用于通栏大图 / 透明 PNG 场景，让图片透明区域透出页面背景
+   * @default false
+   */
+  bgFadesOut?: boolean
+  /**
+   * 加载完成后的背景色（可选）
+   * 设置后，加载完成时背景会从 bgColor 平滑过渡到 loadedBgColor
+   * 不设置则保持 bgColor 不变（或当 bgFadesOut 时变为透明）
+   * 适用于 PNG 卡片：加载时主色调占位，加载后反差色衬托
+   */
+  loadedBgColor?: string
+  fetchPriority?: 'high' | 'low' | 'auto'
+  loadStrategy?: 'normal' | 'defer'
+}
+
+const {
+  src,
+  alt = '',
+  width,
+  height,
+  class: className,
+  loading = 'lazy',
+  decoding = 'async',
+  fadeIn = false,
+  bgColor = '',
+  aspectRatio,
+  bgFadesOut = false,
+  loadedBgColor = '',
+  fetchPriority,
+  loadStrategy = 'normal',
+} = Astro.props
+
+const containerClass = fadeIn ? 'progressive-img-container' : undefined
+const containerStyle: Record<string, string> = {}
+
+if (bgColor) {
+  containerStyle.backgroundColor = bgColor
+}
+
+// bgFadesOut 容器：inline style 预置 height:100%，确保 CSS 延迟加载时有刚性尺寸
+// 与 global CSS 中的 .progressive-img-container[data-bg-fades-out="true"] 形成双重保险
+if (bgFadesOut) {
+  containerStyle.height = '100%'
+}
+
+// 显式传入的 aspectRatio prop 优先使用
+if (aspectRatio) {
+  containerStyle.aspectRatio = aspectRatio
+}
+
+// 注入原始比例变量：父容器无高度约束时作为骨架，避免慢网下正文流坍塌。
+if (isImageMetadata(src)) {
+  containerStyle['--img-original-ratio'] = `${src.width} / ${src.height}`
+} else if (width && height) {
+  containerStyle['--img-original-ratio'] = `${width} / ${height}`
+}
+
+// 如果设置了 loadedBgColor，将其作为 CSS 变量注入，供 CSS transition 使用
+if (loadedBgColor) {
+  containerStyle['--loaded-bg-color'] = loadedBgColor
+}
+
+// ── 自动计算 5 对响应式 srcset 宽度 ──
+const responsiveWidths = (() => {
+  if (!width) return undefined
+  const base = width
+  return [
+    Math.round(base * 0.4),
+    Math.round(base * 0.6),
+    Math.round(base * 0.8),
+    base,
+    Math.round(base * 1.2),
+  ].filter((w, i, arr) => w > 0 && arr.indexOf(w) === i)
+})()
+
+const shouldDeferImage = loadStrategy === 'defer'
+const deferredSrc = typeof src === 'string' ? src : isImageMetadata(src) ? src.src : ''
+
+// ── 图片 onload 回调：标记 loaded ──
+// 使用 closest() 向上查找 .progressive-img-container，兼容 Astro <Image> 的 <picture> 包裹层
+// 当设置了 loadedBgColor 时，容器也标记 loaded，CSS 会将背景色过渡到 --loaded-bg-color
+const onImgReady =
+  `var d=this.dataset;` +
+  `this.setAttribute('data-loaded','true');` +
+  `var c=this.closest('.progressive-img-container');` +
+  `if(c&&(d.bgFadesOut==='true'||d.hasLoadedBg==='true')){c.setAttribute('data-loaded','true')}`
+---
+
+{
+  fadeIn ? (
+    <div class:list={[containerClass, className]} style={containerStyle} data-bg-fades-out={bgFadesOut ? 'true' : undefined} data-has-loaded-bg={loadedBgColor ? 'true' : undefined}>
+      {shouldDeferImage && deferredSrc ? (
+        <img
+          data-progressive-src={deferredSrc}
+          alt={alt}
+          width={width}
+          height={height}
+          class="progressive-img-inner"
+          loading="lazy"
+          decoding={decoding}
+          fetchpriority={fetchPriority ?? 'low'}
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
+          onload={onImgReady}
+        />
+      ) : typeof src === 'string' ? (
+        <img
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          class="progressive-img-inner"
+          loading={loading}
+          decoding={decoding}
+          fetchpriority={fetchPriority}
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
+          onload={onImgReady}
+        />
+      ) : isImageMetadata(src) ? (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          widths={responsiveWidths}
+          class="progressive-img-inner"
+          loading={loading}
+          decoding={decoding}
+          fetchpriority={fetchPriority}
+          data-bg-fades-out={bgFadesOut ? 'true' : undefined}
+          data-has-loaded-bg={loadedBgColor ? 'true' : undefined}
+          onload={onImgReady}
+        />
+      ) : null}
+      <noscript>
+        <style>
+          .progressive-img-inner {
+            opacity: 1 !important;
+          }
+        </style>
+        {shouldDeferImage && deferredSrc && (
+          <img src={deferredSrc} alt={alt} width={width} height={height} class="progressive-img-inner" loading="eager" decoding={decoding} />
+        )}
+      </noscript>
+    </div>
+  ) : typeof src === 'string' ? (
+    <img src={src} alt={alt} width={width} height={height} class={className} loading={loading} decoding={decoding} fetchpriority={fetchPriority} />
+  ) : isImageMetadata(src) ? (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      widths={responsiveWidths}
+      class={className}
+      loading={loading}
+      decoding={decoding}
+      fetchpriority={fetchPriority}
+    />
+  ) : null
+}
+
+<!-- is:inline → 脚本内联于 HTML 流中，首帧即刻执行，不受外部 JS 阻塞 -->
+<script is:inline>
+  // 封装统一的状态标记函数，带 0.4s 渐入过渡
+  // 使用 closest('.progressive-img-container') 向上穿透 <picture> 包裹层（Astro <Image> 组件会生成 <picture>）
+  var markAsLoaded = function(img) {
+    if (!img) return;
+    // 1. 标记图片自身 → opacity 从 0 渐入
+    if (img.getAttribute('data-loaded') !== 'true') {
+      img.setAttribute('data-loaded', 'true');
+    }
+    // 2. 向上查找 progressive-img-container → 触发背景色 transition
+    var container = img.closest('.progressive-img-container');
+    if (container && container.getAttribute('data-loaded') !== 'true') {
+      container.setAttribute('data-loaded', 'true');
+    }
+  };
+
+  var initProgressiveImages = function() {
+    var images = document.querySelectorAll('.progressive-img-inner');
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      // 使用 IIFE 避免 var 闭包陷阱：确保回调中 img 始终指向当前元素
+      (function(imgEl) {
+        // 1. 缓存命中防御：如果图片已经加载完成（缓存），立刻标记
+        if (imgEl.complete) {
+          markAsLoaded(imgEl);
+        } else {
+          // 2. 正常网络加载：只用 addEventListener，不覆盖元素已有的内联 onload
+          //    （如 BreakoutImage 的自定义 onload 处理器，负责移除 opacity-0 等）
+          imgEl.addEventListener('load', function() { markAsLoaded(imgEl); });
+        }
+      })(img);
+    }
+  };
+
+  // 基础首屏与 View Transitions 导航生命周期绑定
+  document.addEventListener('DOMContentLoaded', initProgressiveImages);
+  document.addEventListener('astro:page-load', initProgressiveImages);
+  document.addEventListener('astro:after-swap', initProgressiveImages);
+</script>
+
+{import.meta.env.DEV && (
+  <script is:inline>
+    // 专治开发模式下 Astro / Vite HMR 动态注入新 DOM 片段的终极防线
+    var hmrObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (!node.querySelectorAll) return;
+
+          // 找到 HMR 期间被新插入或替换的图片节点
+          var hmrImages = node.classList && node.classList.contains('progressive-img-inner')
+            ? [node]
+            : node.querySelectorAll('.progressive-img-inner');
+
+          for (var i = 0; i < hmrImages.length; i++) {
+            (function(img) {
+              // 关键：在 HMR 插入瞬间，若浏览器有缓存则瞬发；若无缓存，严禁硬着陆，继续监听加载
+              if (img.complete) {
+                markAsLoaded(img);
+              } else {
+                // 只用 addEventListener，不覆盖已有的内联 onload
+                img.addEventListener('load', function() { markAsLoaded(img); }, { once: true });
+              }
+            })(hmrImages[i]);
+          }
+        });
+      });
+    });
+
+    hmrObserver.observe(document.body, { childList: true, subtree: true });
+  </script>
+)}
+
+<style is:global>
+  /* ═══════════════════════════════════════════════════════════════
+     三层硬核防线 (Hardened CLS Shield)
+     Slow 4G 下 CSS 自然优先级失效 → 显式消费方选择器强行锁死
+     ═══════════════════════════════════════════════════════════════ */
+
+  .progressive-img-container {
+    display: block;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    /* 使用 longhand 避免 transition 简写覆盖消费组件（如 PostCard/ProjectCard）注入的 transform transition */
+    transition-property: background-color;
+    transition-duration: var(--animation-speed-slow);
+    transition-timing-function: var(--cubic-bezier);
+
+    /* 防线 ①：默认 / 正文流兜底 —— 用图片原始比例撑开占位块 */
+    aspect-ratio: var(--img-original-ratio, 16 / 9);
+  }
+
+  /* 防线 ②：详情页页头大图（PostHeader）—— 无条件强制拉满父级高度 */
+  .post-header__image .progressive-img-container,
+  .post-header .progressive-img-container,
+  .progressive-img-container[data-bg-fades-out="true"] {
+    height: 100% !important;
+    min-height: 100% !important;
+    block-size: 100% !important;
+    aspect-ratio: auto !important;
+  }
+
+  /* 防线 ③：卡片流（PostCard / ProjectCard）—— 强制继承父级比例 */
+  .post-card__media .progressive-img-container,
+  .project-card__media .progressive-img-container {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: inherit !important;
+  }
+
+  /* bgFadesOut 模式：加载完成后背景色淡出为透明 */
+  .progressive-img-container[data-bg-fades-out="true"][data-loaded="true"] {
+    background-color: transparent !important;
+  }
+
+  /* loadedBgColor 模式：加载完成后背景色过渡到 --loaded-bg-color */
+  .progressive-img-container[data-has-loaded-bg="true"][data-loaded="true"] {
+    background-color: var(--loaded-bg-color) !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     暗黑模式下的 PNG 反差色保护
+     当主色调计算选择 light var（neutral-200）时，dark 模式下需要
+     改用 dark var（neutral-800），避免在深色界面突然爆出亮灰色块
+     ═══════════════════════════════════════════════════════════════ */
+  :global(.darkmode) .progressive-img-container[data-has-loaded-bg="true"][data-loaded="true"] {
+    /* light 时 200, dark 时 800 */
+    background-color: light-dark(var(--loaded-bg-color), var(--color-neutral-800, #262626)) !important;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     内部图片层：绝对定位，100% 填充上层骨架
+     ═══════════════════════════════════════════════════════════════ */
+  .progressive-img-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;
+  }
+
+  .progressive-img-inner img,
+  .progressive-img-inner picture,
+  .progressive-img-inner :where(img) {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
+  }
+
+  .progressive-img-inner[data-loaded="true"] {
+    opacity: 1 !important;
+  }
+</style>

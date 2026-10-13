@@ -1,0 +1,182 @@
+---
+import {
+  Launcher,
+  LauncherPreferences,
+  LauncherSwitch,
+  LauncherNav,
+  LauncherLink,
+} from 'accessible-astro-launcher'
+import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
+import themeConfig from '@config'
+import { navigationItems, socialConfig } from '../navigation'
+import type { SocialItem } from '../types/config'
+import { getQrCodeBaseId, getQrCodeModalId } from '@utils/qrcodeId'
+
+/**
+ * Launcher preferences for accessibility and theme.
+ * @type {Array<{ label: string, onAction: string }>}
+ */
+const launcherPreferenceItems = [
+  ...(themeConfig.site.darkModeToggle
+    ? [
+        {
+          label: 'Dark mode',
+          onAction: 'toggle-dark-mode',
+        },
+      ]
+    : []),
+  {
+    label: 'High contrast',
+    onAction: 'toggle-high-contrast',
+  },
+  {
+    label: 'Reduced motion',
+    onAction: 'toggle-reduced-motion',
+  },
+]
+
+/**
+ * Maximum number of blog posts to show in the launcher.
+ * @type {number}
+ */
+const maxLauncherBlogPosts = 30
+
+/**
+ * Blog items for the launcher, sourced from the 'posts' collection.
+ * Uses post.id (filename slug) for correct routing, same as the blog list page.
+ *
+ * @type {Array<{ label: string, href: string }>}
+ */
+const launcherBlogItems = (await getCollection('posts'))
+  .filter((post) => !post.data.draft)
+  .slice(0, maxLauncherBlogPosts)
+  .map((post) => ({
+    label: post.data.title,
+    href: `/blog/${post.id}`,
+  }))
+
+/**
+ * Project items for the launcher, sourced from the 'projects' collection.
+ *
+ * @type {Array<{ label: string, href: string, keywords: Array<string> }>}
+ */
+const launcherProjectItems = (await getCollection('projects'))
+  .filter((project) => !project.data.draft)
+  .map((project) => ({
+    label: project.data.title,
+    href: `/portfolio/${project.id}`,
+    keywords: [project.data.author, ...project.data.tags],
+  }))
+
+/**
+ * Navigation items for the launcher, built from the site-config navigation items.
+ * Flattens dropdowns and applies external flags.
+ *
+ * @type {Array<{ label: string, href: string, external?: boolean }>}
+ */
+const launcherNavigationItems = navigationItems.flatMap((item: any) => {
+  if (item.excludeFromLauncher) {
+    return []
+  }
+
+  if (item.type === 'dropdown') {
+    return item.items.map((subItem: any) => ({
+      label: subItem.label,
+      href: subItem.href,
+      external: subItem.external ?? false,
+    }))
+  }
+
+  if (!item.type || item.type === 'link') {
+    return [
+      {
+        label: item.label,
+        href: item.href,
+        external: item.external ?? false,
+      },
+    ]
+  }
+
+  return []
+})
+
+---
+
+<Launcher id="site-launcher">
+  <LauncherPreferences label="Preferences">
+    {
+      launcherPreferenceItems.map((item) => (
+        <LauncherSwitch label={item.label} onAction={item.onAction} />
+      ))
+    }
+  </LauncherPreferences>
+  <LauncherNav label="Navigate to">
+    {
+      launcherNavigationItems.map((item) => (
+        <LauncherLink
+          label={item.label}
+          href={item.href}
+          {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        />
+      ))
+    }
+  </LauncherNav>
+  {
+    launcherBlogItems.length > 0 && (
+      <LauncherNav label="Blog posts">
+        {launcherBlogItems.map((item) => (
+          <LauncherLink label={item.label} href={item.href}>
+            <Icon slot="icon" aria-hidden="true" name="ph:list" size="16" />
+          </LauncherLink>
+        ))}
+      </LauncherNav>
+    )
+  }
+  {
+    launcherProjectItems.length > 0 && (
+      <LauncherNav label="Projects">
+        {launcherProjectItems.map((item) => (
+          <LauncherLink label={item.label} href={item.href} keywords={item.keywords}>
+            <Icon slot="icon" aria-hidden="true" name="ph:bookmark" size="16" />
+          </LauncherLink>
+        ))}
+      </LauncherNav>
+    )
+  }
+  
+  {
+    socialConfig.items.length > 0 && (
+      <LauncherNav label={socialConfig.title}>
+        {socialConfig.items.map((item: SocialItem) => {
+          const cleanLabel = item.label.replace(/[*]/g, '')
+          if (item.type === 'qrCode') {
+            const baseId = getQrCodeBaseId(item.label)
+            const modalId = getQrCodeModalId(item.label)
+            const triggerId = `${baseId}-trigger`
+            return (
+              <LauncherLink
+                label={cleanLabel}
+                href={`#${modalId}`}
+                id={triggerId}
+                data-qrcode-trigger="true"
+                data-qrcode-base={baseId}
+              >
+                <Icon slot="icon" aria-hidden="true" name={item.icon} size="16" />
+              </LauncherLink>
+            )
+          }
+          return (
+            <LauncherLink
+              label={cleanLabel}
+              href={item.href ?? '#'}
+              {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              <Icon slot="icon" aria-hidden="true" name={item.icon} size="16" />
+            </LauncherLink>
+          )
+        })}
+      </LauncherNav>
+    )
+  }
+</Launcher>

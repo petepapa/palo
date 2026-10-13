@@ -1,0 +1,324 @@
+---
+import DefaultLayout from './DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import SocialShares from '@components/SocialShares.astro'
+import { Heading } from 'accessible-astro-components'
+import TableOfContents from '@components/TableOfContents.astro'
+
+const { frontmatter } = Astro.props
+const toc = frontmatter.toc ?? false
+const narrow = frontmatter.narrow ?? false
+const showShare = frontmatter.share !== false
+const pageHeader = frontmatter.pageHeader
+const pageHeaderTitle = pageHeader?.title ?? frontmatter.title
+const pageHeaderSubtitle = pageHeader?.subtitle ?? frontmatter.description
+const pageHeaderBg = pageHeader?.bg ?? {}
+
+// 前台显式传入 ''（空）时让 PaloPageHeader 走 resolveStringProp 回退到 config
+// 前台传入具体值（top/bottom/both/false）时直接透传
+const divider = pageHeader?.divider === '' || pageHeader?.divider === undefined ? '' : pageHeader?.divider
+---
+
+<DefaultLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  hasHero={!!pageHeader}
+  topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
+  {...(frontmatter.image ? { image: frontmatter.image } : {})}
+  {...(frontmatter.author ? { author: frontmatter.author } : {})}
+  {...(frontmatter.type ? { type: frontmatter.type } : {})}
+  {...(frontmatter.useTitleTemplate === undefined ? {} : { useTitleTemplate: frontmatter.useTitleTemplate })}
+>
+  {
+    pageHeader && (
+      <PaloPageHeader
+        title={pageHeaderTitle}
+        subtitle={pageHeaderSubtitle}
+        fullscreen={pageHeader.fullscreen}
+        bg={{
+          image: pageHeaderBg.image ?? '',
+          video: pageHeaderBg.video ?? '',
+          color: pageHeaderBg.color ?? '',
+          fixed: pageHeaderBg.fixed ?? false,
+          overlayOpacity: pageHeaderBg.overlayOpacity ?? 0,
+        }}
+        contentColor={pageHeader.contentColor ?? ''}
+        topNavigationTheme={pageHeader.topNavigationTheme ?? ''}
+        divider={divider}
+        alignV={pageHeader.alignV}
+        alignH={pageHeader.alignH}
+        useContainer={pageHeader.useContainer}
+        class={pageHeader.class}
+      />
+    )
+  }
+  <section class="my-12">
+    <div class="container">
+      <div class={`article-content ${toc ? 'article-content--with-toc' : ''}`}>
+        <div class="article-content__main">
+    <div class={`prose space-content ${narrow ? 'narrow' : ''}`}>
+      <slot />
+    </div>
+          {showShare && (
+            <div class={`space-content mt-12 ${narrow ? 'narrow' : ''}`}>
+              <Heading level="h5">Share this page</Heading>
+              <p>Like this page? Share it with your network!</p>
+              <SocialShares title={frontmatter.title} description={frontmatter.description} />
+            </div>
+          )}
+        </div>
+        {toc && <TableOfContents />}
+      </div>
+    </div>
+  </section>
+</DefaultLayout>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" is:inline></script>
+<script is:inline>
+  const initProseEnhancements = async () => {
+    const DEBUG = document.documentElement.dataset.paloDebug === 'true'
+    // 1. Table responsive wrapping
+    document.querySelectorAll('.prose table').forEach((table) => {
+      if (table.parentElement?.classList.contains('table-wrapper')) return
+      
+      const wrapper = document.createElement('div')
+      wrapper.className = 'table-wrapper overflow-x-auto my-6 max-w-full rounded-lg'
+      
+      table.parentNode?.insertBefore(wrapper, table)
+      wrapper.appendChild(table)
+    })
+
+    // 2. Dynamic client-side Mermaid rendering
+    const allMermaidBlocks = []
+    document.querySelectorAll('.prose pre').forEach((pre) => {
+      if (pre.dataset.paloMermaidProcessed === 'true') return
+      
+      const code = pre.querySelector('code')
+      if (!code) return
+      
+      // Check if it's a mermaid block - check multiple possible locations
+      const isMermaid = pre.dataset.language === 'mermaid' ||
+                        code.classList.contains('language-mermaid') || 
+                        code.classList.contains('lang-mermaid') ||
+                        /\blanguage-mermaid\b|\blang-mermaid\b/.test(pre.className)
+      
+      if (isMermaid) {
+        if (DEBUG) console.log('Found Mermaid block:', pre)
+        allMermaidBlocks.push(pre)
+      }
+    })
+
+    if (allMermaidBlocks.length > 0 && typeof mermaid !== 'undefined') {
+      try {
+        if (DEBUG) console.log('Found', allMermaidBlocks.length, 'Mermaid block(s)')
+
+        for (let i = 0; i < allMermaidBlocks.length; i++) {
+          const pre = allMermaidBlocks[i]
+          const code = pre.querySelector('code')
+          const content = code?.textContent || pre.textContent || ''
+          
+          // 🔥 Create wrapper container with original code backup
+          const container = document.createElement('div')
+          container.className = 'mermaid-container'
+          container.dataset.originalCode = content.trim() // Core: truth source for re-render
+          
+          // Inner div where Mermaid renders SVG
+          const mermaidInner = document.createElement('div')
+          mermaidInner.className = 'mermaid'
+          mermaidInner.id = 'mermaid-' + Date.now() + '-' + i
+          mermaidInner.textContent = content.trim()
+          
+          container.appendChild(mermaidInner)
+          
+          pre.dataset.paloMermaidProcessed = 'true'
+          pre.replaceWith(container)
+        }
+
+        await renderMermaidWithTheme()
+        if (DEBUG) console.log('Mermaid render complete')
+      } catch (err) {
+        console.error('Failed to load or render Mermaid:', err)
+      }
+    }
+  }
+
+  /**
+   * 🔥 Read current CSS custom properties and re-initialize + run Mermaid for all .mermaid-container
+   * Reads from dataset.originalCode on each .mermaid-container's inner .mermaid div.
+   */
+  const renderMermaidWithTheme = async () => {
+    if (typeof mermaid === 'undefined') return
+    const DEBUG = document.documentElement.dataset.paloDebug === 'true'
+
+    const containers = document.querySelectorAll('.mermaid-container')
+    if (containers.length === 0) return
+
+    const isDark = document.documentElement.classList.contains('darkmode')
+
+    try {
+      const cs = getComputedStyle(document.documentElement)
+      const fg = cs.getPropertyValue('--foreground-color')?.trim() || (isDark ? '#fff' : '#111')
+      const bg = cs.getPropertyValue('--background-color')?.trim() || (isDark ? '#111' : '#fff')
+      const primary = cs.getPropertyValue('--link-color')?.trim() || cs.getPropertyValue('--color-primary-400')?.trim() || '#4f46e5'
+      const border = cs.getPropertyValue('--border-color')?.trim() || '#888'
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
+        themeVariables: {
+          background: bg,
+          textColor: fg,
+          primaryColor: primary,
+          lineColor: border,
+        },
+      })
+    } catch (errTheme) {
+      mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default', securityLevel: 'loose' })
+    }
+
+    // 🔥 物理擦除重建：解决 Mermaid 10.x data-processed 缓存污染问题
+    // 不要复用或修改已有的 .mermaid 节点 —— 必须物理擦除 + 全新创建
+    containers.forEach((container) => {
+      const rawCode = container.dataset.originalCode
+      if (!rawCode) return
+
+      // 1. 完全清空容器，抹除所有 data-processed 属性
+      container.innerHTML = ''
+
+      // 2. 创建全新的 div，绝对不携带任何 data-* 残留
+      const newId = `mermaid-${Math.random().toString(36).substr(2, 9)}`
+      const newDiv = document.createElement('div')
+      newDiv.className = 'mermaid'
+      newDiv.id = newId
+      newDiv.textContent = rawCode // 源码塞入文本节点
+
+      // 3. 追加到容器
+      container.appendChild(newDiv)
+    })
+
+    try {
+      await mermaid.run()
+      if (DEBUG) console.log('[Mermaid] Re-render complete (theme:', isDark ? 'dark' : 'light', ')')
+    } catch (err) {
+      console.error('[Mermaid] Re-render failed:', err)
+    }
+  }
+
+  /**
+   * 🔥 MutationObserver: watch for darkmode class toggle on <html>, re-render Mermaid diagrams
+   */
+  const paloInitMermaidThemeWatcher = () => {
+    // Only set up watcher if at least one .mermaid-container exists
+    if (document.querySelectorAll('.mermaid-container').length === 0) return
+
+    let pending = false
+    const observer = new MutationObserver(() => {
+      if (pending) return
+      pending = true
+
+      // Debounce: wait for all class changes to settle (e.g., multiple classList.toggle calls)
+      requestAnimationFrame(() => {
+        pending = false
+        renderMermaidWithTheme()
+      })
+    })
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+  }
+
+
+
+  // Handle standard page loads and View Transitions
+  document.addEventListener('astro:page-load', initProseEnhancements)
+  document.addEventListener('astro:after-swap', initProseEnhancements)
+  
+  /** 🔥 Initialize Mermaid theme watcher after prose enhancements have created .mermaid-container elements */
+  const paloInitMermaidWatcherWithDelay = () => {
+    // Small delay to ensure Mermaid CDN script and initProseEnhancements have run
+    setTimeout(paloInitMermaidThemeWatcher, 200)
+  }
+
+  document.addEventListener('astro:page-load', paloInitMermaidWatcherWithDelay)
+  document.addEventListener('astro:after-swap', paloInitMermaidWatcherWithDelay)
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProseEnhancements)
+    document.addEventListener('DOMContentLoaded', paloInitMermaidWatcherWithDelay)
+  } else {
+    // Small delay to ensure mermaid CDN script is loaded
+    setTimeout(initProseEnhancements, 100)
+    paloInitMermaidThemeWatcher()
+  }
+</script>
+
+
+
+<style lang="scss" is:global>
+  @use 'scss/base/breakpoint' as *;
+
+  @layer components {
+    .article-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+
+      &--with-toc {
+        @media (min-width: 768px) {
+          grid-template-columns: minmax(0, 1fr) 280px;
+        }
+
+        @media (min-width: 1200px) {
+          grid-template-columns: minmax(0, 1fr) 320px;
+        }
+      }
+    }
+
+    .article-content__main {
+      min-width: 0; // 防止内容溢出
+    }
+
+    .article-content--with-toc .article-content__main {
+      @media (min-width: 768px) {
+        border-inline-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+        padding-inline-end: var(--space-l);
+      }
+    }
+
+    .article-content__toc {
+      grid-row: 1;
+
+      @media (min-width: 768px) {
+        position: sticky;
+        grid-row: auto;
+        align-self: start;
+        inset-block-start: var(--space-l);
+        padding-inline-start: 0;
+        max-inline-size: 100%;
+        max-block-size: calc(100vh - var(--space-l));
+        overflow-x: hidden;
+        overflow-y: auto;
+        transition: inset-block-start var(--animation-speed-slow) var(--cubic-bezier);
+      }
+    }
+
+    body.has-fixed-header .article-content__toc {
+      @media (min-width: 768px) {
+        inset-block-start: calc(var(--header-height) + var(--space-l));
+        max-block-size: calc(100vh - calc(var(--header-height) + var(--space-l)));
+      }
+    }
+
+    ul:not([class]) li {
+      margin-block-end: 0.35rem;
+    }
+
+    .narrow {
+      margin-inline: auto;
+      max-width: 65ch;
+    }
+  }
+</style>

@@ -1,0 +1,178 @@
+---
+import PostCard from '@components/PostCard.astro'
+import { Heading, Link } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import config from '@config'
+
+type SortBy = 'latest' | 'earliest'
+
+// Tailwind safelist: justify-start justify-center justify-end
+type ButtonAlign = 'left' | 'center' | 'right'
+
+const buttonAlignMap: Record<ButtonAlign, string> = {
+  left: 'justify-start',
+  center: 'justify-center',
+  right: 'justify-end',
+}
+
+/**
+ * LatestPosts Component
+ *
+ * @description A component that displays the latest blog posts from Astro Content Collections
+ */
+interface Props {
+  /**
+   * Additional classes to apply to the section
+   */
+  class?: string
+  /**
+   * The number of posts to display
+   * @default 3
+   */
+  limit?: number
+  /**
+   * The title for the section
+   * @default "Latest posts"
+   */
+  title?: string
+  /**
+   * Sort posts by: latest (newest first), earliest (oldest first)
+   * @default "latest"
+   */
+  sortBy?: SortBy
+  /**
+   * Heading level for PostCard title
+   * @default "h3"
+   */
+  postHeadingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  /**
+   * CSS class for PostCard description text
+   * @default ""
+   */
+  postDescClass?: string
+  /**
+   * Vertical gap between PostCard items (Tailwind Gap Class)
+   * @default "gap-24"
+   */
+  itemGap?: string
+  /**
+   * CSS gap class between image and content columns inside PostCard
+   * @default "gap-12 md:gap-24"
+   */
+  cardGap?: string
+  /**
+   * "查看更多"按钮对齐方式
+   * @default "right"
+   */
+  buttonAlign?: ButtonAlign
+  /**
+   * "查看更多"按钮文本
+   * @default "Read all posts"
+   */
+  buttonText?: string
+}
+
+// 📖 从 config.yaml 读取 Blog LatestComponent & defaults 全局默认值
+const blogCfg = config.blog
+const latestDefaults = blogCfg?.latestComponent ?? {}
+const blogLayoutDefaults = blogCfg?.defaults ?? {}
+
+const {
+  class: className,
+  limit = latestDefaults.limit ?? 3,
+  title = latestDefaults.title ?? 'Latest posts',
+  sortBy = 'latest',
+  postHeadingLevel = blogLayoutDefaults.postHeadingLevel ?? 'h3',
+  postDescClass = blogLayoutDefaults.postDescClass ?? '',
+  itemGap = blogLayoutDefaults.itemGap ?? 'gap-24',
+  cardGap = blogLayoutDefaults.cardGap ?? 'gap-12 md:gap-24',
+  buttonAlign = (latestDefaults.buttonAlign as ButtonAlign) ?? 'right',
+  buttonText = latestDefaults.buttonText ?? 'Read all posts',
+} = Astro.props
+
+const itemGapSize = resolveTailwindGapClass(itemGap)
+
+// 通过映射表获得实际的 Tailwind 类名，解决动态拼接导致的编译丢失问题
+const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
+
+const coverImageRatio = '8 / 5'
+
+// Get posts from content collection (过滤草稿)
+const posts = (await getCollection('posts')).filter((post) => !post.data.draft)
+
+// Dual-axis sorting: Featured First (by featuredOrder ASC) + Timeline Fallback (by sortBy)
+const featuredPostsList = posts.filter((post) => post.data.featuredOrder !== undefined)
+const regularPostsList = posts.filter((post) => post.data.featuredOrder === undefined)
+
+featuredPostsList.sort(
+  (a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity),
+)
+regularPostsList.sort((a, b) => {
+  const aDate = a.data.publishDate?.valueOf() ?? 0
+  const bDate = b.data.publishDate?.valueOf() ?? 0
+  switch (sortBy) {
+    case 'latest':
+      return bDate - aDate
+    case 'earliest':
+      return aDate - bDate
+    default:
+      return bDate - aDate
+  }
+})
+
+const sortedPosts = [...featuredPostsList, ...regularPostsList]
+
+// Limit posts and map to display data
+const latestPosts = sortedPosts.slice(0, limit).map((post) => {
+  const author = typeof post.data.author === 'object' ? post.data.author.name : post.data.author
+  return {
+    id: post.id,
+    title: post.data.title,
+    description: post.data.description,
+    author,
+    featuredImage: resolveCollectionCoverImage(
+      post.data.coverImage,
+      post.id,
+      'posts',
+      getPostDefaultImage(),
+    ),
+    url: ensureTrailingSlash(`/blog/${post.id}`),
+  }
+})
+---
+
+<section class:list={[className, 'my-8']}>
+  <div class="container">
+    <Heading level="h2" class="mb-6">{title}</Heading>
+    <ul class="my-8 grid grid-cols-1" style={`gap: ${itemGapSize}`}>
+      {
+        latestPosts.map((post) => (
+          <li>
+            <PostCard
+              image={post.featuredImage}
+              imageRatio={coverImageRatio}
+              url={post.url}
+              title={post.title}
+              footer={post.author}
+              headingLevel={postHeadingLevel}
+              descriptionClass={postDescClass}
+              cardGap={cardGap}
+            >
+              {post.description}
+            </PostCard>
+          </li>
+        ))
+      }
+    </ul>
+    <div class={['mt-12 flex', justifyClass].join(' ')}>
+      <Link href={ensureTrailingSlash('/blog')} isButton animateOnHover animationType="nudge">
+        {buttonText}
+        <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
+      </Link>
+    </div>
+  </div>
+</section>

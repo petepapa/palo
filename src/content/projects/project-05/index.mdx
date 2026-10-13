@@ -1,0 +1,83 @@
+---
+# Base Metadata / 基础元数据
+title: "FinanceForAll"
+description: "A fully accessible financial management platform that makes banking and investment tools available to users with various disabilities"
+publishDate: 2024-07-01
+tags: ['Accessibility', 'Finance'] # Keywords for filtering / 用于列表过滤的标签
+
+# Author Profile / 结构化作者信息
+author:
+  name: "Viktor Nakamoto"
+  image: "/branding/avatar.png"
+  bio: "Viktor Nakamoto"
+
+# Visual Assets & Layouts / 视觉资产与排版样式
+type: "poster"                              # Project Layout: default, video, etc. / 作品集专属排版布局类型
+
+# Feature Toggles / 极简功能开关 (Removed 'show' prefix)
+breadcrumbs: true
+toc: false                                    # Projects usually focus on imagery, TOC can be disabled / 作品集通常以大图为主，可选择关闭目录
+share: true
+
+# Status & External Links / 状态与外部链接
+draft: false
+featuredOrder: 5
+---
+
+import BlockQuote from '@components/BlockQuote.astro'
+import BreakoutImage from '@components/BreakoutImage.astro'
+import { Image } from 'astro:assets'
+
+<BreakoutImage src="/projects/project-image-3.jpg" />
+
+## Project Overview
+
+FinanceForAll revolutionizes personal banking by making financial tools accessible to everyone. The platform provides screen-reader optimized interfaces, keyboard-only navigation, and simplified layouts for cognitive accessibility, ensuring equal access to banking, investment, and financial planning tools.
+
+## Technical Challenges
+
+The primary challenge was creating complex financial interfaces that remained fully accessible without sacrificing functionality. We developed a modular interface system that adapts to different assistive technologies while maintaining secure banking protocols and real-time market data integration.
+
+## Project Gallery
+
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+  <Image
+    src="/projects/project-image-5.jpg"
+    alt="FinanceForAll accessible banking dashboard"
+    width={1200}
+    height={600}
+    class="h-[250px] w-full rounded-lg object-cover"
+  />
+  <Image
+    src="/projects/project-image-4.jpg"
+    alt="Screen-reader optimized investment charts"
+    width={1200}
+    height={600}
+    class="h-[250px] w-full rounded-lg object-cover"
+  />
+  <Image
+    src="/projects/project-image-3.jpg"
+    alt="Keyboard-navigable financial planning tools"
+    width={1200}
+    height={600}
+    class="h-[250px] w-full rounded-lg object-cover"
+  />
+  <Image
+    src="/projects/project-image-1.jpg"
+    alt="Simplified interface for cognitive accessibility"
+    width={1200}
+    height={600}
+    class="h-[250px] w-full rounded-lg object-cover"
+  />
+</div>
+
+## Testimonial
+
+<BlockQuote author="James Wu, Software Developer">
+  FinanceForAll has given me true financial independence. As a blind person, I can now manage my investments and banking
+  with the same ease as anyone else. The accessible charts and financial data are game-changing.
+</BlockQuote>
+
+<BreakoutImage src="/projects/project-image-4.jpg" />
+
+Expanding into voice-controlled trading features and developing more accessible financial education tools.

@@ -1,0 +1,318 @@
+---
+// src/components/CreativeSection.astro
+import { normalizePublicAssetUrl, resolveVisualImageUrl } from '@utils/pageHeaderVisuals'
+import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
+
+type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
+
+interface BackgroundEngine {
+  image?: string
+  video?: string
+  color?: string
+  fixed?: boolean
+  overlayOpacity?: number
+}
+
+interface Props {
+  /**
+   * 是否全屏显示 (占满视口高度) / Whether to display fullscreen (fill viewport height)
+   * @default false
+   */
+  fullscreen?: boolean
+  /**
+   * 前景内容颜色 (支持 Hex, OKLCH, CSS 变量) / Foreground text color (supports Hex, OKLCH, CSS variables)
+   * 留空自动跟随 Palo 当前的主题文字颜色 / Empty to automatically follow Palo's default text color
+   */
+  contentColor?: string
+  /**
+   * 分割线位置 / Divider position.
+   * 可选值：top | bottom | both | none
+   * 默认：bottom
+   */
+  divider?: DividerPlacement
+  /** Vertical align: top, center, bottom / 内容垂直对齐 */
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  /** Horizontal & Text align: left, center, right / 水平与文字大一统对齐 */
+  alignH?: '' | 'left' | 'center' | 'right'
+  /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
+  /**
+   * 附加的类名 / Additional CSS classes
+   */
+  class?: string
+  /** Background Media Engine / 背景多媒体引擎 */
+  bg?: BackgroundEngine
+}
+
+const {
+  fullscreen = false,
+  contentColor = '',
+  divider = 'bottom',
+  alignV = '',
+  alignH = '',
+  useContainer = true,
+  class: className = '',
+  bg = {},
+} = Astro.props
+
+const {
+  image: backgroundImage = '',
+  video: backgroundVideo = '',
+  color: backgroundColor = '',
+  fixed: backgroundFixed = false,
+  overlayOpacity: backgroundOverlayOpacity = 0,
+} = bg
+
+const resolvedAlignV =
+  alignV === 'top' || alignV === 'bottom' ? alignV : 'center'
+const sectionContentAlignMap = {
+  top: 'flex-start',
+  center: 'center',
+  bottom: 'flex-end',
+} as const
+const resolveDividerPlacement = (value: DividerPlacement = 'bottom'): 'top' | 'both' | 'bottom' | 'none' => {
+  if (value === 'none' || value === '') return 'none'
+  if (value === 'top') return 'top'
+  if (value === 'both') return 'both'
+  return 'bottom'
+}
+const dividerPlacement = resolveDividerPlacement(divider)
+const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
+const resolvedBackgroundOverlayOpacity =
+  Number.isFinite(normalizedBackgroundOverlayOpacity)
+    ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
+    : 0
+const resolvedBackgroundImage = resolveVisualImageUrl(backgroundImage)
+const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
+
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(backgroundImage)
+const dominantColor = isPng ? '' : (backgroundImage ? await getDominantColor(backgroundImage) : '')
+const shouldBgFadeOut = !isPng
+
+// 1. 动态 CSS 变量映射 / Dynamic CSS variables mapping
+const sectionStyle = {
+  '--section-bg': backgroundColor || 'transparent',
+  '--section-content-align': sectionContentAlignMap[resolvedAlignV],
+  '--section-overlay-opacity': resolvedBackgroundOverlayOpacity,
+  ...(contentColor ? { '--section-color': contentColor } : {}),
+  ...(resolvedBackgroundImage ? { '--section-bg-image': `url("${resolvedBackgroundImage.replace(/"/g, '\\"')}")` } : {}),
+  ...(alignH ? { '--section-text-align': alignH } : {}),
+}
+---
+
+<section
+  class:list={[
+    'creative-section',
+    { 'is-fullscreen': fullscreen },
+    { 'has-fixed-background': backgroundFixed },
+    { 'has-divider-top': dividerPlacement === 'top' || dividerPlacement === 'both' },
+    { 'has-divider-bottom': dividerPlacement === 'bottom' || dividerPlacement === 'both' },
+    className
+  ]}
+  style={sectionStyle}
+>
+  <!-- 层 1: 背景媒体（图片垫底 + 视频覆盖）/ Layer 1: Background media (image fallback + video overlay) -->
+  {(backgroundImage || backgroundVideo) && (
+    <div class="media-container" aria-hidden="true" tabindex="-1">
+      {backgroundImage && (
+        <ContentImage
+          src={resolvedBackgroundImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="bg-image-layer"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+      {backgroundVideo && (
+        <video class="background-media" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
+      )}
+    </div>
+  )}
+
+  <!-- 层 2: 可配置半透明遮罩 (当存在背景视频或图片时启用) / Layer 2: Configurable semi-transparent backdrop overlay (enabled when video or image background is present) -->
+  {(backgroundVideo || backgroundImage) && (
+    <div class="section-overlay" aria-hidden="true" tabindex="-1"></div>
+  )}
+
+  <!-- 层 3: 前景内容 Slot (自动居中布局) / Layer 3: Foreground content Slot (auto-centering layout) -->
+  <div class:list={['section-content', useContainer && 'container']}>
+    <slot />
+  </div>
+</section>
+
+<style>
+  /* 运用 Palo 的 Cascade Layers 治理系统 / Integrate with Palo's CSS Cascade Layers specificity system */
+  @layer components {
+    .creative-section {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: var(--section-text-align, center);
+      text-align: var(--section-text-align, center);
+      justify-content: var(--section-content-align, center);
+      
+      /* 默认背景透明；显式设置变量以避免继承自父级的同名 custom property / Transparent by default; explicitly initialize the variable to avoid inherited overrides */
+      background-color: var(--section-bg, transparent);
+      color: var(--section-color, var(--color-default-text));
+      transition:
+        background-color var(--animation-speed-medium) var(--cubic-bezier),
+        color var(--animation-speed-medium) var(--cubic-bezier);
+    }
+
+    .creative-section.has-fixed-background {
+      overflow: hidden;
+      overflow: clip;
+      clip-path: inset(0);
+      background-image: none;
+    }
+
+    .creative-section.has-divider-top {
+      border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    .creative-section.has-divider-bottom {
+      border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    /* Fixed background: dividers repainted as pseudo-elements above the background layer */
+    .creative-section.has-fixed-background.has-divider-top {
+      border-block-start: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-top::before {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: -1px 0 auto 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-bottom {
+      border-block-end: none;
+    }
+
+    .creative-section.has-fixed-background.has-divider-bottom::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 0 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    /* 全屏显示模式 / Fullscreen display mode */
+    .creative-section.is-fullscreen {
+      /* 全屏高度覆盖整个视口 / Fullscreen height covers the entire viewport */
+      block-size: 100vh;
+      min-block-size: 100vh;
+      box-sizing: border-box;
+    }
+
+    /* 媒体容器层 / Background media container layer */
+    .media-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .creative-section.has-fixed-background .media-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .creative-section.has-fixed-background .section-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .creative-section.has-fixed-background .bg-image-layer {
+      display: block;
+    }
+
+    .background-media {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* 背景图垫底层：视频加载前作为占位 / Background image fallback: placeholder while video loads */
+    .bg-image-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bg-image-layer :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    /* 可配置半透明遮罩层：用于按需降低背景亮度，提高文字可读性 / Configurable overlay layer: darkens backdrop on demand to improve text readability */
+    .section-overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      background-color: rgb(0 0 0 / var(--section-overlay-opacity, 0));
+      backdrop-filter: blur(1px); /* 可选：给背景带来微微的毛玻璃深邃感 / Optional: adds a subtle depth of field blur */
+    }
+
+    /* 前景内容层 / Foreground content container layout */
+    .section-content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      margin-inline: auto;
+      
+      /* 在全屏模式下，子元素自动垂直居中 / Enables automatic vertical alignment inside fullscreen frames */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* 无障碍减弱动态效果 / Accessibility: motion reduction adaptations */
+    @media (prefers-reduced-motion: reduce) {
+      .background-media {
+        display: none; /* 减弱动态偏好下，隐藏视频背景，退化为配置的背景色 / Hides video background when reduced motion is preferred, fallback to color */
+      }
+      .creative-section {
+        transition: none !important;
+      }
+    }
+  }
+</style>

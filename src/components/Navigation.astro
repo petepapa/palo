@@ -1,0 +1,1103 @@
+---
+import ResponsiveToggle from './ResponsiveToggle.astro'
+import NavigationItems from './NavigationItems.astro'
+import Logo from './Logo.astro'
+import LauncherTrigger from './LauncherTrigger.astro'
+import themeConfig from '@config'
+
+/**
+ * Navigation Component
+ *
+ * @description A component that displays the navigation menu for the website
+ */
+const { site, typography } = themeConfig
+const navMinHeight = themeConfig.navigation?.minHeight ?? ''
+const navActiveStyle = themeConfig.navigation?.activeStyle ?? typography.navigationActiveStyle ?? 'wavy'
+const navAlignment =
+  themeConfig.navigation?.desktopMenuAlignment ?? site.desktopNavigationMenuAlignment ?? site.navigationAlignment ?? 'center'
+const navDropdownDesktopColorMode = themeConfig.navigation?.dropdownDesktopColorMode ?? 'theme'
+const navMainMenuLineHeightScale = themeConfig.navigation?.mainMenuLineHeightScale ?? 1
+const navDesktopDropdownLineHeightScale = themeConfig.navigation?.desktopDropdownLineHeightScale ?? 1
+const navMobileDropdownLineHeightScale = themeConfig.navigation?.mobileDropdownLineHeightScale ?? 1
+const launcherGradientBorder = site.launcher === 'gradientBorder'
+const launcherMode = site.launcher
+const launcherIcon = site.launcherIcon || 'ph:lightning'
+const showLauncher = launcherMode !== 'off'
+
+const navStyle = [
+  navMinHeight ? `--nav-min-height: ${navMinHeight}` : '',
+  `--navigation-main-menu-line-height-scale: ${navMainMenuLineHeightScale}`,
+  `--navigation-desktop-dropdown-menu-line-height-scale: ${navDesktopDropdownLineHeightScale}`,
+  `--navigation-mobile-dropdown-menu-line-height-scale: ${navMobileDropdownLineHeightScale}`,
+]
+  .filter(Boolean)
+  .join('; ')
+---
+
+<div
+  id="main-navigation"
+  class=""
+  data-nav-active-style={navActiveStyle}
+  data-dropdown-desktop-color-mode={navDropdownDesktopColorMode}
+  data-dropdown-color-mode-config={navDropdownDesktopColorMode}
+  style={navStyle}
+>
+  <div class="container">
+    <div class="nav-bar">
+      <Logo />
+      <div class="wrapper">
+        <nav class={`desktop-menu desktop-menu--${navAlignment}`} aria-label="Main navigation desktop">
+          <NavigationItems variant="primary" includeLauncher={false} />
+          <NavigationItems variant="utility" />
+        </nav>
+        <ResponsiveToggle />
+        {
+          showLauncher && !(launcherMode === 'compact') && (
+            <div class="mobile-launcher">
+              <LauncherTrigger
+                launcherId="site-launcher"
+                iconOnly={true}
+                gradientBorder={launcherGradientBorder}
+                icon={launcherIcon}
+              />
+            </div>
+          )
+        }
+      </div>
+    </div>
+    <nav class="mobile-menu" aria-label="Main navigation mobile">
+      <NavigationItems includeLauncher={launcherMode === 'compact' && showLauncher} />
+    </nav>
+  </div>
+</div>
+
+<script is:inline>
+  (function(){
+    if (document.readyState !== 'loading') return;
+    var path = window.location.pathname;
+    if (path.length > 1 && path.endsWith('/')) path = path.slice(0, -1);
+    document.querySelectorAll('#main-navigation a[href]').forEach(function(a) {
+      if (a.getAttribute('rel')?.includes('external')) return;
+      var href = a.pathname;
+      if (href.length > 1 && href.endsWith('/')) href = href.slice(0, -1);
+      var isHome = a.textContent.trim() === 'Home';
+      var isActive = isHome ? (path === '/' || path === '') : (path === href || path.startsWith(href + '/'));
+      if (isActive) {
+        a.classList.add('is-active');
+        a.setAttribute('aria-current', 'page');
+        var li = a.closest('li');
+        if (li) li.classList.add('is-active');
+      }
+    });
+  })();
+</script>
+
+<script>
+  // 从 data 属性读取原始 dropdownColorMode 配置（inverse 或 theme）
+  const getDropdownColorMode = () => {
+    const mainNav = document.querySelector('#main-navigation')
+    return mainNav?.dataset.dropdownColorModeConfig || 'theme'
+  }
+
+  let handleOutsideClick: ((event: MouseEvent) => void) | null = null
+  let handleDropdownClick: ((event: MouseEvent) => void) | null = null
+
+  const initNavigation = () => {
+    // 清理旧的全局点击监听器，避免重复绑定
+    if (handleOutsideClick) {
+      window.removeEventListener('click', handleOutsideClick)
+    }
+    // variables
+    const mainNav = document.querySelector('#main-navigation') as HTMLElement | null
+    if (!mainNav) return
+    // 清理旧的 mainNav 点击监听器
+    if (handleDropdownClick) {
+      mainNav.removeEventListener('click', handleDropdownClick)
+    }
+    const navBreakpoint = window.matchMedia('(min-width: 1050px)')
+
+    const mainContainer = mainNav.querySelector(':scope > .container') as HTMLElement | null
+    const mobileMenu = mainNav.querySelector('.mobile-menu') as HTMLElement | null
+    const keyboardMenus = [
+      ...mainNav.querySelectorAll('.desktop-menu .menu--primary, .mobile-menu .menu'),
+    ] as HTMLUListElement[]
+    const dropdownMenus = [...document.querySelectorAll('.has-dropdown button')] as HTMLButtonElement[]
+
+    // functions
+    const setActiveMenuItem = (): void => {
+      const mobileDesktopMenus = mainNav.querySelectorAll('.desktop-menu .menu, .mobile-menu .menu')
+      const currentPathname = window.location.pathname
+
+      // Normalize a path by stripping trailing slash (for comparison purposes)
+      const normalizePath = (path: string): string => {
+        if (path.length > 1 && path.endsWith('/')) {
+          return path.slice(0, -1)
+        }
+        return path
+      }
+
+      const normalizedCurrent = normalizePath(currentPathname)
+
+      mobileDesktopMenus.forEach((menu) => {
+        const menuItems = [...menu.querySelectorAll('a[href]:not([rel*="external"])')] as HTMLAnchorElement[]
+
+        menuItems.forEach((menuItem) => {
+          const isHomeItem = menuItem.textContent?.trim() === 'Home'
+          const normalizedHref = normalizePath(menuItem.pathname)
+
+          if (isHomeItem) {
+            // Home only matches the root path exactly
+            if (normalizedCurrent === '/' || normalizedCurrent === '') {
+              menuItem.classList.add('is-active')
+              menuItem.setAttribute('aria-current', 'page')
+            }
+          } else {
+            // For other items, match if the current pathname starts with the item's href
+            // This handles both exact matches (/blog === /blog) and sub-pages (/blog/some-post starts with /blog)
+            if (normalizedCurrent === normalizedHref || normalizedCurrent.startsWith(normalizedHref + '/')) {
+              menuItem.classList.add('is-active')
+              menuItem.setAttribute('aria-current', 'page')
+            }
+          }
+        })
+      })
+    }
+
+    const openDropdownMenu = (dropdownMenu: HTMLButtonElement): void => {
+      const dropdownList = dropdownMenu.parentNode?.querySelector('ul') as HTMLUListElement | null
+      if (!dropdownList) return
+
+      if (!navBreakpoint.matches && dropdownMenu.closest('.mobile-menu')) {
+        dropdownList.hidden = false
+        dropdownList.style.height = 'auto'
+        const targetHeight = dropdownList.scrollHeight
+        dropdownList.style.height = '0px'
+
+        requestAnimationFrame(() => {
+          dropdownMenu.classList.add('show')
+          dropdownMenu.setAttribute('aria-expanded', 'true')
+          dropdownList.style.height = `${targetHeight}px`
+        })
+        return
+      }
+
+      dropdownList.style.removeProperty('--dropdown-max-inline-size')
+      dropdownMenu.classList.add('show')
+      dropdownMenu.setAttribute('aria-expanded', 'true')
+
+      if (mainContainer) {
+        const containerBounds = mainContainer.getBoundingClientRect()
+        const dropdownBounds = dropdownList.getBoundingClientRect()
+        const availableWidth = containerBounds.right - dropdownBounds.left
+
+        if (availableWidth > 0) {
+          dropdownList.style.setProperty('--dropdown-max-inline-size', `${Math.floor(availableWidth)}px`)
+        }
+      }
+    }
+
+    const closeDropdownMenu = (dropdownMenu: HTMLButtonElement): void => {
+      const dropdownList = dropdownMenu.parentNode?.querySelector('ul') as HTMLUListElement | null
+      if (!dropdownList) return
+
+      if (!navBreakpoint.matches && dropdownMenu.closest('.mobile-menu')) {
+        const currentHeight = dropdownList.scrollHeight
+        dropdownList.style.height = `${currentHeight}px`
+
+        requestAnimationFrame(() => {
+          dropdownMenu.classList.remove('show')
+          dropdownMenu.setAttribute('aria-expanded', 'false')
+          dropdownList.style.height = '0px'
+        })
+        return
+      }
+
+      dropdownList?.style.removeProperty('--dropdown-max-inline-size')
+      dropdownMenu.classList.remove('show')
+      dropdownMenu.setAttribute('aria-expanded', 'false')
+    }
+
+    const closeAllDropdownMenus = (): void => {
+      for (let i = 0; i < dropdownMenus.length; i++) {
+        closeDropdownMenu(dropdownMenus[i])
+      }
+    }
+
+    handleOutsideClick = (event: MouseEvent) => {
+      const element = event.target as Element
+      const isDropdownButton = element.closest('[aria-haspopup]') !== null
+      const isSubmenuItem = element.closest('.submenu-item') !== null
+      if (!isDropdownButton && !isSubmenuItem) {
+        closeAllDropdownMenus()
+      }
+    }
+
+    const toggleDropdownMenu = (event: MouseEvent): void => {
+      const target = event.currentTarget as HTMLButtonElement
+      if (target.getAttribute('aria-expanded') === 'false') {
+        closeAllDropdownMenus()
+        openDropdownMenu(target)
+      } else {
+        closeDropdownMenu(target)
+      }
+    }
+
+    const updateDropdownColorMode = (): void => {
+      const header = document.querySelector('header') as HTMLElement | null
+      const dropdownColorMode = getDropdownColorMode()
+
+      // 页面到顶且有 topNavigationTheme：使用用户设置的主题
+      // 滚动后或无主题：使用系统主题
+      const headerTheme = header?.dataset.topNavigationTheme
+      const isDarkmode = document.documentElement.classList.contains('darkmode')
+      const currentTheme = headerTheme || (isDarkmode ? 'dark' : 'light')
+
+      // 计算下拉菜单应该使用的颜色模式
+      let computedMode = dropdownColorMode
+      if (dropdownColorMode === 'inverse') {
+        // inverse: 与当前导航主题相反
+        // inverse-dark = 白底黑字（对 dark 取反）
+        // inverse-light = 黑底白字（对 light 取反）
+        computedMode = currentTheme === 'dark' ? 'inverse-dark' : 'inverse-light'
+      }
+
+      mainNav.setAttribute('data-dropdown-desktop-color-mode', computedMode)
+    }
+
+    updateDropdownColorMode()
+    window.addEventListener('astro:page-load', updateDropdownColorMode)
+    window.addEventListener('astro:after-swap', updateDropdownColorMode)
+    // 监听 Header 主题变化事件，实时更新下拉菜单样式
+    window.addEventListener('palo:header-theme-change', updateDropdownColorMode)
+    // 监听主题切换（darkmode 类变化），实时更新下拉菜单样式
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+          updateDropdownColorMode()
+        }
+      })
+    })
+    observer.observe(document.documentElement, { attributes: true })
+
+    mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
+      const list = dropdownList as HTMLUListElement
+      list.hidden = true
+      list.style.height = '0px'
+    })
+
+    mainNav.addEventListener('transitionend', (event: TransitionEvent) => {
+      const target = event.target as HTMLElement | null
+      if (!target || event.propertyName !== 'height') return
+
+      if (target.matches('.mobile-menu')) {
+        if (target.classList.contains('show')) {
+          mobileMenu?.dispatchEvent(new CustomEvent('palo:content-resize'))
+        } else {
+          target.style.overflowY = 'hidden'
+        }
+      }
+
+      if (target.matches('.mobile-menu .has-dropdown > ul')) {
+        const trigger = target.parentElement?.querySelector(':scope > button') as HTMLButtonElement | null
+        if (trigger?.classList.contains('show')) {
+          target.style.height = 'auto'
+          target.hidden = false
+        } else {
+          target.hidden = true
+        }
+
+        mobileMenu?.dispatchEvent(new CustomEvent('palo:content-resize'))
+      }
+    })
+
+    navBreakpoint.addEventListener('change', (event) => {
+      if (event.matches) {
+        mainNav.querySelectorAll('.mobile-menu .has-dropdown > ul').forEach((dropdownList) => {
+          const list = dropdownList as HTMLUListElement
+          list.hidden = true
+          list.style.height = '0px'
+        })
+      }
+    })
+
+    keyboardMenus.forEach((menu) => {
+      menu.addEventListener('keydown', (event: KeyboardEvent) => {
+        const element = event.target as Element
+        const currentMenuItem = element.closest('li')
+        const menuItems = [...menu.querySelectorAll('.menu-item')] as HTMLLIElement[]
+        const currentDropdownMenu = element.closest('.has-dropdown button') as HTMLButtonElement | null
+        const currentDropdownMenuItem = element.closest('.has-dropdown li') as HTMLLIElement | null
+        const currentIndex = currentMenuItem ? menuItems.findIndex((item) => item === currentMenuItem) : -1
+
+        const key = event.key
+        let targetItem: Element | null = null
+
+        if (key === 'ArrowRight') {
+          if (currentMenuItem && menuItems.indexOf(currentMenuItem as HTMLLIElement) === menuItems.length - 1) {
+            targetItem = menuItems[0]
+          } else if (currentMenuItem) {
+            targetItem = menuItems[currentIndex + 1]
+          }
+        }
+
+        if (key === 'ArrowLeft') {
+          if (currentMenuItem && menuItems.indexOf(currentMenuItem as HTMLLIElement) === 0) {
+            targetItem = menuItems[menuItems.length - 1]
+          } else if (currentMenuItem) {
+            targetItem = menuItems[currentIndex - 1]
+          }
+        }
+
+        if (key === 'Escape') {
+          targetItem = menuItems[0]
+        }
+
+        if (currentDropdownMenu) {
+          const nextElement = currentDropdownMenu.nextElementSibling as Element | null
+          if (nextElement) {
+            const firstDropdownItem = nextElement.querySelector('li')
+
+            if (key === 'ArrowDown') {
+              event.preventDefault()
+              openDropdownMenu(currentDropdownMenu)
+              targetItem = firstDropdownItem
+            }
+          }
+
+          if (key === 'Escape') {
+            closeDropdownMenu(currentDropdownMenu)
+          }
+        }
+
+        if (currentDropdownMenuItem) {
+          const currentDropdownList = currentDropdownMenuItem.parentNode as Element | null
+          if (currentDropdownList) {
+            const dropdownMenuItems = [...currentDropdownList.querySelectorAll('li')] as HTMLLIElement[]
+            const currentIndex = dropdownMenuItems.findIndex((item) => item === currentDropdownMenuItem)
+
+            if (key === 'ArrowDown') {
+              event.preventDefault()
+
+              if (dropdownMenuItems.indexOf(currentDropdownMenuItem) === dropdownMenuItems.length - 1) {
+                targetItem = dropdownMenuItems[0]
+              } else {
+                targetItem = dropdownMenuItems[currentIndex + 1]
+              }
+            }
+
+            if (key === 'ArrowUp') {
+              event.preventDefault()
+
+              if (dropdownMenuItems.indexOf(currentDropdownMenuItem) === 0) {
+                targetItem = dropdownMenuItems[dropdownMenuItems.length - 1]
+              } else {
+                targetItem = dropdownMenuItems[currentIndex - 1]
+              }
+            }
+
+            if (key === 'Escape') {
+              const currentDropdownMenu = currentDropdownList.previousElementSibling as HTMLButtonElement | null
+              if (currentDropdownMenu) {
+                targetItem = currentDropdownMenu.parentElement
+                closeAllDropdownMenus()
+              }
+            }
+
+            if (key === 'Tab') {
+              const currentDropdownMenu = currentDropdownList.previousElementSibling as HTMLButtonElement | null
+              if (currentDropdownMenu) {
+                if (dropdownMenuItems.indexOf(currentDropdownMenuItem) === dropdownMenuItems.length - 1) {
+                  closeDropdownMenu(currentDropdownMenu)
+                }
+              }
+            }
+          }
+        }
+
+        if (targetItem) {
+          const focusableElement = targetItem.querySelector('a, button, input') as HTMLElement | null
+          if (focusableElement) {
+            focusableElement.focus()
+          }
+        }
+      })
+    })
+
+    handleDropdownClick = (event: MouseEvent) => {
+      const button = (event.target as Element).closest('.has-dropdown > button')
+      if (button instanceof HTMLButtonElement && button.hasAttribute('aria-haspopup')) {
+        const isExpanded = button.getAttribute('aria-expanded') === 'true'
+        if (!isExpanded) {
+          closeAllDropdownMenus()
+          openDropdownMenu(button)
+        } else {
+          closeDropdownMenu(button)
+        }
+      }
+    }
+
+    mainNav.addEventListener('click', handleDropdownClick)
+
+    setActiveMenuItem()
+    window.addEventListener('click', handleOutsideClick)
+  }
+
+  document.addEventListener('astro:page-load', initNavigation)
+  document.addEventListener('astro:after-swap', initNavigation)
+  initNavigation()
+</script>
+
+<style lang="scss" is:global>
+  @use 'scss/base/mixins' as *;
+  @use 'scss/base/breakpoint' as *;
+
+  #main-navigation {
+
+    display: flex;
+    flex-direction: column;
+
+    > .container {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .nav-bar {
+      display: flex;
+      flex: 1 1 100%;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-m);
+      min-block-size: var(--nav-min-height, auto);
+    }
+
+    // Mobile-first: show mobile menu by default
+    .mobile-menu {
+      position: absolute;
+      z-index: 110 !important;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      flex: 1 1 100%;
+      height: 0;
+      opacity: 0;
+      overflow: hidden;
+      contain: layout paint;
+      will-change: height, opacity;
+      border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+      background-color: var(--background-color);
+      transition:
+        height var(--animation-speed-fast) var(--cubic-bezier),
+        opacity var(--animation-speed-instant) var(--cubic-bezier);
+      padding-inline: var(--grid-gutter);
+      padding-block-start: 0;
+      padding-block-end: 0;
+
+      @include breakpoint(m) {
+        padding-inline: 2rem;
+      }
+
+      &.show {
+        opacity: 1;
+        overflow-y: hidden;
+        pointer-events: auto;
+        padding-block-start: var(--space-m);
+        padding-block-end: var(--space-2xs);
+      }
+
+      &:not(.show) {
+        padding-block-start: 0;
+        padding-block-end: 0;
+      }
+    }
+
+    .responsive-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2xs);
+
+      svg {
+        width: 26px;
+        height: 21px;
+        flex-shrink: 0;
+      }
+    }
+
+    .mobile-launcher {
+      display: flex;
+    }
+
+    .desktop-menu {
+      display: none;
+    }
+
+    // Desktop: switch to desktop menu at nav breakpoint
+    @include breakpoint('nav') {
+      > .container {
+        column-gap: var(--space-l);
+      }
+
+      .nav-bar {
+        flex: 1 1 auto;
+      }
+
+      .mobile-menu {
+        display: none;
+      }
+
+      .responsive-toggle {
+        display: none;
+      }
+
+      .mobile-launcher {
+        display: none;
+      }
+
+      .desktop-menu {
+        display: grid;
+        flex: 1 1 auto;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        column-gap: var(--space-m);
+        min-inline-size: 0;
+      }
+
+      .desktop-menu > ul {
+        display: flex;
+        align-items: center;
+        gap: var(--space-m);
+        list-style-type: none;
+      }
+
+      .desktop-menu > ul > li {
+        align-content: center;
+      }
+
+      .menu--primary {
+        min-inline-size: 0;
+      }
+
+      .menu--utility {
+        justify-self: end;
+      }
+
+      .desktop-menu--left .menu--primary {
+        justify-self: start;
+      }
+
+      .desktop-menu--center .menu--primary {
+        justify-self: center;
+      }
+
+      .desktop-menu--right .menu--primary {
+        justify-self: end;
+      }
+
+      &[data-dropdown-desktop-color-mode='theme'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
+          color-scheme: light;
+        }
+      }
+
+      .darkmode &[data-dropdown-desktop-color-mode='theme'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
+          color-scheme: dark;
+        }
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
+          color-scheme: dark;
+        }
+      }
+
+      .darkmode &[data-dropdown-desktop-color-mode='inverse'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
+          color-scheme: light;
+        }
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse-dark'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-800);
+          --background-color: var(--color-neutral-100);
+          --icon-color: var(--color-neutral-800);
+          --border-color: var(--color-neutral-900);
+          --border-color-subtle: var(--color-neutral-300);
+          --link-color: var(--color-primary-400);
+          --link-hover-color: var(--color-primary-300);
+          --text-decoration-color: var(--color-neutral-700);
+          --outline-color: var(--color-outline-200);
+          color-scheme: light;
+        }
+      }
+
+      &[data-dropdown-desktop-color-mode='inverse-light'] {
+        .desktop-menu .menu--primary .dropdown-menu {
+          --foreground-color: var(--color-neutral-100);
+          --background-color: var(--color-neutral-900);
+          --icon-color: var(--color-neutral-100);
+          --border-color: var(--color-neutral-100);
+          --border-color-subtle: var(--color-neutral-800);
+          --link-color: var(--color-secondary-100);
+          --link-hover-color: var(--color-secondary-200);
+          --text-decoration-color: var(--color-neutral-100);
+          --outline-color: var(--color-outline-100);
+          color-scheme: dark;
+        }
+      }
+
+      .wrapper {
+        flex: 1 1 auto;
+        justify-content: flex-start;
+        min-inline-size: 0;
+      }
+    }
+
+    .wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-m);
+    }
+
+    a,
+    button {
+      color: var(--foreground-color);
+      font-weight: var(--font-weight-accent, 400);
+    }
+
+    // --- Active / hover / focus indicator styles (shared between desktop & mobile) ---
+
+    // Base: all interactive states get underline styling (except responsive-toggle)
+    a:hover,
+    a:focus-visible,
+    .is-active,
+    button[aria-expanded='true']:not(.responsive-toggle),
+    .has-dropdown > button:hover,
+    .has-dropdown > button:focus-visible {
+      text-decoration: underline;
+      text-decoration-thickness: max(1.5px, 0.0625em);
+      text-underline-offset: 0.4375em;
+    }
+
+    // Default (wavy mode): wavy underline (except responsive-toggle)
+    a:hover,
+    a:focus-visible,
+    .is-active,
+    button[aria-expanded='true']:not(.responsive-toggle),
+    .has-dropdown > button:hover,
+    .has-dropdown > button:focus-visible {
+      text-decoration-style: wavy;
+    }
+
+    .is-active {
+      font-weight: var(--font-weight-accent, 400);
+    }
+
+    // Underline mode: solid underline (except responsive-toggle)
+    &[data-nav-active-style='underline'] {
+      a:hover,
+      a:focus-visible,
+      .is-active,
+      button[aria-expanded='true']:not(.responsive-toggle),
+      .has-dropdown > button:hover,
+      .has-dropdown > button:focus-visible {
+        text-decoration-style: solid;
+      }
+    }
+
+    // Bold mode: hover/focus → solid underline, active → bold heading weight (no underline)
+    &[data-nav-active-style='bold'] {
+      a:hover,
+      a:focus-visible,
+      button[aria-expanded='true']:not(.responsive-toggle),
+      .has-dropdown > button:hover,
+      .has-dropdown > button:focus-visible {
+        text-decoration-style: solid;
+      }
+
+      .is-active {
+        text-decoration: none;
+        font-weight: var(--font-weight-heading);
+      }
+    }
+
+    // Bold + wavy mode: active → bold heading weight with wavy underline
+    &[data-nav-active-style='boldwavy'] {
+      .is-active {
+        font-weight: var(--font-weight-heading);
+      }
+    }
+
+    // Bold + underline mode: all interactive states → solid underline, active → bold heading weight
+    &[data-nav-active-style='boldunderline'] {
+      a:hover,
+      a:focus-visible,
+      .is-active,
+      button[aria-expanded='true']:not(.responsive-toggle),
+      .has-dropdown > button:hover,
+      .has-dropdown > button:focus-visible {
+        text-decoration-style: solid;
+      }
+
+      .is-active {
+        font-weight: var(--font-weight-heading);
+      }
+    }
+
+    .desktop-menu {
+      .menu--primary a,
+      .menu--primary button,
+      .menu--utility > .type-icon > a,
+      .menu--utility > .type-icon > button {
+        font-size: var(--navigation-desktop-font-size, 1rem);
+      }
+
+      .menu--primary .dropdown-menu a,
+      .menu--primary .dropdown-menu button {
+        display: block;
+        font-size: var(--navigation-dropdown-desktop-font-size, var(--navigation-desktop-font-size, 1rem));
+        inline-size: 100%;
+        line-height: calc(1.5 * var(--navigation-desktop-dropdown-menu-line-height-scale, 1));
+        padding-block: calc(0.25em * var(--navigation-desktop-dropdown-menu-line-height-scale, 1));
+        text-align: start;
+      }
+
+      .menu--primary .dropdown-menu li {
+        inline-size: 100%;
+      }
+
+      svg {
+        width: 1em;
+        height: 1em;
+      }
+
+      .desktop-launcher .launcher-trigger .trigger,
+      .desktop-launcher .launcher-trigger kbd.key,
+      .mobile-launcher .launcher-trigger .trigger,
+      .mobile-launcher .launcher-trigger kbd.key {
+        font-size: initial;
+      }
+    }
+
+    nav {
+      > ul {
+        display: flex;
+        gap: var(--space-m);
+        list-style-type: none;
+
+        li {
+          align-content: center;
+        }
+
+        .highlight a {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-2xs);
+          transition: all var(--animation-speed-fast) var(--cubic-bezier);
+          margin-block-start: calc(var(--space-4xs) * -1);
+          border: var(--border-width-button, var(--border-width-global, 3px)) solid var(--foreground-color);
+          border-radius: var(--radius-large);
+          padding: var(--space-4xs) var(--space-2xs);
+          text-decoration: none;
+
+          &:where(:hover, :focus-visible) {
+            background-color: var(--foreground-color);
+            color: var(--background-color) !important;
+          }
+        }
+      }
+    }
+
+    .mobile-menu {
+      --mobile-menu-item-line-height: calc(
+        1.5 * var(--navigation-main-menu-line-height-scale, 1)
+      );
+      --mobile-menu-item-padding-block: calc(
+        0.25em * var(--navigation-main-menu-line-height-scale, 1)
+      );
+      --mobile-menu-dropdown-item-line-height: calc(
+        1.5 * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
+      );
+      --mobile-menu-dropdown-item-padding-block: calc(
+        0.25em * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
+      );
+      --mobile-menu-dropdown-offset: calc(
+        0.5em * var(--navigation-mobile-dropdown-menu-line-height-scale, 1)
+      );
+      --mobile-menu-icon-group-gap: calc(1em * var(--navigation-main-menu-line-height-scale, 1));
+
+      .desktop-launcher {
+        display: none;
+      }
+
+      > ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        margin-block-end: 5rem;
+        row-gap: 0;
+
+        ul {
+          position: relative;
+          margin-block-start: var(--mobile-menu-dropdown-offset);
+        }
+      }
+
+      a,
+      button {
+        display: block;
+        font-size: var(--navigation-mobile-font-size, 1rem);
+        line-height: var(--mobile-menu-item-line-height);
+        padding-block: var(--mobile-menu-item-padding-block);
+        padding-inline: 0;
+        inline-size: 100%;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+      }
+
+      .dropdown-menu a,
+      .dropdown-menu button {
+        font-size: var(--navigation-dropdown-mobile-font-size, var(--navigation-mobile-font-size, 1rem));
+        line-height: var(--mobile-menu-dropdown-item-line-height);
+        padding-block: var(--mobile-menu-dropdown-item-padding-block);
+      }
+
+      svg {
+        width: 1em;
+        height: 1em;
+      }
+    }
+
+    // Dropdown offset = space-m + surface border width
+    // This ensures the dropdown aligns with the container's inner edge
+    .has-dropdown {
+      position: relative;
+      --dropdown-offset-inline: calc(var(--space-m) + var(--border-width-surface, var(--border-width-global)));
+
+      > button {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4xs);
+        margin-block-start: -1px;
+
+        svg {
+          transition: all var(--animation-speed-instant) var(--cubic-bezier);
+        }
+
+        &.show {
+          svg {
+            scale: -1;
+          }
+        }
+      }
+
+      ul {
+        display: flex;
+        position: absolute;
+        flex-direction: column;
+        gap: var(--space-2xs);
+        visibility: hidden;
+        pointer-events: none;
+        transform: translate(calc(var(--dropdown-offset-inline) * -1), 1rem);
+        opacity: 0;
+        z-index: 100;
+        inset-block-start: 125%;
+        inset-inline-start: 0;
+        inline-size: max-content;
+        max-inline-size: var(--dropdown-max-inline-size, none);
+        box-shadow: var(--elevation-4);
+        border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+        border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+        background-color: var(--background-color);
+        padding: var(--space-m);
+        min-inline-size: 275px;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+
+        transition:
+          opacity var(--animation-speed-medium) var(--cubic-bezier),
+          transform var(--animation-speed-medium) var(--cubic-bezier),
+          visibility 0s linear var(--animation-speed-medium);
+      }
+
+      > button.show ~ ul {
+        visibility: visible;
+        pointer-events: auto;
+        transform: translate(calc(var(--dropdown-offset-inline) * -1), 0);
+        opacity: 1;
+        transition-delay: 0s;
+      }
+    }
+
+    .mobile-menu .has-dropdown ul {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xs);
+      inline-size: 100%;
+      position: relative;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+      opacity: 1;
+      inset: auto;
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+      min-inline-size: auto;
+      height: 0;
+      overflow: hidden;
+      will-change: height;
+      transition:
+        height var(--animation-speed-fast) var(--cubic-bezier);
+
+      a {
+        inline-size: 100%;
+      }
+    }
+
+    .mobile-menu .has-dropdown > button.show ~ ul {
+      margin-block-start: var(--mobile-menu-dropdown-offset);
+      padding-block-start: 0;
+      padding-block-end: 0;
+      transform: none;
+    }
+
+    .mobile-menu .has-dropdown .submenu-item {
+      padding-inline: 0;
+    }
+
+    // Ensure dropdown ul is left-aligned with its parent button in mobile
+    .mobile-menu li.menu-item.has-dropdown {
+      padding-inline: 0;
+      flex-direction: column;
+    }
+
+    .mobile-menu .has-dropdown > button {
+      padding-inline: 0;
+    }
+
+    .mobile-menu .menu-item:not(.type-icon) {
+      flex: 0 0 100%;
+    }
+
+    .mobile-menu .menu-item.type-icon {
+      display: inline-flex;
+      flex: 0 0 auto;
+      margin-block-start: var(--mobile-menu-icon-group-gap);
+    }
+
+    .mobile-menu .menu-item.type-icon + .menu-item.type-icon {
+      margin-inline-start: 0;
+    }
+
+    .darkmode-toggle,
+    .launcher-compact-toggle {
+      border: none;
+      padding: 0;
+
+      .icon {
+        inline-size: 1em;
+        block-size: 1em;
+      }
+
+      &:where(:hover, :focus-visible) {
+        box-shadow: none;
+      }
+
+      &:focus {
+        @include outline;
+
+        &:not(:focus-visible) {
+          outline: none;
+          box-shadow: none;
+        }
+      }
+    }
+
+    .launcher-compact-toggle:focus:not(:focus-visible) {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+</style>
+
+<style is:global>
+@layer overrides {
+  #main-navigation .mobile-launcher .launcher-trigger .wrapper > svg,
+  #main-navigation .desktop-launcher .launcher-trigger .wrapper > svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* 桌面下拉菜单终极加固：确保激活态容器和子项不被全局样式误伤 */
+  .desktop-menu .has-dropdown > button.show ~ ul {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    height: auto !important;
+    min-height: min-content !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .desktop-menu .has-dropdown ul li {
+    display: list-item !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .desktop-menu .has-dropdown ul a,
+  .desktop-menu .has-dropdown ul button {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+  }
+}
+</style>

@@ -1,0 +1,357 @@
+---
+/**
+ * Slogan Component
+ *
+ * @description A versatile component for displaying brand slogans with multiple variants
+ */
+interface Props {
+  text: string;
+  variant?: 'default' | 'inline' | 'marquee';
+  class?: string;
+  wrapperClass?: string;
+  speed?: 'slow' | 'normal' | 'fast';
+  direction?: 'left' | 'right';
+  pause?: boolean;
+}
+
+const {
+  text,
+  variant = 'default',
+  class: className = '',
+  wrapperClass: wrapperClassName = '',
+  speed = 'normal',
+  direction = 'left',
+  pause = true
+} = Astro.props;
+
+const speedMap = { slow: 40, normal: 80, fast: 160 };
+const pxPerSec = speedMap[speed as keyof typeof speedMap] ?? speedMap.normal;
+
+const uid = Math.random().toString(36).substr(2, 9);
+---
+
+{variant === 'marquee' ? (
+  <div
+    class={`palo-marquee-wrapper palo-marquee-${direction} ${pause ? 'palo-marquee-pause' : ''} ${wrapperClassName}`}
+    data-marquee-id={uid}
+    data-px-per-sec={pxPerSec}
+    data-direction={direction}
+    aria-label={text}
+  >
+    <div class="palo-marquee-track">
+      <span class={`palo-marquee-item ${className}`} aria-hidden="true">{text}</span>
+    </div>
+  </div>
+) : variant === 'inline' ? (
+  <div
+    class={`palo-slogan-inline-wrapper ${wrapperClassName}`}
+    data-inline-id={uid}
+  >
+    <span class={`palo-slogan-inline ${className}`} data-slogan-text={text}>
+      {text}
+    </span>
+  </div>
+) : (
+  <div class={`palo-slogan-default ${className}`}>
+    {text}
+  </div>
+)}
+
+<script>
+  // @ts-nocheck
+  /* ===================================================================
+   * Slogan — Unified Lifecycle & Performance (Optimized)
+   * =================================================================== */
+
+  (function () {
+    'use strict';
+
+    // 1️⃣ 清理原生的类型强转，采用标准纯 JS 声明，杜绝 IDE 报错
+    var inlineResizeObserver = null;
+    var marqueeResizeObserver = null;
+    var sharedProbe = null;
+
+    function getProbe() {
+      if (!sharedProbe) {
+        sharedProbe = document.createElement('span');
+        sharedProbe.style.cssText =
+          'position:fixed;visibility:hidden;white-space:nowrap;pointer-events:none;z-index:-1';
+        document.body.appendChild(sharedProbe);
+      }
+      return sharedProbe;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Inline — fit-to-width                                             */
+    /* ------------------------------------------------------------------ */
+    function fitInline(wrapper) {
+      var textEl = wrapper.querySelector('.palo-slogan-inline');
+      if (!textEl) return;
+
+      var containerWidth = wrapper.clientWidth;
+      if (containerWidth <= 0) return;
+
+      var p = getProbe();
+      p.textContent = textEl.dataset.sloganText || textEl.textContent || '';
+      if (!p.textContent) return;
+
+      p.style.fontSize = '200px';
+      var cs = window.getComputedStyle(textEl);
+      p.style.fontFamily = cs.fontFamily;
+      p.style.fontWeight = cs.fontWeight;
+      p.style.fontStyle = cs.fontStyle;
+      p.style.letterSpacing = cs.letterSpacing;
+      p.style.textTransform = cs.textTransform;
+
+      var measuredWidth = p.offsetWidth;
+      if (measuredWidth <= 0) return;
+
+      textEl.style.fontSize = ((containerWidth - 1) * 200 / measuredWidth) + 'px';
+    }
+
+    function fitAllInline() {
+      var wrappers = document.querySelectorAll('[data-inline-id]');
+      for (var i = 0; i < wrappers.length; i++) {
+        fitInline(wrappers[i]);
+      }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Marquee — seamless 2-group clone (zero-flicker)                   */
+    /* ------------------------------------------------------------------ */
+    function setupMarquee(wrapper) {
+      var track = wrapper.querySelector('.palo-marquee-track');
+      if (!track) return;
+
+      var pxPerSec = parseFloat(wrapper.dataset.pxPerSec || '80') || 80;
+      var isRight = wrapper.dataset.direction === 'right';
+
+      // 1️⃣ 只保留第一个 item，后续克隆全部移除
+      var allItems = track.querySelectorAll(':scope > .palo-marquee-item');
+      for (var i = allItems.length - 1; i > 0; i--) {
+        allItems[i].remove();
+      }
+
+      var firstItem = track.querySelector(':scope > .palo-marquee-item');
+      if (!firstItem) return;
+
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(function () {
+          var rect = firstItem.getBoundingClientRect();
+          var cs = window.getComputedStyle(firstItem);
+          var ml = parseFloat(cs.marginLeft) || 0;
+          var mr = parseFloat(cs.marginRight) || 0;
+          var itemW = rect.width + ml + mr;
+          if (itemW <= 0) return;
+
+          var wrapperW = wrapper.offsetWidth;
+          var itemsPerGroup = Math.max(1, Math.ceil(wrapperW / itemW) + 1);
+
+          // 2️⃣ 只保留第一个 item，重新构建
+          var existing = track.querySelectorAll(':scope > .palo-marquee-item');
+          for (var j = existing.length - 1; j > 0; j--) {
+            existing[j].remove();
+          }
+
+          // 3️⃣ 构建 Group 1：铺满可视区
+          for (var k = 1; k < itemsPerGroup; k++) {
+            var clone = firstItem.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            track.appendChild(clone);
+          }
+
+          // 4️⃣ 准确测量 Group 1 的实际渲染宽度（scrollWidth 包含 margin，比 offsetWidth 更精确）
+          var groupWidth = track.scrollWidth;
+          if (groupWidth <= 0) return;
+
+          // 5️⃣ 克隆整个 Group 1 作为 Group 2（无缝衔接用）
+          var group1Items = track.querySelectorAll(':scope > .palo-marquee-item');
+          for (var m = 0; m < group1Items.length; m++) {
+            var dup = group1Items[m].cloneNode(true);
+            dup.setAttribute('aria-hidden', 'true');
+            track.appendChild(dup);
+          }
+
+          // 6️⃣ 不强制 track 宽度，使用 CSS width: max-content 自动适应
+          // translateX(-50%) 相对 track 自身宽度，精度由浏览器保证
+          var duration = groupWidth / pxPerSec;
+
+          // 7️⃣ 重置动画起点（使用 translate3d 强制 GPU 合成）
+          track.style.animation = 'none';
+          track.style.transform = isRight ? 'translate3d(-50%,0,0)' : 'translate3d(0,0,0)';
+          void track.offsetWidth;
+
+          track.style.removeProperty('animation');
+
+          // 8️⃣ 使用 -50% 关键帧 + translate3d 强制 GPU 合成，消除循环边界渲染 artifacts
+          var keyframesName = isRight ? 'marquee-seamless-right-2g' : 'marquee-seamless-left-2g';
+          track.style.animation = keyframesName + ' ' + duration + 's linear infinite';
+          track.style.setProperty('--_mg-dur', duration + 's');
+
+          // 9️⃣ Hover 暂停
+          if (wrapper.classList.contains('palo-marquee-pause')) {
+            var onEnter = function () { track.style.animationPlayState = 'paused'; };
+            var onLeave = function () { track.style.animationPlayState = 'running'; };
+            var prevEnter = wrapper._marqueePauseEnter;
+            var prevLeave = wrapper._marqueePauseLeave;
+            if (prevEnter) wrapper.removeEventListener('mouseenter', prevEnter);
+            if (prevLeave) wrapper.removeEventListener('mouseleave', prevLeave);
+            wrapper.addEventListener('mouseenter', onEnter);
+            wrapper.addEventListener('mouseleave', onLeave);
+            wrapper._marqueePauseEnter = onEnter;
+            wrapper._marqueePauseLeave = onLeave;
+          }
+        });
+      });
+    }
+
+    function initAllMarquee() {
+      var wrappers = document.querySelectorAll('[data-marquee-id]');
+      for (var i = 0; i < wrappers.length; i++) {
+        setupMarquee(wrappers[i]);
+      }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* ResizeObservers                                                   */
+    /* ------------------------------------------------------------------ */
+    function createInlineObserver() {
+      if (inlineResizeObserver) { inlineResizeObserver.disconnect(); }
+      var inlineWidthMap = new Map();
+
+      inlineResizeObserver = new ResizeObserver(function (entries) {
+        var shouldRecalc = false;
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+          var w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+          var prev = inlineWidthMap.get(entry.target);
+          if (prev !== w) {
+            inlineWidthMap.set(entry.target, w);
+            shouldRecalc = true;
+          }
+        }
+        if (shouldRecalc) { requestAnimationFrame(fitAllInline); }
+      });
+
+      var wrappers = document.querySelectorAll('[data-inline-id]');
+      for (var i = 0; i < wrappers.length; i++) { inlineResizeObserver.observe(wrappers[i]); }
+    }
+
+    function createMarqueeObserver() {
+      if (marqueeResizeObserver) { marqueeResizeObserver.disconnect(); }
+      var marqueeWidthMap = new Map();
+
+      marqueeResizeObserver = new ResizeObserver(function (entries) {
+        var shouldRecalc = false;
+        for (var i = 0; i < entries.length; i++) {
+          var entry = entries[i];
+          var w = entry.contentBoxSize ? entry.contentBoxSize[0].inlineSize : entry.contentRect.width;
+          var prev = marqueeWidthMap.get(entry.target);
+          if (prev !== w) {
+            marqueeWidthMap.set(entry.target, w);
+            shouldRecalc = true;
+          }
+        }
+        if (shouldRecalc) { requestAnimationFrame(initAllMarquee); }
+      });
+
+      var wrappers = document.querySelectorAll('[data-marquee-id]');
+      for (var i = 0; i < wrappers.length; i++) { marqueeResizeObserver.observe(wrappers[i]); }
+    }
+
+    function teardownAll() {
+      if (inlineResizeObserver) { inlineResizeObserver.disconnect(); inlineResizeObserver = null; }
+      if (marqueeResizeObserver) { marqueeResizeObserver.disconnect(); marqueeResizeObserver = null; }
+    }
+
+    function bootstrap() {
+      document.fonts.ready.then(function () {
+        requestAnimationFrame(function () {
+          fitAllInline();
+          createInlineObserver();
+          initAllMarquee();
+          createMarqueeObserver();
+        });
+      });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Lifecycle bindings (Fixed Double-Firing Loop)                     */
+    /* ------------------------------------------------------------------ */
+    // 💡 彻底移除 DOMContentLoaded 监听，全权交给 Astro 生命周期，阻断开屏二次高频执行
+    document.addEventListener('astro:page-load', bootstrap);
+    document.addEventListener('astro:before-swap', teardownAll);
+  })();
+</script>
+
+<style lang="scss">
+  .palo-slogan-default {
+    display: block;
+    line-height: 1.2;
+  }
+
+  .palo-slogan-inline-wrapper {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+  }
+
+  .palo-slogan-inline {
+    display: block;
+    line-height: 1;
+    white-space: nowrap;
+    text-align: left;
+    margin: 0;
+  }
+
+  /* ========== 跑马灯 ========== */
+  .palo-marquee-wrapper {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .palo-marquee-track {
+    display: flex;
+    flex-wrap: nowrap;
+    width: max-content;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
+  }
+
+  .palo-marquee-item {
+    flex-shrink: 0;
+    margin-inline: 0.25ch;
+    white-space: nowrap;
+    line-height: 1;
+    backface-visibility: hidden;
+  }
+
+  /* 2-Group seamless keyframes (zero-flicker + GPU composited):
+     - Track 使用 CSS width: max-content 自适应
+     - -50% 相对于 track 自身宽度，正好 = 1 个 Group 宽度
+     - translate3d 强制 GPU 合成，消除 iteration 边界 1 帧空白 */
+  @keyframes marquee-seamless-left-2g {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+
+  @keyframes marquee-seamless-right-2g {
+    from { transform: translate3d(-50%, 0, 0); }
+    to   { transform: translate3d(0, 0, 0); }
+  }
+
+  .palo-marquee-pause:hover .palo-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .palo-marquee-wrapper {
+      overflow-x: auto;
+    }
+    .palo-marquee-wrapper .palo-marquee-track {
+      animation: none !important;
+    }
+  }
+</style>

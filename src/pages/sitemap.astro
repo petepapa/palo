@@ -1,0 +1,237 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import { Heading, Notification } from 'accessible-astro-components'
+import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+// Get all portfolio projects (过滤草稿)
+const projects = (await getCollection('projects')).filter(
+  (project) => !project.data.draft,
+)
+
+// Get all blog posts (过滤草稿)
+const allPosts = (await getCollection('posts')).filter(
+  (post) => !post.data.draft,
+)
+
+// Define static pages with their descriptions
+const staticPages = [
+  {
+    title: 'Home',
+    url: '/',
+    description: 'Welcome to our accessible website featuring modern web development and inclusive design principles.',
+  },
+  {
+    title: 'Accessible components',
+    url: '/accessible-components',
+    description: 'A comprehensive showcase of accessible UI components and design patterns for modern web development.',
+  },
+  {
+    title: 'Portfolio',
+    url: '/portfolio',
+    description: 'A collection of projects demonstrating accessible design and development practices.',
+  },
+  {
+    title: 'Blog',
+    url: '/blog',
+    description: 'Articles and insights about web accessibility, development best practices, and inclusive design.',
+  },
+  {
+    title: 'Contact',
+    url: '/contact',
+    description:
+      'Get in touch with us for accessibility consulting, development services, or collaboration opportunities.',
+  },
+  {
+    title: 'Color contrast checker',
+    url: '/color-contrast-checker',
+    description: 'An interactive tool to check color contrast ratios and ensure WCAG compliance for your designs.',
+  },
+  {
+    title: 'Accessibility statement',
+    url: '/accessibility-statement',
+    description: 'Our commitment to accessibility and information about the accessibility features of this website.',
+  },
+  {
+    title: 'Markdown page example',
+    url: '/markdown-page',
+    description: 'A demonstration of Markdown content rendering with accessible formatting and typography.',
+  },
+  {
+    title: 'MDX page example',
+    url: '/mdx-page',
+    description: 'An example of MDX content combining Markdown with interactive React components.',
+  },
+  {
+    title: 'Thank you',
+    url: '/thank-you',
+    description: 'Confirmation page for successful form submissions and user interactions.',
+  },
+]
+
+// Helper to extract author name from string or object
+const getAuthorName = (author: unknown): string => {
+  if (!author) return 'Anonymous'
+  if (typeof author === 'object' && author !== null && 'name' in author) {
+    return (author as { name: string }).name
+  }
+  return String(author)
+}
+
+// PaloPageHeader settings / 页面头部设置
+const pageHeaderAppearance = {
+  fullscreen: '', // 空=使用 config.yaml 全局默认值
+  contentColor: '', // Text color; empty = theme / 内容颜色，空=跟随主题
+  topNavigationTheme: '', // '' | dark | light / 顶部导航主题
+  alignV: '', // top | center | bottom; empty = center / 垂直位置，空=居中
+  alignH: '', // left | center | right; empty = left / 水平对齐，空=左对齐
+  divider: '', // true/empty=bottom; top/both/bottom/false / true或空=下方；上方/上下/下方/false
+  bg: {
+    video: '', // Video path in /public / 背景视频，放在 /public
+    image: '', // Image path in /public / 背景图片，放在 /public
+    color: '', // Background color; empty = theme / 背景颜色，空=跟随主题
+    fixed: false, // Fixed background inside section / 背景在区域内固定
+    overlayOpacity: 0, // Overlay opacity 0-1 / 遮罩透明度 0-1
+  },
+} as const
+---
+
+<DefaultLayout
+  title="Sitemap"
+  description="Complete site map showing all pages, portfolio projects, and sections available on our accessible website."
+  hasHero={true}
+>
+  <PaloPageHeader
+    title="Sitemap"
+    subtitle="A comprehensive overview of all pages and content available on our website, organized for easy navigation."
+    {...pageHeaderAppearance}
+  />
+
+  <section class="my-16">
+    <div class="container space-y-12">
+      <!-- Main Pages Section -->
+      <div>
+        <Heading level="h2" class="mb-6">Main pages</Heading>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {
+            staticPages.map((page) => (
+              <article>
+                <Heading level="h3" size="h6" class="mb-3">
+                  <a href={ensureTrailingSlash(page.url)}>{page.title}</a>
+                </Heading>
+                <p class="mb-3">{page.description}</p>
+                <p class="text-xs">
+                  URL:{' '}
+                  <code>{page.url}</code>
+                </p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Portfolio Projects Section -->
+      <div>
+        <Heading level="h2">Portfolio projects</Heading>
+        <p class="mb-6">
+          Explore our collection of {projects.length} accessibility-focused projects showcasing inclusive design and development
+          practices.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {
+            projects.map((project) => (
+              <article>
+                <Heading level="h3" size="h6" class="mb-3">
+                  <a href={ensureTrailingSlash(`/portfolio/${project.id}`)}>{project.data.title}</a>
+                </Heading>
+                <p class="mb-3">{project.data.description}</p>
+                <div class="text-xs">
+                  <p class="mb-1">
+                    By: <span class="font-medium">{getAuthorName(project.data.author)}</span>
+                  </p>
+                  <p>
+                    URL:{' '}
+                    <code>/portfolio/{project.id}</code>
+                  </p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Blog Section -->
+      <div>
+        <Heading level="h2" class="mb-6">Blog ({allPosts.length})</Heading>
+        <p class="mb-6">
+          Explore our collection of {allPosts.length} articles about web accessibility, development best practices, and
+          inclusive design, with pagination for easy browsing.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {
+            allPosts.map((post) => (
+              <article>
+                <Heading level="h3" size="h6" class="mb-3">
+                  <a href={ensureTrailingSlash(`/blog/${post.id}`)}>{post.data.title}</a>
+                </Heading>
+                <p class="mb-3">{post.data.description}</p>
+                <div class="text-xs">
+                  <p class="mb-1">
+                    By: <span class="font-medium">{getAuthorName(post.data.author)}</span>
+                  </p>
+                  <p>
+                    URL:{' '}
+                    <code>/blog/{post.id}</code>
+                  </p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <!-- Technical Information -->
+      <Notification type="info" variant="accent">
+        <div class="space-content">
+          <Heading level="h2" size="h6" class="mb-4">Technical sitemap information</Heading>
+          <ul>
+            <li>
+              <span class="font-bold">XML Sitemap:</span> An automated XML sitemap is generated at
+              <code>/sitemap.xml</code>
+              for search engine optimization.
+            </li>
+            <li>
+              <strong>Generated by:</strong> <code>@astrojs/sitemap</code> integration configured in <code>astro.config.mjs</code>
+            </li>
+            <li>
+              <strong>Last updated:</strong> Automatically updated on each build
+            </li>
+          </ul>
+        </div>
+      </Notification>
+    </div>
+  </section>
+</DefaultLayout>
+
+<style lang="scss">
+  @layer components {
+    article {
+      border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+      border-radius: var(--radius-surface, var(--radius-global, var(--radius-m)));
+      background-color: var(--background-color);
+      padding: 1rem;
+    }
+
+    code:not(pre code) {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      font-size: 0.875em;
+      padding: 0.18em 0.4em;
+      border-radius: var(--radius-small, var(--radius-s, 0.25rem));
+      background-color: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.1));
+      border: 1px solid light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.08));
+      color: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+      word-break: break-word;
+    }
+  }
+</style>

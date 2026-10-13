@@ -1,0 +1,701 @@
+@use './mixins' as *;
+
+@view-transition {
+  navigation: auto;
+}
+
+@layer base {
+body {
+  font-weight: var(--font-weight-body, 300);
+  font-style: normal;
+  font-size: var(--font-size-0, 1rem);
+  line-height: calc(1.5 * var(--line-height-scale, 1));
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  text-shadow: rgba(0, 0, 0, 0.01) 0 0 1px;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--background-color);
+  color: var(--foreground-color);
+}
+
+a {
+  transition: color var(--animation-speed-fast) var(--cubic-bezier);
+  color: var(--link-color);
+
+  &:where(:hover, :focus-visible) {
+    color: var(--link-hover-color);
+  }
+}
+
+main a,
+footer a {
+  @include text-decoration(var(--link-color), var(--link-hover-color));
+
+  color: var(--link-color);
+
+  &:where(:hover, :focus-visible) {
+    color: var(--link-hover-color);
+  }
+
+  &.external-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3xs);
+
+    // small visual correction
+    svg {
+      margin-block-start: 3px;
+    }
+  }
+}
+
+*:focus,
+*:focus-visible {
+  @include outline;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.card {
+  border-width: var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+  border-radius: var(--radius-card, var(--radius-surface, var(--radius-global, var(--radius-m)))) !important;
+}
+
+.card.card-thin {
+  --border-width-card: 1px;
+}
+
+.card.card-thick {
+  --border-width-card: 4px;
+}
+
+// Accordion item border width
+.accordion details.wrapper,
+.accordion-stable .wrapper {
+  border-block-start-width: var(--border-width-accordion, var(--border-width-card, var(--border-width-surface, var(--border-width-global, 3px)))) !important;
+}
+
+.dropdown-menu,
+article {
+  border-width: var(--border-width-surface, var(--border-width-global, 3px));
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
+}
+
+.media-wrapper {
+  border-width: var(--border-width-media, var(--border-width-global, 3px));
+  border-radius: var(--radius-media, var(--radius-global, var(--radius-l))) !important;
+}
+
+pre,
+code:not(pre code) {
+  border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+}
+
+.code-block {
+  overflow: hidden;
+  border: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+}
+
+.code-block__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-block-end: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  padding: var(--space-3xs) var(--space-xs);
+  color: var(--foreground-color);
+}
+
+.code-block__language {
+  font-weight: var(--font-weight-accent, 600);
+  font-size: var(--text-base);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.code-block__copy {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    background-color var(--animation-speed-fast) var(--cubic-bezier),
+    color var(--animation-speed-fast) var(--cubic-bezier);
+  cursor: pointer;
+  border: var(--border-width-toggle, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s)));
+  background-color: transparent;
+  padding: var(--space-4xs);
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: inherit;
+}
+
+.code-block__copy:hover,
+.code-block__copy:focus-visible {
+  background-color: var(--foreground-color);
+  color: var(--background-color);
+}
+
+.code-block pre {
+  margin: 0;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+}
+
+pre,
+code:not(pre code),
+kbd:not(.launcher-trigger kbd):not(.launcher kbd),
+.tooltip,
+.skip-link a {
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+}
+
+.darkmode-toggle,
+.highcontrast-toggle,
+.reducedmotion-toggle {
+  border-width: var(--border-width-toggle, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s))) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Astro Code (Shiki) 语法高亮颜色映射
+   使用 'css-variables' 主题时，Shiki 输出形如
+   color: var(--astro-code-token-xxx) 的 CSS 变量引用。
+   在此处将变量映射到项目的语义色系统。
+
+   配色哲学：4 色分层 + neutral 退隐
+   ─────────────────────────────────
+   蓝 (info)     → 代码结构 (关键字/常量/链接)
+   绿 (success)  → 行为 (函数名)
+   橙 (warning)  → 数据 (字符串)
+   灰 (neutral)  → 降噪 (注释/标点)
+
+   可用令牌：
+   --astro-code-background         背景色
+   --astro-code-foreground         默认文本色
+   --astro-code-token-constant     常量（true/false/null/数字/组件名）
+   --astro-code-token-string       字符串
+   --astro-code-token-comment      注释
+   --astro-code-token-keyword      关键字（import, const, return, YAML key...）
+   --astro-code-token-parameter    参数
+   --astro-code-token-function     函数名 / 属性名
+   --astro-code-token-string-expression  模板字符串 / 字符串值
+   --astro-code-token-punctuation  标点/运算符
+   --astro-code-token-link         链接
+═══════════════════════════════════════════════════════════════ */
+:root {
+  --astro-code-background: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  --astro-code-foreground: var(--foreground-color);
+  --astro-code-token-keyword: var(--color-info-400);
+  --astro-code-token-constant: var(--color-info-300);
+  --astro-code-token-function: var(--color-success-400);
+  --astro-code-token-string: var(--color-warning-300);
+  --astro-code-token-string-expression: var(--color-warning-300);
+  --astro-code-token-comment: var(--color-neutral-500);
+  --astro-code-token-punctuation: var(--color-neutral-400);
+  --astro-code-token-parameter: var(--foreground-color);
+  --astro-code-token-link: var(--color-info-400);
+}
+
+.feature::before,
+.feature::after {
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
+}
+
+.call-to-action {
+  border-width: var(--border-width-surface, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-surface, var(--radius-global, var(--radius-m))) !important;
+}
+
+.pagination a,
+.pagination .disabled {
+  border-width: var(--border-width-pagination, var(--border-width-global, 3px)) !important;
+  border-radius: var(--radius-pagination, var(--radius-global, var(--radius-s))) !important;
+}
+
+img.rounded-lg,
+.breakout-image img.rounded-lg,
+.breakout-image .rounded-lg,
+.content-media .rounded-lg {
+  border-width: var(--border-width-media, var(--border-width-global, 3px));
+  border-radius: var(--radius-media, var(--radius-global, var(--radius-l))) !important;
+}
+
+// Avatar border width
+.avatar .initials-container,
+.avatar .icon-container {
+  border-width: var(--border-width-avatar, var(--border-width-global, 3px)) !important;
+}
+
+.avatar.shape-square .initials-container,
+.avatar.shape-square .icon-container,
+.avatar.shape-square .image {
+  border-radius: var(--radius-avatar, var(--radius-global, var(--radius-s))) !important;
+}
+
+.avatar .initials,
+.avatar .title,
+.avatar .subtitle {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1);
+}
+
+.avatar-group.display-condensed .avatar {
+  isolation: isolate;
+}
+
+.avatar.avatar-thin .initials-container,
+.avatar.avatar-thin .icon-container {
+  --border-width-avatar: 1px;
+}
+
+.avatar.avatar-thick .initials-container,
+.avatar.avatar-thick .icon-container {
+  --border-width-avatar: 4px;
+}
+
+// Badge border width
+.badge {
+  --badge-padding-block: 0.05rem;
+  --badge-text-shift: calc(var(--font-cap-height-offset, -0.05em) * -1);
+  --badge-icon-size: 1rem;
+
+  box-sizing: border-box;
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  justify-content: center;
+
+  border-width: var(--border-width-badge, 2px) !important;
+  border-radius: var(--radius-badge, var(--radius-global, var(--radius-m))) !important;
+}
+
+.badge > svg,
+.badge > svg[data-icon] {
+  display: block;
+  flex-shrink: 0;
+  margin-block-start: 0;
+  transform-origin: center center;
+  transform-box: fill-box;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.badge:not(.circular) {
+  block-size: calc(1.5em + (var(--badge-padding-block) * 2) + (var(--border-width-badge, 2px) * 2));
+  padding-block-start: calc(var(--badge-padding-block) + var(--badge-text-shift)) !important;
+  padding-block-end: var(--badge-padding-block) !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    .badge:not(.circular) {
+      --badge-text-shift: calc((var(--font-cap-height-offset, -0.05em) * -1) + 0.1000em);
+    }
+  }
+}
+
+.badge:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.35rem + var(--badge-icon-size) + 0.3rem) !important;
+}
+
+.badge.size-sm:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.2rem + var(--badge-icon-size) + 0.15rem) !important;
+}
+
+.badge.size-lg:not(.circular):has(> svg) {
+  padding-inline-start: calc(0.45rem + var(--badge-icon-size) + 0.4rem) !important;
+}
+
+.badge:not(.circular) > svg,
+.badge:not(.circular) > svg[data-icon] {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 0.35rem;
+  translate: 0 -50%;
+}
+
+.badge.size-sm:not(.circular) > svg,
+.badge.size-sm:not(.circular) > svg[data-icon] {
+  inset-inline-start: 0.2rem;
+}
+
+.badge.size-lg:not(.circular) > svg,
+.badge.size-lg:not(.circular) > svg[data-icon] {
+  inset-inline-start: 0.45rem;
+}
+
+.notification .notification-content > * {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1.5);
+}
+
+/* Notification 内列表：圆点与标题文字左对齐 */
+.notification :where(ul, ol) {
+  padding-inline-start: 0;
+  list-style-position: inside;
+}
+
+.badge.circular {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  line-height: 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+// Safari text metrics render badges slightly high on iOS; use the same
+// cap-height compensation token as Avatar without changing component markup.
+.badge.circular:not(:has(svg)) {
+  padding-block-start: calc(var(--font-cap-height-offset, -0.05em) * -1) !important;
+  padding-block-end: 0 !important;
+}
+
+.badge.size-sm.circular {
+  inline-size: calc(1.5em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(1.5em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
+.badge.size-md.circular {
+  inline-size: calc(1.75em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(1.75em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
+.badge.size-lg.circular {
+  inline-size: calc(2em + (var(--border-width-badge, 2px) * 2)) !important;
+  block-size: calc(2em + (var(--border-width-badge, 2px) * 2)) !important;
+}
+
+.badge.badge-thin {
+  --border-width-badge: 1px;
+}
+
+.badge.badge-thick {
+  --border-width-badge: 4px;
+}
+
+// Notification border width
+.notification:where(.variant-default) {
+  --notification-radius: var(--radius-notification, var(--radius-global, var(--radius-m)));
+  --notification-corner-safe-inset: min(calc(var(--notification-radius) * 0.5), var(--space-s));
+  --notification-padding-inline: calc(1rem + (var(--notification-corner-safe-inset) * 0.5));
+  --notification-padding-block: calc(1rem + (var(--notification-corner-safe-inset) * 0.25));
+
+  border-width: var(--border-width-notification, var(--border-width-global, 2px)) !important;
+  border-radius: var(--notification-radius) !important;
+  padding-inline: var(--notification-padding-inline) !important;
+  padding-block: var(--notification-padding-block) !important;
+}
+
+.notification.notification-thin:where(.variant-default) {
+  --border-width-notification: 1px;
+}
+
+.notification.notification-thick:where(.variant-default) {
+  --border-width-notification: 4px;
+}
+
+.notification:where(.variant-accent) {
+  border-radius: 0 !important;
+}
+
+.notification.variant-accent::before {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+// Tabs border width
+.tab,
+.tab-panel {
+  border-width: var(--border-width-tabs, var(--border-width-global, 3px)) !important;
+}
+
+.tabs-list {
+  position: relative;
+}
+
+.tab {
+  border-radius: var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
+}
+
+.tab-panel {
+  --tabs-panel-radius: var(--radius-tabs, var(--radius-global, var(--radius-m)));
+  --tabs-panel-corner-safe-inset: min(calc(var(--tabs-panel-radius) * 0.5), var(--space-s));
+  --tabs-panel-padding-block-end: calc(2rem + var(--tabs-panel-corner-safe-inset));
+
+  border-radius: 0 0 var(--radius-tabs, var(--radius-global, var(--radius-m)))
+    var(--radius-tabs, var(--radius-global, var(--radius-m))) !important;
+  padding-block-end: var(--tabs-panel-padding-block-end) !important;
+}
+
+@media (min-width: 31.25rem) {
+  .tabs-list {
+    z-index: 1;
+    align-items: flex-end;
+    margin-block-end: calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) !important;
+  }
+
+  .tab {
+    position: relative;
+    z-index: 1;
+    border-radius: var(--radius-tabs, var(--radius-global, var(--radius-m)))
+      var(--radius-tabs, var(--radius-global, var(--radius-m))) 0 0 !important;
+  }
+
+  .tab[aria-selected='true'],
+  .tab:hover,
+  .tab:focus-visible {
+    box-shadow:
+      0 calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)),
+      calc(var(--border-width-tabs, var(--border-width-global, 3px)) * -1) 0 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)),
+      var(--border-width-tabs, var(--border-width-global, 3px)) 0 0 0
+        light-dark(hsl(0 0% 10% / 0.2), hsl(0 0% 90% / 0.2)) !important;
+  }
+
+  .tab[aria-selected='true'] {
+    z-index: 2;
+  }
+}
+
+pre,
+code:not(pre code) {
+  border-width: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+}
+
+.code-block {
+  overflow: hidden;
+  border: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+}
+
+.code-block__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-block-end: var(--border-width-code-block, var(--border-width-surface, var(--border-width-global, 3px))) solid
+    var(--border-color-subtle);
+  background-color: light-dark(var(--color-neutral-200), var(--color-neutral-800));
+  padding: var(--space-3xs) var(--space-xs);
+  color: var(--foreground-color);
+}
+
+.code-block__language {
+  font-weight: var(--font-weight-accent, 600);
+  font-size: var(--text-base);
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.code-block__copy {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition:
+    background-color var(--animation-speed-fast) var(--cubic-bezier),
+    color var(--animation-speed-fast) var(--cubic-bezier);
+  cursor: pointer;
+  border: var(--border-width-toggle, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+  border-radius: var(--radius-toggle, var(--radius-global, var(--radius-s)));
+  background-color: transparent;
+  padding: var(--space-4xs);
+  inline-size: 2rem;
+  block-size: 2rem;
+  color: inherit;
+}
+
+.code-block__copy:hover,
+.code-block__copy:focus-visible {
+  background-color: var(--foreground-color);
+  color: var(--background-color);
+}
+
+.code-block pre {
+  margin: 0;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+}
+
+pre,
+code:not(pre code),
+kbd:not(.launcher-trigger kbd):not(.launcher kbd),
+.tooltip,
+.skip-link a {
+  border-radius: var(--radius-code-block, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+}
+
+.notification.variant-accent::before {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.tab.tab-thin,
+.tab-panel.tab-panel-thin {
+  --border-width-tabs: 1px;
+}
+
+.tab.tab-thick,
+.tab-panel.tab-panel-thick {
+  --border-width-tabs: 4px;
+}
+
+// ──────────────────────────────────────────────
+//  Modal & Launcher 淡入淡出动画 + 主题化
+//  使用 @keyframes animation 替代 @starting-style + transition，
+//  解决 Safari 下 @starting-style 动画卡顿问题。
+//  打开/关闭均为纯 opacity 淡入淡出，无位移。
+//  will-change 提示 GPU 合成，减少 Safari 重绘。
+// ──────────────────────────────────────────────
+
+// 重置 Modal 样式，与 Launcher 保持一致
+dialog.modal {
+  background-color: transparent !important;
+  color: var(--foreground-color);
+  outline: none !important;
+  border-style: solid !important;
+  border-width: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+  border-radius: var(--radius-modal, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  border-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800))) !important;
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.12) !important;
+}
+
+:where(dialog.qrcode-modal) {
+  background-color: transparent !important;
+  color: var(--foreground-color);
+  outline: none !important;
+  border-style: solid !important;
+  border-width: var(--border-width-modal, var(--border-width-surface, var(--border-width-global, 3px))) !important;
+  border-radius: var(--radius-modal, var(--radius-surface, var(--radius-global, var(--radius-s)))) !important;
+  border-color: var(--border-color-subtle, light-dark(var(--color-neutral-300), var(--color-neutral-800))) !important;
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.12) !important;
+}
+
+:where(dialog.modal) .modal-content {
+  backdrop-filter: blur(40px) !important;
+  background-color: light-dark(rgba(255, 255, 255, 0.85), rgba(30, 30, 40, 0.85)) !important;
+  color: var(--foreground-color);
+}
+
+// 统一 Launcher 投影效果，与 Modal 保持一致的克制风格
+// 覆盖 accessible-astro-launcher 包自带的过重 box-shadow
+:where(dialog.launcher) {
+  box-shadow: 0 4px 24px rgba(0 0 0 / 0.12) !important;
+}
+
+:where(dialog.launcher) .header {
+  box-shadow: none !important;
+}
+
+// 完全禁用原生 ::backdrop，统一使用自定义 .palo-dialog-backdrop
+dialog.launcher::backdrop,
+dialog.modal::backdrop,
+dialog.qrcode-modal::backdrop {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  background: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+// Modal + Launcher 通用定位（脱离父容器层叠上下文，确保全屏居中）
+dialog.modal,
+dialog.launcher,
+dialog.qrcode-modal {
+  position: fixed !important;
+  inset: auto !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+  translate: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 999998 !important;
+  max-width: calc(100vw - 2rem) !important;
+  max-height: calc(100vh - 2rem) !important;
+  transition: none !important;
+  transition-behavior: normal !important;
+}
+
+// 自定义 backdrop（用于 show() 代替 showModal()，避免进入 top layer）
+// 插入到 body 末尾，不受父容器层叠上下文限制
+.palo-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999997;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background-color: rgba(0 0 0 / 0.3);
+  opacity: 0;
+  pointer-events: none;
+  animation: palo-backdrop-fade-out var(--animation-speed-medium) var(--cubic-bezier) forwards;
+}
+
+.palo-dialog-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: palo-backdrop-fade-in var(--animation-speed-medium) var(--cubic-bezier) forwards;
+}
+
+// Modal + Launcher 关闭态（始终启用，确保 JS 能安全插入 closing 类）
+dialog.modal.closing,
+dialog.launcher.closing,
+dialog.qrcode-modal.closing {
+  pointer-events: none;
+}
+
+@keyframes palo-dialog-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes palo-dialog-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes palo-backdrop-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes palo-backdrop-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.modal[open],
+  dialog.launcher[open],
+  dialog.qrcode-modal[open] {
+    animation: palo-dialog-fade-in var(--animation-speed-medium) var(--cubic-bezier) forwards;
+    will-change: opacity, transform;
+  }
+
+  dialog.modal.closing,
+  dialog.launcher.closing,
+  dialog.qrcode-modal.closing {
+    animation: palo-dialog-fade-out var(--animation-speed-medium) var(--cubic-bezier) forwards;
+  }
+}
+}

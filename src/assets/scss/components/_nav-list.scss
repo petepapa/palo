@@ -1,0 +1,239 @@
+// ═══════════════════════════════════════════════════════════════
+// .palo-nav-list — 二级导航列表统一样式命名空间
+//
+// 覆盖对象：Tags 标签栏、TOC 页面目录导航、Footer 导航链接
+//
+// 设计契约：
+//   1. 默认无下划线 — 避免视觉噪点
+//   2. Hover/Focus 显示下划线 — 可发现性
+//   3. Active 激活态由 data-active-style 属性控制
+//
+// 🚨 隔离保障：所有规则限定在 .palo-nav-list 内，
+//   正文中的普通 a 标签（不在 .palo-nav-list 容器中）完全不受影响。
+// ═══════════════════════════════════════════════════════════════
+
+@use '../base/mixins' as *;
+
+// ── 共享下划线样式占位符（避免 hover / 5b 段重复）───────────────
+%nav-list-underline {
+  text-decoration: underline !important;
+  text-decoration-style: solid !important;
+  text-decoration-color: currentColor !important;
+  text-decoration-thickness: 0.125em !important;
+  text-underline-offset: 0.25em !important;
+  text-decoration-skip-ink: none !important;
+  transition: none !important;
+}
+
+@layer components {
+  .palo-nav-list {
+    // ── 0. 排版计算令牌 ─────────────────────────────────────────
+    //    垂直间隙 = 1em × 正文行高 × 用户缩放系数
+    --palo-nav-vertical-space: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1));
+    //    列表项行高 = 1em × 正文行高（统一基线，带图标和纯文本自然等高）
+    --palo-nav-item-line-height: calc(1em * var(--line-height-body, 1.5));
+    //    ⚠️  不在此处重新声明 --palo-nav-horizontal-space，直接从 :root 继承避免自引用
+
+    // ── 0b. 容器内政仅清 list-style，外交边界绝不插手 ─────────
+    list-style: none;
+
+    // ── 1. 默认：清空下划线，字重跟随正文，长文本换行 ────────────
+    a {
+      text-decoration: none;
+      font-weight: var(--font-weight-body, 400);
+      color: var(--foreground-color);
+      transition: none;
+      white-space: normal;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+      text-decoration-skip-ink: none;
+
+      // **text** → heading 字重（不改变大小写）
+      .font-medium {
+        font-weight: var(--font-weight-heading, 600);
+        text-transform: none;
+        color: inherit;
+      }
+
+      // *text* → accent 字重
+      .font-accent {
+        font-weight: var(--font-weight-accent, 500);
+        color: inherit;
+      }
+
+      svg {
+        width: 1em;
+        height: 1em;
+        margin-inline-end: var(--space-2xs, 0.5rem);
+        flex-shrink: 0;
+      }
+    }
+
+    // ── 2. 横排容器（Tags 标签栏）────────────────────────────────
+    //    Row gap = verticalScale 联动行高  |  Column gap = horizontalSpace
+    //    🔥 双轴参数完整保留；子元素清洗仅在横排作用域内生效
+    &.is-horizontal,
+    .is-horizontal {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      gap: var(--palo-nav-vertical-space) var(--palo-nav-horizontal-space) !important;
+
+      li,
+      a,
+      [class*='nav-item'] {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: var(--line-height-body, 1.5) !important;
+      }
+    }
+
+    // ── 3. 竖排容器（TOC 目录 / Footer 垂直列）──────────────────
+    //    🔥 竖排的绝对归零仅在此作用域，绝不波及横排
+    &.is-vertical,
+    .is-vertical {
+      display: flex !important;
+      flex-direction: column !important;
+      gap: var(--palo-nav-vertical-space) 0 !important;
+
+      li,
+      a,
+      [class*='nav-item'],
+      [class*='article-toc__item'],
+      span {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: var(--palo-nav-item-line-height);
+        line-height: var(--line-height-body, 1.5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        svg {
+          flex-shrink: 0;
+          height: 1em;
+          width: 1em;
+          margin-inline-end: var(--space-2xs, 0.5rem);
+        }
+
+        span {
+          flex-shrink: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
+    // ── 4. TOC 专属：释放轻量工业阻尼过渡动画 ──────────────────────
+    &[data-context='toc'] a {
+      transition:
+        color var(--animation-speed-fast) var(--cubic-bezier),
+        text-decoration-color var(--animation-speed-fast) var(--cubic-bezier),
+        font-weight var(--animation-speed-instant) var(--cubic-bezier);
+    }
+
+    // ── 5. Hover / Focus：展示下划线（覆盖 footer a 的 mixin）───
+    a:hover,
+    a:focus-visible {
+      @extend %nav-list-underline;
+    }
+
+    a:hover svg,
+    a:focus-visible svg {
+      text-decoration: none !important;
+    }
+
+    // ── 5b. 含 accent/heading 字重的列表项（social 列表）：仅在 body 字重文字上展示下划线 ──
+    a:has(.font-medium, .font-accent):hover,
+    a:has(.font-medium, .font-accent):focus-visible {
+      text-decoration: none !important;
+    }
+
+    a:has(.font-medium, .font-accent):hover .font-body,
+    a:has(.font-medium, .font-accent):focus-visible .font-body {
+      @extend %nav-list-underline;
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // 6. Active 激活态 — 通过 data-active-style 属性派发
+    //    所有激活态切换均为瞬时（0ms），无缓动动画
+    // ═══════════════════════════════════════════════════════════
+
+    // ── bold 模式：激活项加粗（accent 字重）─────────────────────
+    &[data-active-style='bold'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: none;
+        font-weight: var(--font-weight-accent, 500);
+      }
+    }
+
+    // ── underline 模式：激活项下划线 ─────────────────────────────
+    &[data-active-style='underline'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: underline;
+        text-decoration-thickness: 0.125em;
+        text-underline-offset: 0.25em;
+        font-weight: inherit;
+      }
+    }
+
+    // ── both 模式：accent 加粗 + 下划线 ────────────────────────
+    &[data-active-style='both'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: underline;
+        text-decoration-thickness: 0.125em;
+        text-underline-offset: 0.25em;
+        font-weight: var(--font-weight-accent, 500);
+      }
+    }
+
+    // ── none 模式：无激活样式（仅保留默认 hover 行为）─────────────
+    &[data-active-style='none'] {
+      a[aria-current],
+      a.is-active {
+        text-decoration: none;
+        font-weight: inherit;
+      }
+    }
+
+    // ── 7. disabled 状态处理 ────────────────────────────────────
+    a[disabled],
+    a.disabled {
+      cursor: default;
+      opacity: 0.6;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🔥 TOC 全局降维打击：对抗 .article-toc__item--h2/h3/h4 等高权重类名
+  //    确保 verticalScale:0 时，TOC 项间无任何残留物理间隙
+  // ═══════════════════════════════════════════════════════════════
+  [class*='article-toc'] {
+    // 🔥 排除 .is-horizontal，防止污染 Tags 横排的双轴 gap
+    ul:not(.is-horizontal),
+    ol:not(.is-horizontal) {
+      gap: var(--palo-nav-vertical-space, 0px) 0 !important;
+    }
+
+    // 仅对列表项内部进行极端物理归零，不碰容器边界
+    li,
+    li > a {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+  }
+}

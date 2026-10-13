@@ -1,0 +1,3369 @@
+---
+import '../styles/tailwind.css'
+import '../assets/scss/index.scss'
+import { existsSync, readdirSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { SEO } from 'astro-seo'
+import Header from '@components/Header.astro'
+import Footer from '@components/Footer.astro'
+import { ClientRouter } from 'astro:transitions'
+import type { ImageMetadata } from 'astro'
+import themeConfig from '@config'
+import { getCanonical } from '@utils/trailingSlash'
+
+interface Props {
+  /**
+   * The title of the page
+   */
+  title?: string
+  /**
+   * The description of the page
+   */
+  description?: string
+  /**
+   * The image path for social sharing (can be ImageMetadata or string path)
+   */
+  image?: ImageMetadata | string | null
+  /**
+   * The author of the page
+   */
+  author?: string
+  /**
+   * The type of content (default: 'website')
+   */
+  type?: 'website' | 'article'
+  /**
+   * Whether to use the title template (default: true)
+   * Set to false to use the title as-is without appending site name
+   */
+  useTitleTemplate?: boolean
+  /**
+   * Whether the page has an immersive Hero / fullscreen PageHeader overlay.
+   * When true, &lt;main&gt; receives 0 padding-top so the hero sits flush at top: 0.
+   */
+  hasHero?: boolean
+  /**
+   * Top navigation theme when scrolled to top on hero/page-header pages.
+   */
+  topNavigationTheme?: '' | 'dark' | 'light'
+}
+
+const {
+  title = themeConfig.metadata.title,
+  description = themeConfig.metadata.description ?? '',
+  image = themeConfig.metadata.image ?? null,
+  author = themeConfig.metadata.author ?? '',
+  type = 'website',
+  useTitleTemplate = true,
+} = Astro.props
+
+const isHomePage = Astro.url.pathname === '/'
+
+// ──────────────────────────────────────────────
+//  Canonical URL & Trailing Slash Logic
+// ──────────────────────────────────────────────
+const rawSiteUrl = String(themeConfig.metadata.siteUrl ?? '').trim()
+const siteUrl = rawSiteUrl.replace(/\/\/+$/, '')
+const hasSiteUrl = Boolean(siteUrl)
+/**
+ * Ensure a path starts with '/'.
+ * If path is empty or undefined, defaults to the Palo social preview image.
+ */
+function ensureLeadingSlash(p: string): string {
+  if (!p || p.trim() === '') {
+    return '/branding/social-preview-image.gif'
+  }
+  return p.startsWith('/') ? p : `/${p}`
+}
+
+/**
+ * Build a URL for an image path.
+ * If siteUrl is not configured, return a site-relative path.
+ */
+function buildImageUrl(img: ImageMetadata | string | null): string {
+  const path = !img ? '/branding/social-preview-image.gif' : typeof img === 'string' ? img : img.src
+  const safePath = ensureLeadingSlash(path)
+
+  if (!hasSiteUrl) {
+    return safePath
+  }
+
+  return new URL(safePath, `${siteUrl}/`).href
+}
+
+// Generate canonical URL from the current request URL's pathname
+const canonicalUrl = getCanonical(Astro.url.pathname, themeConfig.metadata.siteUrl)
+
+// Generate OG image URL
+const imageUrl = buildImageUrl(image)
+
+// ──────────────────────────────────────────────
+//  Dynamic title generation
+//  Rules:
+//    - Homepage without explicit title + metadata.title set → show metadata.title directly
+//    - Homepage without explicit title + metadata.title empty → show Home {separator} {siteName}
+//    - All other cases → {pageTitle} {separator} {siteName}
+// ──────────────────────────────────────────────
+const hasExplicitTitle = 'title' in Astro.props
+const hasMetadataTitle = Boolean(themeConfig.metadata.title?.trim())
+const isHomeWithoutExplicitTitle = isHomePage && !hasExplicitTitle
+const homeFallbackTitle = 'Home'
+const formatDisplayTitleSegment = (value: string) =>
+  themeConfig.typography.uppercaseDisplayText ? value.toUpperCase() : value
+
+const seoTitle = isHomeWithoutExplicitTitle
+  ? hasMetadataTitle
+    ? formatDisplayTitleSegment(themeConfig.metadata.title)
+    : formatDisplayTitleSegment(homeFallbackTitle)
+  : formatDisplayTitleSegment(title)
+const seoTitleTemplate =
+  isHomeWithoutExplicitTitle && hasMetadataTitle ? undefined : !useTitleTemplate ? undefined : `%s ${themeConfig.site.titleSeparator} ${themeConfig.site.name}`
+const defaultTheme = themeConfig.site.defaultTheme ?? 'auto'
+const darkModeToggle = themeConfig.site.darkModeToggle
+const enableCustomCursor = themeConfig.site.enableCustomCursor ?? false
+const hideScrollbar = themeConfig.site.hideScrollbar ?? true
+
+// ──────────────────────────────────────────────
+//  Dynamic brand variables from config.yaml
+// ──────────────────────────────────────────────
+const {
+  branding: { colors, font },
+  layout,
+  typography,
+} = themeConfig
+
+const navMinHeight = themeConfig.navigation?.minHeight ?? '6rem'
+const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+const headerBgOpacity = themeConfig.navigation?.headerBackgroundOpacity ?? layout.headerBackgroundOpacity ?? 0.45
+const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.headerBackgroundBlur ?? '10px'
+/* eslint-disable-next-line no-unused-vars */
+const shieldHeaderPosition = fixedHeader ? 'fixed' : 'absolute'
+
+// ── .palo-nav-list 间距配置（CSS 变量驱动，不依赖动态 Tailwind 类名拼接） ──
+const navListHorizontalGapClass = themeConfig.navigation?.navList?.horizontalGap ?? 'gap-4'
+const navListVerticalScale = themeConfig.navigation?.navList?.verticalScale ?? 1
+
+/** Tailwind gap 类名 → rem 值映射（31 项，严格对齐 Tailwind CSS 官方标准） */
+const tailwindGapToRem = (gapClass: string): string => {
+  const map: Record<string, string> = {
+    'gap-0': '0px',    'gap-px': '1px',
+    'gap-1': '0.25rem', 'gap-2': '0.5rem',  'gap-3': '0.75rem',
+    'gap-4': '1rem',    'gap-5': '1.25rem', 'gap-6': '1.5rem',
+    'gap-7': '1.75rem', 'gap-8': '2rem',    'gap-9': '2.25rem',
+    'gap-10': '2.5rem', 'gap-11': '2.75rem','gap-12': '3rem',
+    'gap-14': '3.5rem', 'gap-16': '4rem',   'gap-20': '5rem',
+    'gap-24': '6rem',   'gap-28': '7rem',   'gap-32': '8rem',
+    'gap-36': '9rem',   'gap-40': '10rem',  'gap-44': '11rem',
+    'gap-48': '12rem',  'gap-52': '13rem',  'gap-56': '14rem',
+    'gap-60': '15rem',  'gap-64': '16rem',  'gap-72': '18rem',
+    'gap-80': '20rem',  'gap-96': '24rem',
+  }
+  return map[gapClass] ?? '1rem'
+}
+const navListHorizontalGapRem = tailwindGapToRem(navListHorizontalGapClass)
+const hasHero = Astro.props.hasHero ?? false
+const topNavigationTheme = Astro.props.topNavigationTheme ?? ''
+const mainPaddingTop = !hasHero ? navMinHeight : '0'
+
+const rootFontSizePx = Number.parseFloat(typography.baseFontSize)
+
+// ──────────────────────────────────────────────
+//  正文字号阶梯 / Body text size scale
+//  xs → -2, sm → -1, base → 0, md → 1 ... 9xl → 11
+// ──────────────────────────────────────────────
+const textSizeStepMap = [
+  ['xs', -2],
+  ['sm', -1],
+  ['base', 0],
+  ['md', 1],
+  ['lg', 2],
+  ['xl', 3],
+  ['2xl', 4],
+  ['3xl', 5],
+  ['4xl', 6],
+  ['5xl', 7],
+  ['6xl', 8],
+  ['7xl', 9],
+  ['8xl', 10],
+  ['9xl', 11],
+] as const
+
+const bodyTextStepRatio = 1.25
+const calculateBodyTextSize = (step: number) => {
+  const ratio = step >= 0 ? Math.pow(bodyTextStepRatio, step) : 1 / Math.pow(bodyTextStepRatio, Math.abs(step))
+  return `${(ratio * rootFontSizePx) / 16}rem`
+}
+
+const bodyTextSizes = textSizeStepMap
+  .map(([size, step]) => `  --text-${size}: ${calculateBodyTextSize(step)} !important;`)
+  .join('\n')
+
+// 生成行高 CSS 变量 / Generate line-height variables
+const lineHeights: Record<string, number> = {
+  xs: 1.4,
+  sm: 1.5,
+  base: 1.6,
+  md: 1.6,
+  lg: 1.625,
+  xl: 1.4,
+  '2xl': 1.33,
+  '3xl': 1.2,
+  '4xl': 1.1,
+  '5xl': 1.05,
+  '6xl': 1,
+  '7xl': 1,
+  '8xl': 1,
+  '9xl': 1,
+}
+
+const bodyLineHeights = Object.entries(lineHeights).map(([size, lh]) => {
+  return `  --text-${size}--line-height: calc(${lh} * var(--line-height-scale)) !important;`
+}).join('\n')
+
+// ──────────────────────────────────────────────
+//  Color-to-RGB helper for pulse colors
+//  Accepts hex (#333, #333333) or named CSS colors ('orange').
+// ──────────────────────────────────────────────
+function colorToRgbTriplet(color: string): string {
+  // Named CSS color → hex map (common subset)
+  const namedColorMap: Record<string, string> = {
+    orange: '#ffa500',
+    red: '#ff0000',
+    blue: '#0000ff',
+    green: '#008000',
+    yellow: '#ffff00',
+    purple: '#800080',
+    pink: '#ffc0cb',
+    cyan: '#00ffff',
+    white: '#ffffff',
+    black: '#000000',
+    gray: '#808080',
+    grey: '#808080',
+    silver: '#c0c0c0',
+    maroon: '#800000',
+    navy: '#000080',
+    olive: '#808000',
+    teal: '#008080',
+    aqua: '#00ffff',
+    fuchsia: '#ff00ff',
+    lime: '#00ff00',
+  }
+  const hex = namedColorMap[color.toLowerCase()] ?? color
+  return hexToRgbTriplet(hex)
+}
+
+function hexToRgbTriplet(hex: string): string {
+  // Strip # and handle shorthand hex (e.g. #333 → #333333)
+  let normalized = hex.replace(/^#/, '')
+  if (normalized.length === 3) {
+    normalized = normalized
+      .split('')
+      .map((c) => c + c)
+      .join('')
+  }
+  const num = parseInt(normalized, 16)
+  if (isNaN(num)) return '0, 0, 0'
+  const r = (num >> 16) & 255
+  const g = (num >> 8) & 255
+  const b = num & 255
+  return `${r}, ${g}, ${b}`
+}
+
+const defaultContainerMaxWidth = '90rem'
+const cssLengthPattern = /^\d+(\.\d+)?(px|rem|em|vw|vh|vmin|vmax|ch|cm|mm|in|pc|%)$/i
+const textSizeTokenMap: Record<string, string> = {
+  ...Object.fromEntries(textSizeStepMap.map(([size]) => [size, `var(--text-${size})`])),
+  ...Object.fromEntries(textSizeStepMap.map(([size, step]) => [String(step), `var(--text-${size})`])),
+}
+
+const resolveTextSizeToken = (rawValue: string): string | null => {
+  const raw = rawValue.trim().toLowerCase()
+  const unwrapped = raw.match(/^var\((--[^)]+)\)$/)?.[1] ?? raw
+  const token = unwrapped
+    .replace(/^--/, '')
+    .replace(/^text-/, '')
+    .replace(/^font-size-/, '')
+
+  return textSizeTokenMap[token] ?? null
+}
+
+const resolveCssLength = (rawValue: unknown, fallback: string): string => {
+  const raw = String(rawValue ?? '').trim()
+  if (!raw) {
+    return fallback
+  }
+
+  if (cssLengthPattern.test(raw)) {
+    return raw
+  }
+
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    return `${raw}px`
+  }
+
+  return fallback
+}
+
+const resolveFontSizeValue = (rawValue: unknown, fallback: string): string => {
+  const raw = String(rawValue ?? '').trim()
+  if (!raw) {
+    return fallback
+  }
+
+  return resolveTextSizeToken(raw) ?? resolveCssLength(raw, fallback)
+}
+
+const containerMaxWidth = (() => {
+  const raw = String(layout.containerMaxWidth ?? '').trim()
+  const resolved = resolveCssLength(raw, defaultContainerMaxWidth)
+
+  if (raw && resolved === defaultContainerMaxWidth && raw !== defaultContainerMaxWidth) {
+    console.warn(
+      `\n[Config Warning] layout.containerMaxWidth '${raw}' is not a valid CSS length. Falling back to ${defaultContainerMaxWidth}.\n`,
+    )
+  }
+
+  return resolved
+})()
+
+const defaultBorderWidth = resolveCssLength(themeConfig.border?.global, '3px')
+const buttonBorderWidth = resolveCssLength(themeConfig.border?.button, defaultBorderWidth)
+const cardBorderWidth = resolveCssLength(themeConfig.border?.card, defaultBorderWidth)
+const accordionBorderWidth = resolveCssLength(themeConfig.border?.accordion, defaultBorderWidth)
+const tabsBorderWidth = resolveCssLength(themeConfig.border?.tabs, defaultBorderWidth)
+const avatarBorderWidth = resolveCssLength(themeConfig.border?.avatar, defaultBorderWidth)
+const badgeBorderWidth = resolveCssLength(themeConfig.border?.badge, defaultBorderWidth)
+const notificationBorderWidth = resolveCssLength(themeConfig.border?.notification, defaultBorderWidth)
+const formBorderWidth = resolveCssLength(themeConfig.border?.form, defaultBorderWidth)
+const paginationBorderWidth = resolveCssLength(themeConfig.border?.pagination, defaultBorderWidth)
+const toggleBorderWidth = resolveCssLength(themeConfig.border?.toggle, defaultBorderWidth)
+const mediaBorderWidth = resolveCssLength(themeConfig.border?.media, defaultBorderWidth)
+const surfaceBorderWidth = resolveCssLength(themeConfig.border?.surface, defaultBorderWidth)
+const codeBlockBorderWidth = resolveCssLength(themeConfig.border?.codeBlock, surfaceBorderWidth)
+const modalBorderWidth = resolveCssLength(themeConfig.border?.modal, surfaceBorderWidth)
+const dividerBorderWidth = resolveCssLength(themeConfig.border?.divider, defaultBorderWidth)
+const defaultRadiusSize = resolveCssLength(themeConfig.radius?.global, '0.5rem')
+const buttonRadiusSize = resolveCssLength(themeConfig.radius?.button, defaultRadiusSize)
+const cardRadiusSize = resolveCssLength(themeConfig.radius?.card, defaultRadiusSize)
+const mediaRadiusSize = resolveCssLength(themeConfig.radius?.media, defaultRadiusSize)
+const tabsRadiusSize = resolveCssLength(themeConfig.radius?.tabs, defaultRadiusSize)
+const avatarRadiusSize = resolveCssLength(themeConfig.radius?.avatar, defaultRadiusSize)
+const badgeRadiusSize = resolveCssLength(themeConfig.radius?.badge, defaultRadiusSize)
+const formRadiusSize = resolveCssLength(themeConfig.radius?.form, defaultRadiusSize)
+const notificationRadiusSize = resolveCssLength(themeConfig.radius?.notification, defaultRadiusSize)
+const paginationRadiusSize = resolveCssLength(themeConfig.radius?.pagination, defaultRadiusSize)
+const toggleRadiusSize = resolveCssLength(themeConfig.radius?.toggle, defaultRadiusSize)
+const surfaceRadiusSize = resolveCssLength(themeConfig.radius?.surface, defaultRadiusSize)
+const codeBlockRadiusSize = resolveCssLength(themeConfig.radius?.codeBlock, surfaceRadiusSize)
+const modalRadiusSize = resolveCssLength(themeConfig.radius?.modal, surfaceRadiusSize)
+
+const navigationDesktopFontSize = resolveFontSizeValue(
+  themeConfig.navigation?.desktopFontSize ?? typography.navigationDesktopFontSize,
+  typography.baseFontSize,
+)
+const navigationMobileFontSize = resolveFontSizeValue(
+  themeConfig.navigation?.mobileFontSize ?? typography.navigationMobileFontSize,
+  typography.baseFontSize,
+)
+const navigationDropdownDesktopFontSize = resolveFontSizeValue(
+  themeConfig.navigation?.dropdownDesktopFontSize ?? typography.navigationDropdownDesktopFontSize,
+  navigationDesktopFontSize,
+)
+const navigationDropdownMobileFontSize = resolveFontSizeValue(
+  themeConfig.navigation?.dropdownMobileFontSize ?? typography.navigationDropdownMobileFontSize,
+  navigationMobileFontSize,
+)
+const logoSize = resolveFontSizeValue(themeConfig.branding?.logoSize, navigationDesktopFontSize)
+
+const publicRoot = resolve(process.cwd(), 'public')
+const fontDirectory = resolve(publicRoot, font.path.replace(/^\//, ''))
+
+const fontWeightFileHints: Record<number, string[]> = {
+  100: ['thin', '100'],
+  200: ['extralight', 'extra-light', '200'],
+  300: ['light', '300'],
+  400: ['regular', '400'],
+  500: ['medium', '500'],
+  600: ['semibold', 'semi-bold', '600'],
+  700: ['bold', '700'],
+  800: ['extrabold', 'extra-bold', '800'],
+  900: ['black', '900'],
+}
+
+const getPublicUrl = (absoluteFilePath: string): string => {
+  const relativePath = absoluteFilePath.slice(publicRoot.length).replace(/\\/g, '/')
+  return relativePath.startsWith('/') ? relativePath : `/${relativePath}`
+}
+
+const findFontFiles = (): string[] => {
+  if (!existsSync(fontDirectory)) return []
+
+  const stack = [fontDirectory]
+  const files: string[] = []
+
+  while (stack.length > 0) {
+    const currentDirectory = stack.pop()
+    if (!currentDirectory) continue
+
+    for (const entry of readdirSync(currentDirectory, { withFileTypes: true })) {
+      const entryPath = resolve(currentDirectory, entry.name)
+
+      if (entry.isDirectory()) {
+        stack.push(entryPath)
+        continue
+      }
+
+      if (/\.(woff2|woff|ttf|otf)$/i.test(entry.name)) {
+        files.push(entryPath)
+      }
+    }
+  }
+
+  return files.sort()
+}
+
+const availableFontFiles = findFontFiles()
+const uniqueConfiguredWeights = [...new Set([font.weights.body, font.weights.accent, font.weights.heading])]
+
+const selectStaticFontFile = (weight: number): string | null => {
+  const hints = fontWeightFileHints[weight] ?? [String(weight)]
+  const normalizedFiles = availableFontFiles.map((filePath) => ({
+    path: filePath,
+    name: filePath.split('/').pop()?.toLowerCase() ?? '',
+  }))
+
+  for (const hint of hints) {
+    const match = normalizedFiles.find((file) => file.name.includes(hint))
+    if (match) return match.path
+  }
+
+  return null
+}
+
+const variableFontFile =
+  availableFontFiles.find(
+    (filePath) =>
+      /variablefont/i.test(filePath) &&
+      !/italic/i.test(filePath) &&
+      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
+  ) ?? null
+
+const variableFontItalicFile =
+  availableFontFiles.find(
+    (filePath) =>
+      /italic/i.test(filePath) &&
+      /variablefont/i.test(filePath) &&
+      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
+  ) ?? null
+
+const selectStaticItalicFontFile = (weight: number): string | null => {
+  const hints = fontWeightFileHints[weight] ?? [String(weight)]
+  const normalizedFiles = availableFontFiles
+    .filter((filePath) => /italic/i.test(filePath) && !/variablefont/i.test(filePath))
+    .map((filePath) => ({
+      path: filePath,
+      name: filePath.split('/').pop()?.toLowerCase() ?? '',
+    }))
+
+  for (const hint of hints) {
+    const match = normalizedFiles.find((file) => file.name.includes(hint))
+    if (match) return match.path
+  }
+
+  return null
+}
+
+const buildFontFaceCss = (): string => {
+  if (variableFontFile) {
+    const publicUrl = getPublicUrl(variableFontFile)
+    const format = publicUrl.endsWith('.woff2')
+      ? 'woff2'
+      : publicUrl.endsWith('.woff')
+        ? 'woff'
+        : publicUrl.endsWith('.otf')
+          ? 'opentype'
+          : 'truetype'
+
+    let fontFaceRules = `
+@font-face {
+  font-family: "${font.name}";
+  src: url("${publicUrl}") format("${format}");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+`.trim()
+
+    if (variableFontItalicFile) {
+      const italicPublicUrl = getPublicUrl(variableFontItalicFile)
+      const italicFormat = italicPublicUrl.endsWith('.woff2')
+        ? 'woff2'
+        : italicPublicUrl.endsWith('.woff')
+          ? 'woff'
+          : italicPublicUrl.endsWith('.otf')
+            ? 'opentype'
+            : 'truetype'
+
+      fontFaceRules += `
+
+@font-face {
+  font-family: "${font.name}";
+  src: url("${italicPublicUrl}") format("${italicFormat}");
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}`
+    }
+
+    return fontFaceRules
+  }
+
+  let fontFaceRules = uniqueConfiguredWeights
+    .map((weight) => {
+      const filePath = selectStaticFontFile(weight)
+      if (!filePath) return ''
+
+      const publicUrl = getPublicUrl(filePath)
+      const format = publicUrl.endsWith('.woff2')
+        ? 'woff2'
+        : publicUrl.endsWith('.woff')
+          ? 'woff'
+          : publicUrl.endsWith('.otf')
+            ? 'opentype'
+            : 'truetype'
+
+      let rule = `
+@font-face {
+  font-family: "${font.name}";
+  src: url("${publicUrl}") format("${format}");
+  font-style: normal;
+  font-weight: ${weight};
+  font-display: swap;
+}`.trim()
+
+      const italicFilePath = selectStaticItalicFontFile(weight)
+      if (italicFilePath) {
+        const italicPublicUrl = getPublicUrl(italicFilePath)
+        const italicFormat = italicPublicUrl.endsWith('.woff2')
+          ? 'woff2'
+          : italicPublicUrl.endsWith('.woff')
+            ? 'woff'
+            : italicPublicUrl.endsWith('.otf')
+              ? 'opentype'
+              : 'truetype'
+
+        rule += `
+
+@font-face {
+  font-family: "${font.name}";
+  src: url("${italicPublicUrl}") format("${italicFormat}");
+  font-style: italic;
+  font-weight: ${weight};
+  font-display: swap;
+}`
+      }
+
+      return rule
+    })
+    .filter(Boolean)
+    .join('\n')
+
+  return fontFaceRules
+}
+
+const fontFaceCss = buildFontFaceCss()
+
+// Preload body weight font for reduced CLS
+const bodyFontFile = variableFontFile ?? selectStaticFontFile(font.weights.body)
+const bodyFontPreloadUrl = bodyFontFile ? getPublicUrl(bodyFontFile) : null
+const bodyFontIsWoff2 = bodyFontPreloadUrl?.endsWith('.woff2') ?? false
+
+// Preload accent weight font for instant navigation text (no FOUT)
+const navFontFile = selectStaticFontFile(font.weights.accent)
+const navFontPreloadUrl = navFontFile ? getPublicUrl(navFontFile) : null
+
+const mobileScale = typography.mobileHeadingScale
+const desktopScale = typography.desktopHeadingScale
+const viewportMin = 375
+const viewportMax = 1440
+const buildScaleStep = (step: number) => {
+  const mobileValueRem = step >= 0 ? Math.pow(mobileScale, step) : 1 / Math.pow(mobileScale, Math.abs(step))
+  const desktopValueRem = step >= 0 ? Math.pow(desktopScale, step) : 1 / Math.pow(desktopScale, Math.abs(step))
+  const mobileValuePx = mobileValueRem * rootFontSizePx
+  const desktopValuePx = desktopValueRem * rootFontSizePx
+  const slope = ((desktopValuePx - mobileValuePx) / (viewportMax - viewportMin)) * 100
+  const intercept = (mobileValuePx - (slope * viewportMin) / 100) / rootFontSizePx
+
+  return {
+    min: Math.min(mobileValueRem, desktopValueRem),
+    max: Math.max(mobileValueRem, desktopValueRem),
+    slope,
+    intercept,
+  }
+}
+
+const fontScaleSteps = [-2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const
+const fontScaleMap = Object.fromEntries(fontScaleSteps.map((step) => [step, buildScaleStep(step)])) as Record<
+  (typeof fontScaleSteps)[number],
+  { min: number; max: number; slope: number; intercept: number }
+>
+
+const themeVariablesCss = `
+:root:root {
+  --header-height: var(--nav-min-height);
+  --nav-min-height: ${navMinHeight};
+  --header-bg-opacity: ${headerBgOpacity};
+  --header-bg-blur: ${headerBgBlur};
+
+  /* Launcher 按钮关键 CSS 变量 — 与 accessible-astro-launcher 包 :root 值逐字一致 */
+  --launcher-theme-light: #fff;
+  --launcher-theme-dark: #090b0f;
+  --launcher-text-color: light-dark(oklch(from var(--launcher-theme-light) 0% c h), oklch(from var(--launcher-theme-dark) 85% c h));
+  --launcher-action-bar-color: light-dark(oklch(from var(--launcher-theme-light) 100% c h), oklch(from var(--launcher-theme-dark) 20% c h));
+  --launcher-inner-border-color: light-dark(oklch(from var(--launcher-theme-light) 80% c h), oklch(from var(--launcher-theme-dark) 40% c h));
+  --launcher-border-interaction-color: light-dark(oklch(from var(--launcher-theme-light) 10% c h), oklch(from var(--launcher-theme-dark) 80% c h));
+  --launcher-kbd-background-color: light-dark(oklch(from var(--launcher-theme-light) 90% c h), oklch(from var(--launcher-theme-dark) 40% c h));
+  --launcher-kbd-text-color: light-dark(oklch(from var(--launcher-theme-light) 0% c h), oklch(from var(--launcher-theme-dark) 90% c h));
+  --launcher-radius-sm: 0.25rem;
+  --launcher-radius-md: 0.5rem;
+  --launcher-trigger-width-min: 44px;
+  --launcher-trigger-width-max: 350px;
+  --launcher-trigger-height: 40px;
+  --launcher-trigger-compact-width: 95px;
+  --launcher-trigger-compact-height: 40px;
+  --launcher-trigger-icon-only-size: 44px;
+  --launcher-font-size-xs: clamp(0.5831rem, 0.5778rem + 0.027vw, 0.59rem);
+  --launcher-font-size-sm: clamp(0.6944rem, 0.6855rem + 0.0446vw, 0.72rem);
+  --launcher-font-size-md: clamp(0.8331rem, 0.8099rem + 0.1163vw, 0.9rem);
+  --launcher-space-xs: clamp(0.25rem, 0.2283rem + 0.1087vw, 0.3125rem);
+  --launcher-space-sm: clamp(0.5rem, 0.4783rem + 0.1087vw, 0.5625rem);
+  --launcher-animation-duration: var(--animation-speed-fast);
+  --launcher-animation-timing: var(--cubic-bezier);
+  font-size: ${typography.baseFontSize};
+  --m-scale: ${mobileScale};
+  --d-scale: ${desktopScale};
+  --line-height-scale: ${typography.lineHeightScale};
+  --heading-line-height-scale: ${typography.headingLineHeightScale};
+
+  --brand-primary: ${colors.primary} !important;
+  --brand-secondary: ${colors.secondary} !important;
+  --brand-neutral: ${colors.neutral} !important;
+  --brand-outline: ${colors.outline} !important;
+
+  --color-pulse-primary: ${colorToRgbTriplet(colors.primary)} !important;
+  --color-pulse-secondary: ${colorToRgbTriplet(colors.secondary)} !important;
+
+  --brand-info: ${colors.info} !important;
+  --brand-success: ${colors.success} !important;
+  --brand-warning: ${colors.warning} !important;
+  --brand-error: ${colors.error} !important;
+
+  --color-pulse-info: ${colorToRgbTriplet(colors.info)} !important;
+  --color-pulse-success: ${colorToRgbTriplet(colors.success)} !important;
+  --color-pulse-warning: ${colorToRgbTriplet(colors.warning)} !important;
+  --color-pulse-error: ${colorToRgbTriplet(colors.error)} !important;
+
+  /* Semantic color variables — override accessible-astro-components hardcoded HSL values */
+  --color-default-border: light-dark(var(--color-neutral-700), var(--color-neutral-400)) !important;
+  --color-default-bg: light-dark(var(--color-neutral-200), var(--color-neutral-800)) !important;
+  --color-default-text: light-dark(var(--color-neutral-900), var(--color-neutral-100)) !important;
+  --color-primary-bg: light-dark(var(--color-primary-200), var(--color-primary-500)) !important;
+  --color-secondary-bg: light-dark(var(--color-secondary-200), var(--color-secondary-500)) !important;
+  --color-info-border: var(--brand-info) !important;
+  --color-info-bg: light-dark(var(--color-info-200), var(--color-info-400)) !important;
+  --color-info-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-success-border: var(--brand-success) !important;
+  --color-success-bg: light-dark(var(--color-success-200), var(--color-success-400)) !important;
+  --color-success-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-warning-border: var(--brand-warning) !important;
+  --color-warning-bg: light-dark(var(--color-warning-200), var(--color-warning-400)) !important;
+  --color-warning-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-error-border: var(--brand-error) !important;
+  --color-error-bg: light-dark(var(--color-error-200), var(--color-error-400)) !important;
+  --color-error-text: light-dark(var(--color-neutral-800), var(--color-neutral-100)) !important;
+  --color-pulse-default: 100, 100, 100;
+
+  --font-family-name: "${font.name}";
+  --font-body-family: "${font.name}";
+  --font-heading-family: "${font.name}";
+  --font-family-default: "${font.name}", sans-serif;
+  --font-family-special: "${font.name}", sans-serif;
+  --font-heading: var(--font-family-special);
+  --font-body: var(--font-family-default);
+  --font-weight-body: ${font.weights.body};
+  --font-weight-accent: ${font.weights.accent};
+  --font-weight-heading: ${font.weights.heading};
+  --font-cap-height-offset: ${font.capHeightOffset || '-0.05em'};
+  --line-height-scale: ${typography.lineHeightScale};
+  --border-width-global: ${defaultBorderWidth};
+  --border-width-button: ${buttonBorderWidth};
+  --border-width-card: ${cardBorderWidth};
+  --border-width-accordion: ${accordionBorderWidth};
+  --border-width-tabs: ${tabsBorderWidth};
+  --border-width-avatar: ${avatarBorderWidth};
+  --border-width-badge: ${badgeBorderWidth};
+  --border-width-notification: ${notificationBorderWidth};
+  --border-width-form: ${formBorderWidth};
+  --border-width-pagination: ${paginationBorderWidth};
+  --border-width-toggle: ${toggleBorderWidth};
+  --border-width-media: ${mediaBorderWidth};
+  --border-width-surface: ${surfaceBorderWidth};
+  --border-width-code-block: ${codeBlockBorderWidth};
+  --border-width-modal: ${modalBorderWidth};
+  --border-width-divider: ${dividerBorderWidth};
+  --radius-global: ${defaultRadiusSize};
+  --radius-xs: calc(${defaultRadiusSize} * 0.25);
+  --radius-s: calc(${defaultRadiusSize} * 0.5);
+  --radius-m: ${defaultRadiusSize};
+  --radius-l: calc(${defaultRadiusSize} * 1.5);
+  --radius-h: calc(${defaultRadiusSize} * 2);
+  --radius-md: var(--radius-m);
+  --radius-small: var(--radius-s);
+  --radius-large: var(--radius-m);
+  --radius-button: ${buttonRadiusSize};
+  --radius-card: ${cardRadiusSize};
+  --radius-media: ${mediaRadiusSize};
+  --radius-tabs: ${tabsRadiusSize};
+  --radius-avatar: ${avatarRadiusSize};
+  --radius-badge: ${badgeRadiusSize};
+  --radius-form: ${formRadiusSize};
+  --radius-notification: ${notificationRadiusSize};
+  --radius-pagination: ${paginationRadiusSize};
+  --radius-toggle: ${toggleRadiusSize};
+  --radius-surface: ${surfaceRadiusSize};
+  --radius-code-block: ${codeBlockRadiusSize};
+  --radius-modal: ${modalRadiusSize};
+  --navigation-desktop-font-size: ${navigationDesktopFontSize};
+  --navigation-mobile-font-size: ${navigationMobileFontSize};
+  --navigation-dropdown-desktop-font-size: ${navigationDropdownDesktopFontSize};
+  --navigation-dropdown-mobile-font-size: ${navigationDropdownMobileFontSize};
+  --palo-nav-horizontal-space: ${navListHorizontalGapRem};
+  --palo-nav-vertical-scale: ${navListVerticalScale};
+  --palo-nav-heading-gap: calc(1em * var(--line-height-body, 1.5) * var(--palo-nav-vertical-scale, 1) * 1.5);
+  --line-height-body: calc(1.6 * var(--line-height-scale));
+  --logo-size: ${logoSize};
+  --display-text-transform: ${typography.uppercaseDisplayText ? 'uppercase' : 'none'};
+  --font-size--2: clamp(${fontScaleMap[-2].min}rem, calc(${fontScaleMap[-2].intercept}rem + ${fontScaleMap[-2].slope}vw), ${fontScaleMap[-2].max}rem) !important;
+  --font-size--1: clamp(${fontScaleMap[-1].min}rem, calc(${fontScaleMap[-1].intercept}rem + ${fontScaleMap[-1].slope}vw), ${fontScaleMap[-1].max}rem) !important;
+  --font-size-0: clamp(${fontScaleMap[0].min}rem, calc(${fontScaleMap[0].intercept}rem + ${fontScaleMap[0].slope}vw), ${fontScaleMap[0].max}rem) !important;
+  --font-size-1: clamp(${fontScaleMap[1].min}rem, calc(${fontScaleMap[1].intercept}rem + ${fontScaleMap[1].slope}vw), ${fontScaleMap[1].max}rem) !important;
+  --font-size-2: clamp(${fontScaleMap[2].min}rem, calc(${fontScaleMap[2].intercept}rem + ${fontScaleMap[2].slope}vw), ${fontScaleMap[2].max}rem) !important;
+  --font-size-3: clamp(${fontScaleMap[3].min}rem, calc(${fontScaleMap[3].intercept}rem + ${fontScaleMap[3].slope}vw), ${fontScaleMap[3].max}rem) !important;
+  --font-size-4: clamp(${fontScaleMap[4].min}rem, calc(${fontScaleMap[4].intercept}rem + ${fontScaleMap[4].slope}vw), ${fontScaleMap[4].max}rem) !important;
+  --font-size-5: clamp(${fontScaleMap[5].min}rem, calc(${fontScaleMap[5].intercept}rem + ${fontScaleMap[5].slope}vw), ${fontScaleMap[5].max}rem) !important;
+  --font-size-6: clamp(${fontScaleMap[6].min}rem, calc(${fontScaleMap[6].intercept}rem + ${fontScaleMap[6].slope}vw), ${fontScaleMap[6].max}rem) !important;
+  --font-size-7: clamp(${fontScaleMap[7].min}rem, calc(${fontScaleMap[7].intercept}rem + ${fontScaleMap[7].slope}vw), ${fontScaleMap[7].max}rem) !important;
+  --font-size-8: clamp(${fontScaleMap[8].min}rem, calc(${fontScaleMap[8].intercept}rem + ${fontScaleMap[8].slope}vw), ${fontScaleMap[8].max}rem) !important;
+  --font-size-9: clamp(${fontScaleMap[9].min}rem, calc(${fontScaleMap[9].intercept}rem + ${fontScaleMap[9].slope}vw), ${fontScaleMap[9].max}rem) !important;
+  --font-size-10: clamp(${fontScaleMap[10].min}rem, calc(${fontScaleMap[10].intercept}rem + ${fontScaleMap[10].slope}vw), ${fontScaleMap[10].max}rem) !important;
+  --font-size-11: clamp(${fontScaleMap[11].min}rem, calc(${fontScaleMap[11].intercept}rem + ${fontScaleMap[11].slope}vw), ${fontScaleMap[11].max}rem) !important;
+  --font-size-12: clamp(${fontScaleMap[12].min}rem, calc(${fontScaleMap[12].intercept}rem + ${fontScaleMap[12].slope}vw), ${fontScaleMap[12].max}rem) !important;
+  --font-size-13: clamp(${fontScaleMap[13].min}rem, calc(${fontScaleMap[13].intercept}rem + ${fontScaleMap[13].slope}vw), ${fontScaleMap[13].max}rem) !important;
+  /* 正文文本 - 基于 baseFontSize 动态计算 */
+${bodyTextSizes}
+${bodyLineHeights}
+
+  --grid-max-width: ${containerMaxWidth};
+
+  /* ── 语义颜色令牌（内联到首帧，慢速网络首帧即有颜色）── */
+  --color-neutral-100: oklch(from var(--brand-neutral) 100% 0 0);
+  --color-neutral-200: oklch(from var(--brand-neutral) 95% c h);
+  --color-neutral-300: oklch(from var(--brand-neutral) 90% c h);
+  --color-neutral-700: oklch(from var(--brand-neutral) 40% c h);
+  --color-neutral-800: oklch(from var(--brand-neutral) 30% c h);
+  --color-neutral-900: oklch(from var(--brand-neutral) 15% c h);
+  --color-primary-400: oklch(from var(--brand-primary) 60% c h);
+  --color-secondary-100: oklch(from var(--brand-secondary) 90% c h);
+  --color-secondary-200: oklch(from var(--brand-secondary) 80% c h);
+  --foreground-color: light-dark(var(--color-neutral-800), var(--color-neutral-100));
+  --background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+  --link-color: light-dark(var(--color-primary-400), var(--color-secondary-100));
+  --border-color-subtle: light-dark(var(--color-neutral-300), var(--color-neutral-800));
+}
+`.trim()
+---
+
+<html lang="en" dir="ltr" class:list={[hideScrollbar && 'hide-scrollbar']}>
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline define:vars={{ defaultTheme, darkModeToggle }}>
+      try {
+        const storedTheme = localStorage.getItem('darkMode')
+        // Locked theme: when defaultTheme is explicitly set (not auto) and toggle is off,
+        // force the configured theme and clear any stale localStorage value.
+        if (defaultTheme !== 'auto' && !darkModeToggle) {
+          const useDarkTheme = defaultTheme === 'dark'
+          document.documentElement.classList.toggle('darkmode', useDarkTheme)
+          document.documentElement.style.colorScheme = useDarkTheme ? 'dark' : 'light'
+          if (storedTheme) {
+            localStorage.removeItem('darkMode')
+          }
+        } else if (!storedTheme) {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          const useDarkTheme = defaultTheme === 'dark' || (defaultTheme === 'auto' && prefersDark)
+          document.documentElement.classList.toggle('darkmode', useDarkTheme)
+          document.documentElement.style.colorScheme = useDarkTheme ? 'dark' : 'light'
+        }
+      } catch {
+        // Keep the static light theme if browser storage or media queries are unavailable.
+      }
+    </script>
+
+    {enableCustomCursor && (
+      <script is:inline>
+        document.documentElement.classList.add('has-custom-cursor')
+        document.addEventListener('astro:after-swap', function () {
+          document.documentElement.classList.add('has-custom-cursor')
+        })
+      </script>
+    )}
+
+    <style is:global set:html={`@layer tokens { ${themeVariablesCss} }`}></style>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Anti-FOUC Shield / 刚性尺寸锚定版
+         Slow 4G 下外部 CSS 到达前：
+           • 纯黑底色，系统字体秒开导航文字（不再隐藏）
+           • 导航栏锁死 64px + flex + gap 刚性布局，杜绝字体替换偏移
+           • 右侧动态组件（图标/搜索框）隐藏，防止塌陷撑开
+         font-display: swap 已在 @font-face 声明中配置，文字不会隐形。
+         CSS 就绪后 data-css-ready="true" 激活，骨架平滑绽放。
+         ═══════════════════════════════════════════════════════════════ -->
+    <style is:inline>
+      html:not([data-css-ready="true"]) {
+        background-color: var(--background-color, #f8fafc) !important;
+        color: var(--foreground-color, #1f2937) !important;
+      }
+
+      html:not([data-css-ready="true"]) body {
+        margin: 0 !important;
+        min-height: 100vh !important;
+        background-color: var(--background-color, #f8fafc) !important;
+        color: var(--foreground-color, #1f2937) !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) {
+        background-color: var(--background-color, #0f172a) !important;
+        color: var(--foreground-color, #f8fafc) !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) body {
+        background-color: var(--background-color, #0f172a) !important;
+        color: var(--foreground-color, #f8fafc) !important;
+      }
+
+      /* Header 背景与 Header.astro 内联关键 CSS 保持像素级一致，避免盾牌释放时跳变 */
+      html:not([data-css-ready="true"]) header {
+        position: ${shieldHeaderPosition} !important;
+        inset-block-start: 0 !important;
+        inset-inline-start: 0 !important;
+        inset-inline-end: 0 !important;
+        width: 100% !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+        box-sizing: border-box !important;
+        z-index: 50 !important;
+        background-color: color-mix(
+          in oklab,
+          var(--background-color, #f8fafc) calc(var(--header-bg-opacity, ${headerBgOpacity}) * 100%),
+          transparent
+        ) !important;
+        backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        transition: none !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) header {
+        background-color: color-mix(
+          in oklab,
+          var(--background-color, #0f172a) calc(var(--header-bg-opacity, ${headerBgOpacity}) * 100%),
+          transparent
+        ) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation {
+        background-color: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-menu-open {
+        background-color: var(--background-color, #f8fafc) !important;
+        backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+        -webkit-backdrop-filter: blur(var(--header-bg-blur, ${headerBgBlur})) !important;
+      }
+
+      html.darkmode:not([data-css-ready="true"]) header.is-menu-open {
+        background-color: var(--background-color, #0f172a) !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top:not(.is-menu-open) {
+        background-color: transparent !important;
+        backdrop-filter: blur(0) !important;
+        -webkit-backdrop-filter: blur(0) !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme='light'] {
+        --foreground-color: #1f2937 !important;
+        --background-color: #f8fafc !important;
+        --icon-color: #1f2937 !important;
+        --link-color: #1d4ed8 !important;
+        --link-hover-color: #1e40af !important;
+        --border-color: #111827 !important;
+        --text-decoration-color: #374151 !important;
+        --text-decoration-color-hover: #111827 !important;
+        --outline-color: #d1d5db !important;
+        color-scheme: light !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme='dark'] {
+        --foreground-color: #f8fafc !important;
+        --background-color: #111827 !important;
+        --icon-color: #f8fafc !important;
+        --link-color: #f8fafc !important;
+        --link-hover-color: #e5e7eb !important;
+        --border-color: #f8fafc !important;
+        --text-decoration-color: #e5e7eb !important;
+        --text-decoration-color-hover: #f8fafc !important;
+        --outline-color: #f8fafc !important;
+        color-scheme: dark !important;
+      }
+
+      html:not([data-css-ready="true"]) header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+        color: var(--foreground-color) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation > .container {
+        position: relative !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        max-width: var(--grid-max-width, 90rem) !important;
+        margin-inline-start: auto !important;
+        margin-inline-end: auto !important;
+        padding-inline-start: var(--grid-gutter, 1.5rem) !important;
+        padding-inline-end: var(--grid-gutter, 1.5rem) !important;
+        box-sizing: border-box !important;
+      }
+
+      @media (min-width: 768px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          padding-inline-start: 2rem !important;
+          padding-inline-end: 2rem !important;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          padding-inline-start: 1rem !important;
+          padding-inline-end: 1rem !important;
+        }
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation .nav-bar {
+        display: flex !important;
+        flex: 1 1 100% !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: var(--space-m, 1rem) !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation > .container > .nav-bar > .wrapper {
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-m, 1rem) !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .logo-link {
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-menu {
+        display: none !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-menu > ul {
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-m, 1rem) !important;
+        list-style: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .responsive-toggle,
+      html:not([data-css-ready="true"]) .mobile-launcher {
+        display: flex !important;
+        align-items: center !important;
+        gap: var(--space-2xs, 0.25rem) !important;
+        min-block-size: var(--nav-min-height, 4.5rem) !important;
+      }
+
+      html:not([data-css-ready="true"]) .mobile-menu {
+        display: none !important;
+      }
+
+      @media (min-width: 1050px) {
+        html:not([data-css-ready="true"]) #main-navigation > .container {
+          column-gap: var(--space-l, 1.5rem) !important;
+        }
+
+        html:not([data-css-ready="true"]) #main-navigation .nav-bar {
+          flex: 1 1 auto !important;
+        }
+
+        html:not([data-css-ready="true"]) #main-navigation > .container > .nav-bar > .wrapper {
+          flex: 1 1 auto !important;
+          justify-content: flex-start !important;
+          min-inline-size: 0 !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu {
+          display: grid !important;
+          flex: 1 1 auto !important;
+          grid-template-columns: minmax(0, 1fr) auto !important;
+          align-items: center !important;
+          column-gap: var(--space-m, 1rem) !important;
+          min-inline-size: 0 !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu > ul {
+          display: flex !important;
+          align-items: center !important;
+          gap: var(--space-m, 1rem) !important;
+          list-style: none !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          box-sizing: border-box !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu > ul > li {
+          align-content: center !important;
+        }
+
+        html:not([data-css-ready="true"]) .menu--utility {
+          justify-self: end !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--left .menu--primary {
+          justify-self: start !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--center .menu--primary {
+          justify-self: center !important;
+        }
+
+        html:not([data-css-ready="true"]) .desktop-menu--right .menu--primary {
+          justify-self: end !important;
+        }
+
+        html:not([data-css-ready="true"]) .menu-item {
+          display: flex !important;
+          align-items: center !important;
+          list-style: none !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon {
+          display: block !important;
+          translate: 0 4px !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon button {
+          border: none !important;
+          border-radius: 0 !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon svg {
+          inline-size: 30px !important;
+          block-size: 30px !important;
+        }
+
+        html:not([data-css-ready="true"]) header li.type-icon ~ li.type-icon {
+          margin-inline-start: calc(var(--space-2xs, 0.25rem) * -1) !important;
+        }
+
+        html:not([data-css-ready="true"]) .mobile-launcher,
+        html:not([data-css-ready="true"]) .mobile-menu,
+        html:not([data-css-ready="true"]) .responsive-toggle {
+          display: none !important;
+        }
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation a,
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger) {
+        color: var(--foreground-color, #f8fafc) !important;
+        background-color: transparent !important;
+        border: none !important;
+        text-decoration: none !important;
+        font-size: var(--navigation-desktop-font-size, 1rem) !important;
+        font-weight: var(--font-weight-accent, 400) !important;
+        line-height: 1.5 !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation a:hover,
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger):hover,
+      html:not([data-css-ready="true"]) #main-navigation a:focus-visible,
+      html:not([data-css-ready="true"]) #main-navigation button:not(.trigger):focus-visible,
+      html:not([data-css-ready="true"]) #main-navigation .is-active {
+        text-decoration: underline !important;
+        text-decoration-thickness: max(1.5px, 0.0625em) !important;
+        text-underline-offset: 0.4375em !important;
+        text-decoration-style: wavy !important;
+      }
+
+      /* Active 样式 — 与 Navigation.astro data-nav-active-style 各模式保持一致 */
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='underline'] .is-active {
+        text-decoration-style: solid !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='bold'] .is-active {
+        text-decoration: none !important;
+        font-weight: var(--font-weight-heading) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='boldwavy'] .is-active {
+        font-weight: var(--font-weight-heading) !important;
+      }
+
+      html:not([data-css-ready="true"]) #main-navigation[data-nav-active-style='boldunderline'] .is-active {
+        text-decoration-style: solid !important;
+        font-weight: var(--font-weight-heading) !important;
+      }
+
+      html:not([data-css-ready="true"]) .has-dropdown > button {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        background-color: transparent !important;
+        border: none !important;
+        padding-inline-start: 0 !important;
+        padding-inline-end: 0 !important;
+        margin: 0 !important;
+        color: inherit !important;
+        cursor: pointer !important;
+      }
+
+      html:not([data-css-ready="true"]) .has-dropdown > ul,
+      html:not([data-css-ready="true"]) .dropdown-menu {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .skip-to-content,
+      html:not([data-css-ready="true"]) [href="#main-content"] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-launcher {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      @media (max-width: 1049px) {
+        html:not([data-css-ready="true"]) .mobile-launcher {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger {
+        container-type: inline-size !important;
+        min-inline-size: var(--launcher-trigger-width-min, 44px) !important;
+        min-block-size: var(--launcher-trigger-height, 40px) !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.icon-only) {
+        inline-size: var(--launcher-trigger-icon-only-size, 44px) !important;
+        block-size: var(--launcher-trigger-icon-only-size, 44px) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger:has(.trigger.compact) {
+        inline-size: var(--launcher-trigger-compact-width, 95px) !important;
+      }
+
+      html:not([data-css-ready="true"]) .desktop-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) .mobile-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        border: 1px solid var(--launcher-inner-border-color) !important;
+        border-radius: var(--launcher-radius-md, 0.5rem) !important;
+        background-color: var(--launcher-action-bar-color) !important;
+        padding: var(--launcher-space-sm) !important;
+        inline-size: clamp(var(--launcher-trigger-width-min, 44px), 100%, var(--launcher-trigger-width-max, 350px)) !important;
+        min-block-size: var(--launcher-trigger-height, 40px) !important;
+        color: var(--launcher-text-color) !important;
+        font-size: var(--launcher-font-size-md) !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
+        box-sizing: border-box !important;
+      }
+
+      /* 桌面端 launcher 字号与 Navigation.astro 的 font-size:initial override 保持一致 */
+      html:not([data-css-ready="true"]) #main-navigation .desktop-menu .desktop-launcher .launcher-trigger .trigger,
+      html:not([data-css-ready="true"]) #main-navigation .desktop-menu .desktop-launcher .launcher-trigger kbd.key {
+        font-size: initial !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger.icon-only {
+        justify-content: center !important;
+        block-size: var(--launcher-trigger-icon-only-size, 44px) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger.compact {
+        inline-size: var(--launcher-trigger-compact-width, 95px) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .wrapper {
+        display: flex !important;
+        flex-shrink: 0 !important;
+        align-items: center !important;
+        gap: var(--launcher-space-sm) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger svg {
+        flex-shrink: 0 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .shortcut {
+        display: flex !important;
+        flex-shrink: 0 !important;
+        align-items: center !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key {
+        display: grid !important;
+        place-content: center !important;
+        border-radius: var(--launcher-radius-sm, 0.25rem) !important;
+        background-color: var(--launcher-kbd-background-color) !important;
+        padding: var(--launcher-space-xs) !important;
+        inline-size: fit-content !important;
+        block-size: 20px !important;
+        color: var(--launcher-kbd-text-color) !important;
+        font-weight: 500 !important;
+        font-size: var(--launcher-font-size-xs) !important;
+        text-shadow: none !important;
+        box-sizing: border-box !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key:first-child {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        padding-inline-end: 1px !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger kbd.key:last-child {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        padding-inline-start: 1px !important;
+        font-size: var(--launcher-font-size-sm) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger:hover,
+      html:not([data-css-ready="true"]) .launcher-trigger .trigger:focus-visible {
+        border-color: var(--launcher-border-interaction-color) !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger {
+        border: none !important;
+        background: linear-gradient(115deg, #a767e5, #12bcfe, #44ce7b, #fad648, #a767e5) !important;
+        background-position: 0 0 !important;
+        background-size: 200% 100% !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger::before {
+        position: absolute !important;
+        z-index: 1 !important;
+        inset: 2px !important;
+        border-radius: calc(var(--launcher-radius-md, 0.5rem) - 2px) !important;
+        background-color: var(--launcher-action-bar-color, #fff) !important;
+        content: '' !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger > * {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger:hover,
+      html:not([data-css-ready="true"]) .launcher-trigger.gradient-border .trigger:focus-visible {
+        animation: palo-launcher-rainbow-effect 1s linear infinite !important;
+      }
+
+      @keyframes palo-launcher-rainbow-effect {
+        to {
+          background-position: 200% 0 !important;
+        }
+      }
+
+      /* ── 关键修复：Shield 阶段刚性宽度锚定 ──
+         在 prose 增强脚本执行前（表格尚未被 .table-wrapper 包裹），
+         防止宽表格 / 代码块 / BreakoutImage 撑破视口，
+         避免 iOS Safari 文档宽度被污染，造成 Shield 骨架横向拉伸错乱。
+
+         ⚠️ 兼容性注意：
+         - 用 overflow-x: hidden 而不是 clip：clip 在 iOS Safari <16 支持不一致，
+           可能降级为 visible，完全失去作用。hidden 更保守、更可靠。
+         - 不使用 contain: layout paint：它会创建新的包含块，破坏 position:fixed
+           元素（如 Header 导航），并影响 Shield 骨架期的布局计算。 */
+      html:not([data-css-ready="true"]),
+      html:not([data-css-ready="true"]) body {
+        overflow-x: hidden !important;
+      }
+
+      html:not([data-css-ready="true"]) main,
+      html:not([data-css-ready="true"]) .container,
+      html:not([data-css-ready="true"]) .prose,
+      html:not([data-css-ready="true"]) .article-content,
+      html:not([data-css-ready="true"]) .article-content__main,
+      html:not([data-css-ready="true"]) section > .container,
+      html:not([data-css-ready="true"]) #main-content > * {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Shield 阶段裸表格 / 代码块强制不撑破父容器
+         注意：不再使用 table-layout: fixed / td max-width:0 这种过激规则，
+         因为 _prose.scss 已给裸 table 加了 display:block + overflow-x:auto 的永久兜底，
+         过激规则会导致 Shield→正常态切换时出现瞬间布局跳动，反而让 iOS Safari 计算错乱 */
+      html:not([data-css-ready="true"]) .prose table,
+      html:not([data-css-ready="true"]) .prose pre,
+      html:not([data-css-ready="true"]) .prose blockquote {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        display: block !important;
+        box-sizing: border-box !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+
+      html:not([data-css-ready="true"]) .prose code,
+      html:not([data-css-ready="true"]) .prose pre code {
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+        word-break: break-word !important;
+      }
+
+      /* Shield 阶段 BreakoutImage 不参与横向突破，防止 100vw fallback 撑破 iOS Safari */
+      html:not([data-css-ready="true"]) .breakout-image,
+      html:not([data-css-ready="true"]) [data-breakout-image],
+      html:not([data-css-ready="true"]) .breakout-image-wrapper,
+      html:not([data-css-ready="true"]) .breakout {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        overflow: hidden !important;
+      }
+
+    </style>
+
+    <script is:inline>
+      (function () {
+        function getStorageKey() {
+          return 'palo_scroll_' + window.location.pathname + window.location.search;
+        }
+
+        if (window.location.hash) {
+          window['__paloCustomHashScroll'] = true;
+          window['__paloInitialHash'] = window.location.hash.replace('#', '');
+          history.replaceState(null, '', window.location.pathname + window.location.search);
+          window.scrollTo(0, 0);
+        } else {
+          window['__paloCustomHashScroll'] = false;
+        }
+
+        if ('scrollRestoration' in history) {
+          history.scrollRestoration = 'manual';
+        }
+
+        var activeScrollFrame = null
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        function cancelSmoothScroll() {
+          if (activeScrollFrame !== null) {
+            cancelAnimationFrame(activeScrollFrame)
+            activeScrollFrame = null
+          }
+        }
+
+        function smoothScrollTo(targetY) {
+          if (prefersReducedMotion) {
+            window.scrollTo(0, targetY)
+            return
+          }
+
+          cancelSmoothScroll()
+          var startY = window.scrollY
+          var distance = targetY - startY
+          if (Math.abs(distance) < 2) {
+            window.scrollTo(0, targetY)
+            return
+          }
+
+          var duration = Math.min(900, Math.max(300, Math.sqrt(Math.abs(distance)) * 18))
+          var startTime = performance.now()
+          var rootStyle = document.documentElement.style
+          var previousScrollBehavior = rootStyle.scrollBehavior
+          rootStyle.scrollBehavior = 'auto'
+
+          function easeOutExpo(t) {
+            return t === 0 ? 0 : 1 - Math.pow(2, -10 * t)
+          }
+
+          function step(currentTime) {
+            var elapsed = currentTime - startTime
+            var progress = Math.min(elapsed / duration, 1)
+            if (progress >= 1) {
+              window.scrollTo(0, targetY)
+              rootStyle.scrollBehavior = previousScrollBehavior
+              activeScrollFrame = null
+            } else {
+              var eased = easeOutExpo(progress)
+              window.scrollTo(0, startY + distance * eased)
+              activeScrollFrame = requestAnimationFrame(step)
+            }
+          }
+
+          step(startTime)
+        }
+
+        var restoredScrollPosition = false
+
+        function restoreScrollPosition() {
+          if (restoredScrollPosition || window.location.hash || window['__paloInitialHash']) {
+            return
+          }
+          restoredScrollPosition = true
+
+          var savedY = sessionStorage.getItem(getStorageKey())
+
+          // ── 在滚动动画之前，立即根据 saved 位置同步 header 状态 ──
+          // 解决 scroll 恢复时 header.is-at-top 未及时更新的问题
+          if (savedY !== null) {
+            var header = document.querySelector('header')
+            if (header) {
+              var headerHeight = header.offsetHeight || 64
+              header.classList.toggle('is-at-top', parseInt(savedY, 10) <= headerHeight)
+            }
+          }
+
+          var rootStyle = document.documentElement.style
+          var previousScrollBehavior = rootStyle.scrollBehavior
+          rootStyle.scrollBehavior = 'auto'
+          window.scrollTo(0, 0)
+          rootStyle.scrollBehavior = previousScrollBehavior
+
+          if (savedY !== null) {
+            smoothScrollTo(parseInt(savedY, 10))
+          }
+        }
+
+        function releaseShield() { document.documentElement.setAttribute('data-css-ready', 'true'); }
+        function lockShield() { document.documentElement.removeAttribute('data-css-ready'); }
+
+        function syncHeaderThemeFromMain() {
+          var header = document.querySelector('header')
+          if (!header || !header.classList.contains('is-at-top') || header.dataset.topNavigationTheme) return
+
+          var source = document.querySelector('main [data-top-navigation-theme]')
+          var theme = source && source.getAttribute('data-top-navigation-theme')
+          if (theme === 'light' || theme === 'dark') {
+            header.dataset.topNavigationTheme = theme
+          }
+        }
+
+        function scheduleReleaseShield() {
+          var released = false
+
+          function tryRelease() {
+            if (released) return
+            released = true
+            releaseShield()
+          }
+
+          function stylesheetsReady() {
+            var links = document.querySelectorAll('link[rel="stylesheet"]')
+            if (!links.length) return true
+
+            for (var i = 0; i < links.length; i++) {
+              if (!links[i].sheet) return false
+            }
+
+            return true
+          }
+
+          function waitForPaintReady() {
+            if (stylesheetsReady()) {
+              requestAnimationFrame(tryRelease)
+              return
+            }
+
+            setTimeout(waitForPaintReady, 32)
+          }
+
+          if (document.readyState === 'complete') {
+            tryRelease()
+            return
+          }
+
+          // DOM + 样式表就绪即可释放；不必等待图片/字体等阻塞资源
+          document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+              waitForPaintReady()
+            },
+            { once: true },
+          )
+
+          window.addEventListener('load', tryRelease, { once: true })
+          setTimeout(tryRelease, 3000)
+        }
+
+        function initScrollRestore() {
+          if (document.readyState !== 'loading') {
+            restoreScrollPosition()
+          } else {
+            document.addEventListener('DOMContentLoaded', restoreScrollPosition)
+          }
+        }
+
+        // 1. 首次加载：DOM 就绪后同步 header 主题，等 CSS 加载完再释放首帧盾牌
+        initScrollRestore()
+        window.addEventListener('pageshow', initScrollRestore)
+
+        function onDomReady() {
+          syncHeaderThemeFromMain()
+          scheduleReleaseShield()
+        }
+
+        if (document.readyState !== 'loading') {
+          onDomReady()
+        } else {
+          document.addEventListener('DOMContentLoaded', onDomReady)
+        }
+
+        // 2. 实时保存滚动位置（100ms 节流）
+        var scrollTimer;
+        window.addEventListener('scroll', function () {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(function () {
+            sessionStorage.setItem(getStorageKey(), String(window.scrollY));
+          }, 100);
+        }, { passive: true });
+
+        // 3. Astro SPA 生命周期深度适配
+        document.addEventListener('astro:before-swap', function () {
+          sessionStorage.setItem(getStorageKey(), String(window.scrollY));
+          lockShield();
+        });
+
+        document.addEventListener('astro:after-swap', function () {
+          // DOM 树已替换完毕，节点存在，精确恢复滚动
+          restoreScrollPosition();
+        });
+
+        document.addEventListener('astro:page-load', function () {
+          syncHeaderThemeFromMain();
+          releaseShield();
+        });
+
+        // ── SPA 导航后重新播放背景视频 ──
+        // Astro ClientRouter 替换 DOM 后，新 <video autoplay> 不会自动播放，原因有二：
+        // 1. muted 属性反射 bug：HTML muted 属性不反映到 video.muted IDL 属性
+        // 2. 新 video 元素未自动开始加载：需显式 load() 启动，canplay 才会触发
+        function replayAutoplayVideos() {
+          document.querySelectorAll('video[autoplay]').forEach(function (video) {
+            video.muted = true
+            // 先尝试直接播放（如果视频已就绪或浏览器会自动加载）
+            var playPromise = video.play()
+            if (playPromise && typeof playPromise.then === 'function') {
+              playPromise.catch(function () {
+                // play() 被拒绝：视频未就绪且未开始加载
+                // 显式 load() 强制启动加载，canplay 触发后再播放
+                video.addEventListener('canplay', function () {
+                  video.muted = true
+                  video.play().catch(function () {})
+                }, { once: true })
+                video.load()
+              })
+            }
+          })
+        }
+
+        document.addEventListener('astro:after-swap', replayAutoplayVideos)
+        document.addEventListener('astro:page-load', replayAutoplayVideos)
+      })();
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <!-- favicon -->
+    <link rel="icon" type="image/svg+xml" href={themeConfig.metadata.favicon || '/favicon.svg'} />
+    <!-- Preload body weight font to reduce CLS -->
+    {bodyFontPreloadUrl && bodyFontIsWoff2 && (
+      <link rel="preload" as="font" type="font/woff2" crossorigin href={bodyFontPreloadUrl} />
+    )}
+    <!-- Preload navigation accent font: 抢在网络请求最前列，杜绝导航 FOUT -->
+    {navFontPreloadUrl && (
+      <link rel="preload" as="font" type="font/ttf" crossorigin href={navFontPreloadUrl} />
+    )}
+
+    {fontFaceCss && <style is:global set:html={`@layer base { ${fontFaceCss} }`} />}
+
+    <SEO
+      title={seoTitle}
+      titleTemplate={seoTitleTemplate}
+      titleDefault={themeConfig.metadata.title}
+      description={description}
+      canonical={canonicalUrl}
+      openGraph={{
+        basic: {
+          title: title,
+          type: type,
+          image: imageUrl,
+          url: canonicalUrl,
+        },
+        optional: {
+          description: description,
+        },
+      }}
+      twitter={{
+        card: 'summary_large_image',
+        title: title,
+        description: description,
+        image: imageUrl,
+      }}
+      extend={{
+        meta: [
+          {
+            name: 'author',
+            content: author,
+          },
+        ],
+      }}
+    />
+
+    <!-- ClientRouter：Astro 5 内置 SPA 路由 + 视图过渡，保护 CSS 加载顺序避免 FOUC -->
+    <ClientRouter />
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         Critical CSS Anti-FOUC Shield
+         在慢速网络（3G/4G）下，浏览器在外部 CSS bundle 到达前会先用
+         默认样式渲染 HTML（白底黑字、蓝链接、无约束布局）。
+         此内联块涵盖首屏必需规则，确保第一帧即有正确的颜色和骨架。
+         ═══════════════════════════════════════════════════════════════ -->
+    <style is:global>
+      @layer base {
+        /* ── Body & link colors —— 防止白底/蓝链闪烁 ── */
+        body {
+          background-color: var(--background-color);
+          color: var(--foreground-color);
+          font-family: var(--font-body);
+        }
+
+        a {
+          color: var(--link-color);
+        }
+
+        /* ── Spacing fallback —— 慢速网络下外部 SCSS 到达前的占位值 ── */
+        :root {
+          --space-xl: clamp(3rem, 2.8696rem + 0.6522vw, 3.375rem);
+          --space-l: clamp(2rem, 1.913rem + 0.4348vw, 2.25rem);
+        }
+
+        /* ── PaloPageHeader 骨架：慢速网络下首屏基础 padding ──
+           放在 @layer base，确保 config.yaml 中 paloPageHeader.class 的
+           pt-* / pb-* / py-* / p-* 工具类（@layer utilities）能覆盖。
+           使用 --nav-min-height 而非 --header-height：前者是静态 CSS 变量，
+           不依赖 JS 执行，第一帧即有正确的顶部空间。 ── */
+        :where(.palo-page-header--standard) {
+          padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+          padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
+        }
+
+        /* ── PaloPageHeader 全屏模式骨架 ── */
+        :where(.section-fullscreen.palo-page-header) {
+          min-height: 100vh;
+          padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+          padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
+        }
+
+        /* ── PaloPageHeader 非固定导航模式：额外的顶部空间 ── */
+        :where(.palo-page-header--needs-header-space) {
+          padding-top: var(--nav-min-height, 4.5rem);
+        }
+      }
+
+      @layer components {
+        /* ── 核心容器布局骨架 —— 防止内容区坍塌 ── */
+        .container {
+          margin-inline: auto;
+          padding-inline: var(--grid-gutter);
+          width: min(100%, var(--grid-max-width));
+          max-width: var(--grid-max-width);
+        }
+
+        /* ── PaloPageHeader 布局骨架 —— CSS 到达前确保不会贴顶塌陷 ── */
+        .palo-page-header {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr);
+          overflow: hidden;
+          background-color: var(--page-header-background-color, var(--background-color));
+        }
+
+        .palo-page-header__content {
+          position: relative;
+          z-index: 2;
+        }
+
+        /* ── 文章详情页 Grid 布局 —— 防止 TOC 无约束平铺 ── */
+        .article-content {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: var(--space-l);
+        }
+
+        .article-content__main {
+          min-width: 0;
+        }
+
+        /* ── TOC 容器初始约束 —— 防止未样式化列表铺满全屏 ── */
+        .article-content__toc {
+          display: block;
+          grid-row: 1;
+        }
+
+        .article-toc {
+          max-width: 100%;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+        }
+
+        .article-toc ul {
+          list-style: none;
+          padding-inline-start: 0;
+        }
+
+        .article-toc a {
+          display: inline-block;
+          max-width: 100%;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          text-decoration: none;
+          color: var(--link-color);
+        }
+
+        /* ── TOC 骨架屏：慢速网络下首帧即有动画效果 ── */
+        .article-toc__skeleton {
+          display: block;
+          margin-block: 0.35rem;
+          list-style: none;
+        }
+
+        .article-toc__skeleton span {
+          display: block;
+          height: 1em;
+          border-radius: 0.25rem;
+          background: linear-gradient(
+            90deg,
+            var(--color-neutral-200, #e5e5e5) 25%,
+            var(--color-neutral-100, #f5f5f5) 50%,
+            var(--color-neutral-200, #e5e5e5) 75%
+          );
+          background-size: 200% 100%;
+          animation: toc-skeleton-shimmer 1.5s linear infinite;
+        }
+
+        @media (prefers-color-scheme: dark) {
+          .article-toc__skeleton span {
+            background: linear-gradient(
+              90deg,
+              var(--color-neutral-700, #404040) 25%,
+              var(--color-neutral-800, #262626) 50%,
+              var(--color-neutral-700, #404040) 75%
+            );
+            background-size: 200% 100%;
+          }
+        }
+
+        .article-toc__skeleton--h2 span { font-size: 1.25rem; width: 85%; }
+        .article-toc__skeleton--h3 span { font-size: 1.125rem; width: 70%; margin-inline-start: 1rem; }
+        .article-toc__skeleton--h4 span { font-size: 1rem; width: 60%; margin-inline-start: 2rem; }
+
+        @keyframes toc-skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
+        /* ── TOC 标题 "On this page" 基础样式：慢网下保持正确外观 ── */
+        .article-toc > h3,
+        .article-toc > h4,
+        .article-toc .space-content > h3,
+        .article-toc .space-content > h4 {
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-block: 0 0.75rem;
+          color: var(--foreground-color);
+        }
+
+        /* ── Tags 标签栏 & 页脚导航：CSS 到达前屏蔽浏览器默认下划线 ── */
+        .palo-nav-list a {
+          text-decoration: none;
+        }
+
+        /* ── Footer / Tags / TOC：标题与第一行的间距统一跟随 verticalScale ── */
+        :is(
+          footer .flex.flex-col:has(>.palo-nav-list),
+          .tags-filter,
+          .article-toc
+        ) {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: var(--palo-nav-heading-gap) !important;
+        }
+
+        .tags-filter .heading,
+        .article-toc > * {
+          margin-block: 0 !important;
+        }
+
+        @media (min-width: 768px) {
+          .article-content--with-toc {
+            grid-template-columns: minmax(0, 1fr) 280px;
+          }
+
+          .article-content__toc {
+            grid-row: auto;
+            position: sticky;
+            align-self: start;
+            top: var(--space-l, 2rem);
+            max-height: calc(100vh - var(--space-l, 2rem));
+            overflow-y: auto;
+            padding-block-end: 5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+
+          .article-content__toc::-webkit-scrollbar {
+            display: none;
+          }
+
+          .article-content__toc.is-un-stuck-locked {
+            overflow-y: hidden;
+          }
+
+          .article-content__toc.is-stuck {
+            overflow-y: auto;
+          }
+
+          body.has-fixed-header .article-content__toc {
+            top: calc(var(--header-height, 0px) + var(--space-l, 2rem));
+            max-height: calc(100vh - var(--header-height, 0px) - var(--space-l, 2rem));
+          }
+        }
+
+        /* ── 图片渐进加载骨架 —— 主色调占位 + 淡入刚性容器 ── */
+        .progressive-img-container {
+          position: relative;
+          display: block;
+          overflow: hidden;
+          inline-size: 100%;
+          block-size: 100%;
+        }
+
+        .progressive-img-inner {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          opacity: 0;
+        }
+
+        /* ── PostHeader 封面图骨架 —— 防止图片区域坍塌 ── */
+        .post-header__image {
+          position: relative;
+          left: 50%;
+          right: 50%;
+          margin-left: -50vw;
+          margin-right: -50vw;
+          width: 100vw;
+          max-width: 100vw;
+          height: 60vh;
+          min-height: 60dvh;
+          overflow: hidden;
+        }
+
+        /* ── Breakout 图片容器初始 rigid 约束 ── */
+        .breakout-image-container {
+          position: relative;
+          overflow: hidden;
+          --breakout-radius: var(--radius-media, var(--radius-global, 0.5rem));
+        }
+
+        .breakout-image-container :is(img, > div.absolute) {
+          border-radius: var(--breakout-radius) !important;
+        }
+
+        .breakout-image-container img {
+          display: block;
+          width: 100%;
+          height: auto;
+        }
+
+        /* ── full：贴近左右屏幕边缘，直角 ── */
+        .breakout-image-container[data-layout="full"] {
+          --breakout-radius: 0;
+          margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+          margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50%);
+          border-radius: 0 !important;
+        }
+
+        /* ── wide：距离左右屏幕 1rem 间隙，圆角 ── */
+        .breakout-image-container[data-layout="wide"] {
+          margin-left: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+          margin-right: calc(calc(var(--viewport-width, 100vw) / -2) + 50% + 1rem);
+          border-radius: var(--breakout-radius) !important;
+        }
+
+        /* ── contained：对齐页面最大宽度容器，圆角 ── */
+        .breakout-image-container[data-layout="contained"] {
+          --breakout-contained-padding: var(--grid-gutter, 1rem);
+          margin-left: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+          margin-right: calc(50% - min(calc(var(--viewport-width, 100vw) / 2), var(--grid-max-width) / 2) + var(--breakout-contained-padding));
+          border-radius: var(--breakout-radius) !important;
+        }
+
+        @media (min-width: 768px) {
+          .breakout-image-container[data-layout="contained"] {
+            --breakout-contained-padding: 2rem;
+          }
+        }
+
+        @media (min-width: 1280px) {
+          .breakout-image-container[data-layout="contained"] {
+            --breakout-contained-padding: 1rem;
+          }
+        }
+
+        /* ── TOC 模式（≥768px 侧栏显示时）：三种 layout 宽度统一为主内容列宽度，不突破 ── */
+        @media (min-width: 768px) {
+          .article-content--with-toc .breakout-image-container {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+        }
+
+        /* ── 窄文栏居中 ── */
+        .narrow {
+          margin-inline: auto;
+          max-width: 65ch;
+        }
+
+        /* ── prose 正文区域基础样式 ── */
+        .prose {
+          color: var(--foreground-color);
+        }
+
+        /* ── 导航链接首帧样式 —— 防止慢网下退化为纯文本堆叠 ── */
+        #main-navigation a {
+          font-family: var(--font-body);
+          font-weight: var(--font-weight-accent, 500);
+          font-size: var(--text-base);
+          display: inline-flex;
+          align-items: center;
+          text-decoration: none;
+          color: var(--foreground-color);
+        }
+
+        #main-navigation .menu-item {
+          display: flex;
+          align-items: center;
+          list-style: none;
+        }
+
+        /* ── PostHeader 元信息 & 分割线骨架 —— 防止作者/操作区塌陷 ── */
+        .post-header__meta {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          align-items: center;
+          gap: 1rem;
+          margin-top: 1.5rem;
+        }
+
+        .post-header__divider {
+          display: block;
+          border-block-end: 1px solid var(--border-color-subtle, var(--color-neutral-300));
+        }
+
+        .post-header--needs-header-space {
+          padding-block-start: var(--nav-min-height, 6rem);
+        }
+
+        @media (max-width: 768px) {
+          .post-header__meta {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* ── 纯图标按钮：完美正方形，图标尺寸由按钮 size 联动 ── */
+        .button--icon-only {
+          aspect-ratio: 1;
+          padding: var(--space-xs);
+        }
+
+        .button--icon-only.button--sm {
+          padding: var(--space-2xs);
+        }
+
+        .button--icon-only.button--lg {
+          padding: var(--space-s);
+        }
+
+        .button--icon-only svg {
+          width: 1.75em !important;
+          height: 1.75em !important;
+        }
+      }
+    </style>
+
+    {enableCustomCursor && (
+      <style is:global>
+        html.has-custom-cursor,
+        html.has-custom-cursor *,
+        html.has-custom-cursor *::before,
+        html.has-custom-cursor *::after {
+          cursor: none !important;
+        }
+
+        .palo-custom-cursor {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 1rem;
+          height: 1rem;
+          border-radius: 50%;
+          background-color: #ffffff;
+          mix-blend-mode: difference;
+          pointer-events: none;
+          z-index: 999999;
+          will-change: transform;
+          transition: width var(--animation-speed-instant) var(--cubic-bezier), height var(--animation-speed-instant) var(--cubic-bezier), opacity var(--animation-speed-fast) var(--cubic-bezier);
+          transform: translate3d(-100px, -100px, 0);
+        }
+
+        .palo-custom-cursor.is-hovering {
+          width: 3rem;
+          height: 3rem;
+          transition: width var(--animation-speed-medium) var(--cubic-bezier), height var(--animation-speed-medium) var(--cubic-bezier);
+        }
+
+        .palo-custom-cursor.is-hidden {
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        @media (hover: none) {
+          .palo-custom-cursor {
+            display: none !important;
+          }
+
+          html.has-custom-cursor,
+          html.has-custom-cursor *,
+          html.has-custom-cursor *::before,
+          html.has-custom-cursor *::after {
+            cursor: auto !important;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .palo-custom-cursor {
+            transition: width var(--animation-speed-instant) linear, height var(--animation-speed-instant) linear;
+          }
+        }
+      </style>
+    )}
+  </head>
+  <body>
+    {enableCustomCursor && (
+      <>
+        <div class="palo-custom-cursor" aria-hidden="true"></div>
+        <noscript>
+          <style>.palo-custom-cursor { display: none !important; }</style>
+        </noscript>
+      </>
+    )}
+    <Header topNavigationTheme={topNavigationTheme} />
+    <main id="main-content" transition:animate="fade" style={`padding-top: ${mainPaddingTop} !important;`}>
+      <slot />
+
+      <!-- ⚡ Markdown 正文原生图片：纯淡入动画，无黑底占位，无强制宽高 -->
+      <style is:inline>
+        .prose img:not(.progressive-img-inner),
+        .markdown-content img:not(.progressive-img-inner),
+        article img:not(.progressive-img-inner) {
+          opacity: 0;
+          transition: opacity var(--animation-speed-slow) var(--cubic-bezier) !important;
+        }
+
+        .prose img:not(.progressive-img-inner).is-markdown-loaded,
+        .markdown-content img:not(.progressive-img-inner).is-markdown-loaded,
+        article img:not(.progressive-img-inner).is-markdown-loaded {
+          opacity: 1 !important;
+        }
+
+        /* 组件隔离：BreakoutImage/ContentImage 不受上述 prose 淡入影响 */
+        .breakout-image-container img,
+        .progressive-img-container img {
+          opacity: initial !important;
+          transition: initial !important;
+        }
+      </style>
+
+      <noscript>
+        <style>
+          .prose img:not(.progressive-img-inner),
+          .markdown-content img:not(.progressive-img-inner),
+          article img:not(.progressive-img-inner) {
+            opacity: 1 !important;
+          }
+        </style>
+      </noscript>
+
+      <script is:inline>
+        const initMarkdownImagesFadeIn = () => {
+          const containers = document.querySelectorAll('.prose, .markdown-content, article');
+          containers.forEach(container => {
+            container.querySelectorAll('img').forEach(img => {
+              // 排除已经被 ContentImage 组件处理好的图片，避免双重淡入冲突
+              if (img.classList.contains('progressive-img-inner')) return;
+
+              const triggerFadeIn = () => {
+                if ('decode' in img) {
+                  img.decode()
+                    .then(() => img.classList.add('is-markdown-loaded'))
+                    .catch(() => img.classList.add('is-markdown-loaded'));
+                } else {
+                  img.classList.add('is-markdown-loaded');
+                }
+              };
+
+              if (img.complete) {
+                triggerFadeIn();
+              } else {
+                img.addEventListener('load', triggerFadeIn);
+                img.addEventListener('error', triggerFadeIn);
+              }
+            });
+          });
+        };
+
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initMarkdownImagesFadeIn);
+        } else {
+          initMarkdownImagesFadeIn();
+        }
+
+        document.addEventListener('astro:page-load', initMarkdownImagesFadeIn);
+      </script>
+    </main>
+    <Footer />
+    <script is:inline>
+      const paloInitCodeBlocks = () => {
+        const copyIcon = `
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+            <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+          </svg>
+        `
+        const checkIcon = `
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+        `
+        const languageLabels = {
+          js: 'JS',
+          jsx: 'JSX',
+          ts: 'TS',
+          tsx: 'TSX',
+          html: 'HTML',
+          css: 'CSS',
+          scss: 'SCSS',
+          astro: 'Astro',
+          md: 'Markdown',
+          mdx: 'MDX',
+          sh: 'Shell',
+          bash: 'Bash',
+          zsh: 'Zsh',
+          json: 'JSON',
+          yaml: 'YAML',
+          yml: 'YAML',
+        }
+
+        const getLanguage = (pre) => {
+          const rawLanguage =
+            pre.dataset.language ||
+            pre.querySelector('code')?.className?.match(/language-([^\s]+)/)?.[1] ||
+            pre.className.match(/language-([^\s]+)/)?.[1] ||
+            ''
+          const normalizedLanguage = String(rawLanguage).trim().toLowerCase()
+          return languageLabels[normalizedLanguage] || normalizedLanguage || 'Code'
+        }
+
+        const copyText = async (text) => {
+          if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text)
+            return
+          }
+
+          const textarea = document.createElement('textarea')
+          textarea.value = text
+          textarea.setAttribute('readonly', '')
+          textarea.style.position = 'fixed'
+          textarea.style.insetBlockStart = '-9999px'
+          document.body.append(textarea)
+          textarea.select()
+          document.execCommand('copy')
+          textarea.remove()
+        }
+
+        document.querySelectorAll('pre').forEach((pre) => {
+          if (!(pre instanceof HTMLElement) || pre.dataset.paloCodeBlockEnhanced === 'true') return
+          if (pre.closest('.code-block')) return
+
+          const code = pre.querySelector('code')
+          if (!(code instanceof HTMLElement)) return
+
+          const isMermaid = /\b(?:language|lang)-mermaid\b/.test(pre.dataset.language || pre.className || '') || /\b(?:language|lang)-mermaid\b/.test(code.className || '')
+          if (isMermaid) return
+
+          const wrapper = document.createElement('div')
+          wrapper.className = 'code-block'
+
+          const header = document.createElement('div')
+          header.className = 'code-block__header'
+
+          const language = document.createElement('span')
+          language.className = 'code-block__language'
+          language.textContent = getLanguage(pre)
+
+          const button = document.createElement('button')
+          button.type = 'button'
+          button.className = 'code-block__copy'
+          button.setAttribute('aria-label', 'Copy code')
+          button.innerHTML = `${copyIcon}<span class="sr-only">Copy code</span>`
+
+          button.addEventListener('click', async () => {
+            await copyText(code.innerText)
+            button.innerHTML = `${checkIcon}<span class="sr-only">Copied</span>`
+            button.setAttribute('aria-label', 'Copied')
+            window.setTimeout(() => {
+              button.innerHTML = `${copyIcon}<span class="sr-only">Copy code</span>`
+              button.setAttribute('aria-label', 'Copy code')
+            }, 1800)
+          })
+
+          header.append(language, button)
+          pre.before(wrapper)
+          wrapper.append(header, pre)
+          pre.dataset.paloCodeBlockEnhanced = 'true'
+        })
+      }
+
+      document.addEventListener('astro:page-load', paloInitCodeBlocks)
+      document.addEventListener('astro:after-swap', paloInitCodeBlocks)
+      paloInitCodeBlocks()
+    </script>
+    <script is:inline>
+      const paloInitAccordionFallback = () => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        document.querySelectorAll('.accordion details.wrapper').forEach((wrapper) => {
+          if (wrapper.dataset.paloAccordionBound === 'true') return
+
+          const summary = wrapper.querySelector('.title')
+          const content = wrapper.querySelector('.content')
+          if (!(summary instanceof HTMLElement) || !(content instanceof HTMLElement)) return
+
+          const setExpandedState = (isOpen) => {
+            summary.setAttribute('aria-expanded', isOpen ? 'true' : 'false')
+            if (isOpen) {
+              wrapper.setAttribute('open', '')
+            } else {
+              wrapper.removeAttribute('open')
+            }
+          }
+
+          const getContentHeight = () => content.scrollHeight
+
+          const stopTransition = () => {
+            content.style.transition = 'none'
+          }
+
+          const startTransition = () => {
+            content.style.transition = prefersReducedMotion
+              ? 'none'
+              : 'max-height var(--animation-speed-medium) var(--cubic-bezier), opacity var(--animation-speed-medium) var(--cubic-bezier)'
+          }
+
+          const resetToClosedState = () => {
+            stopTransition()
+            content.style.maxHeight = '0px'
+            content.style.opacity = '0'
+            void content.offsetHeight
+            startTransition()
+          }
+
+          const resetToOpenState = () => {
+            stopTransition()
+            content.style.maxHeight = `${getContentHeight()}px`
+            content.style.opacity = '1'
+            void content.offsetHeight
+            startTransition()
+          }
+
+          const openAccordion = () => {
+            const groupName = wrapper.getAttribute('name')
+            if (groupName) {
+              document.querySelectorAll(`.accordion details.wrapper[name="${groupName}"]`).forEach((item) => {
+                if (item !== wrapper && item instanceof HTMLDetailsElement && item.open) {
+                  const otherSummary = item.querySelector('.title')
+                  const otherContent = item.querySelector('.content')
+                  if (!(otherSummary instanceof HTMLElement) || !(otherContent instanceof HTMLElement)) return
+
+                  if (prefersReducedMotion) {
+                    otherContent.style.maxHeight = '0px'
+                    otherContent.style.opacity = '0'
+                    item.removeAttribute('open')
+                    otherSummary.setAttribute('aria-expanded', 'false')
+                    return
+                  }
+
+                  otherContent.style.maxHeight = `${otherContent.scrollHeight}px`
+                  otherContent.style.opacity = '1'
+                  void otherContent.offsetHeight
+                  requestAnimationFrame(() => {
+                    otherContent.style.maxHeight = '0px'
+                    otherContent.style.opacity = '0'
+                  })
+                  otherContent.addEventListener(
+                    'transitionend',
+                    (event) => {
+                      if (event.propertyName !== 'max-height') return
+                      item.removeAttribute('open')
+                      otherSummary.setAttribute('aria-expanded', 'false')
+                    },
+                    { once: true },
+                  )
+                }
+              })
+            }
+
+            if (prefersReducedMotion) {
+              content.style.maxHeight = `${getContentHeight()}px`
+              content.style.opacity = '1'
+              setExpandedState(true)
+              return
+            }
+
+            setExpandedState(true)
+            resetToClosedState()
+
+            requestAnimationFrame(() => {
+              content.style.maxHeight = `${getContentHeight()}px`
+              content.style.opacity = '1'
+            })
+          }
+
+          const closeAccordion = () => {
+            if (prefersReducedMotion) {
+              content.style.maxHeight = '0px'
+              content.style.opacity = '0'
+              setExpandedState(false)
+              return
+            }
+
+            resetToOpenState()
+            setExpandedState(false)
+
+            requestAnimationFrame(() => {
+              content.style.maxHeight = '0px'
+              content.style.opacity = '0'
+            })
+
+            content.addEventListener(
+              'transitionend',
+              (event) => {
+                if (event.propertyName !== 'max-height') return
+                content.style.maxHeight = '0px'
+                content.style.opacity = '0'
+              },
+              { once: true },
+            )
+          }
+
+          summary.setAttribute('aria-expanded', wrapper.hasAttribute('open') ? 'true' : 'false')
+          content.style.overflow = 'hidden'
+          startTransition()
+
+          if (wrapper.hasAttribute('open')) {
+            content.style.maxHeight = `${getContentHeight()}px`
+            content.style.opacity = '1'
+          } else {
+            content.style.maxHeight = '0px'
+            content.style.opacity = '0'
+          }
+
+          summary.addEventListener('click', (event) => {
+            event.preventDefault()
+            wrapper.hasAttribute('open') ? closeAccordion() : openAccordion()
+          })
+
+          wrapper.dataset.paloAccordionBound = 'true'
+        })
+      }
+
+      document.addEventListener('astro:page-load', paloInitAccordionFallback)
+      document.addEventListener('astro:after-swap', paloInitAccordionFallback)
+      paloInitAccordionFallback()
+    </script>
+    <script is:inline>
+      function paloInitFloatingFormLabels() {
+        const groups = document.querySelectorAll('.input-group, .textarea-group')
+        if (!groups.length) return
+
+        groups.forEach((group) => {
+          const control = group.querySelector('input, textarea')
+          if (!(control instanceof HTMLInputElement || control instanceof HTMLTextAreaElement)) return
+
+          const syncState = () => {
+            const hasValue = control.value.trim().length > 0
+            group.setAttribute('data-floating-active', hasValue ? 'true' : 'false')
+          }
+
+          if (group.getAttribute('data-palo-floating-bound') !== 'true') {
+            control.addEventListener('input', syncState)
+            control.addEventListener('change', syncState)
+            control.addEventListener('blur', syncState)
+            control.addEventListener('animationstart', syncState)
+            group.setAttribute('data-palo-floating-bound', 'true')
+          }
+
+          syncState()
+          requestAnimationFrame(syncState)
+          setTimeout(syncState, 0)
+        })
+      }
+
+      document.addEventListener('astro:page-load', paloInitFloatingFormLabels)
+      document.addEventListener('astro:after-swap', paloInitFloatingFormLabels)
+      paloInitFloatingFormLabels()
+    </script>
+    <script is:inline>
+      /**
+       * 全局拦截 showModal / close：统一使用 show() + 自定义 backdrop
+       * 在 HTMLDialogElement.prototype 层面重写，确保任何 dialog 都无法绕过，
+       * 避免原生 ::backdrop 与自定义 backdrop 叠加导致背景过暗。
+       */
+      ;(function() {
+        if (window.__paloShowModalPatched) return
+        window.__paloShowModalPatched = true
+
+        var originalShowModal = HTMLDialogElement.prototype.showModal
+        var originalShow = HTMLDialogElement.prototype.show
+        var originalClose = HTMLDialogElement.prototype.close
+
+        function paloGetBackdropClass(dialog) {
+          if (dialog.classList.contains('launcher')) return 'palo-dialog-backdrop--launcher'
+          if (dialog.classList.contains('modal') || dialog.classList.contains('qrcode-modal')) return 'palo-dialog-backdrop--modal'
+          return 'palo-dialog-backdrop--default'
+        }
+
+        function paloEnsureBackdrop(dialog) {
+          if (dialog._paloBackdrop) return dialog._paloBackdrop
+          var backdrop = document.createElement('div')
+          backdrop.className = 'palo-dialog-backdrop ' + paloGetBackdropClass(dialog)
+          backdrop.setAttribute('aria-hidden', 'true')
+          document.body.appendChild(backdrop)
+          dialog._paloBackdrop = backdrop
+          backdrop.addEventListener('click', function() {
+            window.paloCloseDialog(dialog)
+          })
+          return backdrop
+        }
+
+        function paloFadeOutBackdrop(dialog) {
+          if (!dialog._paloBackdrop) return
+          var backdrop = dialog._paloBackdrop
+          dialog._paloBackdrop = null
+          backdrop.classList.remove('is-visible')
+          var removed = false
+          function removeIt() {
+            if (removed) return
+            removed = true
+            if (backdrop.parentNode) backdrop.remove()
+          }
+          backdrop.addEventListener('animationend', removeIt, { once: true })
+          setTimeout(removeIt, 300)
+        }
+
+        function paloShowDialog(dialog) {
+          dialog.classList.remove('closing')
+          document.body.appendChild(dialog)
+          var backdrop = paloEnsureBackdrop(dialog)
+          backdrop.offsetHeight
+          backdrop.classList.add('is-visible')
+          return originalShow.apply(dialog)
+        }
+
+        HTMLDialogElement.prototype.showModal = function() {
+          if (arguments.length > 0 && arguments[0] === '__paloNative__') {
+            return originalShowModal.apply(this, Array.prototype.slice.call(arguments, 1))
+          }
+
+          // 如果打开的是 launcher，且当前有 modal 或 qrcode-modal 打开，
+          // 先关闭 modal，等动画结束后再打开 launcher
+          if (this.classList.contains('launcher')) {
+            var openModal = document.querySelector('.modal[open]:not(.closing), .qrcode-modal[open]:not(.closing)')
+            if (openModal) {
+              var self = this
+              var launcherOpened = false
+              function openLauncherNow() {
+                if (launcherOpened) return
+                launcherOpened = true
+                paloShowDialog(self)
+              }
+              // 使用包装后的 closeModal，确保 Modal 库状态正确清理
+              if (openModal.classList.contains('qrcode-modal')) {
+                window.paloCloseQrCodeModal()
+              } else if (typeof window.closeModal === 'function') {
+                window.closeModal()
+              } else {
+                window.paloCloseDialog(openModal)
+              }
+              // 等 modal 关闭动画结束后再打开 launcher
+              openModal.addEventListener('animationend', function onCloseEnd(e) {
+                if (e.target !== openModal) return
+                openModal.removeEventListener('animationend', onCloseEnd)
+                openLauncherNow()
+              })
+              // 兜底：350ms 后强制打开（防止 animationend 不触发）
+              setTimeout(openLauncherNow, 350)
+              return
+            }
+          }
+
+          // 如果打开的是 modal 或 qrcode-modal，且当前有 launcher 打开，
+          // 先关闭 launcher，等动画结束后再打开 modal
+          if (this.classList.contains('modal') || this.classList.contains('qrcode-modal')) {
+            var openLauncher = document.querySelector('.launcher[open]:not(.closing)')
+            if (openLauncher) {
+              var self2 = this
+              var modalOpened = false
+              function openModalNow() {
+                if (modalOpened) return
+                modalOpened = true
+                paloShowDialog(self2)
+              }
+              window.paloCloseDialog(openLauncher)
+              // 等 launcher 关闭后再打开 modal
+              openLauncher.addEventListener('close', function onLauncherClosed() {
+                openLauncher.removeEventListener('close', onLauncherClosed)
+                openModalNow()
+              })
+              // 兜底：400ms 后强制打开
+              setTimeout(openModalNow, 400)
+              return
+            }
+          }
+
+          // 如果打开的是 modal 或 qrcode-modal，且当前有其他 modal 或 qrcode-modal 已打开，
+          // 先关闭已有的，等动画结束后再打开新的
+          if (this.classList.contains('modal') || this.classList.contains('qrcode-modal')) {
+            var openOtherModal = document.querySelector('.modal[open]:not(.closing), .qrcode-modal[open]:not(.closing)')
+            if (openOtherModal && openOtherModal !== this) {
+              var self3 = this
+              var newModalOpened = false
+              function openNewModalNow() {
+                if (newModalOpened) return
+                newModalOpened = true
+                paloShowDialog(self3)
+              }
+              // 根据类型选择正确的关闭函数
+              if (openOtherModal.classList.contains('qrcode-modal')) {
+                window.paloCloseQrCodeModal()
+              } else if (typeof window.closeModal === 'function') {
+                window.closeModal()
+              } else {
+                window.paloCloseDialog(openOtherModal)
+              }
+              // 等已有 modal 关闭动画结束后再打开新的
+              openOtherModal.addEventListener('animationend', function onCloseEnd(e) {
+                if (e.target !== openOtherModal) return
+                openOtherModal.removeEventListener('animationend', onCloseEnd)
+                openNewModalNow()
+              })
+              // 兜底：350ms 后强制打开
+              setTimeout(openNewModalNow, 350)
+              return
+            }
+          }
+
+          return paloShowDialog(this)
+        }
+
+        HTMLDialogElement.prototype.close = function() {
+          var result = originalClose.apply(this, arguments)
+          paloFadeOutBackdrop(this)
+          return result
+        }
+
+        // 通用关闭动画函数（Modal + Launcher 共用）
+        window.paloCloseDialog = function(dialog, fallbackClose) {
+          if (!dialog || dialog.classList.contains('closing')) return
+          dialog.classList.add('closing')
+
+          paloFadeOutBackdrop(dialog)
+
+          var finish = function() {
+            dialog.classList.remove('closing')
+            if (fallbackClose) fallbackClose()
+            else dialog.close()
+          }
+          var done = false
+          dialog.addEventListener('animationend', function(e) {
+            if (done || e.target !== dialog) return
+            done = true
+            finish()
+          }, { once: true })
+          setTimeout(function() {
+            if (!done) {
+              done = true
+              finish()
+            }
+          }, 300)
+        }
+      })()
+    </script>
+    <script is:inline>
+      /**
+       * Modal + Launcher 淡入淡出动画
+       * 使用 capture 阶段拦截全部关闭路径（关闭按钮、遮罩、快捷键），
+       * 先播放 .closing 动画再真正 close。
+       * Escape 由 capture 阶段 keydown 统一处理（见下方）。
+       * Safari 兼容：capture 事件、keydown、keyframes—均广泛支持。
+       */
+
+      // 通用 dialog 动画初始化（Modal + Launcher 共用）
+      function paloInitDialogAnimation(selector, closeBtnSelector, boundFlag) {
+        const dialogs = document.querySelectorAll(selector)
+        if (!dialogs.length) return
+
+        dialogs.forEach((dialog) => {
+          if (dialog.dataset[boundFlag]) return
+          dialog.dataset[boundFlag] = '1'
+
+          // 监听 cancel 事件防止原生关闭行为
+          dialog.addEventListener('cancel', (e) => {
+            e.preventDefault()
+          }, { capture: true })
+
+          // 1) 关闭按钮 — capture 阶段拦截，阻止组件 bubbling handler
+          const closeBtn = dialog.querySelector(closeBtnSelector)
+          if (closeBtn) {
+            closeBtn.addEventListener(
+              'click',
+              (e) => {
+                e.stopPropagation()
+                window.paloCloseDialog(dialog)
+              },
+              { capture: true },
+            )
+          }
+
+          // 2) 遮罩点击 — capture 阶段拦截位置在 dialog 自身上的 click
+          dialog.addEventListener(
+            'click',
+            (e) => {
+              if (e.target === dialog) {
+                e.stopPropagation()
+                window.paloCloseDialog(dialog)
+              }
+            },
+            { capture: true },
+          )
+        })
+      }
+
+      function paloInitModalAnimation() {
+        const dialogs = document.querySelectorAll('.modal, .qrcode-modal')
+        if (!dialogs.length) return
+
+        // 保存并包装全局 closeModal（只执行一次）
+        if (typeof window.closeModal === 'function' && !window.__paloOrigCloseModal) {
+          window.__paloOrigCloseModal = window.closeModal
+          const origClose = window.closeModal
+          window.closeModal = () =>
+            window.paloCloseDialog(document.querySelector('.modal[open]'), origClose)
+        }
+
+        paloInitDialogAnimation('.modal, .qrcode-modal', '.modal-close button', 'paloModalBound')
+      }
+
+      function paloInitLauncherAnimation() {
+        const dialogs = document.querySelectorAll('.launcher')
+        if (!dialogs.length) return
+
+        paloInitDialogAnimation('.launcher', '.close', 'paloLauncherBound')
+
+        // 点击外链后清除 trigger 焦点
+        // Launcher 库的 closeLauncher 会在 dialog.close() 后调用 trigger.focus()，
+        // 导致点击外链（target="_blank"）后按钮残留 :focus/:focus-visible 状态，
+        // gradientBorder 模式下会触发彩虹动画（形似 hover）。
+        // 此处 capture 阶段标记外链点击，close 事件后用 setTimeout 在库的 focus() 之后 blur()。
+        dialogs.forEach((dialog) => {
+          if (dialog.dataset.paloLauncherFocusCleanup) return
+          dialog.dataset.paloLauncherFocusCleanup = '1'
+
+          let externalLinkClicked = false
+
+          dialog.addEventListener(
+            'click',
+            (e) => {
+              const link = e.target.closest('.launcher-link')
+              if (!link) return
+              if (link.target === '_blank') {
+                externalLinkClicked = true
+              }
+            },
+            { capture: true },
+          )
+
+          dialog.addEventListener('close', () => {
+            if (!externalLinkClicked) return
+            externalLinkClicked = false
+            setTimeout(() => {
+              const active = document.activeElement
+              if (active && active.hasAttribute('data-launcher-target')) {
+                active.blur()
+              }
+            }, 0)
+          })
+        })
+
+        // Cmd+K / Ctrl+K 快捷键 — capture 阶段提前拦截（只注册一次）
+        if (!window.__paloLauncherKeyBound) {
+          window.__paloLauncherKeyBound = true
+          document.addEventListener(
+            'keydown',
+            (e) => {
+              const isMac = navigator.userAgent.toLowerCase().includes('mac')
+              const mod = isMac ? e.metaKey : e.ctrlKey
+              if (mod && e.key.toLowerCase() === 'k') {
+                const launcher = document.querySelector('.launcher[open]')
+                if (launcher && !launcher.classList.contains('closing')) {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  window.paloCloseDialog(launcher)
+                }
+              }
+            },
+            { capture: true },
+          )
+        }
+      }
+
+      document.addEventListener('astro:page-load', paloInitModalAnimation)
+      document.addEventListener('astro:after-swap', paloInitModalAnimation)
+      paloInitModalAnimation()
+
+      document.addEventListener('astro:page-load', paloInitLauncherAnimation)
+      document.addEventListener('astro:after-swap', paloInitLauncherAnimation)
+      paloInitLauncherAnimation()
+
+      // ═══════════════════════════════════════════
+      //  全局 QRCode 弹窗 trigger 绑定
+      //  同一个 QRCode modal 可能被多个位置的 trigger 触发（footer / contact / launcher），
+      //  Modal 库内置脚本只绑定 #${triggerId} 的第一个元素，后续位置的 trigger 点击无效。
+      //  本脚本统一接管所有带 data-qrcode-trigger="true" 的元素，
+      //  通过 data-qrcode-base 关联到对应 modal，确保任何位置都能打开 modal。
+      // ═══════════════════════════════════════════
+      function paloInitQrCodeTriggers() {
+        const triggers = document.querySelectorAll('[data-qrcode-trigger="true"]')
+        triggers.forEach((trigger) => {
+          if (trigger.dataset.paloQrcodeBound === 'true') return
+          trigger.dataset.paloQrcodeBound = 'true'
+
+          trigger.addEventListener(
+            'click',
+            (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              const baseId = trigger.dataset.qrcodeBase
+              if (!baseId) return
+              const modalEl = document.getElementById(baseId + '-modal')
+              if (!(modalEl instanceof HTMLDialogElement)) return
+
+              const onModalClose = () => {
+                modalEl.removeEventListener('close', onModalClose)
+                modalEl.removeEventListener('click', onClickBackdrop)
+                trigger.blur()
+                const launcherButton = document.querySelector('[data-launcher-target]')
+                if (launcherButton) launcherButton.blur()
+              }
+
+              const onClickBackdrop = (ev) => {
+                const rect = modalEl.getBoundingClientRect()
+                if (
+                  ev.clientX < rect.left ||
+                  ev.clientX > rect.right ||
+                  ev.clientY < rect.top ||
+                  ev.clientY > rect.bottom
+                ) {
+                  modalEl.close()
+                }
+              }
+
+              // 如果 launcher 开着，先关 launcher 再打开 qrcode modal
+              const openLauncher = document.querySelector('.launcher[open]:not(.closing)')
+              if (openLauncher) {
+                const tryOpen = function () {
+                  if (modalEl.open) return
+                  modalEl.addEventListener('close', onModalClose)
+                  modalEl.addEventListener('click', onClickBackdrop)
+                  modalEl.showModal()
+                }
+                openLauncher.addEventListener('close', function onLauncherClosed() {
+                  openLauncher.removeEventListener('close', onLauncherClosed)
+                  tryOpen()
+                })
+                // 兜底：400ms 后强制打开
+                setTimeout(tryOpen, 400)
+                window.paloCloseDialog(openLauncher)
+                return
+              }
+
+              modalEl.addEventListener('close', onModalClose)
+              modalEl.addEventListener('click', onClickBackdrop)
+              if (!modalEl.open) modalEl.showModal()
+            },
+            { capture: true },
+          )
+        })
+      }
+
+      // QRCodeModal dialog close handler (click on close button or backdrop)
+      function paloCloseQrCodeModal(event) {
+        if (event) event.stopPropagation()
+        const openModal = document.querySelector('.qrcode-modal[open]')
+        if (openModal) openModal.close()
+      }
+
+      document.addEventListener('astro:page-load', paloInitQrCodeTriggers)
+      document.addEventListener('astro:after-swap', paloInitQrCodeTriggers)
+      paloInitQrCodeTriggers()
+
+      // ═══════════════════════════════════════════
+      //  Escape 统一处理（Modal + Launcher）
+      //  使用 capture 阶段 keydown 在 dialog 原生处理之前拦截，
+      //  解决 Safari 下 cancel 事件 preventDefault() 不可靠的问题。
+      // ═══════════════════════════════════════════
+      document.addEventListener(
+        'keydown',
+        (e) => {
+          if (e.key !== 'Escape') return
+
+          // 优先检查 Launcher（Launcher 打开时 modal 不显示）
+          const launcher = document.querySelector('.launcher[open]')
+          if (launcher && !launcher.classList.contains('closing')) {
+            e.preventDefault()
+            e.stopPropagation()
+            window.paloCloseDialog(launcher)
+            return
+          }
+
+          // 检查 Modal
+          const modal = document.querySelector('.modal[open], .qrcode-modal[open]')
+          if (modal && !modal.classList.contains('closing')) {
+            const fallback = modal.classList.contains('modal') ? window.__paloOrigCloseModal : undefined
+            e.preventDefault()
+            e.stopPropagation()
+            window.paloCloseDialog(modal, fallback)
+          }
+        },
+        { capture: true },
+      )
+    </script>
+    <style lang="scss" is:global>
+      @use 'scss/base/mixins' as *;
+
+      @layer components {
+        .accordion details.wrapper > .content {
+          display: block;
+        }
+
+        .accordion details.wrapper.variant-default > .content {
+          padding: 0;
+        }
+
+        .accordion details.wrapper.variant-default > .content > * {
+          padding: 0 0 1.5rem 2.2rem;
+        }
+
+        .accordion details.wrapper.variant-chevron > .content {
+          padding-block-end: 0;
+        }
+
+        .accordion details.wrapper.variant-chevron > .content > * {
+          padding-block-end: 2.2rem;
+        }
+
+        html,
+        body {
+          min-height: 100%;
+          overflow-x: clip;
+        }
+
+        html.hide-scrollbar {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+
+        html.hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+
+        body {
+          display: flex;
+          flex-direction: column;
+
+          main {
+            flex: 1 0 auto;
+          }
+
+          footer {
+            flex-shrink: 0;
+          }
+        }
+
+        pre {
+          border: var(--border-width-surface, var(--border-width-global, 3px)) solid var(--link-color);
+          border-radius: var(--radius-s);
+          padding: 1rem;
+        }
+
+        .card {
+          a {
+            @include text-decoration(transparent, var(--foreground-color), 0.1875em, 0.125em);
+          }
+        }
+      }
+    </style>
+
+    <script>
+      const easeOutExpo = (t: number): number => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+      const calculateDuration = (distance: number): number => {
+        const absDistance = Math.abs(distance)
+        const minDuration = 300
+        const maxDuration = 900
+        const baseDuration = Math.sqrt(absDistance) * 18
+        return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+      }
+
+      let globalScrollFrame: number | null = null
+
+      const smoothScrollTo = (targetY: number, offset = 0): void => {
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (prefersReducedMotion) {
+          window.scrollTo(0, Math.max(0, targetY - offset))
+          return
+        }
+
+        if (globalScrollFrame !== null) {
+          cancelAnimationFrame(globalScrollFrame)
+          globalScrollFrame = null
+        }
+
+        const finalY = Math.max(0, targetY - offset)
+        const startY = window.scrollY
+        const distance = finalY - startY
+
+        if (Math.abs(distance) < 2) return
+
+        const duration = calculateDuration(distance)
+        const startTime = performance.now()
+        const rootStyle = document.documentElement.style
+        const previousScrollBehavior = rootStyle.scrollBehavior
+        rootStyle.scrollBehavior = 'auto'
+
+        const step = (currentTime: number) => {
+          const elapsed = currentTime - startTime
+          const progress = Math.min(elapsed / duration, 1)
+          if (progress >= 1) {
+            window.scrollTo(0, finalY)
+            rootStyle.scrollBehavior = previousScrollBehavior
+            globalScrollFrame = null
+          } else {
+            const eased = easeOutExpo(progress)
+            window.scrollTo(0, startY + distance * eased)
+            globalScrollFrame = requestAnimationFrame(step)
+          }
+        }
+
+        step(startTime)
+      }
+
+      const initHashScroll = () => {
+        // @ts-ignore: window custom flag injected at runtime
+        if (window['__paloCustomHashScroll']) return
+
+        const hash = window.location.hash.replace('#', '')
+        if (!hash) return
+
+        const element = document.getElementById(hash)
+        if (!element) return
+
+        // 用 scrollIntoView 测量准确的目标位置，
+        // 确保与原生锚点跳转行为像素级一致
+        const rootStyle = document.documentElement.style
+        const previousScrollBehavior = rootStyle.scrollBehavior
+        rootStyle.scrollBehavior = 'auto'
+        window.scrollTo(0, 0)
+        element.scrollIntoView({ block: 'start', behavior: 'instant' })
+        const targetY = window.scrollY
+        window.scrollTo(0, 0)
+        rootStyle.scrollBehavior = previousScrollBehavior
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            smoothScrollTo(targetY, 0)
+          })
+        })
+      }
+
+      document.addEventListener('astro:page-load', initHashScroll)
+      document.addEventListener('astro:after-swap', initHashScroll)
+      if (document.readyState !== 'loading') {
+        initHashScroll()
+      } else {
+        document.addEventListener('DOMContentLoaded', initHashScroll)
+      }
+
+      // ── 弹性上下文锁定（Elastic Context Locking）──
+      // CSS 默认 overflow-y: auto（慢网/无 JS 安全）
+      // JS 加载后动态切换状态：
+      //   .is-un-stuck-locked → overflow-y: hidden（未贴顶时滚轮滚页面）
+      //   .is-stuck → overflow-y: auto（贴顶后滚轮滚内部）
+      const ELASTIC_SIDEBAR_SELECTORS = [
+        '.article-content__toc',
+        '.components-navigation',
+      ]
+
+      const checkSidebarStuck = (sidebar: HTMLElement): boolean => {
+        const stickyTopStr = getComputedStyle(sidebar).top
+        const stickyTop = parseFloat(stickyTopStr)
+        if (isNaN(stickyTop)) return false
+
+        const actualTop = sidebar.getBoundingClientRect().top
+        return Math.abs(actualTop - stickyTop) < 2
+      }
+
+      const __paloSidebarStuckStates = new WeakMap<HTMLElement, boolean>()
+
+      const updateSidebarStuckState = () => {
+        const sidebars = document.querySelectorAll(ELASTIC_SIDEBAR_SELECTORS.join(','))
+        sidebars.forEach((el) => {
+          const sidebar = el as HTMLElement
+          if (sidebar.offsetParent === null) return
+
+          const isStuck = checkSidebarStuck(sidebar)
+          const wasStuck = __paloSidebarStuckStates.get(sidebar) ?? false
+
+          sidebar.classList.toggle('is-stuck', isStuck)
+          sidebar.classList.toggle('is-un-stuck-locked', !isStuck)
+
+          // 从 stuck → un-stuck 时刚性复位 scrollTop，确保标题始终在视口内
+          if (wasStuck && !isStuck && sidebar.scrollTop > 0) {
+            sidebar.scrollTop = 0
+          }
+
+          __paloSidebarStuckStates.set(sidebar, isStuck)
+        })
+      }
+
+      let elasticScrollRaf = 0
+      const scheduleElasticUpdate = () => {
+        if (elasticScrollRaf) return
+        elasticScrollRaf = requestAnimationFrame(() => {
+          updateSidebarStuckState()
+          elasticScrollRaf = 0
+        })
+      }
+
+      const initElasticSidebarScroll = () => {
+        const sidebars = document.querySelectorAll(ELASTIC_SIDEBAR_SELECTORS.join(','))
+        if (sidebars.length === 0) return
+
+        updateSidebarStuckState()
+
+        window.addEventListener('scroll', scheduleElasticUpdate, { passive: true })
+        window.addEventListener('resize', scheduleElasticUpdate, { passive: true })
+      }
+
+      document.addEventListener('astro:page-load', initElasticSidebarScroll)
+      document.addEventListener('astro:after-swap', initElasticSidebarScroll)
+      if (document.readyState !== 'loading') {
+        initElasticSidebarScroll()
+      }
+    </script>
+
+    {enableCustomCursor && (
+      <script is:inline>
+        (function () {
+          var targetX = window.innerWidth / 2
+          var targetY = window.innerHeight / 2
+          var currentX = targetX
+          var currentY = targetY
+          var hasLastPointerPosition = false
+          var rafId = null
+          var isHovering = false
+          var isHidden = true
+          var CURSOR_POSITION_STORAGE_KEY = 'palo-custom-cursor-position'
+
+          var HOVER_SELECTOR = 'a, button, .clickable, [role="button"], summary, label, input[type="checkbox"], input[type="radio"]'
+
+          // 检测 Safari：只有 Safari 的 position:fixed 在 pinch-zoom 时
+          // 相对于 layout viewport 定位，需要 visualViewport offset 补偿
+          // Chrome/Firefox 的 fixed 相对于 visual viewport，直接用 clientX/Y 即可
+          var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+
+          function getCursor() {
+            return document.querySelector('.palo-custom-cursor')
+          }
+
+          // 获取 visualViewport 偏移（仅 Safari 需要）
+          function getViewportOffset() {
+            if (!isSafari || !window.visualViewport) return { offsetX: 0, offsetY: 0 }
+            var vv = window.visualViewport
+            return { offsetX: vv.offsetLeft, offsetY: vv.offsetTop }
+          }
+
+          function update() {
+            var cursor = getCursor()
+            if (!cursor) {
+              rafId = null
+              return
+            }
+
+            if (isHidden) {
+              rafId = null
+              return
+            }
+
+            currentX += (targetX - currentX) * 0.5
+            currentY += (targetY - currentY) * 0.5
+
+            var vp = getViewportOffset()
+            var x = currentX + vp.offsetX
+            var y = currentY + vp.offsetY
+
+            cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)'
+
+            if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
+              rafId = requestAnimationFrame(update)
+            } else {
+              rafId = null
+            }
+          }
+
+          function scheduleUpdate() {
+            if (isHidden) return
+            if (rafId === null) {
+              rafId = requestAnimationFrame(update)
+            }
+          }
+
+          function showCursor() {
+            var cursor = getCursor()
+            if (!cursor) return
+            isHidden = false
+            cursor.classList.remove('is-hidden')
+            cursor.style.opacity = '1'
+            cursor.style.visibility = 'visible'
+          }
+
+          function hideCursor() {
+            var cursor = getCursor()
+            if (!cursor) return
+            isHidden = true
+            if (rafId !== null) {
+              cancelAnimationFrame(rafId)
+              rafId = null
+            }
+            cursor.classList.add('is-hidden')
+            cursor.style.opacity = '0'
+            cursor.style.visibility = 'hidden'
+            cursor.style.transform = 'translate3d(-200px, -200px, 0) translate(-50%, -50%)'
+          }
+
+          function isInsideViewport(x, y) {
+            return x >= 0 && x <= window.innerWidth && y >= 0 && y <= window.innerHeight
+          }
+
+          function savePointerPosition(x, y) {
+            try {
+              window.sessionStorage.setItem(CURSOR_POSITION_STORAGE_KEY, JSON.stringify({ x: x, y: y }))
+            } catch (e) {
+              // Ignore storage errors.
+            }
+          }
+
+          function restorePointerPosition() {
+            try {
+              var raw = window.sessionStorage.getItem(CURSOR_POSITION_STORAGE_KEY)
+              if (!raw) return false
+              var parsed = JSON.parse(raw)
+              if (!parsed || typeof parsed.x !== 'number' || typeof parsed.y !== 'number') return false
+              if (!isInsideViewport(parsed.x, parsed.y)) return false
+              targetX = currentX = parsed.x
+              targetY = currentY = parsed.y
+              hasLastPointerPosition = true
+              return true
+            } catch (e) {
+              return false
+            }
+          }
+
+          function onMouseMove(e) {
+            targetX = e.clientX
+            targetY = e.clientY
+            hasLastPointerPosition = true
+            savePointerPosition(targetX, targetY)
+
+            if (!isInsideViewport(targetX, targetY)) {
+              hideCursor()
+              return
+            }
+
+            showCursor()
+            scheduleUpdate()
+          }
+
+          function onMouseOver(e) {
+            var target = e.target
+            if (!(target instanceof Element)) return
+            var interactive = target.closest(HOVER_SELECTOR)
+            if (isHovering !== !!interactive) {
+              isHovering = !!interactive
+              var cursor = getCursor()
+              if (cursor) cursor.classList.toggle('is-hovering', isHovering)
+            }
+          }
+
+          function onMouseEnter() {
+            showCursor()
+          }
+
+          function onMouseLeave() {
+            hideCursor()
+          }
+
+          function onMouseOut(e) {
+            var related = e.relatedTarget
+            if (!related || !(related instanceof Node)) {
+              hideCursor()
+              return
+            }
+
+            if (!document.documentElement.contains(related)) {
+              hideCursor()
+            }
+          }
+
+          // Safari 缩放/滚动时立即重新定位，避免指针停留在旧位置
+          function onViewportChange() {
+            scheduleUpdate()
+          }
+
+          function init() {
+            var cursor = getCursor()
+            if (!cursor) return
+
+            if (!restorePointerPosition()) {
+              targetX = currentX = window.innerWidth / 2
+              targetY = currentY = window.innerHeight / 2
+            }
+
+            var vp = getViewportOffset()
+            var x = currentX + vp.offsetX
+            var y = currentY + vp.offsetY
+            cursor.style.transform = 'translate3d(' + x + 'px, ' + y + 'px, 0) translate(-50%, -50%)'
+            cursor.classList.remove('is-hidden')
+            cursor.style.opacity = '1'
+            cursor.style.visibility = 'visible'
+            isHidden = false
+
+            requestAnimationFrame(function () {
+              showCursor()
+              scheduleUpdate()
+            })
+          }
+
+          document.addEventListener('mousemove', onMouseMove, { passive: true })
+          document.addEventListener('mouseover', onMouseOver)
+          document.documentElement.addEventListener('mouseenter', onMouseEnter, { passive: true })
+          document.documentElement.addEventListener('mouseleave', onMouseLeave, { passive: true })
+          document.addEventListener('mouseout', onMouseOut)
+          window.addEventListener('blur', onMouseLeave)
+          window.addEventListener('focus', onMouseEnter)
+          window.addEventListener('pageshow', init)
+          window.addEventListener('load', init)
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') {
+              init()
+            }
+          })
+
+          // 只在 Safari 中监听 visualViewport 变化（pinch-zoom 补偿）
+          if (isSafari && window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onViewportChange)
+            window.visualViewport.addEventListener('scroll', onViewportChange)
+          }
+
+          init()
+          document.addEventListener('astro:page-load', init)
+          document.addEventListener('astro:after-swap', init)
+          document.addEventListener('astro:before-swap', hideCursor)
+        })()
+      </script>
+    )}
+  </body>
+</html>

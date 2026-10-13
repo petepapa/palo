@@ -1,0 +1,215 @@
+---
+import ProjectCard from '@components/ProjectCard.astro'
+import { Heading, Link } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getProjectTypeDefaultImage } from '@utils/projectImages'
+import { resolveCollectionCoverImage } from '@utils/contentImages'
+import { getProjectListWidthClass, type ProjectListWidth } from '@utils/projectListWidth'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import config from '@config'
+import { buildProjectListStyle } from '../types/config'
+
+type FeaturedProjectLayout = 'standard' | 'overlay'
+
+type SortBy = 'latest' | 'earliest' | 'popular'
+
+// Tailwind safelist: justify-start justify-center justify-end
+type ButtonAlign = 'left' | 'center' | 'right'
+
+const buttonAlignMap: Record<ButtonAlign, string> = {
+  left: 'justify-start',
+  center: 'justify-center',
+  right: 'justify-end',
+}
+
+/**
+ * FeaturedProjects Component
+ *
+ * @description A component that displays featured projects from Astro Content Collections
+ */
+interface Props {
+  /**
+   * Additional classes to apply to the section
+   */
+  class?: string
+  /**
+   * The number of projects to display
+   * @default 3
+   */
+  limit?: number
+  /**
+   * The title for the section
+   * @default "Featured projects"
+   */
+  title?: string
+  /**
+   * Project card layout
+   * @default "standard"
+   */
+  layout?: FeaturedProjectLayout
+  /**
+   * Project list width
+   * @default "container"
+   */
+  width?: ProjectListWidth
+  /**
+   * Project list gap class
+   * @default "gap-12"
+   */
+  gap?: string
+  /**
+   * Sort projects by: latest (newest first), earliest (oldest first)
+   * @default "latest"
+   */
+  sortBy?: SortBy
+  /**
+   * Heading level for ProjectCard title
+   * @default "h5"
+   */
+  projectHeadingLevel?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
+  /**
+   * CSS class for ProjectCard description text
+   * @default "text-base"
+   */
+  projectDescClass?: string
+  /**
+   * @deprecated Column counts are driven by `config.yaml` → `portfolio.defaults.columns`.
+   *            This prop is kept for backward compatibility and has no effect.
+   */
+  colsClass?: string
+  /**
+   * "查看更多"按钮对齐方式
+   * @default "right"
+   */
+  buttonAlign?: ButtonAlign
+  /**
+   * "查看更多"按钮文本
+   * @default "View all projects"
+   */
+  buttonText?: string
+}
+
+// 📖 从 config.yaml 读取 Portfolio FeaturedComponent 全局默认值
+const portfolioCfg = config.portfolio
+const featuredDefaults = portfolioCfg?.featuredComponent ?? {}
+const projectDefaults = portfolioCfg?.defaults ?? {}
+
+const {
+  class: className,
+  limit = featuredDefaults.limit ?? 3,
+  title = featuredDefaults.title ?? 'Featured projects',
+  layout = projectDefaults.layout ?? 'standard',
+  width = projectDefaults.width ?? 'container',
+  gap = projectDefaults.gap ?? 'gap-5',
+  sortBy = 'latest',
+  projectHeadingLevel = projectDefaults.projectHeadingLevel ?? 'h5',
+  projectDescClass = projectDefaults.projectDescClass ?? 'text-base',
+  buttonAlign = (featuredDefaults.buttonAlign as ButtonAlign) ?? 'right',
+  buttonText = featuredDefaults.buttonText ?? 'View all projects',
+} = Astro.props
+
+// 通过映射表获得实际的 Tailwind 类名，解决动态拼接导致的编译丢失问题
+const justifyClass = buttonAlignMap[buttonAlign] ?? 'justify-end'
+const projectListWidthClass = getProjectListWidthClass(width)
+const projectListGapSize = resolveTailwindGapClass(gap)
+const isFullWidthList = width === 'full'
+const listBaseClasses = ['project-masonry', projectListWidthClass]
+const listStyle = buildProjectListStyle(projectListGapSize, undefined, projectDefaults.columns)
+
+// Get projects from content collection (过滤草稿)
+const projects = (await getCollection('projects')).filter(
+  (project) => !project.data.draft,
+)
+
+// Dual-axis sorting: Featured First (by featuredOrder ASC) + Timeline Fallback (by sortBy)
+const featuredProjectsList = projects.filter((project) => project.data.featuredOrder !== undefined)
+const regularProjectsList = projects.filter((project) => project.data.featuredOrder === undefined)
+
+featuredProjectsList.sort(
+  (a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity),
+)
+regularProjectsList.sort((a, b) => {
+  switch (sortBy) {
+    case 'latest':
+    case 'popular':
+      return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
+    case 'earliest':
+      return (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0)
+    default:
+      return (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0)
+  }
+})
+
+const sortedProjects = [...featuredProjectsList, ...regularProjectsList]
+
+// Limit projects and add featured images
+const featuredProjects = sortedProjects.slice(0, limit).map((project) => ({
+  ...project,
+  featuredImage: resolveCollectionCoverImage(
+    project.data.coverImage,
+    project.id,
+    'projects',
+    getProjectTypeDefaultImage(project.data.type),
+  ),
+}))
+---
+
+<section class:list={[className, 'my-8']}>
+  {
+    isFullWidthList ? (
+      <>
+        <div class="container">
+          <Heading level="h2" class="mb-8">{title}</Heading>
+        </div>
+        <ul class:list={listBaseClasses} style={listStyle}>
+          {
+            featuredProjects.map((project) => (
+              <li class="project-masonry__item break-inside-avoid">
+                <ProjectCard
+                  project={project}
+                  image={project.featuredImage}
+                  layout={layout}
+                  headingLevel={projectHeadingLevel}
+                  descriptionClass={projectDescClass}
+                />
+              </li>
+            ))
+          }
+        </ul>
+        <div class={['container mt-12 flex', justifyClass].join(' ')}>
+          <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
+            {buttonText}
+            <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
+          </Link>
+        </div>
+      </>
+    ) : (
+      <div class="container">
+        <Heading level="h2" class="mb-8">{title}</Heading>
+        <ul class:list={listBaseClasses} style={listStyle}>
+          {
+            featuredProjects.map((project) => (
+              <li class="project-masonry__item break-inside-avoid">
+                <ProjectCard
+                  project={project}
+                  image={project.featuredImage}
+                  layout={layout}
+                  headingLevel={projectHeadingLevel}
+                  descriptionClass={projectDescClass}
+                />
+              </li>
+            ))
+          }
+        </ul>
+        <div class={['mt-12 flex', justifyClass].join(' ')}>
+          <Link href={ensureTrailingSlash('/portfolio')} isButton animateOnHover animationType="nudge">
+            {buttonText}
+            <Icon aria-hidden="true" name="ph:arrow-right" size="1.5rem" />
+          </Link>
+        </div>
+      </div>
+    )
+  }
+</section>

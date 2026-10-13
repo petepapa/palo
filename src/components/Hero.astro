@@ -1,0 +1,311 @@
+---
+import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
+import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
+
+/**
+ * Hero Component
+ *
+ * @description Reusable hero section with customizable visuals and slotted content.
+ */
+
+type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
+
+interface BackgroundEngine {
+  image?: string
+  video?: string
+  color?: string
+  fixed?: boolean
+  overlayOpacity?: number
+}
+
+interface Props {
+  fullscreen?: boolean
+  contentColor?: string
+  topNavigationTheme?: string
+  /**
+   * 分割线位置 / Divider position.
+   * 可选值：top | bottom | both | none
+   * 默认：bottom
+   */
+  divider?: DividerPlacement
+  /** Vertical align: top, center, bottom / 内容垂直对齐 */
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  /** Horizontal & Text align: left, center, right / 水平与文字大一统对齐 */
+  alignH?: '' | 'left' | 'center' | 'right'
+  /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
+  class?: string
+  /** Background Media Engine / 背景多媒体引擎 */
+  bg?: BackgroundEngine
+}
+
+const {
+  fullscreen = true,
+  contentColor = '',
+  topNavigationTheme = '',
+  divider = 'bottom',
+  alignV = '',
+  alignH = '',
+  useContainer = true,
+  class: className = '',
+  bg = {},
+} = Astro.props
+
+const {
+  image: backgroundImage = '',
+  video: backgroundVideo = '',
+  color: backgroundColor = '',
+  fixed: backgroundFixed = false,
+  overlayOpacity: backgroundOverlayOpacity = 0,
+} = bg
+
+const resolvedAlignV =
+  alignV === 'top' || alignV === 'bottom' ? alignV : 'center'
+const heroContentAlignMap = {
+  top: 'start',
+  center: 'center',
+  bottom: 'end',
+} as const
+const resolveDividerPlacement = (value: DividerPlacement = 'bottom'): 'top' | 'both' | 'bottom' | 'none' => {
+  if (value === 'none' || value === '') return 'none'
+  if (value === 'top') return 'top'
+  if (value === 'both') return 'both'
+  return 'bottom'
+}
+const dividerPlacement = resolveDividerPlacement(divider)
+const normalizedBackgroundOverlayOpacity = Number(backgroundOverlayOpacity)
+const resolvedBackgroundOverlayOpacity =
+  Number.isFinite(normalizedBackgroundOverlayOpacity)
+    ? Math.min(1, Math.max(0, normalizedBackgroundOverlayOpacity))
+    : 0
+const resolvedBackgroundVideo = normalizePublicAssetUrl(backgroundVideo)
+
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(backgroundImage)
+const dominantColor = isPng ? '' : (backgroundImage ? await getDominantColor(backgroundImage) : '')
+const shouldBgFadeOut = !isPng
+
+const { resolvedTopNavigationTheme, style: pageHeaderVisualStyle } = createPageHeaderVisuals({
+  backgroundColor,
+  backgroundImage,
+  contentColor,
+  topNavigationTheme,
+})
+const heroStyle = [
+  pageHeaderVisualStyle.replaceAll('--page-header-', '--hero-'),
+  `--hero-content-align: ${heroContentAlignMap[resolvedAlignV]}`,
+  `--hero-background-overlay-opacity: ${resolvedBackgroundOverlayOpacity}`,
+  alignH ? `--hero-text-align: ${alignH}` : '',
+]
+  .filter(Boolean)
+  .join('; ')
+---
+
+<section
+  class:list={[
+    className,
+    'hero',
+    fullscreen ? 'section-fullscreen' : 'hero--standard',
+    backgroundFixed && 'hero--background-fixed',
+    (dividerPlacement === 'top' || dividerPlacement === 'both') && 'hero--with-divider-top',
+    (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'hero--with-divider-bottom',
+  ]}
+  data-top-navigation-theme={resolvedTopNavigationTheme}
+  style={heroStyle || undefined}
+>
+  {(backgroundImage || backgroundVideo) && (
+    <div class="hero__background-media" aria-hidden="true">
+      {backgroundImage && (
+        <ContentImage
+          src={backgroundImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="hero__background-image"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+      {backgroundVideo && (
+        <video class="hero__background-video" src={resolvedBackgroundVideo} autoplay muted loop playsinline />
+      )}
+    </div>
+  )}
+
+  {(backgroundVideo || backgroundImage) && <div class="hero__background-overlay" aria-hidden="true"></div>}
+
+  <div class:list={['hero__content', useContainer && 'container']}>
+    <slot />
+  </div>
+</section>
+
+<style lang="scss">
+  @layer components {
+    .hero {
+      position: relative;
+      isolation: isolate;
+      background-color: var(--hero-background-color, transparent);
+    }
+
+    .hero--background-fixed {
+      overflow: hidden;
+      overflow: clip;
+      clip-path: inset(0);
+      background-image: none;
+    }
+
+    .hero--standard {
+      display: flex;
+      flex-direction: column;
+      align-items: var(--hero-text-align, center);
+      text-align: var(--hero-text-align, center);
+      justify-content: var(--hero-content-align, center);
+      padding-block-start: calc(var(--header-height, 0px) + var(--space-xl));
+      padding-block-end: var(--space-xl);
+    }
+
+    .hero--with-divider-top {
+      border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    .hero--with-divider-bottom {
+      border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    /* Fixed background: dividers repainted as pseudo-elements above the background layer */
+    .hero--background-fixed.hero--with-divider-top {
+      border-block-start: none;
+    }
+
+    .hero--background-fixed.hero--with-divider-top::before {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: -1px 0 auto 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .hero--background-fixed.hero--with-divider-bottom {
+      border-block-end: none;
+    }
+
+    .hero--background-fixed.hero--with-divider-bottom::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 0 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .hero > .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero__background-media {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      pointer-events: none;
+    }
+
+    .hero--background-fixed .hero__background-media {
+      position: fixed;
+      inset: 0;
+      inline-size: 100vw;
+      block-size: 100vh;
+      z-index: 0;
+    }
+
+    .hero--background-fixed .hero__background-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .hero__background-video {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero__background-image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero__background-image :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero__background-overlay {
+      position: absolute;
+      z-index: 2;
+      inset: 0;
+      pointer-events: none;
+      background-color: rgb(0 0 0 / var(--hero-background-overlay-opacity, 0));
+    }
+
+    .hero__content {
+      position: relative;
+      z-index: 3;
+      color: var(--hero-content-color, inherit);
+    }
+
+    /* Theme-adaptive buttons (only apply when topNavigationTheme is set) */
+    .hero[data-top-navigation-theme="light"] .button,
+    .hero[data-top-navigation-theme="dark"] .button {
+      --btn-bg: var(--hero-button-bg, var(--brand-primary)) !important;
+      --btn-text: var(--hero-button-text, var(--color-neutral-100)) !important;
+      background-color: var(--btn-bg) !important;
+      border-color: var(--hero-button-border, var(--btn-bg)) !important;
+      color: var(--btn-text) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button:hover,
+    .hero[data-top-navigation-theme="dark"] .button:hover {
+      background-color: var(--btn-text) !important;
+      border-color: var(--btn-text) !important;
+      color: var(--btn-bg) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button.button--outlined,
+    .hero[data-top-navigation-theme="dark"] .button.button--outlined {
+      background-color: transparent !important;
+      color: var(--hero-button-text) !important;
+      border-color: var(--hero-button-border) !important;
+    }
+
+    .hero[data-top-navigation-theme="light"] .button.button--outlined:hover,
+    .hero[data-top-navigation-theme="dark"] .button.button--outlined:hover {
+      background-color: var(--hero-button-border) !important;
+      color: var(--hero-button-bg) !important;
+    }
+  }
+</style>

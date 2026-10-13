@@ -1,0 +1,306 @@
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  基本信息 / Site Info                                        ║
+# ║  网站名称、标题格式、URL、功能开关                             ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+site:
+  name: Palo
+  titleSeparator: '|'         # 标签页标题分隔符，例："About | Palo"
+  trailingSlash: false        # URL 尾部斜杠：false → /about, true → /about/
+  defaultTheme: auto          # 默认主题：auto 跟随系统 / light 浅色 / dark 深色
+  darkModeToggle: true       # 启用深色模式切换 / Enable dark mode toggle
+  launcher: 'gradientBorder'          # 快捷启动器模式 (Cmd+K / Ctrl+K)。可选值：default / compact / gradientBorder / off
+  launcherIcon: 'ph:magnifying-glass' # 快捷启动器图标 / Launcher button icon
+  backToTop: true            # 启用页脚"回到顶部"链接 / Enable "Back to Top" link in footer
+  backToTopText: 'Back to Top'  # "回到顶部"链接文本 / Custom text for the back-to-top link
+  enableCustomCursor: true   # 启用自定义圆形鼠标指针（反色 + 悬停放大）/ Enable custom circular cursor with color inversion and hover scaling
+  hideScrollbar: true        # 隐藏网站滚动条 / Hide website scrollbar
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  SEO & 元数据 / SEO & Metadata                               ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+metadata:
+  siteUrl: 'https://palo.petepa.com/'
+  title: 'Palo — The Astro Theme for Creative Portfolios'
+  description: 'Palo is a minimalist Astro theme for artists, musicians, and designers. Control colors, typography, and layouts from one config file.'
+  author: Pete Lee
+  image: '/branding/social-preview-image.gif'  # 社交分享预览图，放 /public 下
+  favicon: '/branding/favicon.svg'             # 标签页图标，放 /public 下
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  品牌 / Branding                                             ║
+# ║  Logo · 主题色 · 状态色 · 字体                                ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+branding:
+  # Logo：两个都留空 → 显示文字 Logo；填路径 → 显示图片（放 /public 下）
+  # Logo: both empty → text logo; fill path → image logo (put in /public)
+  logoLight: '/branding/logo-light.svg' # 浅色主题 Logo / Light theme logo
+  logoDark: '/branding/logo-dark.svg'   # 深色主题 Logo / Dark theme logo
+  textLogo: 'Pa**lo**'    # 文字 Logo，支持 **bold**/*accent* 字重语法 / Text logo with **bold**/*accent* weight syntax
+  logoSize: '40px'  # 文字为字号，图片为高度 / Font size for text, height for image
+
+  # ── 颜色 / Colors ────────────────────────────────────────────
+  colors:
+    primary: '#ff4b00'    # 主品牌色
+    secondary: '#632a1b'  # 副品牌色
+    neutral: '#75878a'    # 中性色（文字、边框、背景）
+    outline: '#ffffff'    # 无障碍焦点轮廓色
+
+    # 状态色（按钮、徽章、通知等）
+    info: '#177cb0'
+    success: '#00bc12'
+    warning: '#ffa631'
+    error: '#f00056'
+
+  # ── 字体 / Font ──────────────────────────────────────────────
+  font:
+    name: 'League Spartan'         # 字体族名称
+    path: '/fonts/League_Spartan/' # 字体目录，放 /public 下
+    weights:
+      body: 300     # 正文
+      accent: 500   # 导航、按钮、标签等
+      heading: 600  # 所有标题
+    capHeightOffset: '-0.10em'     # 表单控件与 label 的垂直对齐微调
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  导航 / Navigation                                           ║
+# ║  固定顶栏、菜单布局、字号、高亮样式                            ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+navigation:
+  # ── 固定顶栏 / Sticky Header ─────────────────────────────────
+  fixedHeader: true              # 固定顶部，滚动时始终可见
+  minHeight: '6rem'               # 导航栏最小高度
+  headerBackgroundOpacity: 0.45   # 背景透明度（0 全透明 → 1 不透明）
+  headerBackgroundBlur: 10px      # 背景模糊（0 = 关闭）
+  mobileMenuLabel: false         # 展开菜单按钮旁是否显示 Menu/Close 文字
+
+  # ── 菜单布局 / Menu Layout ────────────────────────────────────
+  desktopMenuAlignment: 'center'  # 'left' | 'center' | 'right'
+  dropdownDesktopColorMode: 'inverse' # PC 下拉菜单配色：'theme' 跟随主题，'inverse' 反相
+
+  # ── 字号 / Font Sizes ─────────────────────────────────────────
+  desktopFontSize: 'lg'           # 桌面端主导航字号
+  dropdownDesktopFontSize: 'md'   # 桌面端下拉子菜单
+  mobileFontSize: 'xl'            # 手机端展开菜单
+  dropdownMobileFontSize: 'lg'    # 手机端下拉子菜单
+  mainMenuLineHeightScale: 1.25      # 主菜单竖排行高倍数
+  desktopDropdownLineHeightScale: 0.85  # PC端下拉菜单竖排行高倍数 (仅控制桌面端浮层间隙)
+  mobileDropdownLineHeightScale: 1      # 移动端下拉菜单竖排行高倍数 (仅控制折叠展开项间隙)
+
+  # ── 高亮样式 / Active Style ───────────────────────────────────
+  activeStyle: 'boldwavy'             # 'wavy' 波浪线 | 'underline' 直线 | 'bold' 加粗 | 'boldwavy' 加粗+波浪线 | 'boldunderline' 加粗+直线
+
+  # ── 二级导航列表（Tags、TOC、Footer 等）/ Nav List ──────────────
+  navList:
+    activeStyle: 'both'           # 'bold' 加粗 | 'underline' 下划线 | 'both' 双重 | 'none' 无
+    horizontalGap: 'gap-4'        # Tags 标签栏横排间距（标准 Tailwind gap 类名）
+    verticalScale: 0.6             # TOC / Footer 列表项纵向间距系数（行高倍数，默认 1 倍行高）
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  布局 / Layout                                               ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+layout:
+  containerMaxWidth: '1536px'     # 内容区最大宽度
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  版式 / Typography                                           ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+typography:
+  baseFontSize: '16px'          # 根字号，全站 1rem = 此值
+  lineHeightScale: 1.0          # 行高倍数
+  uppercaseDisplayText: true    # 标题和强调文字强制大写
+
+  # ── 标题缩放 / Heading Scale ──────────────────────────────────
+  mobileHeadingScale: 1.25      # 小屏标题缩放比
+  desktopHeadingScale: 1.65     # 大屏标题缩放比
+  headingLineHeightScale: 0.85  # 标题行高微调
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  描边 / Borders                                              ║
+# ║  在 border 命名空间下，组件名去除了冗余的 "Width" 后缀          ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+border:
+  global: '0.1rem'            # 全站默认描边宽度
+
+  # ── 组件独立描边（留空 = 继承全局） ──
+  button: ''                  # 按钮与按钮型链接
+  form: '0.075rem'            # 输入框、选择框、勾选框等
+  card: ''                    # Card 卡片
+  accordion: ''               # Accordion 折叠面板
+  tabs: ''                    # Tabs 标签与面板
+  badge: '0.075rem'           # Badge 徽章
+  avatar: ''                  # Avatar 头像
+  notification: ''            # Notification 通知
+  pagination: '0.1rem'        # Pagination 分页按钮
+  toggle: '0.1rem'            # Toggle 切换按钮
+  media: '0'                  # 图片/媒体描边
+  surface: '0.1rem'           # 下拉菜单、面板等容器
+  codeBlock: '0'              # 代码块描边
+  modal: '0.075rem'                  # Modal 弹窗
+  divider: '0.075rem'         # 分隔线线宽
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  圆角 / Radius                                               ║
+# ║  在 radius 命名空间下，组件名去除了冗余的 "Size" 后缀           ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+radius:
+  global: '0.75rem'           # 全站默认圆角大小
+
+  # ── 组件独立圆角（留空 = 继承全局） ──
+  button: ''                  # Button、按钮型 Link
+  form: ''                    # Input、Textarea、Select 等
+  card: '1.5rem'              # Card、Feature、CTA 等卡片型区块
+  media: ''                   # 图片/媒体圆角
+  tabs: '1rem'                # Tabs 标签与面板
+  badge: '0.25rem'            # Badge 徽章
+  notification: ''            # Notification 通知
+  avatar: ''                  # Avatar 方形圆角
+  pagination: '0.5rem'        # Pagination 分页按钮
+  toggle: '0.5rem'            # Toggle 切换按钮
+  surface: ''                 # 下拉菜单、工具面板等容器
+  codeBlock: '0.25rem'        # 代码块圆角
+  modal: '1rem'                  # Modal 弹窗
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  通用组件默认值 / Common Components Defaults                  ║
+# ║  配置独立聚合页头与内容详情页头（当页面 Frontmatter 未设置时）    ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+components:
+  # 🌐 网站菜单对应的各大主页/列表页头部总控 (应用于 Portfolio 主页、Blog 主页、About 页、Tags 汇总页等)
+  paloPageHeader:
+    headingLevel: "h1"    # 标题标签层级 (h1 ~ h6)
+    descClass: "text-lg"  # 描述文字的 Tailwind 类名
+    alignV: "center"      # 垂直对齐方式: center (居中) | top (靠顶) | bottom (靠底)
+    alignH: "left"        # 水平对齐方式: left (靠左) | center (居中) | right (靠右)
+    divider: "bottom"     # 装饰分割线位置: top | bottom | both | none
+    useContainer: true    # 是否默认使用 container 包裹内容区
+    fullscreen: false     # 是否全屏显示: true | false
+    topNavigationTheme: "" # 顶部导航主题: ''(跟随主题) | dark | light
+    class: ""             # 默认添加到组件根元素的自定义 CSS 类名
+
+  # 📄 所有内容详情页头部总控 (穿透应用于所有的 Single Post 文章页与 Single Project 作品详情页)
+  postHeader:
+    headingLevel: "h2"    # 详情页大标题标签层级 (h2 ~ h6)
+    descClass: "text-lg"  # 详情页摘要/引言的 Tailwind 类名
+    coverImagePosition: "head" # 封面图渲染位置: top | head | bottom | none
+    divider: "both"     # 标题下方的分割线: top | bottom | both | none
+    showBreadcrumbs: true # 是否默认显示面包屑导航 (True/False)
+    showShare: true       # 是否默认显示社交分享按钮组 (True/False)
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Portfolio / Projects 相关默认值                              ║
+# ║  作品集模块的视觉基因基座与场景平级覆盖控制                     ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+portfolio:
+  # ── 1. 数据与分页 (Data & Pagination) ──
+  pagination:
+    pageSize: 10           # 每页默认加载的项目数量
+    sortBy: "latest"      # 排序规则: latest (最新) | oldest (最早) | alphabetical (字母表)
+
+  # ── 2. 🧬 视觉基因基座 (Visual Framework Base) ──
+  # 改变此区块的参数，全站所有作品列表、分类、标签页及推荐组件的样式将一键同步。
+  defaults:
+    showTags: true        # 是否在卡片上显示标签徽章
+    showStats: true       # 是否显示项目统计/度量信息
+    layout: "overlay"     # 默认卡片布局: overlay (文字浮在图片上) | standard (文字在图片下方)
+    width: "full"         # 容器最大宽度: full (全宽屏幕) | container (限制在1536px盒模型内)
+    gap: "gap-5"          # 网格之间的间距 (支持标准 Tailwind gap 类名)
+    # 瀑布流/网格的响应式列数拆解，防止由于动态拼接导致编译时 Tailwind CSS 丢失
+    columns:
+      initial: 1          # 手机端默认列数 (Width < 640px)
+      sm: 2               # 平板端列数 (smBreakpoint)
+      lg: 3               # 桌面端列数 (lgBreakpoint)
+      xl: 3               # 大屏超宽端列数 (xlBreakpoint)
+    tagsHeading: "h5"          # 标签区块的隐藏层级
+    projectHeadingLevel: "h5"  # 项目卡片标题的字号标签
+    projectDescClass: "text-base" # 项目卡片简介的 Tailwind 类名
+
+  # ── 3. 📄 场景平级覆盖 (Scene Overrides) ──
+  # 各具体场景若无特别声明，将完美继承上方的 defaults 基座样式
+
+  listPage:               # 💡 对应主路由 [/portfolio] 作品集总列表页
+    title: "All Projects"
+    subtitle: "A visual summary of every project, arranged as an overlay masonry gallery."
+    allLabel: 'All Projects'  # 标签筛选中"全部"按钮文字
+
+  typePage:               # 💡 对应路由 [/portfolio/type/*] 按项目类型筛选的列表页
+    layout: "standard"    # 覆盖：类型页倾向于清晰的 standard 图文版式
+    width: "container"    # 覆盖：收紧页面视口宽度
+    gap: "gap-6"
+    columns: {}           # 留空：保持响应式列数完全继承 defaults.columns
+
+  tagPage:                # 💡 对应路由 [/portfolio/tag/*] 按技术标签筛选的列表页
+    layout: "overlay" 
+    width: "container" 
+    gap: "gap-5" 
+    columns: {} 
+
+  featuredComponent:      # 💡 智能组件：全站通用的「精选推荐作品」组件
+    limit: 10             # 限制该组件最多只渲染前 10 个精选项目
+    buttonAlign: right    # "查看更多"按钮位置：right | center | left
+    title: "Featured Projects"         # 🔥 大标题自定义
+    buttonText: "View All Projects"   # 🔥 "查看更多"按钮文本自定义
+
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  Blog / Posts 相关默认值                                     ║
+# ║  博客文章模块的视觉基因基座与场景平级覆盖控制                   ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+blog:
+  # ── 1. 数据与分页 (Data & Pagination) ──
+  pagination:
+    pageSize: 10          # 每页默认加载的文章数量
+    sortBy: "latest"
+
+  # ── 2. 🧬 视觉基因基座 (Visual Framework Base) ──
+  # 改变此区块的参数，全站文章列表页、标签页及最新文章组件将一键同步。
+  defaults:
+    showTags: true
+    showStats: true
+    itemGap: "gap-24"          # 列表条目之间的纵向大间距
+    cardGap: "gap-8 md:gap-16" # 卡片内部响应式间距体系
+    tagsHeading: "h5"
+    postHeadingLevel: "h3"
+    postDescClass: "text-md" # 🛠️ 深度优化：已修正非标准类名 text-md，统一规范为标准 text-base
+
+  # ── 3. 📄 场景平级覆盖 (Scene Overrides) ──
+  listPage:               # 💡 对应主路由 [/blog] 博客总文章列表页
+    title: "Blog"
+    subtitle: "Latest articles on web development, accessibility, and design best practices." # 🛠️ 修复：收拢了不规范的多行尾巴
+    allLabel: 'All Posts'     # 标签筛选中"全部"按钮文字
+
+  latestComponent:        # 💡 智能组件：首页或侧边栏通用的「最新文章」推荐组件
+    limit: 5              # 限制展示最新的 5 篇文章
+    buttonAlign: right    # "查看更多"按钮位置：right | center | left
+    title: "Latest Posts"              # 🔥 大标题自定义
+    buttonText: "View All Posts"      # 🔥 "查看更多"按钮文本自定义
+
+# ╔══════════════════════════════════════════════════════════════╗
+# ║  联系表单 / Contact Form                                      ║
+# ║  Resend 邮件服务配置，修改后重新部署即可生效，无需改代码          ║
+# ╚══════════════════════════════════════════════════════════════╝
+
+contact:
+  receiveEmail: "contact@petepa.com"      # 接收表单通知的个人邮箱
+  resendDomain: "palo.petepa.com"          # Resend 已验证域名；与下方前缀组合为发件邮箱
+  resendFromLocalPart: "hello"             # 发件邮箱前缀；与 resendDomain 必须同时填写
+  resendApiKey: ""                         # 本地测试用（线上留空，走部署平台环境变量 RESEND_API_KEY）

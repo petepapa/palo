@@ -1,0 +1,111 @@
+---
+import { Link, DarkMode } from 'accessible-astro-components'
+import LauncherTrigger from './LauncherTrigger.astro'
+import { Icon } from 'astro-icon/components'
+import themeConfig from '@config'
+import { navigationItems } from '../navigation'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+
+/**
+ * Navigation Items Component
+ *
+ * @description A component that displays the navigation items for the website
+ */
+interface Props {
+  variant?: 'all' | 'primary' | 'utility'
+  includeLauncher?: boolean
+}
+
+const { variant = 'all', includeLauncher = true } = Astro.props
+const launcherMode = themeConfig.site.launcher
+const launcherGradientBorder = launcherMode === 'gradientBorder'
+const launcherIsCompact = launcherMode === 'compact'
+const launcherIcon = themeConfig.site.launcherIcon || 'ph:lightning'
+const showLauncher = launcherMode !== 'off' && includeLauncher
+
+const primaryItems = navigationItems.filter((item) => !item.icon)
+const utilityItems = navigationItems.filter((item) => Boolean(item.icon))
+const itemsToRender = variant === 'primary' ? primaryItems : variant === 'utility' ? utilityItems : navigationItems
+---
+
+<ul class:list={['menu', variant !== 'all' && `menu--${variant}`]}>
+  {
+    itemsToRender.map((item: any) => (
+      <li
+        class:list={[
+          'menu-item',
+          item.type === 'dropdown' && 'has-dropdown',
+          item.icon && 'type-icon animate-rotate menu-item--utility',
+          !item.icon && 'menu-item--primary',
+        ]}
+      >
+        {item.type === 'dropdown' ? (
+          <button aria-haspopup="true" aria-expanded="false">
+            {item.label}
+            <Icon aria-hidden="true" name="ph:caret-down" size="32" />
+          </button>
+        ) : !item.type || item.type === 'link' ? (
+          <Link href={ensureTrailingSlash(item.href)} isExternal={item.external ?? false} hideIcon={!!item.icon}>
+            {item.icon ? (
+              <>
+                <Icon aria-hidden="true" name={item.icon} size="32" />
+                <span class="sr-only">{item.label}</span>
+              </>
+            ) : (
+              item.label
+            )}
+          </Link>
+        ) : null}
+        {item.type === 'dropdown' && (
+          <ul class="dropdown-menu">
+            {item.items.map((subItem: any) => (
+              <li class="submenu-item">
+                <Link href={ensureTrailingSlash(subItem.href)} isExternal={subItem.external ?? false}>
+                  {subItem.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))
+  }
+  {
+    variant !== 'primary' && themeConfig.site.darkModeToggle && (
+      <li class="menu-item type-icon animate-rotate menu-item--utility">
+        <DarkMode initialMode={themeConfig.site.defaultTheme}>
+          <Icon aria-hidden="true" name="ph:moon" slot="light" />
+          <Icon aria-hidden="true" name="ph:sun" slot="dark" />
+        </DarkMode>
+      </li>
+    )
+  }
+  {
+    variant !== 'primary' && showLauncher && launcherIsCompact && (
+      <li class="menu-item type-icon animate-rotate menu-item--utility">
+        <button
+          type="button"
+          class="launcher-compact-toggle"
+          aria-haspopup="dialog"
+          data-launcher-target="site-launcher"
+          aria-label="Search"
+        >
+          <Icon name={launcherIcon} size="1em" aria-hidden="true" />
+        </button>
+      </li>
+    )
+  }
+  {
+    variant !== 'primary' && showLauncher && !launcherIsCompact && (
+      <li class="menu-item menu-item--utility desktop-launcher">
+        <LauncherTrigger
+          launcherId="site-launcher"
+          compact={true}
+          gradientBorder={launcherGradientBorder}
+          icon={launcherIcon}
+        />
+      </li>
+    )
+  }
+</ul>
+

@@ -1,0 +1,98 @@
+import { defineCollection, z } from 'astro:content'
+import { glob } from 'astro/loaders'
+import { defaultProjectType, projectTypeIds } from './projectTypes'
+
+const imageField = z.string().optional().catch(undefined)
+
+const safeDateField = z
+  .date()
+  .optional()
+  .catch(() => new Date('2024-01-01'))
+
+const posts = defineCollection({
+  loader: glob({ 
+    pattern: '**/[^_]*.{md,mdx}', 
+    base: './src/content/posts',
+  }),
+  schema: () =>
+    z.object({
+      title: z.string().catch('Untitled'),
+      description: z.string().catch(''),
+      publishDate: safeDateField,
+      author: z
+        .union([
+          z.string(),
+          z.object({
+            name: z.string().catch('Anonymous'),
+            image: z.string().optional().catch(undefined),
+            bio: z.string().optional().catch(''),
+          }),
+        ])
+        .default('Anonymous')
+        .catch('Anonymous'),
+      tags: z.array(z.string()).default([]).catch([]),
+      coverImage: imageField,
+      breadcrumbs: z.boolean().default(true).catch(true),
+      source: z.string().optional().catch(undefined),
+      liveDemo: z.string().optional().catch(undefined),
+      customBreadcrumbLabels: z.any().optional().catch(undefined),
+      joinLastBreadcrumb: z.boolean().default(false).catch(false),
+      divider: z.enum(['top', 'bottom', 'both', 'none']).default('both').catch('both'),
+      coverImagePosition: z
+        .preprocess((val) => (val === false ? 'none' : val), z.enum(['top', 'head', 'bottom', 'none']))
+        .default('head')
+        .catch('head'),
+      toc: z.boolean().default(true).catch(true),
+      narrow: z.boolean().default(true).catch(true),
+      updatedDate: safeDateField,
+      featuredOrder: z.number().int().positive().optional().catch(undefined),
+      draft: z.boolean().default(false).catch(false),
+      share: z.boolean().default(true).catch(true),
+    }),
+})
+
+const projects = defineCollection({
+  loader: glob({ 
+    pattern: '**/[^_]*.{md,mdx}', 
+    base: './src/content/projects',
+  }),
+  schema: () =>
+    z.object({
+      title: z.string().catch('Untitled'),
+      author: z
+        .union([
+          z.string(),
+          z.object({
+            name: z.string().catch('Anonymous'),
+            image: z.string().optional().catch(undefined),
+            bio: z.string().optional().catch(''),
+          }),
+        ])
+        .default('Anonymous')
+        .catch('Anonymous'),
+      description: z.string().catch(''),
+      type: z.enum(projectTypeIds).default(defaultProjectType).catch(defaultProjectType),
+      tags: z.array(z.string()).default([]).catch([]),
+      coverImage: imageField,
+      breadcrumbs: z.boolean().default(true).catch(true),
+      source: z.string().optional().catch(undefined),
+      liveDemo: z.string().optional().catch(undefined),
+      customBreadcrumbLabels: z.any().optional().catch(undefined),
+      joinLastBreadcrumb: z.boolean().default(false).catch(false),
+      divider: z.enum(['top', 'bottom', 'both', 'none']).default('both').catch('both'),
+      coverImagePosition: z
+        .preprocess((val) => (val === false ? 'none' : val), z.enum(['top', 'head', 'bottom', 'none']))
+        .default('head')
+        .catch('head'),
+      toc: z.boolean().default(true).catch(true),
+      narrow: z.boolean().default(true).catch(true),
+      publishDate: safeDateField,
+      featuredOrder: z.number().int().positive().optional().catch(undefined),
+      externalLink: z.string().optional().catch(undefined),
+      video: z.string().optional().catch(undefined),
+      draft: z.boolean().default(false).catch(false),
+      share: z.boolean().default(true).catch(true),
+    }),
+})
+
+export const collections = { posts, projects }

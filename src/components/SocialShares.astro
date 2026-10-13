@@ -1,0 +1,75 @@
+---
+import { Icon } from 'astro-icon/components'
+import { Link } from 'accessible-astro-components'
+import QRCodeModal from '@components/QRCodeModal.astro'
+import { shareConfig } from '../shareConfig'
+
+interface Props {
+  url?: string
+  title?: string
+  description?: string
+}
+
+const {
+  url = Astro.url.href,
+  title = '',
+  description = '',
+} = Astro.props
+
+const wechatTriggerId = 'palo-wechat-share-trigger'
+---
+
+<ul class="flex flex-wrap gap-2">
+  {
+    shareConfig.map((channel) => {
+      if (channel.actionType === 'link' && channel.buildUrl) {
+        const href = channel.buildUrl({ url, title, description })
+        return (
+          <li>
+            <Link
+              href={href}
+              isButton
+              isExternal
+              hideIcon
+              animateOnHover
+              animationType="boop"
+              class="button--icon-only"
+            >
+              <Icon aria-hidden="true" name={channel.icon} />
+              <span class="sr-only">{channel.srText ?? `Share on ${channel.name}`}</span>
+            </Link>
+          </li>
+        )
+      }
+
+      if (channel.actionType === 'modal') {
+        return (
+          <li>
+            <Link
+              href="javascript:void(0)"
+              id={wechatTriggerId}
+              data-qrcode-trigger="true"
+              data-qrcode-base={wechatTriggerId}
+              isButton
+              hideIcon
+              animateOnHover
+              animationType="boop"
+              class="button--icon-only"
+            >
+              <Icon aria-hidden="true" name={channel.icon} />
+              <span class="sr-only">{channel.srText ?? `Share on ${channel.name}`}</span>
+            </Link>
+          </li>
+        )
+      }
+
+      return null
+    })
+  }
+</ul>
+
+<QRCodeModal 
+  title="Share on WeChat" 
+  qrUrl={url}
+  triggerId={wechatTriggerId}
+/>

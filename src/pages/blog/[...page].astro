@@ -1,0 +1,199 @@
+---
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import PostCard from '@components/PostCard.astro'
+import { Heading, Link, Pagination } from 'accessible-astro-components'
+import type { PaginateFunction } from 'astro'
+import { getCollection } from 'astro:content'
+import { getPostDefaultImage, resolveCollectionCoverImage } from '@utils/contentImages'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import { getTagOptions } from '@utils/slugify'
+import { PAGE_SIZE, SORT_BY } from '@utils/listConfig'
+import { resolveTailwindGapClass } from '@utils/tailwindSpacing'
+import config from '@config'
+
+// =========================================================================
+// 🎛️ 中央控制台 / Central Page Configuration (源自 config.yaml)
+//   三级降级链路：listPage → defaults → 硬编码兜底
+// =========================================================================
+const COVER_IMAGE_RATIO = '8 / 5'
+
+const blogRoot = config.blog
+const blogDefaults = blogRoot?.defaults ?? {}
+const blogListPage = blogRoot?.listPage ?? {}
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
+
+// ── .palo-nav-list 行内变量注入（gap-* → rem 映射 + verticalScale）──
+const GAP_TO_REM: Record<string, string> = {
+  'gap-0':'0','gap-px':'1px','gap-1':'0.25rem','gap-2':'0.5rem','gap-3':'0.75rem',
+  'gap-4':'1rem','gap-5':'1.25rem','gap-6':'1.5rem','gap-7':'1.75rem','gap-8':'2rem',
+  'gap-9':'2.25rem','gap-10':'2.5rem','gap-12':'3rem','gap-16':'4rem',
+  'gap-20':'5rem','gap-24':'6rem','gap-32':'8rem','gap-48':'12rem','gap-64':'16rem',
+}
+const navListHorizontalGapRem = GAP_TO_REM[config.navigation?.navList?.horizontalGap ?? 'gap-4'] ?? '1rem'
+const navListVerticalScale = config.navigation?.navList?.verticalScale ?? 1
+
+const pageConfig = {
+  // ── 文案与 SEO / Copywriting & SEO ──
+  title: blogListPage.title ?? 'Blog',
+  subtitle: blogListPage.subtitle ?? 'Latest articles on web development, accessibility, and design best practices.',
+  metaTitle: '',        // 选填。留空则自动复用 title
+  metaDescription: 'Insights, tutorials, and thoughts on web development, accessibility, and design.',
+  allLabel: blogListPage.allLabel ?? 'All Posts',
+
+  // ── 功能开关中心 / Feature Toggles (listPage → defaults) ──
+  showTags: blogListPage.showTags ?? blogDefaults.showTags ?? true,
+  showStats: blogListPage.showStats ?? blogDefaults.showStats ?? true,
+
+  // ── 列表排版参数 / List Layout Settings (listPage → defaults) ──
+  itemGap: blogListPage.itemGap ?? blogDefaults.itemGap ?? 'gap-24',
+  itemGapSize: resolveTailwindGapClass(blogListPage.itemGap ?? blogDefaults.itemGap ?? 'gap-24'),
+  cardGap: blogListPage.cardGap ?? blogDefaults.cardGap ?? 'gap-12 md:gap-24',
+
+  // ── 细粒度排版微调 / Typography Fine-Tuning (listPage → defaults) ──
+  tagsHeading: blogListPage.tagsHeading ?? blogDefaults.tagsHeading ?? 'h5',
+  postHeadingLevel: blogListPage.postHeadingLevel ?? blogDefaults.postHeadingLevel ?? 'h3',
+  postDescClass: blogListPage.postDescClass ?? blogDefaults.postDescClass ?? 'text-base',
+} as const
+
+// ── PaloPageHeader 结构化参数 (从 config.yaml 读取全局默认值) ──
+const pageHeaderDefaults = config.components?.paloPageHeader ?? {}
+const pageHeader = {
+  fullscreen: '',
+  contentColor: '',
+  topNavigationTheme: '',
+  alignV: pageHeaderDefaults.alignV ?? 'center',
+  alignH: pageHeaderDefaults.alignH ?? 'left',
+  divider: pageHeaderDefaults.divider ?? 'bottom',
+  bg: {
+    video: '',
+    image: '',
+    color: '',
+    fixed: false,
+    overlayOpacity: 0,
+  },
+} as const
+
+// =========================================================================
+// 📦 数据引擎与沙盒分页 / Data Fetching & Sandbox Pagination
+// =========================================================================
+export async function getStaticPaths({ paginate }: { paginate: PaginateFunction }) {
+  const posts = (await getCollection('posts')).filter((p) => !p.data.draft)
+
+  // 双轴排序引擎：精选置顶 (featuredOrder 升序) + SORT_BY.blog 时间轴兜底
+  const featured = posts.filter((p) => p.data.featuredOrder !== undefined)
+  const regular = posts.filter((p) => p.data.featuredOrder === undefined)
+
+  featured.sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+
+  if (SORT_BY.blog === 'latest') {
+    regular.sort((a, b) => (b.data.publishDate?.valueOf() || 0) - (a.data.publishDate?.valueOf() || 0))
+  } else {
+    regular.sort((a, b) => (a.data.publishDate?.valueOf() || 0) - (b.data.publishDate?.valueOf() || 0))
+  }
+
+  const sortedPosts = [...featured, ...regular]
+
+  const postsWithImages = sortedPosts.map((post) => {
+    const { author: originalAuthor, ...rest } = post.data
+    const author = typeof originalAuthor === 'object' ? originalAuthor.name : originalAuthor
+    return {
+      ...rest,
+      id: post.id,
+      author,
+      tags: rest.tags ?? [],
+      coverImage: post.data.coverImage,
+    }
+  })
+
+  return paginate(postsWithImages, { pageSize: PAGE_SIZE.blog })
+}
+
+// 类型由 getStaticPaths 返回值自动推断，无需手写 interface Post
+const { page } = Astro.props
+
+const resolvedMetaTitle = pageConfig.metaTitle || pageConfig.title
+
+// 💡 仅在开启 showTags 时才在服务器端计算 Tags 集合，彻底避免不必要的性能损耗与沙盒隔离隐患
+let uniqueTags: Array<{ label: string; slug: string }> = []
+if (pageConfig.showTags) {
+  const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
+  uniqueTags = getTagOptions(allPosts.flatMap((post) => post.data.tags))
+}
+---
+
+<DefaultLayout title={resolvedMetaTitle} description={pageConfig.metaDescription} hasHero={true}>
+  <PaloPageHeader
+    title={pageConfig.title}
+    subtitle={pageConfig.subtitle}
+    {...pageHeader}
+  />
+
+  <section class="my-12">
+    <div class="container">
+      {pageConfig.showTags && uniqueTags.length > 0 && (
+        <div class="tags-filter mb-8 palo-nav-list" data-active-style={navListActiveStyle}>
+          <Heading level={pageConfig.tagsHeading} size={pageConfig.tagsHeading} class="mb-3">Tags</Heading>
+          <div class="is-horizontal" style={`--palo-nav-horizontal-space: ${navListHorizontalGapRem}; --palo-nav-vertical-scale: ${navListVerticalScale}`}>
+            <Link href={ensureTrailingSlash('/blog')} aria-current="page">{pageConfig.allLabel}</Link>
+            {uniqueTags.map((tag) => (
+              <Link href={ensureTrailingSlash('/blog/tag/' + tag.slug)}>{tag.label}</Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pageConfig.showStats && (
+        <p class="mb-6 text-sm text-neutral-500 italic">
+          <em>Post {page.start + 1} through {page.end} of {page.total} total posts · Page {page.currentPage} of {page.lastPage}</em>
+        </p>
+      )}
+
+      <ul class="my-8 grid grid-cols-1" style={`gap: ${pageConfig.itemGapSize}`}>
+        {
+          page.data.map((post) => {
+            const featuredImage = resolveCollectionCoverImage(
+              post.coverImage,
+              post.id,
+              'posts',
+              getPostDefaultImage(),
+            )
+
+            return (
+              <li>
+                <PostCard
+                  image={featuredImage}
+                  imageRatio={COVER_IMAGE_RATIO}
+                  url={ensureTrailingSlash('/blog/' + post.id)}
+                  title={post.title}
+                  footer={post.author}
+                  headingLevel={pageConfig.postHeadingLevel}
+                  cardGap={pageConfig.cardGap}
+                  descriptionClass={pageConfig.postDescClass}
+                >
+                  {post.description}
+                </PostCard>
+              </li>
+            )
+          })
+        }
+      </ul>
+
+      {
+        page && page.lastPage > 1 && (
+          <div class="mt-12 grid place-content-center">
+            <Pagination
+              firstPage={page.url.prev ? ensureTrailingSlash('/blog') : null}
+              previousPage={page.url.prev ? ensureTrailingSlash(page.url.prev) : null}
+              nextPage={page.url.next ? ensureTrailingSlash(page.url.next) : null}
+              lastPage={page.url.next ? ensureTrailingSlash(`/blog/${page.lastPage}`) : null}
+              currentPage={`${page.currentPage}`}
+              totalPages={`${page.lastPage}`}
+              ariaLabel="Blog pagination"
+            />
+          </div>
+        )
+      }
+    </div>
+  </section>
+</DefaultLayout>

@@ -1,0 +1,257 @@
+/**
+ * Button Override Styles — Flat Design with Interactive Color Swap
+ *
+ * Features:
+ * - No box-shadow, no translate shifts, no text-decoration (flat + minimal)
+ * - Default: black bg / white text (light), white bg / black text (dark)
+ * - Primary/Secondary: brand-color bg / neutral-100 text (both modes)
+ * - Semantic types (Info, Success, Warning, Error): solid color bg / light text
+ * - Outline: transparent bg, theme-driven text (black/white), type-specific border
+ * - Hover (solid): swap background-color ↔ color
+ * - Hover (outlined): bg becomes border color, text becomes white
+ * - Smooth transition: background/color/border-color use --animation-speed-medium + --cubic-bezier
+ */
+
+/* ============================================================
+   1. DECORATIVE EFFECT REMOVAL (overrides component library)
+   ============================================================ */
+
+.button,
+a.button,
+button.button {
+  --button-radius: var(--radius-button, 0.25rem);
+  --button-corner-safe-inset: min(calc(var(--button-radius) * 0.5), var(--space-s));
+  --button-padding-inline-base: 1rem;
+  --button-padding-inline: calc(var(--button-padding-inline-base) + (var(--button-corner-safe-inset) * 0.5));
+
+  font-weight: var(--font-weight-accent, 400);
+  border-width: var(--border-width-button, var(--border-width-global, 3px)) !important;
+  border-radius: var(--button-radius) !important;
+  padding-inline: var(--button-padding-inline) !important;
+}
+
+.button.button--sm,
+a.button.button--sm,
+button.button.button--sm {
+  --button-padding-inline-base: 0.75rem;
+}
+
+.button.button--lg,
+a.button.button--lg,
+button.button.button--lg {
+  --button-padding-inline-base: 1.5rem;
+}
+
+.button .button-content,
+a.button .button-content,
+button.button .button-content {
+  position: relative;
+  top: calc(var(--font-cap-height-offset, -0.05em) * -1.5);
+}
+
+:where(.button) {
+  box-shadow: none !important;
+  text-decoration: none !important;
+}
+
+:where(.button:where(:hover, :focus-visible)) {
+  text-decoration: none !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :where(.button:where(:hover, :focus-visible)) {
+    translate: none !important;
+  }
+}
+
+:where(.button.animation-pulse) {
+  box-shadow: none !important;
+}
+
+/* ============================================================
+   2. BASE TRANSITION
+   ============================================================ */
+
+:where(.button) {
+  transition:
+    background var(--animation-speed-medium) var(--cubic-bezier),
+    color var(--animation-speed-medium) var(--cubic-bezier),
+    border-color var(--animation-speed-medium) var(--cubic-bezier) !important;
+}
+
+/* ============================================================
+   3. SOLID (FILLED) BUTTONS
+      Each type uses --btn-bg / --btn-text custom properties
+      for clean hover swap without JavaScript.
+   ============================================================ */
+
+/* --- Default: black/white extreme contrast --- */
+:where(.button.type-default) {
+  --btn-bg: var(--color-default-bg) !important;
+  --btn-text: var(--color-default-text) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--color-default-border) !important;
+  color: var(--btn-text) !important;
+}
+
+:where(.button.type-default:hover) {
+  background-color: var(--color-default-text) !important;
+  border-color: var(--color-default-text) !important;
+  color: var(--color-default-bg) !important;
+}
+
+/* --- Primary: brand color, always light text --- */
+:where(.button.type-primary) {
+  --btn-bg: var(--brand-primary) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+/* --- Secondary: brand color, always light text --- */
+:where(.button.type-secondary) {
+  --btn-bg: var(--brand-secondary) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+/* --- Info: solid blue background --- */
+:where(.button.type-info) {
+  --btn-bg: var(--color-info-border) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+/* --- Success: solid green background --- */
+:where(.button.type-success) {
+  --btn-bg: var(--color-success-border) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+/* --- Warning: solid orange background --- */
+:where(.button.type-warning) {
+  --btn-bg: var(--color-warning-border) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+/* --- Error: solid red background --- */
+:where(.button.type-error) {
+  --btn-bg: var(--color-error-border) !important;
+  --btn-text: var(--color-neutral-100) !important;
+  background-color: var(--btn-bg) !important;
+  border-color: var(--btn-bg) !important;
+  color: var(--btn-text) !important;
+}
+
+:where(.button.button--filled:not(.type-default):hover) {
+  background-color: var(--color-default-text) !important;
+  border-color: var(--color-default-text) !important;
+  color: var(--color-default-bg) !important;
+}
+
+/* ============================================================
+   4. OUTLINED BUTTONS
+      Transparent bg, theme-driven text, type-specific border.
+      Hover: bg becomes border color, text becomes white.
+   ============================================================ */
+
+/* Base: all outlined buttons have transparent background */
+:where(.button.button--outlined),
+:where(a.button.button--outlined),
+:where(button.button.button--outlined) {
+  background-color: transparent !important;
+  border-width: max(1px, var(--border-width-button, var(--border-width-global, 3px))) !important;
+}
+
+/* Default state text: theme-driven --- */
+:where(.button--outlined) {
+  color: light-dark(#000000, #ffffff) !important;
+}
+
+/* Outlined Default */
+:where(.button--outlined.type-default) {
+  --outline-border: light-dark(var(--color-neutral-700), var(--color-neutral-300)) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-default:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Primary */
+:where(.button--outlined.type-primary) {
+  --outline-border: var(--brand-primary) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-primary:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Secondary */
+:where(.button--outlined.type-secondary) {
+  --outline-border: var(--brand-secondary) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-secondary:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Info */
+:where(.button--outlined.type-info) {
+  --outline-border: var(--color-info-border) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-info:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Success */
+:where(.button--outlined.type-success) {
+  --outline-border: var(--color-success-border) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-success:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Warning */
+:where(.button--outlined.type-warning) {
+  --outline-border: var(--color-warning-border) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-warning:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}
+
+/* Outlined Error */
+:where(.button--outlined.type-error) {
+  --outline-border: var(--color-error-border) !important;
+  border-color: var(--outline-border) !important;
+}
+
+:where(.button--outlined.type-error:hover) {
+  background-color: var(--outline-border) !important;
+  color: #ffffff !important;
+}

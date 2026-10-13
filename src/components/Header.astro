@@ -1,0 +1,494 @@
+---
+import Navigation from '@components/Navigation.astro'
+import LauncherConfig from '@components/LauncherConfig.astro'
+import { HighContrast, ReducedMotion, SkipLink } from 'accessible-astro-components'
+import themeConfig from '@config'
+
+/**
+ * Header Component
+ *
+ * @description A component that displays the header of the website
+ */
+interface Props {
+  /** Hero / page-header navigation theme at scroll top: '' | 'dark' | 'light' */
+  topNavigationTheme?: '' | 'dark' | 'light'
+}
+
+const { topNavigationTheme = '' } = Astro.props as Props
+const { layout, site } = themeConfig
+
+// Convert opacity (0–1) to a CSS alpha value for the fixed header background
+const headerBgOpacity = themeConfig.navigation?.headerBackgroundOpacity ?? layout.headerBackgroundOpacity ?? 0.75
+// Blur strength for the fixed header background
+const headerBgBlur = themeConfig.navigation?.headerBackgroundBlur ?? layout.headerBackgroundBlur ?? '12px'
+const fixedHeader = themeConfig.navigation?.fixedHeader ?? layout.fixedHeader
+const navMinHeight = themeConfig.navigation?.minHeight ?? '4.5rem'
+const headerPosition = fixedHeader ? 'fixed' : 'absolute'
+const resolvedTopNavigationTheme =
+  topNavigationTheme === 'dark' || topNavigationTheme === 'light' ? topNavigationTheme : undefined
+---
+
+<style is:inline>
+  header {
+    min-height: var(--nav-min-height, 4.5rem);
+    background-color: color-mix(
+      in oklab,
+      var(--background-color, #000) calc(var(--header-bg-opacity, 0.75) * 100%),
+      transparent
+    );
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+    transition:
+      background-color var(--animation-speed-fast) var(--cubic-bezier),
+      backdrop-filter var(--animation-speed-fast) var(--cubic-bezier);
+  }
+
+  html:not([data-css-ready="true"]) header {
+    transition: none;
+  }
+
+  header.is-at-top:not(.is-menu-open) {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+
+  header.is-menu-open {
+    background-color: var(--background-color, #000);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+  }
+
+  header.is-at-top[data-top-navigation-theme='light'] {
+    --foreground-color: var(--color-neutral-800, #1f2937);
+    --background-color: var(--color-neutral-100, #f8fafc);
+    --icon-color: var(--color-neutral-800, #1f2937);
+    --link-color: var(--color-neutral-800, #1f2937);
+    --link-hover-color: var(--color-neutral-700, #374151);
+    --border-color: var(--color-neutral-900, #111827);
+    --text-decoration-color: var(--color-neutral-700, #374151);
+    --text-decoration-color-hover: var(--color-neutral-900, #111827);
+    --outline-color: var(--color-outline-200, #d1d5db);
+    color-scheme: light;
+  }
+
+  header.is-at-top[data-top-navigation-theme='dark'] {
+    --foreground-color: var(--color-neutral-100, #f8fafc);
+    --background-color: var(--color-neutral-900, #111827);
+    --icon-color: var(--color-neutral-100, #f8fafc);
+    --link-color: var(--color-neutral-100, #f8fafc);
+    --link-hover-color: var(--color-neutral-200, #e5e7eb);
+    --border-color: var(--color-neutral-100, #f8fafc);
+    --text-decoration-color: var(--color-neutral-100, #f8fafc);
+    --text-decoration-color-hover: var(--color-neutral-200, #e5e7eb);
+    --outline-color: var(--color-outline-100, #f8fafc);
+    color-scheme: dark;
+  }
+
+  header.is-at-top[data-top-navigation-theme] {
+    color: var(--foreground-color);
+  }
+
+  header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+    color: var(--foreground-color);
+  }
+
+  header.is-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  #main-navigation {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #main-navigation > .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    position: relative;
+  }
+
+  #main-navigation .nav-bar {
+    display: flex;
+    flex: 1 1 100%;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-m, 1rem);
+    min-block-size: var(--nav-min-height, 6rem);
+  }
+
+  #main-navigation .wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-m, 1rem);
+  }
+
+  #main-navigation ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #main-navigation a {
+    text-decoration: none;
+  }
+
+  #main-navigation .desktop-menu {
+    display: none;
+  }
+
+  #main-navigation .mobile-menu {
+    position: absolute;
+    z-index: 110;
+    inset-block-start: 100%;
+    inset-inline: 0;
+    height: 0;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    background-color: var(--background-color);
+  }
+
+  #main-navigation .has-dropdown > ul {
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .logo-link .logo-svg,
+  .logo-link .logo-raster {
+    width: auto;
+    height: var(--logo-size, 40px);
+    block-size: var(--logo-size, 40px);
+    max-inline-size: 100%;
+    background-color: transparent;
+  }
+
+  .logo-link .logo-svg svg {
+    display: block;
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+  }
+
+  .logo-svg--light,
+  .logo-raster--light {
+    display: block;
+  }
+
+  .logo-svg--dark,
+  .logo-raster--dark {
+    display: none;
+  }
+
+  .darkmode .logo-svg--light,
+  .darkmode .logo-raster--light {
+    display: none;
+  }
+
+  .darkmode .logo-svg--dark,
+  .darkmode .logo-raster--dark {
+    display: block;
+  }
+
+  .logo-link .logo-text {
+    font-size: var(--logo-size, 40px);
+    line-height: 1;
+    text-transform: none;
+    white-space: nowrap;
+  }
+
+  .responsive-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs, 0.25rem);
+  }
+
+  .responsive-toggle svg {
+    width: 26px;
+    height: 21px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 1050px) {
+    #main-navigation .nav-bar {
+      flex: 1 1 auto;
+    }
+
+    #main-navigation .mobile-menu,
+    #main-navigation .responsive-toggle,
+    #main-navigation .mobile-launcher {
+      display: none;
+    }
+
+    #main-navigation .desktop-menu {
+      display: grid;
+      flex: 1 1 auto;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: var(--space-m, 1rem);
+      min-inline-size: 0;
+    }
+
+    #main-navigation .desktop-menu > ul {
+      display: flex;
+      align-items: center;
+      gap: var(--space-m, 1rem);
+    }
+  }
+</style>
+
+<header
+  class:list={[fixedHeader && 'is-fixed', 'is-at-top']}
+  {...(resolvedTopNavigationTheme ? { 'data-top-navigation-theme': resolvedTopNavigationTheme } : {})}
+  style={`position: ${headerPosition}; top: 0; left: 0; right: 0; width: 100%; min-height: ${navMinHeight}; z-index: 50; --header-bg-opacity: ${headerBgOpacity}; --header-bg-blur: ${headerBgBlur}`}
+>
+  <SkipLink />
+  <!-- Initialize preference components -->
+  <div hidden>
+    <HighContrast />
+    <ReducedMotion />
+  </div>
+
+  <Navigation />
+  {
+    site.launcher && <LauncherConfig />
+  }
+</header>
+
+<script is:inline>
+  (function () {
+    var header = document.querySelector('header');
+    if (!header) return;
+
+    var threshold = header.offsetHeight || 72;
+    if (window.scrollY > threshold) header.classList.remove('is-at-top');
+
+    // 预填充 modifier 快捷键（launcher JS bundle 加载前即显示正确的修饰键图标）
+    if (document.readyState === 'loading') {
+      var modifiers = document.querySelectorAll('.key.modifier');
+      if (modifiers.length) {
+        var isMac = navigator.userAgent.indexOf('Mac') !== -1;
+        var content = isMac
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"/></svg><span class="sr-only">Command</span>'
+          : 'Ctrl';
+        for (var i = 0; i < modifiers.length; i++) {
+          modifiers[i].innerHTML = content;
+        }
+      }
+    }
+  })();
+</script>
+
+<style lang="scss" is:global>
+  header {
+    width: 100%;
+    z-index: 50;
+    background-color: color-mix(in oklab, var(--background-color) calc(var(--header-bg-opacity, 0.75) * 100%), transparent);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+    transition:
+      background-color var(--animation-speed-fast) var(--cubic-bezier),
+      backdrop-filter var(--animation-speed-fast) var(--cubic-bezier);
+  }
+
+  html:not([data-css-ready="true"]) header {
+    transition: none;
+  }
+
+  header.is-fixed,
+  header.is-menu-open {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  body:not(.has-fixed-header):has(main > :where(.hero, .palo-page-header):first-child) > header:not(.is-menu-open) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  header.is-at-top:not(.is-menu-open) {
+    background-color: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+
+  header.is-at-top[data-top-navigation-theme='light'] {
+    --foreground-color: var(--color-neutral-800);
+    --background-color: var(--color-neutral-100);
+    --icon-color: var(--color-neutral-800);
+    --link-color: var(--color-neutral-800);
+    --link-hover-color: var(--color-neutral-700);
+    --border-color: var(--color-neutral-900);
+    --text-decoration-color: var(--color-neutral-700);
+    --text-decoration-color-hover: var(--color-neutral-900);
+    --outline-color: var(--color-outline-200);
+    color-scheme: light;
+  }
+
+  header.is-at-top[data-top-navigation-theme='dark'] {
+    --foreground-color: var(--color-neutral-100);
+    --background-color: var(--color-neutral-900);
+    --icon-color: var(--color-neutral-100);
+    --link-color: var(--color-neutral-100);
+    --link-hover-color: var(--color-neutral-200);
+    --border-color: var(--color-neutral-100);
+    --text-decoration-color: var(--color-neutral-100);
+    --text-decoration-color-hover: var(--color-neutral-200);
+    --outline-color: var(--color-outline-100);
+    color-scheme: dark;
+  }
+
+  header.is-at-top[data-top-navigation-theme] {
+    color: var(--foreground-color);
+  }
+
+  header.is-at-top[data-top-navigation-theme] :where(a, button, svg, .logo-text) {
+    color: var(--foreground-color);
+  }
+
+  header.is-menu-open {
+    background-color: var(--background-color);
+    backdrop-filter: blur(var(--header-bg-blur, 12px));
+    -webkit-backdrop-filter: blur(var(--header-bg-blur, 12px));
+  }
+
+  body.has-fixed-header main {
+    padding-top: var(--header-height);
+  }
+
+  body.has-fixed-header #main-content {
+    scroll-margin-top: var(--header-height);
+  }
+</style>
+
+<script define:vars={{ fixedHeader }}>
+  /**
+   * Dynamically measures the fixed header height and sets
+   * --header-height on :root so content padding follows suit.
+   */
+  function observeHeaderHeight() {
+    const header = /** @type {HTMLElement} */ (document.querySelector('header'))
+    if (!header) return
+
+    document.body.classList.toggle('has-fixed-header', Boolean(fixedHeader))
+
+    const setHeight = () => {
+      document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px')
+    }
+
+    setHeight()
+
+    window.__paloHeaderResizeObserver?.disconnect()
+    const ro = new ResizeObserver(setHeight)
+    ro.observe(header)
+    window.__paloHeaderResizeObserver = ro
+  }
+
+  const initHeaderHeight = () => {
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', observeHeaderHeight, { once: true })
+    } else {
+      observeHeaderHeight()
+    }
+  }
+
+  function initHeaderScrollState() {
+    const header = /** @type {HTMLElement} */ (document.querySelector('header'))
+    if (!header) return
+
+    const syncHeaderScrollState = () => {
+      const headerHeight = header.offsetHeight || 1
+      const isAtTop = !fixedHeader || window.scrollY <= headerHeight
+      const topNavigationSource = /** @type {HTMLElement | null} */ (document.querySelector('main [data-top-navigation-theme]'))
+      const topNavigationTheme = topNavigationSource?.dataset.topNavigationTheme
+
+      header.classList.toggle('is-at-top', isAtTop)
+
+      if (isAtTop && (topNavigationTheme === 'light' || topNavigationTheme === 'dark')) {
+        header.dataset.topNavigationTheme = topNavigationTheme
+      } else {
+        delete header.dataset.topNavigationTheme
+      }
+
+      // 派发自定义事件，通知下拉菜单更新样式
+      window.dispatchEvent(new CustomEvent('palo:header-theme-change'))
+    }
+
+    window.__paloHeaderScrollController?.abort()
+    const controller = new AbortController()
+    window.__paloHeaderScrollController = controller
+
+    syncHeaderScrollState()
+    window.addEventListener('scroll', syncHeaderScrollState, { passive: true, signal: controller.signal })
+    window.addEventListener('resize', syncHeaderScrollState, { passive: true, signal: controller.signal })
+  }
+
+  const initHeader = () => {
+    initHeaderHeight()
+    initHeaderScrollState()
+  }
+
+  document.addEventListener('astro:page-load', initHeader)
+  document.addEventListener('astro:after-swap', initHeader)
+  initHeader()
+</script>
+
+<style lang="scss" is:global>
+  @use 'scss/base/breakpoint' as *;
+
+  @layer overrides {
+    header {
+      li.type-icon {
+        display: block;
+
+        @include breakpoint('nav') {
+          translate: 0 4px;
+        }
+
+        button {
+          border: none !important;
+          border-radius: 0;
+        }
+
+        svg {
+          inline-size: 30px;
+          block-size: 30px;
+        }
+      }
+
+      li.type-icon ~ li.type-icon {
+        @include breakpoint('nav') {
+          margin-inline-start: calc(var(--space-2xs) * -1);
+        }
+      }
+
+      li.desktop-launcher {
+        display: none;
+      }
+
+      @include breakpoint('nav') {
+        li.desktop-launcher {
+          display: block;
+        }
+      }
+    }
+  }
+</style>

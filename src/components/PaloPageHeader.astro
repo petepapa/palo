@@ -1,0 +1,401 @@
+---
+import { Heading } from 'accessible-astro-components'
+import sanitizeHtml from 'sanitize-html'
+import { createPageHeaderVisuals, normalizePublicAssetUrl } from '@utils/pageHeaderVisuals'
+import config from '@config'
+import { getDominantColor } from '@utils/imageColor'
+import { isPngImage } from '@utils/contentImages'
+import ContentImage from '@components/ContentImage.astro'
+
+type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
+
+interface BgProps {
+  image?: string
+  video?: string
+  color?: string
+  fixed?: boolean
+  overlayOpacity?: number
+}
+
+interface Props {
+  class?: string
+  title: string
+  subtitle?: string
+  fullscreen?: boolean
+  contentColor?: string
+  topNavigationTheme?: string
+  /**
+   * 分割线位置 / Divider position.
+   * 可选值：top | bottom | both | none
+   * 默认：bottom
+   */
+  divider?: DividerPlacement
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  alignH?: '' | 'left' | 'center' | 'right'
+  headingLevel?: string
+  descClass?: string
+  bg?: BgProps
+  /**
+   * 是否使用 container 容器包裹内容 / Whether to wrap content in a container
+   * @default true
+   */
+  useContainer?: boolean
+}
+
+// 📖 从 config.yaml 读取组件全局默认值
+const componentDefaults = config.components?.paloPageHeader ?? {}
+
+// 📖 从 config.yaml 读取导航相关配置
+const { navigation } = config
+const navMinHeight = navigation?.minHeight ?? '4.5rem'
+
+// 🛡️ 安全取值：拦截空字符串，当 prop 显式传入 '' 时视同未设置，回退至 config.yaml 默认值
+const _props = Astro.props as Props
+
+const className = _props.class || componentDefaults.class || ''
+const title = _props.title
+const subtitle = _props.subtitle
+// ⚡ 布尔解析：支持 boolean/string，未设置或空串回退到 config 默认值
+const isFullscreenExplicitFalse = _props.fullscreen === false || _props.fullscreen === 'false'
+const hasFullscreenProp = _props.fullscreen !== undefined && _props.fullscreen !== null && _props.fullscreen !== ''
+const fullscreen = isFullscreenExplicitFalse ? false : (hasFullscreenProp ? Boolean(_props.fullscreen) : Boolean(componentDefaults.fullscreen))
+const contentColor = _props.contentColor || ''
+const topNavigationTheme = _props.topNavigationTheme || componentDefaults.topNavigationTheme || ''
+
+// ⚡ 空字符串拦截：当 Astro 传入空 string 时视为未设置，回退至 config.yaml 默认值
+function resolveStringProp<T>(prop: any, configDefault: T, fallback: T): T {
+  return (prop === '' || prop === undefined || prop === null) ? (configDefault ?? fallback) : (prop as T)
+}
+
+const divider = resolveStringProp(_props.divider, componentDefaults.divider, 'bottom')
+const alignV: string = resolveStringProp(_props.alignV, componentDefaults.alignV, 'center')
+const alignH: string = resolveStringProp(_props.alignH, componentDefaults.alignH, 'left')
+const headingLevel = _props.headingLevel || componentDefaults.headingLevel || 'h1'
+const descClass = _props.descClass || componentDefaults.descClass || 'text-lg'
+const bg = _props.bg ?? {}
+// ⚡ 布尔解析：仅 boolean false / string 'false' 为关闭，undefined/null/空串回退到 config 默认值
+const isExplicitFalse = _props.useContainer === false || _props.useContainer === 'false'
+const useContainer = isExplicitFalse ? false : (componentDefaults.useContainer ?? true)
+
+const bgImage = bg.image ?? ''
+const bgVideo = bg.video ?? ''
+const bgColor = bg.color ?? ''
+const bgFixed = bg.fixed ?? false
+const bgOverlayOpacity = Number(bg.overlayOpacity ?? 0)
+
+const resolvedAlignV = alignV === 'top' || alignV === 'bottom' ? alignV : 'center'
+const pageHeaderContentAlignMap = {
+  top: 'start',
+  center: 'center',
+  bottom: 'end',
+} as const
+
+const resolveDividerPlacement = (value: DividerPlacement = 'bottom'): 'top' | 'both' | 'bottom' | 'none' => {
+  if (value === 'none' || value === '') return 'none'
+  if (value === 'top') return 'top'
+  if (value === 'both') return 'both'
+  return 'bottom'
+}
+const dividerPlacement = resolveDividerPlacement(divider)
+
+const resolvedAlignH = alignH === 'center' || alignH === 'right' ? alignH : 'left'
+const pageHeaderTextAlignMap = {
+  left: 'start',
+  center: 'center',
+  right: 'end',
+} as const
+const pageHeaderItemsAlignMap = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+} as const
+
+const resolvedBgOverlayOpacity = Number.isFinite(bgOverlayOpacity)
+  ? Math.min(1, Math.max(0, bgOverlayOpacity))
+  : 0
+const resolvedBgVideo = normalizePublicAssetUrl(bgVideo)
+const hasMedia = Boolean(bgImage) || Boolean(bgVideo)
+
+const { resolvedTopNavigationTheme, style: pageHeaderStyle } = createPageHeaderVisuals({
+  backgroundColor: bgColor,
+  backgroundImage: bgImage,
+  contentColor,
+  topNavigationTheme,
+})
+
+// ── 图片格式智能感知 ──
+// PNG：不显示纯色占位（防止透明通道闪烁，直接透出页面背景）
+// 非 PNG：提取主色调作为加载占位
+const isPng = isPngImage(bgImage)
+const dominantColor = isPng ? '' : (bgImage ? await getDominantColor(bgImage) : '')
+const bgImageBgStyle = dominantColor ? `background-color: ${dominantColor};` : ''
+const shouldBgFadeOut = !isPng
+
+// ── 慢速网络优化：直接计算内联 padding，确保第一帧即有正确的顶部空间 ──
+// 不依赖外部 CSS 文件，避免加载延迟导致的内容贴顶塌陷
+// 策略：只定义 CSS 变量，不直接设置 padding 属性
+// 这样允许 Tailwind utilities（@layer utilities）覆盖默认值
+// 用户可通过 config.yaml 的 class 参数设置 pt-* / pb-* / py-* 来自定义
+const resolvedPageHeaderStyle = [
+  pageHeaderStyle,
+  bgImageBgStyle,
+  `--page-header-content-align: ${pageHeaderContentAlignMap[resolvedAlignV]}`,
+  `--page-header-text-align: ${pageHeaderTextAlignMap[resolvedAlignH]}`,
+  `--page-header-items-align: ${pageHeaderItemsAlignMap[resolvedAlignH]}`,
+  `--page-header-background-overlay-opacity: ${resolvedBgOverlayOpacity}`,
+  `--page-header-padding-top: calc(${navMinHeight} + var(--page-header-padding-block, var(--space-xl, 3rem)))`,
+  `--page-header-padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem))`,
+]
+  .filter(Boolean)
+  .join('; ')
+
+const sanitizedSubtitle: string = subtitle
+  ? sanitizeHtml(subtitle, {
+      allowedTags: ['b', 'i', 'em', 'strong', 'a', 'span', 'br'],
+      allowedAttributes: {
+        a: ['href', 'title', 'target', 'rel'],
+        span: ['class'],
+      },
+    })
+  : ''
+---
+
+<section
+  class:list={[
+    className,
+    'palo-page-header',
+    fullscreen ? 'section-fullscreen' : 'palo-page-header--standard',
+    bgFixed && 'palo-page-header--background-fixed',
+    (dividerPlacement === 'top' || dividerPlacement === 'both') && 'palo-page-header--with-divider-top',
+    (dividerPlacement === 'bottom' || dividerPlacement === 'both') && 'palo-page-header--with-divider-bottom',
+  ]}
+  data-top-navigation-theme={resolvedTopNavigationTheme}
+  style={resolvedPageHeaderStyle || undefined}
+>
+  {(bgImage || bgVideo) && (
+    <div class="palo-page-header__background-media" aria-hidden="true">
+      {bgImage && (
+        <ContentImage
+          src={bgImage}
+          alt=""
+          width={1920}
+          height={1080}
+          class="palo-page-header__background-image"
+          fadeIn={true}
+          bgColor={dominantColor || undefined}
+          bgFadesOut={shouldBgFadeOut}
+          loading="eager"
+          decoding="async"
+        />
+      )}
+      {bgVideo && (
+        <video class="palo-page-header__background-video" src={resolvedBgVideo} autoplay muted loop playsinline />
+      )}
+    </div>
+  )}
+
+  {hasMedia && <div class="palo-page-header__background-overlay" aria-hidden="true"></div>}
+
+  <div class:list={['palo-page-header__content', 'space-content', useContainer ? 'container' : 'palo-page-header__content--no-container']}>
+    <Heading level={headingLevel}>{title}</Heading>
+    {sanitizedSubtitle && <p class={descClass} set:html={sanitizedSubtitle} />}
+  </div>
+</section>
+
+<style lang="scss">
+  // 默认 padding（含导航栏补偿）：放在 @layer base，
+  // 使其优先级低于 Tailwind 在 @layer utilities 中的 pt-、pb-、py-、p- 工具类
+  // 使用 --nav-min-height 而非 --header-height：前者是静态 CSS 变量，
+  // 不依赖 JS 执行，慢速网络下第一帧即有正确的顶部空间。
+  @layer base {
+    :where(.palo-page-header--standard) {
+      padding-top: calc(var(--nav-min-height, 4.5rem) + var(--page-header-padding-block, var(--space-xl, 3rem)));
+      padding-bottom: var(--page-header-padding-block, var(--space-xl, 3rem));
+    }
+  }
+
+  @layer components {
+    .palo-page-header {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background-color: var(--page-header-background-color, transparent);
+    }
+
+    .palo-page-header--background-fixed {
+      overflow: hidden;
+      overflow: clip;
+      clip-path: inset(0);
+      background-image: none;
+    }
+
+    .palo-page-header--standard {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-content: var(--page-header-content-align, center);
+      justify-content: stretch;
+      justify-items: stretch;
+    }
+
+    .palo-page-header--with-divider-top {
+      border-block-start: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    .palo-page-header--with-divider-bottom {
+      border-block-end: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+
+    /* Fixed background: dividers repainted as pseudo-elements above the background layer */
+    .palo-page-header--background-fixed.palo-page-header--with-divider-top {
+      border-block-start: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-top::before {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: -1px 0 auto 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-bottom {
+      border-block-end: none;
+    }
+
+    .palo-page-header--background-fixed.palo-page-header--with-divider-bottom::after {
+      content: '';
+      position: absolute;
+      z-index: 2;
+      inset: auto 0 0 0;
+      block-size: var(--border-width-divider, var(--border-width-global, 3px));
+      background: var(--border-color-subtle);
+      pointer-events: none;
+    }
+
+    .palo-page-header > .container {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      inline-size: 100%;
+      max-width: none;
+      max-inline-size: none;
+    }
+
+    .palo-page-header__content--no-container {
+      position: relative;
+      z-index: 2;
+      padding-inline: var(--grid-gutter, 1.5rem);
+      width: 100%;
+      inline-size: 100%;
+      box-sizing: border-box;
+    }
+
+    .palo-page-header__background-media {
+      position: absolute;
+      z-index: 0;
+      inset: 0;
+      inline-size: 100%;
+      block-size: 100%;
+      pointer-events: none;
+    }
+
+    .palo-page-header--background-fixed .palo-page-header__background-media {
+      position: fixed;
+      inset: 0;
+      inline-size: 100vw;
+      block-size: 100vh;
+      z-index: 0;
+    }
+
+    .palo-page-header--background-fixed .palo-page-header__background-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+    }
+
+    // 修复：非固定全屏模式外层容器物理高度像素对冲
+    // 当 fullscreen=true 且 fixed=false 时，min-height:100vh 在部分浏览器中存在
+    // 亚像素四舍五入误差，导致外层容器比实际视口矮约 0.5–1px。
+    // 通过在外层容器上强制 +1px 高度并用负 margin 咬合后续元素，
+    // 从物理层面消灭底部穿帮线。内层 overflow: hidden 无影响。
+    .palo-page-header.section-fullscreen:not(.palo-page-header--background-fixed) {
+      height: calc(100vh + 1px) !important;
+      min-height: calc(100dvh + 1px) !important;
+      margin-block-end: -1px !important;
+      position: relative;
+      z-index: 1;
+    }
+
+    .palo-page-header__background-video {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      inline-size: 100%;
+      block-size: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .palo-page-header__background-image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .palo-page-header__background-image :global(.progressive-img-inner) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .palo-page-header__background-overlay {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      pointer-events: none;
+      background-color: rgb(0 0 0 / var(--page-header-background-overlay-opacity, 0));
+    }
+
+    .palo-page-header__content {
+      display: flex;
+      flex-direction: column;
+      align-items: var(--page-header-items-align, flex-start);
+      text-align: var(--page-header-text-align, start);
+      color: var(--page-header-content-color, inherit);
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button,
+    .palo-page-header[data-top-navigation-theme='dark'] .button {
+      --btn-bg: var(--page-header-button-bg, var(--brand-primary)) !important;
+      --btn-text: var(--page-header-button-text, var(--color-neutral-100)) !important;
+      background-color: var(--btn-bg) !important;
+      border-color: var(--page-header-button-border, var(--btn-bg)) !important;
+      color: var(--btn-text) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button:hover,
+    .palo-page-header[data-top-navigation-theme='dark'] .button:hover {
+      background-color: var(--btn-text) !important;
+      border-color: var(--btn-text) !important;
+      color: var(--btn-bg) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button.button--outlined,
+    .palo-page-header[data-top-navigation-theme='dark'] .button.button--outlined {
+      background-color: transparent !important;
+      color: var(--page-header-button-text) !important;
+      border-color: var(--page-header-button-border) !important;
+    }
+
+    .palo-page-header[data-top-navigation-theme='light'] .button.button--outlined:hover,
+    .palo-page-header[data-top-navigation-theme='dark'] .button.button--outlined:hover {
+      background-color: var(--page-header-button-border) !important;
+      color: var(--page-header-button-bg) !important;
+    }
+  }
+</style>

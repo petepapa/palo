@@ -1,0 +1,69 @@
+---
+import { Icon } from 'astro-icon/components'
+
+interface Props {
+  /**
+   * The quote content that will be displayed
+   */
+  children: any
+  /**
+   * The name of the person who said the quote
+   */
+  author?: string
+}
+
+const { author } = Astro.props
+---
+
+<blockquote class="border-primary-500 border-l-4 pl-4">
+  <div>
+    <Icon aria-hidden="true" name="ph:quotes" class="quote-icon-start" size="2rem" />
+    <slot />
+    <Icon aria-hidden="true" name="ph:quotes" class="quote-icon-end" size="2rem" />
+  </div>
+  {author && <cite class="block text-sm font-medium">{author}</cite>}
+</blockquote>
+
+<style lang="scss" is:global>
+  @layer components {
+    blockquote {
+      font-size: var(--font-size-1);
+
+      div {
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+
+      span {
+        font-size: 1.125rem;
+      }
+
+      span p, p {
+        display: inline;
+      }
+
+      svg {
+        display: inline;
+        margin-block-start: calc(var(--space-s) * -1);
+        vertical-align: middle;
+
+        // 🔥 核心修正：开头的左引号通过 scale: -1 实现真正的双轴对称翻转（等同于旋转 180 度）
+        &.quote-icon-start {
+          scale: -1 !important;
+        }
+
+        &.quote-icon-end {
+          // 结尾的右引号保持原生朝向
+          scale: 1 !important;
+        }
+      }
+
+      cite {
+        margin-block-start: var(--space-s);
+        font-size: var(--font-size-1);
+        text-transform: uppercase; // 保持你图纸中的全大写冷峻格调
+        letter-spacing: 0.05em;
+      }
+    }
+  }
+</style>

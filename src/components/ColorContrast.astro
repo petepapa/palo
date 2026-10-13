@@ -1,0 +1,440 @@
+---
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+
+import { Heading, Tabs, TabsList, TabsTab, TabsPanel } from 'accessible-astro-components'
+
+interface ColorGroup {
+  name: string
+  prefix: string
+  values: number[]
+}
+
+interface Theme {
+  name: string
+  id: string
+  description: string
+  textColor: string
+  bgVar: string
+}
+
+// Define color variants to test
+const colorGroups: ColorGroup[] = [
+  { name: 'Primary', prefix: 'primary', values: [100, 200, 300, 400, 500] },
+  { name: 'Secondary', prefix: 'secondary', values: [100, 200, 300, 400, 500] },
+  { name: 'Neutral', prefix: 'neutral', values: [100, 200, 300, 400, 500, 600, 700, 800, 900] },
+]
+
+// Semantic color variants (info, success, warning, error)
+const semanticColorGroups: ColorGroup[] = [
+  { name: 'Info', prefix: 'info', values: [100, 200, 300, 400, 500] },
+  { name: 'Success', prefix: 'success', values: [100, 200, 300, 400, 500] },
+  { name: 'Warning', prefix: 'warning', values: [100, 200, 300, 400, 500] },
+  { name: 'Error', prefix: 'error', values: [100, 200, 300, 400, 500] },
+]
+
+// Define themes to test
+const themes: Theme[] = [
+  {
+    name: 'Light Mode',
+    id: 'light-mode',
+    description: 'Dark text on colored backgrounds',
+    textColor: '#1A1A1A',
+    bgVar: 'var(--color-neutral-100)',
+  },
+  {
+    name: 'Dark Mode',
+    id: 'dark-mode',
+    description: 'Light text on colored backgrounds',
+    textColor: '#FFFFFF',
+    bgVar: 'var(--color-neutral-900)',
+  },
+]
+---
+
+<div class={`color-contrast ${className || ''}`}>
+  <div class="tabs-wrapper">
+    <Tabs>
+      <TabsList>
+        {
+          themes.map((theme, index) => (
+            <TabsTab id={theme.id} controls={`${theme.id}-panel`} selected={index === 0}>
+              {theme.name}
+            </TabsTab>
+          ))
+        }
+      </TabsList>
+
+      {
+        themes.map((theme, index) => (
+          <TabsPanel id={`${theme.id}-panel`} labelledby={theme.id} selected={index === 0}>
+            <div class="theme-section">
+              <div class="theme-header">
+                <Heading level="h2">{theme.name}</Heading>
+                <p>{theme.description}</p>
+              </div>
+              <div class="color-categories">
+                {/* Three column layout for color categories */}
+                <div class="color-category">
+                  <Heading level="h3">Primary Colors</Heading>
+                  <div class="colors">
+                    {colorGroups[0].values.map((value) => (
+                      <div
+                        class="color-item"
+                        data-color-var={`--color-${colorGroups[0].prefix}-${value}`}
+                        data-theme-text-color={theme.textColor}
+                        style={`background-color: var(--color-${colorGroups[0].prefix}-${value})`}
+                      >
+                        <span class="color-name">
+                          {colorGroups[0].prefix} {value}
+                        </span>
+                        <span class="contrast-score" aria-live="polite" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div class="color-category">
+                  <Heading level="h3">Secondary Colors</Heading>
+                  <div class="colors">
+                    {colorGroups[1].values.map((value) => (
+                      <div
+                        class="color-item"
+                        data-color-var={`--color-${colorGroups[1].prefix}-${value}`}
+                        data-theme-text-color={theme.textColor}
+                        style={`background-color: var(--color-${colorGroups[1].prefix}-${value})`}
+                      >
+                        <span class="color-name">
+                          {colorGroups[1].prefix} {value}
+                        </span>
+                        <span class="contrast-score" aria-live="polite" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div class="color-category">
+                  <Heading level="h3">Neutral Colors</Heading>
+                  <div class="colors">
+                    {colorGroups[2].values.map((value) => (
+                      <div
+                        class="color-item"
+                        data-color-var={`--color-${colorGroups[2].prefix}-${value}`}
+                        data-theme-text-color={theme.textColor}
+                        style={`background-color: var(--color-${colorGroups[2].prefix}-${value})`}
+                      >
+                        <span class="color-name">
+                          {colorGroups[2].prefix} {value}
+                        </span>
+                        <span class="contrast-score" aria-live="polite" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsPanel>
+        ))
+      }
+    </Tabs>
+  </div>
+
+  <!-- Semantic Colors Section -->
+  <div class="tabs-wrapper">
+    <Tabs>
+      <TabsList>
+        {
+          themes.map((theme, index) => (
+            <TabsTab id={`semantic-${theme.id}`} controls={`semantic-${theme.id}-panel`} selected={index === 0}>
+              {theme.name}
+            </TabsTab>
+          ))
+        }
+      </TabsList>
+
+      {
+        themes.map((theme, index) => (
+          <TabsPanel id={`semantic-${theme.id}-panel`} labelledby={`semantic-${theme.id}`} selected={index === 0}>
+            <div class="theme-section">
+              <div class="theme-header">
+                <Heading level="h2">{theme.name}</Heading>
+                <p>{theme.description}</p>
+              </div>
+              <div class="color-categories color-categories--semantic">
+                {
+                  semanticColorGroups.map((group) => (
+                    <div class="color-category">
+                      <Heading level="h3">{group.name} Colors</Heading>
+                      <div class="colors">
+                        {group.values.map((value) => (
+                          <div
+                            class="color-item"
+                            data-color-var={`--color-${group.prefix}-${value}`}
+                            data-theme-text-color={theme.textColor}
+                            style={`background-color: var(--color-${group.prefix}-${value})`}
+                          >
+                            <span class="color-name">
+                              {group.prefix} {value}
+                            </span>
+                            <span class="contrast-score" aria-live="polite" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
+          </TabsPanel>
+        ))
+      }
+    </Tabs>
+  </div>
+</div>
+
+<script>
+  function initializeContrastChecker(): void {
+    const wcagLevels = [
+      { name: 'AAA', ratio: 7.0, className: 'excellent' },
+      { name: 'AA', ratio: 4.5, className: 'good' },
+      { name: 'AA Large', ratio: 3.0, className: 'fair' },
+      { name: 'Fail', ratio: 0, className: 'poor' },
+    ]
+
+    function getLuminance(r: number, g: number, b: number): number {
+      const sRGB = [r, g, b].map((val) => {
+        val = val / 255
+        return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4)
+      })
+      return 0.2126 * sRGB[0] + 0.7152 * sRGB[1] + 0.0722 * sRGB[2]
+    }
+
+    function getContrastRatio(rgb1: number[], rgb2: number[]): number {
+      const lum1 = getLuminance(rgb1[0], rgb1[1], rgb1[2])
+      const lum2 = getLuminance(rgb2[0], rgb2[1], rgb2[2])
+      return (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05)
+    }
+
+    /** 从任意 CSS 颜色字符串中提取 sRGB [r,g,b]，层进式兜底 */
+    function extractSRGB(colorStr: string): [number, number, number] | null {
+      if (!colorStr) return null
+      const s = colorStr.trim()
+      // rgb() / rgba() — 逗号分隔
+      let m = s.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/)
+      if (m) return [Number(m[1]), Number(m[2]), Number(m[3])]
+      // rgb() / rgba() — 空格分隔
+      m = s.match(/rgba?\(\s*(\d+)\s+(\d+)\s+(\d+)/)
+      if (m) return [Number(m[1]), Number(m[2]), Number(m[3])]
+      // hex
+      m = s.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/)
+      if (m) return [parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)]
+      m = s.match(/^#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])$/)
+      if (m) return [parseInt(m[1]+m[1],16), parseInt(m[2]+m[2],16), parseInt(m[3]+m[3],16)]
+      return null
+    }
+
+    /** 将 CSS 变量表达式（如 "var(--color-info-100)"）强行解析为 sRGB 三通道 */
+    function resolveCSSVarToRGB(cssVarExpr: string): [number, number, number] {
+      // 方法1：注入临时 div 的 backgroundColor，尝试直接读取 computed value
+      const div = document.createElement('div')
+      div.style.cssText = 'position:fixed;top:-9999px;left:-9999px;display:block;'
+      div.style.backgroundColor = cssVarExpr
+      document.body.appendChild(div)
+      div.getBoundingClientRect() // 强制 layout，确保变量求值
+
+      const raw = window.getComputedStyle(div).backgroundColor
+      const direct = extractSRGB(raw)
+      if (direct) {
+        document.body.removeChild(div)
+        return direct
+      }
+
+      // 方法2：部分浏览器对 color 属性的计算值一定会转为 sRGB
+      div.style.color = cssVarExpr
+      const viaColor = extractSRGB(window.getComputedStyle(div).color)
+      if (viaColor) {
+        document.body.removeChild(div)
+        return viaColor
+      }
+
+      // 方法3：canvas 2D fillStyle 兜底（仅支持 sRGB，但可触发浏览器转换）
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = 1; canvas.height = 1
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.fillStyle = raw || cssVarExpr
+          ctx.fillRect(0, 0, 1, 1)
+          const px = ctx.getImageData(0, 0, 1, 1).data
+          if (px[3] > 0) {  // alpha > 0 说明有颜色写入
+            document.body.removeChild(div)
+            return [px[0], px[1], px[2]]
+          }
+        }
+      } catch (_) { /* canvas 不可用 */ }
+
+      // 终极兜底：记录错误，返回中灰作为明显异常信号
+      console.error(
+        '[ContrastChecker] 无法将 CSS 变量解析为 RGB：',
+        { expr: cssVarExpr, rawComputed: raw, div }
+      )
+      document.body.removeChild(div)
+      return [128, 128, 128]
+    }
+
+    function getWCAGLevel(ratio: number) {
+      for (const level of wcagLevels) {
+        if (ratio >= level.ratio) return { name: level.name, className: level.className, ratio: ratio.toFixed(2) }
+      }
+      return { name: 'Fail', className: 'poor', ratio: ratio.toFixed(2) }
+    }
+
+    function processColorItems(): void {
+      const colorItems = document.querySelectorAll('.color-item')
+
+      colorItems.forEach((item) => {
+        if (!(item instanceof HTMLElement)) return
+
+        const colorVar = item.getAttribute('data-color-var')
+        if (!colorVar) {
+          console.warn('[ContrastChecker] 缺少 data-color-var', item)
+          return
+        }
+
+        const bgRGB = resolveCSSVarToRGB(`var(${colorVar})`)
+
+        const isDarkPanel = item.closest('[id*="dark-mode"]') !== null || 
+                            item.getAttribute('data-theme-text-color') === '#FFFFFF'
+
+        const targetTextColor = isDarkPanel ? '#FFFFFF' : '#1A1A1A'
+        const nameElement = item.querySelector('.color-name') as HTMLElement
+        if (nameElement) nameElement.style.color = targetTextColor
+
+        const textRGB: [number, number, number] = isDarkPanel ? [255, 255, 255] : [26, 26, 26]
+        const contrastRatio = getContrastRatio(bgRGB, textRGB)
+        const result = getWCAGLevel(contrastRatio)
+
+        const scoreElement = item.querySelector('.contrast-score')
+        if (scoreElement) {
+          scoreElement.textContent = `${result.ratio} ${result.name}`
+          scoreElement.className = `contrast-score ${result.className}`
+        }
+      })
+    }
+
+    // 事件挂载
+    document.addEventListener('astro:page-load', processColorItems)
+    document.addEventListener('astro:after-swap', processColorItems)
+    
+    // 监控一切可能引发 Tab 切换或主题切换的全局点击
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement
+      if (target.closest('[role="tab"]') || target.closest('.darkmode-toggle') || target.closest('[data-action="toggle-dark-mode"]')) {
+        setTimeout(processColorItems, 100)
+      }
+    })
+  }
+
+  initializeContrastChecker()
+</script>
+
+<style lang="scss">
+  @use 'scss/base/breakpoint' as *;
+
+  @layer components {
+    .color-contrast {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .theme-section {
+      inline-size: 100%;
+    }
+
+    .theme-header {
+      margin-bottom: var(--space-m);
+    }
+
+    .theme-header h2,
+    .theme-header h3 {
+      margin-bottom: var(--space-xs);
+    }
+
+    .theme-header p {
+      font-size: var(--font-size-2);
+    }
+
+    .color-categories {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+
+      @include breakpoint(l) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      &.color-categories--semantic {
+        @include breakpoint(m) {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        @include breakpoint(l) {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+    }
+
+    .color-category h3 {
+      margin-bottom: var(--space-xs);
+      font-size: var(--font-size-1);
+    }
+
+    .colors {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .color-item {
+      display: flex;
+      position: relative;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: var(--radius-s);
+      padding: var(--space-m);
+      block-size: 3rem;
+      font-weight: var(--font-weight-accent, 400);
+    }
+
+    .contrast-score {
+      border-radius: var(--radius-xs);
+      padding: var(--space-2xs) var(--space-3xs);
+      font-weight: var(--font-weight-heading, 500);
+      font-size: var(--font-size--1);
+    }
+
+    .excellent {
+      background-color: #047857;
+      color: #fff;
+    }
+
+    .good {
+      background-color: #059669;
+      color: #fff;
+    }
+
+    .fair {
+      background-color: #d97706;
+      color: #fff;
+    }
+
+    .poor {
+      background-color: #dc2626;
+      color: #fff;
+    }
+  }
+</style>

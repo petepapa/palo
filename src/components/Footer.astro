@@ -1,0 +1,250 @@
+---
+import CreativeSection from './CreativeSection.astro'
+import Logo from './Logo.astro'
+import Slogan from './Slogan.astro'
+import QRCodeModal from './QRCodeModal.astro'
+import { Heading, Link } from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
+import { getCollection } from 'astro:content'
+import { ensureTrailingSlash } from '@utils/trailingSlash'
+import config from '@config'
+import { socialConfig } from '../navigation'
+import { getQrCodeBaseId, getQrCodeModalId, getQrCodeFooterTriggerId } from '@utils/qrcodeId'
+import { renderAccentLabel } from '@utils/parseAccentLabel'
+
+/**
+ * Footer Component
+ *
+ * @description A component that displays the footer of the website
+ */
+const currentYear = new Date().getFullYear()
+const siteName = config.site.name
+const backToTopEnabled = config.site.backToTop !== false
+const backToTopText = config.site.backToTopText ?? 'Back to Top'
+const navListActiveStyle = config.navigation?.navList?.activeStyle ?? 'bold'
+
+// ── Footer 列表：动态获取 Featured Projects 和 Latest Posts ──
+const footerLimit = 5
+const featuredTitle = config.portfolio?.featuredComponent?.title ?? 'Featured Projects'
+const latestTitle = config.blog?.latestComponent?.title ?? 'Latest Posts'
+
+// Featured Projects
+const allProjects = (await getCollection('projects')).filter((p) => !p.data.draft)
+const featuredProjects = allProjects
+  .filter((p) => p.data.featuredOrder !== undefined)
+  .sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+const regularProjects = allProjects
+  .filter((p) => p.data.featuredOrder === undefined)
+  .sort((a, b) => (b.data.publishDate?.valueOf() ?? 0) - (a.data.publishDate?.valueOf() ?? 0))
+const footerProjects = [...featuredProjects, ...regularProjects].slice(0, footerLimit)
+
+// Latest Posts
+const allPosts = (await getCollection('posts')).filter((p) => !p.data.draft)
+const featuredPosts = allPosts
+  .filter((p) => p.data.featuredOrder !== undefined)
+  .sort((a, b) => (a.data.featuredOrder ?? Infinity) - (b.data.featuredOrder ?? Infinity))
+const regularPosts = allPosts
+  .filter((p) => p.data.featuredOrder === undefined)
+  .sort((a, b) => (b.data.publishDate?.valueOf() ?? 0) - (a.data.publishDate?.valueOf() ?? 0))
+const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
+---
+<footer>
+  <section class="py-20 mt-24">
+    <Heading level="h2" class="sr-only">Footer</Heading>
+    <div class="container grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div class="flex flex-col gap-4">
+        <Heading level="h3" size="h6">{featuredTitle}</Heading>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
+          {footerProjects.map((project) => (
+            <li><Link href={ensureTrailingSlash(`/portfolio/${project.id}`)}>{project.data.title}</Link></li>
+          ))}
+        </ul>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Heading level="h3" size="h6">{latestTitle}</Heading>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
+          {footerPosts.map((post) => (
+            <li><Link href={ensureTrailingSlash(`/blog/${post.id}`)}>{post.data.title}</Link></li>
+          ))}
+        </ul>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Heading level="h3" size="h6">{socialConfig.title}</Heading>
+        <ul class="palo-nav-list is-vertical" data-active-style={navListActiveStyle}>
+          {socialConfig.items.map((item) => {
+            if (item.type === 'qrCode') {
+              const baseId = getQrCodeBaseId(item.label)
+              const modalId = getQrCodeModalId(item.label)
+              const triggerId = getQrCodeFooterTriggerId(item.label)
+              return (
+                <li>
+                  <Link
+                    href={`#${modalId}`}
+                    id={triggerId}
+                    data-qrcode-trigger="true"
+                    data-qrcode-base={baseId}
+                  >
+                    <Icon aria-hidden="true" name={item.icon} />
+                    <span set:html={renderAccentLabel(item.label)} />
+                  </Link>
+                </li>
+              )
+            }
+            return (
+              <li>
+                <Link href={item.href ?? '#'} {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                  <Icon aria-hidden="true" name={item.icon} />
+                  <span set:html={renderAccentLabel(item.label)} />
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      <div class="flex flex-col gap-4">
+        <Logo loading="lazy" />
+        <p class="leading-[1.75]">{config.metadata.description}</p>
+        <p>Built upon <Link isExternal href="https://accessible-astro-starter.incluud.dev">Accessible Astro Starter</Link>.</p>
+      </div>
+    </div>
+    {
+      socialConfig.items.filter((item) => item.type === 'qrCode').map((item) => (
+        <QRCodeModal socialItem={item} />
+      ))
+    }
+  </section>
+  <section class="py-8">
+    <div class="container flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
+      <p class="copyright">
+        &copy; {currentYear} {siteName}. All Rights Reserved.
+      </p>
+      {backToTopEnabled && (
+        <a href="#top" id="back-to-top" class="back-to-top-link inline-flex items-center gap-1 text-sm" aria-label={!backToTopText ? 'Back to top' : undefined}>
+          {backToTopText && <span>{backToTopText}</span>}
+          <Icon name="ph:arrow-up" size="1.25em" />
+        </a>
+      )}
+    </div>
+  </section>
+
+  <CreativeSection
+    fullscreen={false}
+    contentColor=""
+    class="bg-primary py-4 sm:py-8 md:py-16"
+    alignV="center"
+    alignH="left"
+    divider="false"
+    useContainer={false}
+    bg={{
+      image: "",
+      video: "",
+      color: "",
+      fixed: false,
+      overlayOpacity: 0.5,
+    }}
+  >
+    
+    
+    
+    <Slogan
+      text="Palo, The Best Astro Theme For You. "
+      variant="marquee"
+      speed="fast"
+      pause={true}
+      direction="left"
+      class="text-neutral- text-secondary uppercase text-3xl md:text-5xl lg:text-9xl"
+    />
+
+    <img src="/branding/logo-text.svg" class="w-full" />
+
+    
+  </CreativeSection>
+
+
+
+</footer>
+
+<style lang="scss">
+  @layer components {
+    section {
+      border-top: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
+    }
+  }
+
+</style>
+
+<script>
+  const initBackToTop = () => {
+    const link = document.getElementById('back-to-top')
+    if (!link || link.dataset.paloBound === 'true') return
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let activeScrollFrame = null
+
+    const easeOutExpo = (t) => (t === 0 ? 0 : 1 - Math.pow(2, -10 * t))
+
+    const calculateDuration = (distance) => {
+      const absDistance = Math.abs(distance)
+      const minDuration = 300
+      const maxDuration = 900
+      const baseDuration = Math.sqrt(absDistance) * 18
+      return Math.min(maxDuration, Math.max(minDuration, baseDuration))
+    }
+
+    const smoothScrollToTop = () => {
+      if (prefersReducedMotion) {
+        window.scrollTo(0, 0)
+        return
+      }
+
+      if (activeScrollFrame) {
+        cancelAnimationFrame(activeScrollFrame)
+        activeScrollFrame = null
+      }
+
+      const startY = window.scrollY
+      const distance = -startY
+      const duration = calculateDuration(distance)
+      const startTime = performance.now()
+      const rootStyle = document.documentElement.style
+      const previousScrollBehavior = rootStyle.scrollBehavior
+      rootStyle.scrollBehavior = 'auto'
+
+      if (Math.abs(distance) < 2) {
+        rootStyle.scrollBehavior = previousScrollBehavior
+        return
+      }
+
+      const step = (currentTime) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const eased = easeOutExpo(progress)
+        window.scrollTo(0, startY + distance * eased)
+
+        if (progress < 1) {
+          activeScrollFrame = requestAnimationFrame(step)
+        } else {
+          rootStyle.scrollBehavior = previousScrollBehavior
+          activeScrollFrame = null
+        }
+      }
+
+      step(startTime)
+    }
+
+    link.addEventListener('click', (e) => {
+      e.preventDefault()
+      smoothScrollToTop()
+      history.pushState(null, '', window.location.pathname)
+    })
+
+    link.dataset.paloBound = 'true'
+  }
+
+  document.addEventListener('astro:page-load', initBackToTop)
+  document.addEventListener('astro:after-swap', initBackToTop)
+  initBackToTop()
+</script>
+
+
+

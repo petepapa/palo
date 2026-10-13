@@ -1,0 +1,4 @@
+# Memory Bank Protocol
+- At the start of every task, read the files in `.clinedocs/` to synchronize context.
+- When a significant decision is made or a task is completed, update the relevant `.md` files in `.clinedocs/`.
+- Ensure the button styling logic (Unified Global Hover, no shadows, no movement) is preserved in `systemPatterns.md`.

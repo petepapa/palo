@@ -1,0 +1,306 @@
+---
+import themeConfig from '@config'
+
+/**
+ * ResponsiveToggle Component
+ *
+ * @description A toggle button for mobile navigation with animated hamburger icon
+ */
+interface Props {
+  /**
+   * Additional classes to apply to the ResponsiveToggle
+   */
+  class?: string
+}
+
+const { class: className } = Astro.props
+const showMobileMenuLabel = themeConfig.navigation?.mobileMenuLabel ?? false
+---
+
+<button class:list={[className, 'responsive-toggle']} aria-expanded="false" aria-label="Open menu navigation">
+  <span class:list={[!showMobileMenuLabel && 'sr-only']}>Menu</span>
+  <div class="hamburger-box" aria-hidden="true">
+    <span class="hamburger-line hamburger-line--top"></span>
+    <span class="hamburger-line hamburger-line--middle"></span>
+    <span class="hamburger-line hamburger-line--bottom"></span>
+  </div>
+</button>
+
+<script>
+  const paloInitMobileMenu = () => {
+    const responsiveToggle = document.querySelector('.responsive-toggle') as HTMLButtonElement | null
+    if (!responsiveToggle || responsiveToggle.dataset.paloMobileBound) return
+    responsiveToggle.dataset.paloMobileBound = 'true'
+
+    const mobileNavigation = document.querySelector('.mobile-menu') as HTMLElement | null
+    if (!mobileNavigation) return
+    const navBar = document.querySelector('#main-navigation .nav-bar') as HTMLElement | null
+    const header = responsiveToggle.closest('header')
+
+    // functions
+    const openMenu = (toggle: Element) => {
+      const text = toggle.querySelector('span')
+      if (!text) return
+
+      text.textContent = 'Close'
+      toggle.setAttribute('aria-expanded', 'true')
+      toggle.setAttribute('aria-label', 'Close menu navigation')
+      header?.classList.add('is-menu-open')
+    }
+
+    const closeMenu = (toggle: Element) => {
+      const text = toggle.querySelector('span')
+      if (!text) return
+
+      text.textContent = 'Menu'
+      toggle.setAttribute('aria-expanded', 'false')
+      toggle.setAttribute('aria-label', 'Open menu navigation')
+      header?.classList.remove('is-menu-open')
+    }
+
+    const getViewportHeight = () => window.visualViewport?.height ?? window.innerHeight
+
+    const getOpenMetrics = () => {
+      const navBarHeight = navBar?.getBoundingClientRect().height ?? 0
+      const menuTop = mobileNavigation.getBoundingClientRect().top || navBarHeight
+      const availableHeight = Math.max(getViewportHeight() - menuTop, 0)
+
+      mobileNavigation.style.maxHeight = 'none'
+      const contentHeight = mobileNavigation.scrollHeight
+      const targetHeight = availableHeight
+
+      return { availableHeight, contentHeight, targetHeight }
+    }
+
+    const syncExpandedMenuSize = () => {
+      if (!mobileNavigation.classList.contains('show')) return
+
+      const { availableHeight, contentHeight, targetHeight } = getOpenMetrics()
+      mobileNavigation.style.maxHeight = `${availableHeight}px`
+      mobileNavigation.style.height = `${targetHeight}px`
+      mobileNavigation.style.overflowY = contentHeight > availableHeight ? 'auto' : 'hidden'
+    }
+
+    const closeMobileMenu = () => {
+      if (mobileNavigation.classList.contains('show')) {
+        const currentHeight = mobileNavigation.getBoundingClientRect().height
+        mobileNavigation.style.height = `${currentHeight}px`
+        mobileNavigation.style.overflowY = 'hidden'
+
+        requestAnimationFrame(() => {
+          mobileNavigation.classList.remove('show')
+          mobileNavigation.style.height = '0px'
+        })
+
+        closeMenu(responsiveToggle)
+      }
+    }
+
+    // ── Pull-to-close 手势：触底上滑关闭菜单 ──
+    const initPullToClose = () => {
+      if (!mobileNavigation) return
+
+      let startY = 0
+      let currentY = 0
+      let isAtBottom = false
+      let pullDistance = 0
+      let startTime = 0
+
+      mobileNavigation.addEventListener('touchstart', (e: TouchEvent) => {
+        if (!mobileNavigation.classList.contains('show')) return
+
+        const { scrollTop, clientHeight, scrollHeight } = mobileNavigation
+        // 容忍 1px 浮点误差
+        isAtBottom = scrollHeight - scrollTop - clientHeight <= 1
+
+        if (isAtBottom) {
+          startY = e.touches[0].pageY
+          startTime = Date.now()
+          // 取消回弹过渡，确保跟手
+          mobileNavigation.style.transition = 'none'
+        }
+      }, { passive: true })
+
+      mobileNavigation.addEventListener('touchmove', (e: TouchEvent) => {
+        if (!mobileNavigation.classList.contains('show')) return
+
+        const { scrollTop, clientHeight, scrollHeight } = mobileNavigation
+        const atBottom = scrollHeight - scrollTop - clientHeight <= 1
+
+        // 未触底：重置状态，正常滚动
+        if (!atBottom) {
+          isAtBottom = false
+          pullDistance = 0
+          return
+        }
+
+        // 刚触底的瞬间：以此为新的拖拽起点
+        if (!isAtBottom) {
+          isAtBottom = true
+          startY = e.touches[0].pageY
+          startTime = Date.now()
+          mobileNavigation.style.transition = 'none'
+          return
+        }
+
+        currentY = e.touches[0].pageY
+        const diffY = startY - currentY // 向上滑动为正值
+
+        if (diffY > 0) {
+          // 阻止浏览器原生橡皮筋效果
+          if (e.cancelable) e.preventDefault()
+          // 阻尼系数 0.3
+          pullDistance = diffY * 0.3
+          mobileNavigation.style.transform = `translateY(${-pullDistance}px)`
+        }
+      }, { passive: false })
+
+      mobileNavigation.addEventListener('touchend', (e: TouchEvent) => {
+        if (!isAtBottom || pullDistance === 0 || !mobileNavigation.classList.contains('show')) {
+          isAtBottom = false
+          pullDistance = 0
+          return
+        }
+
+        const timeDiff = Date.now() - startTime
+        const finalCurrentY = e.changedTouches[0].pageY
+        const finalDiffY = startY - finalCurrentY
+        // 计算上滑速度 (px/ms)
+        const speedY = timeDiff > 0 ? finalDiffY / timeDiff : 0
+
+        // 恢复过渡动画
+        mobileNavigation.style.transition = 'transform var(--animation-speed-slow) var(--cubic-bezier)'
+
+        // 阈值判定：拖拽距离 > 80px 或 爆发速度 > 0.5 px/ms
+        if (pullDistance > 80 || speedY > 0.5) {
+          // 触发关闭：清除 transform，让全局 CSS 接管 height 过渡
+          mobileNavigation.style.transition = ''
+          mobileNavigation.style.transform = ''
+          closeMobileMenu()
+        } else {
+          // 未达阈值，回弹归位
+          mobileNavigation.style.transform = 'translateY(0)'
+        }
+
+        // 重置状态
+        isAtBottom = false
+        pullDistance = 0
+      })
+    }
+
+    initPullToClose()
+
+    // execution
+    responsiveToggle.addEventListener('click', () => {
+      if (mobileNavigation.classList.contains('show')) {
+        closeMobileMenu()
+        return
+      }
+
+      mobileNavigation.classList.add('show')
+      mobileNavigation.style.height = 'auto'
+      const { availableHeight, targetHeight } = getOpenMetrics()
+      mobileNavigation.style.maxHeight = `${availableHeight}px`
+      mobileNavigation.style.height = '0px'
+
+      requestAnimationFrame(() => {
+        mobileNavigation.style.height = `${targetHeight}px`
+      })
+
+      openMenu(responsiveToggle)
+    })
+
+    // Close menu when window resizes to desktop width (matches nav breakpoint: 1050px)
+    const mediaQuery = window.matchMedia('(min-width: 1050px)')
+    const handleResize = () => {
+      if (mediaQuery.matches) {
+        closeMobileMenu()
+        return
+      }
+
+      syncExpandedMenuSize()
+    }
+    mediaQuery.addEventListener('change', handleResize)
+
+    mobileNavigation.addEventListener('transitionend', (event: TransitionEvent) => {
+      if (event.propertyName === 'height' && mobileNavigation.classList.contains('show')) {
+        syncExpandedMenuSize()
+      }
+    })
+
+    mobileNavigation.addEventListener('palo:content-resize', () => {
+      syncExpandedMenuSize()
+    })
+
+    window.addEventListener('resize', handleResize)
+    window.visualViewport?.addEventListener('resize', handleResize)
+  }
+
+  document.addEventListener('astro:page-load', paloInitMobileMenu)
+  document.addEventListener('astro:after-swap', paloInitMobileMenu)
+  paloInitMobileMenu()
+</script>
+
+<style lang="scss">
+  @use 'scss/base/breakpoint' as *;
+
+  @layer components {
+    .responsive-toggle {
+      display: none;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+
+      span {
+        margin-inline-end: var(--space-3xs);
+      }
+
+      .hamburger-box {
+        position: relative;
+        width: 30px;
+        height: 21px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .hamburger-line {
+        display: block;
+        width: 100%;
+        height: 2.667px;
+        background-color: var(--foreground-color);
+        border-radius: 2px;
+        transition:
+          translate var(--animation-speed-medium) var(--cubic-bezier),
+          rotate var(--animation-speed-medium) var(--cubic-bezier),
+          opacity var(--animation-speed-fast) var(--cubic-bezier);
+        transform-origin: center;
+      }
+
+      &[aria-expanded='true'] {
+        .hamburger-line--top {
+          translate: 0 9.166px;
+          rotate: 45deg;
+        }
+
+        .hamburger-line--middle {
+          opacity: 0;
+        }
+
+        .hamburger-line--bottom {
+          translate: 0 -9.166px;
+          rotate: -45deg;
+        }
+      }
+
+      &:where(:hover, :focus-visible, [aria-expanded='true']) {
+        text-decoration: none;
+
+        span {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+</style>

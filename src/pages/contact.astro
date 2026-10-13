@@ -1,0 +1,443 @@
+---
+// 导入页面布局和组件 / Import page layout and components
+import DefaultLayout from '@layouts/DefaultLayout.astro'
+import PaloPageHeader from '@components/PaloPageHeader.astro'
+import {
+  Form,
+  Input,
+  Button,
+  Textarea,
+  Checkbox,
+  Fieldset,
+  Radio,
+  Heading,
+  Link,
+} from 'accessible-astro-components'
+import { Icon } from 'astro-icon/components'
+import { contactFormConfig } from '../contactForm'
+import { socialConfig } from '../navigation'
+import { getQrCodeBaseId, getQrCodeModalId, getQrCodeContactTriggerId } from '@utils/qrcodeId'
+
+const { fields, dynamicSections } = contactFormConfig
+---
+
+<DefaultLayout title="Contact" hasHero={true}>
+  <!-- 页面头部区域 / Page header section -->
+  <PaloPageHeader
+    title="Contact"
+    subtitle="Have a question? Get in touch with us!"
+    fullscreen=""
+    contentColor=""
+    topNavigationTheme=""
+    alignV=""
+    alignH=""
+    useContainer=''
+    divider=""
+    class=""
+    bg={{
+      image: "",
+      color: "",
+      fixed: false,
+      overlayOpacity: 0,
+    }}
+  />
+
+  <!-- 标题区域 / Heading section -->
+  <section class="my-16">
+    <div class="container">
+      <Heading level="h2">LET'S TALK</Heading>
+    </div>
+  </section>
+
+  <!-- 联系表单和信息区域 / Contact form and info section -->
+  <section class="container">
+    <div class="grid grid-cols-1 gap-20 md:grid-cols-2">
+      <!-- 左侧：联系表单 / Left: Contact form -->
+      <div id="contact-form" class="space-content">
+        <Form id="contact-form-element" name="contact" action="/thank-you" method="post">
+          <!-- 姓名输入框 / Name input -->
+          <Input
+            name="firstname"
+            label={fields.name.label}
+            required
+            autocomplete="given-name"
+          />
+
+          <!-- 邮箱输入框 / Email input -->
+          <Input name="email" label={fields.email.label} type="email" required autocomplete="email" />
+
+          <!-- 模块 A：身份识别 (单选) / Identity radio group -->
+          {dynamicSections.identity.enable && (
+            <Fieldset name="identity" legend={dynamicSections.identity.legend}>
+              {dynamicSections.identity.options.map((opt) => (
+                <Radio name="identity" value={opt.value} label={opt.label} />
+              ))}
+            </Fieldset>
+          )}
+
+          <!-- 模块 B：协作内容 (多选) / Collaboration checkbox group -->
+          {dynamicSections.collaboration.enable && (
+            <Fieldset name="collaboration" legend={dynamicSections.collaboration.legend}>
+              {dynamicSections.collaboration.options.map((opt) => (
+                <Checkbox name={opt.value} value={opt.value} label={opt.label} />
+              ))}
+            </Fieldset>
+          )}
+
+          <!-- 项目/想法多行文本框 / Project or idea textarea -->
+          <Textarea
+            name="message"
+            label={fields.message.label}
+            required
+            placeholder={fields.message.placeholder}
+          />
+
+          <!-- 提交按钮 / Submit button -->
+          <Button htmlType="submit" type="primary">SUBMIT</Button>
+        </Form>
+      </div>
+
+      <!-- 右侧：联系信息 / Right: Contact info -->
+      <div class="space-content">
+        <Heading level="h3">Keep in touch :-)</Heading>
+        <p class="text-xl">
+          Whether it's web, motion, or a full branding system, I build things that work and feel
+          right. Have an idea, a complex product challenge, or just want to talk music and code? Drop
+          a line.
+        </p>
+
+
+        <!-- 电话号码 / Phone number -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:phone" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Phone:</span>
+            <Link href="tel:+8612312345678">+86 123 1234 5678</Link>
+            <span class="text-xs" style="color: light-dark(var(--color-neutral-500), var(--color-neutral-500));"> (example)</span>
+          </p>
+        </div>
+
+        <!-- 邮箱地址 / Email address -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:envelope" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Email:</span>
+            <Link href="mailto:hello@petepa.com">hello@petepa.com</Link>
+          </p>
+        </div>
+
+        <!-- 地址 / Address -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:map-pin" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Location:</span>
+            Fengtai District, Beijing
+          </p>
+        </div>
+
+        <!-- 工作节奏 / Work rhythm -->
+        <div class="gap-2xs flex items-center">
+          <Icon aria-hidden="true" name="ph:clock" size={20} class="flex-shrink-0" />
+          <p>
+            <span class="font-bold">Business Hours:</span>
+            Monday - Friday, 9:00 AM - 5:00 PM EST
+          </p>
+        </div>
+
+        <br />
+
+
+        <!-- 社交媒体链接 / Social media links -->
+        <ul class="flex flex-wrap gap-2">
+          {socialConfig.items.map((item) => {
+            const cleanLabel = item.label.replace(/\*\*/g, '')
+            if (item.type === 'qrCode') {
+              const baseId = getQrCodeBaseId(item.label)
+              const modalId = getQrCodeModalId(item.label)
+              const triggerId = getQrCodeContactTriggerId(item.label)
+              return (
+                <li>
+                  <Link
+                    href={`#${modalId}`}
+                    id={triggerId}
+                    data-qrcode-trigger="true"
+                    data-qrcode-base={baseId}
+                    isButton
+                    hideIcon
+                    animateOnHover
+                    animationType="boop"
+                    class="button--icon-only"
+                  >
+                    <Icon aria-hidden="true" name={item.icon} />
+                    <span class="sr-only">Open {cleanLabel} QR code</span>
+                  </Link>
+                </li>
+              )
+            }
+            return (
+              <li>
+                <Link
+                  href={item.href ?? '#'}
+                  isButton
+                  {...(item.external ? { isExternal: true } : {})}
+                  hideIcon
+                  animateOnHover
+                  animationType="boop"
+                  class="button--icon-only"
+                >
+                  <Icon aria-hidden="true" name={item.icon} />
+                  <span class="sr-only">{item.external ? `Go to ${cleanLabel}, opens in a new tab` : `Go to ${cleanLabel}`}</span>
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </div>
+  </section>
+</DefaultLayout>
+
+<style is:global>
+  /* ── 1. 净化标签：隐藏组件自动渲染的 (required) 标记 ── */
+  #contact-form .input-group label > span:last-child,
+  #contact-form .textarea-group label > span:last-child {
+    display: none;
+  }
+
+  /* ── 2. 物理移除顶部红色 Notification 横幅 ── */
+  #contact-form .notification {
+    display: none !important;
+  }
+
+  /* ── 3. 修复 Textarea 标题与 Placeholder 重合 ── */
+  #contact-form .textarea-group textarea::placeholder {
+    color: transparent;
+    transition: color var(--animation-speed-fast) var(--cubic-bezier);
+  }
+  #contact-form .textarea-group textarea:focus::placeholder {
+    color: color-mix(in oklab, var(--foreground-color) 50%, transparent);
+  }
+
+  /* ── 4. 浮标 label 锚定 input 中心（不依赖容器高度） ── */
+  /*
+   * _form.scss 中 .input-group label { top: 50% } 参照的是
+   * .input-group 容器。报错时 small 变为 display:flex 撑高容器，
+   * 50% 下移 → label 偏离 input 几何中心。
+   *
+   * 修复：在 label 未浮起（非聚焦、无值）时，将 top 改为基于
+   * input 固定高度计算，不再依赖容器百分比。聚焦/有值时由
+   * _form.scss 的 [data-floating-active] / :has(:focus) 接管。
+   */
+  #contact-form .input-group:not([data-floating-active='true']):not(:has(input:focus)) label {
+    inset-block-start: calc(
+      (2.75em + var(--border-width-form, var(--border-width-global, 3px)) * 2 + var(--form-control-radius, var(--radius-s))) / 2
+    );
+  }
+
+  /* ── 5. 报错消息：收紧间距 + 向右圆角位移补偿 ── */
+  /*
+   * - margin-block-start 收紧到极小值，让消息紧贴红框底部
+   * - padding-inline-start 向右偏移，避开 input 边框圆角造成的视觉挤压
+   * - 仅作用于 <small>，不影响 input/internal 任何元素
+   */
+  #contact-form .input-group small,
+  #contact-form .textarea-group small {
+    margin-block-start: 0.1875rem;   /* ≈ mt-0.5，紧贴 input 底部红线 */
+    margin-block-end: 0.25rem;       /* 与下一字段的呼吸间距 */
+    padding-inline-start: 0.5rem;    /* 避开圆角挤压（≈ pl-2） */
+  }
+
+  /* ── 6. 校验图标字体垂直偏移补偿（仅图标 span） ── */
+  /*
+   * 复用 Checkbox 方框的对齐逻辑，只 translate 图标，
+   * 不与 input/父容器产生任何耦合。
+   */
+  #contact-form .input-group small .icon,
+  #contact-form .textarea-group small .icon {
+    translate: 0 var(--font-cap-height-offset, -0.05em);
+  }
+
+  /* ── 7. 选择区域响应式布局：手机+平板单列，桌面端双列 ── */
+  /*
+   * 覆盖组件默认的纵向 flex 排列，改为 grid。
+   * 手机和平板（<1024px）默认单列，确保可读性；
+   * lg（1024px）及以上切换为双列，形成简洁的视觉节奏。
+   * 字体缩小到 13px 保持克制，不让表单纵向撑得过长。
+   */
+  #contact-form fieldset.fieldset > .fieldset-group {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--space-2xs);
+    row-gap: var(--space-3xs);
+    font-size: 0.8125rem;
+  }
+
+  @media (min-width: 1024px) {
+    #contact-form fieldset.fieldset > .fieldset-group {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  /* ── 8. 提交按钮靠右对齐 ── */
+  #contact-form .form > .button {
+    display: flex;
+    margin-inline-start: auto;
+    width: fit-content;
+  }
+</style>
+
+<script>
+  function initContactForm() {
+    const form = document.getElementById('contact-form-element') as HTMLFormElement | null
+    if (!form) return
+
+    if (form.dataset.paloContactBound === 'true') return
+    form.dataset.paloContactBound = 'true'
+
+    const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+    // 🔒 1. 完整的局部三态同步校验（始终执行，不离场守卫）
+    function syncFieldError(
+      el: HTMLInputElement | HTMLTextAreaElement,
+      regExp: RegExp | null,
+      emptyMsg: string,
+      invalidMsg: string,
+    ) {
+      const value = el.value
+      const group = el.closest('.input-group, .textarea-group')
+      const msgEl = group?.querySelector<HTMLElement>('.message')
+      if (!msgEl) return
+
+      if (value.trim() === '') {
+        el.setAttribute('aria-invalid', 'true')
+        msgEl.textContent = emptyMsg
+      } else if (regExp && !regExp.test(value)) {
+        el.setAttribute('aria-invalid', 'true')
+        msgEl.textContent = invalidMsg
+      } else {
+        el.setAttribute('aria-invalid', 'false')
+        msgEl.textContent = ''
+      }
+    }
+
+    function clearFieldsetError(fieldset: HTMLFieldSetElement) {
+      fieldset.setAttribute('aria-invalid', 'false')
+      const msgEl = fieldset.querySelector<HTMLElement>('.message')
+      if (msgEl) msgEl.textContent = ''
+    }
+
+    // ⚡ 2. 核心文本字段高频监听
+    const nameEl = form.querySelector<HTMLInputElement>('input[name="firstname"]')
+    const emailEl = form.querySelector<HTMLInputElement>('input[name="email"]')
+    const msgEl = form.querySelector<HTMLTextAreaElement>('textarea[name="message"]')
+
+    nameEl?.addEventListener('input', () => {
+      syncFieldError(nameEl, null, 'Please enter your name', '')
+    })
+    emailEl?.addEventListener('input', () => {
+      syncFieldError(emailEl, EMAIL_RE, 'Please enter your email address', 'Please enter a valid email address')
+    })
+    msgEl?.addEventListener('input', () => {
+      syncFieldError(msgEl, null, 'Please tell me about your project or idea', '')
+    })
+
+    // 🎯 3. 单选组自动绑定：通过属性选择器动态查找，零变量依赖
+    const identityFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="identity"]')
+    if (identityFieldset) {
+      const identityRadios = identityFieldset.querySelectorAll<HTMLInputElement>('input[type="radio"]')
+      identityRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+          const checked = identityFieldset.querySelector('input[type="radio"]:checked')
+          if (checked) clearFieldsetError(identityFieldset)
+        })
+      })
+    }
+
+    // 🔗 4. 多选组自动绑定：全自动化收集，不论配置如何变动都完美契合
+    const collabFieldset = form.querySelector<HTMLFieldSetElement>('fieldset[name="collaboration"]')
+    if (collabFieldset) {
+      const collabCheckboxes = collabFieldset.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
+      collabCheckboxes.forEach((cb) => {
+        cb.addEventListener('change', () => {
+          clearFieldsetError(collabFieldset)
+        })
+      })
+    }
+
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement | null
+    const originalBtnText = submitBtn?.textContent || 'SUBMIT'
+
+    function setButtonState(state: 'idle' | 'sending' | 'success' | 'error') {
+      if (!submitBtn) return
+      submitBtn.disabled = state !== 'idle'
+      switch (state) {
+        case 'sending':
+          submitBtn.textContent = 'SENDING...'
+          break
+        case 'success':
+          submitBtn.textContent = 'SUCCESS'
+          break
+        case 'error':
+          submitBtn.textContent = 'ERROR — TRY AGAIN'
+          break
+        default:
+          submitBtn.textContent = originalBtnText
+      }
+    }
+
+    function showFieldError(input: HTMLInputElement | HTMLTextAreaElement, message: string) {
+      input.setAttribute('aria-invalid', 'true')
+      input.dataset.hadError = 'true'
+      const group = input.closest('.input-group, .textarea-group')
+      const msgEl = group?.querySelector<HTMLElement>('.message')
+      if (msgEl) msgEl.textContent = message
+    }
+
+    // 🚀 5. 全自动化、零泄露的数据收集器
+    function collectFormData(): Record<string, unknown> {
+      const identityRadio = identityFieldset?.querySelector<HTMLInputElement>('input[type="radio"]:checked')
+      const topics = Array.from(form!.querySelectorAll<HTMLInputElement>('input[type="checkbox"]:checked'))
+        .map((cb) => cb.value)
+
+      return {
+        name: nameEl?.value.trim() || '',
+        email: emailEl?.value.trim() || '',
+        identity: identityRadio?.value || '',
+        topics,
+        message: msgEl?.value.trim() || '',
+      }
+    }
+
+    // 🛠️ 6. 拦截默认代理，重写接管表单提交逻辑
+    form.submit = async () => {
+      const data = collectFormData()
+      setButtonState('sending')
+
+      try {
+        const res = await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+
+        await res.json().catch(() => ({}))
+
+        if (!res.ok) {
+          if (msgEl) showFieldError(msgEl, 'Something went wrong on my end. Please try again later.')
+          setButtonState('error')
+          setTimeout(() => setButtonState('idle'), 2500)
+          return
+        }
+
+        window.location.href = '/thank-you'
+      } catch {
+        if (msgEl) showFieldError(msgEl, 'Network error. Please check your connection.')
+        setButtonState('error')
+        setTimeout(() => setButtonState('idle'), 2500)
+      }
+    }
+  }
+
+  document.addEventListener('astro:page-load', initContactForm)
+  initContactForm()
+</script>

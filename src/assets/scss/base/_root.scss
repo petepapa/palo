@@ -1,0 +1,192 @@
+@layer tokens {
+  :root {
+  color-scheme: light;
+  interpolate-size: allow-keywords;
+
+  // ── Primary 轴线（恢复纯明度阶梯） ──
+  --color-primary-100: oklch(from var(--brand-primary) 90% c h);
+  --color-primary-200: oklch(from var(--brand-primary) 80% c h);
+  --color-primary-300: oklch(from var(--brand-primary) 70% c h);
+  --color-primary-400: oklch(from var(--brand-primary) 60% c h);
+  --color-primary-500: oklch(from var(--brand-primary) 50% c h);
+
+  // ── Secondary 轴线（恢复纯明度阶梯） ──
+  --color-secondary-100: oklch(from var(--brand-secondary) 90% c h);
+  --color-secondary-200: oklch(from var(--brand-secondary) 80% c h);
+  --color-secondary-300: oklch(from var(--brand-secondary) 70% c h);
+  --color-secondary-400: oklch(from var(--brand-secondary) 60% c h);
+  --color-secondary-500: oklch(from var(--brand-secondary) 50% c h);
+  --color-outline-100: oklch(from var(--brand-outline) 80% c h);
+  --color-outline-200: oklch(from var(--brand-outline) 50% c h);
+
+  // ── Neutral 中性轴线（恢复原版灰度定义：100级强行转纯白，其余透传） ──
+  --color-neutral-100: oklch(from var(--brand-neutral) 100% 0 0);
+  --color-neutral-200: oklch(from var(--brand-neutral) 95% c h);
+  --color-neutral-300: oklch(from var(--brand-neutral) 90% c h);
+  --color-neutral-400: oklch(from var(--brand-neutral) 85% c h);
+  --color-neutral-500: oklch(from var(--brand-neutral) 80% c h);
+  --color-neutral-600: oklch(from var(--brand-neutral) 60% c h);
+  --color-neutral-700: oklch(from var(--brand-neutral) 40% c h);
+  --color-neutral-800: oklch(from var(--brand-neutral) 30% c h);
+  --color-neutral-900: oklch(from var(--brand-neutral) 15% c h);
+
+  // ════════════════════════════════════════════════════════════════
+  // 轨道 B：固定语义状态色（精准提明度·控饱和·色相微调·死锁纯度）
+  // ════════════════════════════════════════════════════════════════
+
+  // ── INFO (标准深霓虹蓝) ──
+  --color-info-100: oklch(from var(--brand-info) 0.82 calc(c * 0.35) h);
+  --color-info-200: oklch(from var(--brand-info) 0.70 calc(c * 0.65) h);
+  --color-info-300: var(--brand-info);
+  --color-info-400: oklch(from var(--brand-info) 0.48 calc(c * 1.35) h); // 明度压到 0.48，拉高饱和，彻底与 300 剥离
+  --color-info-500: oklch(from var(--brand-info) 0.36 calc(c * 1.40) h); // 明度下潜到 0.36，锁死深邃霓虹蓝
+
+  // ── ERROR (极纯暗品红，释放明度防脏) ──
+  --color-error-100: oklch(from var(--brand-error) 0.84 calc(c * 0.20) 17.49);
+  --color-error-200: oklch(from var(--brand-error) 0.73 calc(c * 0.45) 15.49);
+  --color-error-300: var(--brand-error);
+  --color-error-400: oklch(from var(--brand-error) 0.55 calc(c * 1.25) h);
+  --color-error-500: oklch(from var(--brand-error) 0.40 calc(c * 1.35) h);
+
+  // ── WARNING (重校明度过渡曲线，平缓放量，锁死高维清透金黄) ──
+  --color-warning-100: oklch(from var(--brand-warning) 0.92 calc(c * 0.18) 63.80);
+  --color-warning-200: oklch(from var(--brand-warning) 0.85 calc(c * 0.42) 65.80);
+  --color-warning-300: var(--brand-warning);                                          // 基准色 (~0.75)
+  --color-warning-400: oklch(from var(--brand-warning) 0.65 calc(c * 1.15) calc(h + 4));  // 平缓下滑，减弱红移
+  --color-warning-500: oklch(from var(--brand-warning) 0.54 calc(c * 1.25) calc(h + 10)); // 优雅落底，保障警示
+
+  // ── SUCCESS (释放明度锁死高纯翡翠翠绿) ──
+  --color-success-100: oklch(from var(--brand-success) 0.86 calc(c * 0.20) 145.94);
+  --color-success-200: oklch(from var(--brand-success) 0.78 calc(c * 0.45) 144.44);
+  --color-success-300: var(--brand-success);
+  --color-success-400: oklch(from var(--brand-success) 0.55 calc(c * 1.25) calc(h - 2));
+  --color-success-500: oklch(from var(--brand-success) 0.42 calc(c * 1.35) calc(h - 4));
+
+  --color-primary-bg: var(--brand-primary);
+  --color-primary-border: var(--brand-primary);
+  --color-primary-text: var(--brand-primary);
+
+  --color-secondary-bg: var(--brand-secondary);
+  --color-secondary-border: var(--brand-secondary);
+  --color-secondary-text: var(--brand-secondary);
+
+  --color-info-bg: var(--brand-info);
+  --color-info-border: var(--brand-info);
+  --color-info-text: var(--brand-info);
+
+  --color-success-bg: var(--brand-success);
+  --color-success-border: var(--brand-success);
+  --color-success-text: var(--brand-success);
+
+  --color-warning-bg: var(--brand-warning);
+  --color-warning-border: var(--brand-warning);
+  --color-warning-text: var(--brand-warning);
+
+  --color-error-bg: var(--brand-error);
+  --color-error-border: var(--brand-error);
+  --color-error-text: var(--brand-error);
+
+  --foreground-color: light-dark(var(--color-neutral-800), var(--color-neutral-100));
+  --background-color: light-dark(var(--color-neutral-100), var(--color-neutral-900));
+  --icon-color: light-dark(var(--color-neutral-800), var(--color-neutral-100));
+  --link-color: light-dark(var(--color-primary-400), var(--color-secondary-100));
+  --link-hover-color: light-dark(var(--color-primary-300), var(--color-secondary-200));
+  --border-color: light-dark(var(--color-neutral-900), var(--color-neutral-100));
+  --border-color-subtle: light-dark(var(--color-neutral-300), var(--color-neutral-800));
+  --text-decoration-color: light-dark(var(--color-neutral-700), var(--color-neutral-100));
+  --text-decoration-color-hover: light-dark(var(--color-neutral-100), var(--color-neutral-200));
+  --outline-color: light-dark(var(--color-outline-200), var(--color-outline-100));
+
+  --radius-small: 3px;
+  --radius-large: 6px;
+  --gap-default: 2rem;
+  --font-measure: 70ch;
+  --font-family-default: var(--font-body-family, 'League Spartan'), sans-serif;
+  --font-family-special: var(--font-heading-family, 'League Spartan'), sans-serif;
+
+  --font-heading: var(--font-family-special);
+  --font-body: var(--font-family-default);
+
+  --space-5xs: clamp(0.1rem, 0.0931rem + 0.1087vw, 0.125rem);
+  --space-4xs: clamp(0.125rem, 0.1131rem + 0.1087vw, 0.1563rem);
+  --space-3xs: clamp(0.25rem, 0.2283rem + 0.1087vw, 0.3125rem);
+  --space-2xs: clamp(0.5rem, 0.4783rem + 0.1087vw, 0.5625rem);
+  --space-xs: clamp(0.75rem, 0.7065rem + 0.2174vw, 0.875rem);
+  --space-s: clamp(1rem, 0.9565rem + 0.2174vw, 1.125rem);
+  --space-m: clamp(1.5rem, 1.4348rem + 0.3261vw, 1.6875rem);
+  --space-l: clamp(2rem, 1.913rem + 0.4348vw, 2.25rem);
+  --space-xl: clamp(3rem, 2.8696rem + 0.6522vw, 3.375rem);
+  --space-2xl: clamp(4rem, 3.8261rem + 0.8696vw, 4.5rem);
+  --space-3xl: clamp(6rem, 5.7391rem + 1.3043vw, 6.75rem);
+  --space-4xl: clamp(8rem, 7.6522rem + 1.7403vw, 8.25rem);
+  --space-5xl: clamp(10rem, 9.5652rem + 2.1741vw, 10.5rem);
+
+  --grid-gutter: var(--space-s-l, clamp(1.125rem, 0.6467rem + 2.3913vw, 2.5rem));
+  --grid-columns: 12;
+
+  --radius-xs: 0.125rem;
+  --radius-s: 0.25rem;
+  --radius-m: 0.5rem;
+  --radius-l: 0.75rem;
+  --radius-h: 1rem;
+
+  --elevation-1: 0 1px 3px rgba(0 0 0 / 0.12);
+  --elevation-2: 0 3px 6px rgba(0 0 0 / 0.15);
+  --elevation-3: 0 10px 20px rgba(0 0 0 / 0.15);
+  --elevation-4: 0 15px 25px rgba(0 0 0 / 0.15);
+  --elevation-5: 0 20px 40px rgba(0 0 0 / 0.5);
+
+  --z-index--1: -1;
+  --z-index-0: 0;
+  --z-index-1: 10;
+  --z-index-2: 20;
+  --z-index-3: 30;
+  --z-index-4: 40;
+  --z-index-5: 50;
+  --z-index-6: 60;
+  --z-index-7: 70;
+  --z-index-8: 80;
+  --z-index-9: 90;
+  --z-index-10: 100;
+
+  --ratio-square: 1;
+  --ratio-landscape: 4/3;
+  --ratio-portrait: 3/4;
+  --ratio-widescreen: 16/9;
+  --ratio-ultrawide: 18/5;
+
+  --animation-timing: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --cubic-bezier: var(--animation-timing);
+  --animation-easing: var(--animation-timing);
+  --animation-speed-slow: 0.4s;
+  --animation-speed-medium: 0.3s;
+  --animation-speed-fast: 0.2s;
+  --animation-speed-instant: 0.1s;
+
+  /* Accessible Astro Components library aliases — keep library animations in sync with project tokens */
+  --transition-duration: var(--animation-speed-fast);
+  --transition-easing: var(--cubic-bezier);
+
+  --line-clamp: 3;
+  --target-size-min: 24px;
+  --target-size-max: 44px;
+  --backdrop-color: hsl(0deg 100% 0% / 0.75);
+  --backdrop-blur: blur(3px);
+
+  --kbd-color-text: light-dark(var(--color-neutral-800), var(--color-neutral-200));
+  --kbd-color-border: light-dark(var(--color-neutral-600), var(--color-neutral-300));
+  --kbd-color-background: light-dark(var(--color-neutral-900), var(--color-neutral-200));
+
+  --color-pulse-primary: var(--color-pulse-primary, 51, 51, 51);
+  --color-pulse-secondary: var(--color-pulse-secondary, 255, 165, 0);
+  --color-pulse-default: var(--color-pulse-default, 100, 100, 100);
+  --color-pulse-info: var(--color-pulse-info, 0, 122, 255);
+  --color-pulse-success: var(--color-pulse-success, 52, 199, 89);
+  --color-pulse-warning: var(--color-pulse-warning, 255, 149, 0);
+  --color-pulse-error: var(--color-pulse-error, 255, 59, 48);
+}
+
+.darkmode {
+  color-scheme: dark;
+}
+}
