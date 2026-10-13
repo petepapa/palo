@@ -75,10 +75,12 @@ export const getStaticPaths = (async ({ paginate }) => {
   )
   const allTags = allProjects.map((project) => project.data.tags).flat()
   const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
-  const uniqueTags = uniqueTagLabels.map((label) => ({
-    label,
-    slug: slugify(label),
-  }))
+  const uniqueTags = uniqueTagLabels
+    .map((label) => ({
+      label,
+      slug: slugify(label),
+    }))
+    .filter((tag) => tag.slug.length > 0)
 
   const allPaginatedPages = []
 

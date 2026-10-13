@@ -70,13 +70,15 @@ const pageHeader = {
 export const getStaticPaths = (async ({ paginate }: { paginate: PaginateFunction }) => {
   const posts = (await getCollection('posts')).filter((p) => !p.data.draft)
 
-  // 提取所有 tag 用于生成静态路径
+  // 提取所有 tag 用于生成静态路径（跳过 slug 为空的标签，避免 Missing parameter: tag）
   const allTags = posts.map((p) => p.data.tags).flat().filter(Boolean)
   const uniqueTagLabels = [...new Set(allTags)].sort((a, b) => a.localeCompare(b))
-  const uniqueTags = uniqueTagLabels.map((label) => ({
-    label,
-    slug: slugify(label),
-  }))
+  const uniqueTags = uniqueTagLabels
+    .map((label) => ({
+      label,
+      slug: slugify(label),
+    }))
+    .filter((tag) => tag.slug.length > 0)
 
   const allPaginatedPages = []
 
