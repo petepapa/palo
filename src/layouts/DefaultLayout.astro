@@ -1347,6 +1347,11 @@ ${bodyLineHeights}
         box-sizing: border-box !important;
       }
 
+      html:not([data-css-ready="true"]) .prose.narrow {
+        max-width: 65ch !important;
+        margin-inline: auto !important;
+      }
+
       /* Shield 阶段裸表格 / 代码块强制不撑破父容器
          注意：不再使用 table-layout: fixed / td max-width:0 这种过激规则，
          因为 _prose.scss 已给裸 table 加了 display:block + overflow-x:auto 的永久兜底，
