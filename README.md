@@ -174,9 +174,9 @@ import BreakoutImage from '@components/BreakoutImage.astro'
 <BreakoutImage src="./wide-image.jpg" alt="Gallery installation view" mode="full" />
 ```
 
-Generated public mirrors under `public/posts/{slug}/` and `public/projects/{slug}/` are ignored by Git. Commit the original files under `src/content/...`. If you manually add static files to `public/posts` or `public/projects`, place them at the root level, not inside slug subdirectories.
+Generated public mirrors under `public/posts/{slug}/` and `public/projects/{slug}/` are ignored by Git and are removed when their source entry or image is deleted. Commit the original files under `src/content/...`. If you manually add static files to `public/posts` or `public/projects`, place them at the root level, not inside slug subdirectories.
 
-中文提示：自动生成的 public 子目录不要提交；手动 public 文件请放在 `public/posts/` 或 `public/projects/` 根目录。
+中文提示：自动生成的 public 子目录不要提交；删除源条目或图片时对应镜像也会清理。手动 public 文件请放在 `public/posts/` 或 `public/projects/` 根目录。
 
 ---
 

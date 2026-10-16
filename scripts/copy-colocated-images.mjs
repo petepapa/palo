@@ -33,8 +33,11 @@ export function copyContentEntryImages(entryDir, srcContentRoot, publicRoot, col
   fs.mkdirSync(publicEntryPath, { recursive: true })
 
   const copied = []
-  for (const file of fs.readdirSync(entryDir)) {
-    if (!IMAGE_EXT.test(file)) continue
+  const files = fs.readdirSync(entryDir)
+  const imageFiles = files.filter((file) => IMAGE_EXT.test(file))
+  pruneEntryImageMirrors(publicEntryPath, new Set(imageFiles))
+
+  for (const file of imageFiles) {
     const srcImagePath = path.join(entryDir, file)
     const publicImagePath = path.join(publicEntryPath, file)
     copyImageFile(srcImagePath, publicImagePath)
@@ -68,12 +71,17 @@ export function copyColocatedImages(srcDir, publicDir, collectionName) {
   const publicPath = path.join(publicDir, collectionName)
 
   if (!fs.existsSync(srcPath)) {
-    console.log(`[copy-images] ${collectionName}: 目录不存在，跳过`)
+    prunePublicMirrors(srcPath, publicPath)
+    console.log(`[copy-images] ${collectionName}: 目录不存在，已清理镜像`)
     return []
   }
 
   const copied = []
   const entries = fs.readdirSync(srcPath, { withFileTypes: true })
+  const sourceEntries = new Map(
+    entries.filter((entry) => entry.isDirectory()).map((entry) => [entry.name, path.join(srcPath, entry.name)]),
+  )
+  prunePublicMirrors(srcPath, publicPath, sourceEntries)
 
   for (const entry of entries) {
     const srcEntryPath = path.join(srcPath, entry.name)
@@ -86,6 +94,7 @@ export function copyColocatedImages(srcDir, publicDir, collectionName) {
 
       const files = fs.readdirSync(srcEntryPath)
       const imageFiles = files.filter((f) => IMAGE_EXT.test(f))
+      pruneEntryImageMirrors(publicEntryPath, new Set(imageFiles))
 
       for (const imageFile of imageFiles) {
         const srcImagePath = path.join(srcEntryPath, imageFile)
@@ -98,6 +107,44 @@ export function copyColocatedImages(srcDir, publicDir, collectionName) {
   }
 
   return copied
+}
+
+function prunePublicMirrors(srcPath, publicPath, sourceEntries) {
+  if (!fs.existsSync(publicPath)) return
+
+  const entries =
+    sourceEntries ??
+    (fs.existsSync(srcPath)
+      ? new Map(
+          fs
+            .readdirSync(srcPath, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => [entry.name, path.join(srcPath, entry.name)]),
+        )
+      : new Map())
+
+  for (const entry of fs.readdirSync(publicPath, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue
+
+    const srcEntryPath = entries.get(entry.name)
+    if (!srcEntryPath || !isContentEntryDir(srcEntryPath)) {
+      fs.rmSync(path.join(publicPath, entry.name), { recursive: true, force: true })
+      continue
+    }
+
+    const sourceImages = new Set(fs.readdirSync(srcEntryPath).filter((file) => IMAGE_EXT.test(file)))
+    pruneEntryImageMirrors(path.join(publicPath, entry.name), sourceImages)
+  }
+}
+
+function pruneEntryImageMirrors(publicEntryPath, sourceImages) {
+  if (!fs.existsSync(publicEntryPath)) return
+
+  for (const entry of fs.readdirSync(publicEntryPath, { withFileTypes: true })) {
+    if (entry.isFile() && IMAGE_EXT.test(entry.name) && !sourceImages.has(entry.name)) {
+      fs.unlinkSync(path.join(publicEntryPath, entry.name))
+    }
+  }
 }
 
 function main() {

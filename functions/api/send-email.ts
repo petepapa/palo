@@ -1,4 +1,5 @@
-import { sendContactEmail, type ContactPayload } from '../../src/utils/contact-email'
+import { sendContactEmail } from '../../src/utils/contact-email'
+import { readContactRequest } from '../../src/utils/contact-request'
 import { contactDeliveryConfig } from '../../.palo/contact-config.mjs'
 
 interface Env {
@@ -18,14 +19,10 @@ function json(body: Record<string, unknown>, status: number): Response {
 }
 
 export async function onRequestPost({ request, env }: PagesContext): Promise<Response> {
-  let payload: ContactPayload
-  try {
-    payload = await request.json()
-  } catch {
-    return json({ error: 'Invalid request body.' }, 400)
-  }
+  const requestResult = await readContactRequest(request)
+  if (!requestResult.ok) return json(requestResult.body, requestResult.status)
 
-  const result = await sendContactEmail(payload, {
+  const result = await sendContactEmail(requestResult.payload, {
     apiKey: env.RESEND_API_KEY,
     ...contactDeliveryConfig,
   })

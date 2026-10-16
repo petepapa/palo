@@ -119,7 +119,7 @@ export default defineConfig({
   site: siteUrl || undefined,
   trailingSlash: yamlConfig.site.trailingSlash ? 'always' : 'never',
   build: {
-    format: 'directory',
+    format: yamlConfig.site.trailingSlash ? 'directory' : 'file',
   },
   markdown: {
     shikiConfig: {

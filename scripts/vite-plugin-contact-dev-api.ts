@@ -4,9 +4,9 @@ import path from 'node:path'
 import yaml from 'js-yaml'
 import type { Plugin } from 'vite'
 import { sendContactEmail, type ContactPayload } from '../src/utils/contact-email'
+import { MAX_CONTACT_BODY_BYTES } from '../src/utils/contact-request'
 
 const CONFIG_FILE = 'src/config.yaml'
-const MAX_BODY_BYTES = 100_000
 
 function respond(res: ServerResponse, status: number, body: Record<string, unknown>) {
   res.writeHead(status, { 'Content-Type': 'application/json' })
@@ -14,13 +14,18 @@ function respond(res: ServerResponse, status: number, body: Record<string, unkno
 }
 
 async function readBody(req: IncomingMessage): Promise<string> {
-  let body = ''
+  const chunks: Buffer[] = []
+  let byteLength = 0
   for await (const chunk of req) {
-    body += chunk
-    if (body.length > MAX_BODY_BYTES) throw new Error('Request body is too large.')
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
+    byteLength += buffer.byteLength
+    if (byteLength > MAX_CONTACT_BODY_BYTES) throw new RequestBodyTooLargeError()
+    chunks.push(buffer)
   }
-  return body
+  return Buffer.concat(chunks).toString('utf8')
 }
+
+class RequestBodyTooLargeError extends Error {}
 
 export function paloContactDevApi(): Plugin {
   return {
@@ -36,14 +41,31 @@ export function paloContactDevApi(): Plugin {
           return
         }
 
-        let payload: ContactPayload
+        let body: string
         try {
-          payload = JSON.parse(await readBody(req))
+          body = await readBody(req)
+        } catch (error) {
+          if (error instanceof RequestBodyTooLargeError) {
+            respond(res, 413, { error: 'Request body is too large.' })
+            return
+          }
+          throw error
+        }
+
+        let parsedPayload: unknown
+        try {
+          parsedPayload = JSON.parse(body)
         } catch {
           respond(res, 400, { error: 'Invalid request body.' })
           return
         }
 
+        if (parsedPayload === null || typeof parsedPayload !== 'object' || Array.isArray(parsedPayload)) {
+          respond(res, 400, { error: 'Invalid request body.' })
+          return
+        }
+
+        const payload = parsedPayload as ContactPayload
         const config = yaml.load(fs.readFileSync(configPath, 'utf-8')) as {
           contact?: {
             resendApiKey?: string

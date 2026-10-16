@@ -9,11 +9,7 @@
 
 import type { Plugin, ViteDevServer } from 'vite'
 import path from 'node:path'
-import {
-  copyColocatedImages,
-  copyContentEntryImages,
-  copySingleColocatedImage,
-} from './copy-colocated-images.mjs'
+import { copyColocatedImages, copyContentEntryImages, copySingleColocatedImage } from './copy-colocated-images.mjs'
 
 const COLLECTIONS = ['posts', 'projects'] as const
 const WATCH_GLOBS = COLLECTIONS.map((c) => `src/content/${c}/**/*`)
@@ -42,7 +38,28 @@ export function paloCopyColocatedImages(): Plugin {
 
       server.watcher.on('add', (file) => handleFileEvent(server, file, root, srcContentRoot, publicRoot))
       server.watcher.on('change', (file) => handleFileEvent(server, file, root, srcContentRoot, publicRoot))
+      server.watcher.on('unlink', (file) => handleRemoval(server, file, root, srcContentRoot, publicRoot))
+      server.watcher.on('unlinkDir', (dir) => handleRemoval(server, dir, root, srcContentRoot, publicRoot))
     },
+  }
+}
+
+function handleRemoval(
+  server: ViteDevServer,
+  removedPath: string,
+  root: string,
+  srcContentRoot: string,
+  publicRoot: string,
+) {
+  const absolutePath = path.isAbsolute(removedPath) ? removedPath : path.resolve(root, removedPath)
+
+  for (const collection of COLLECTIONS) {
+    const collectionRoot = path.join(srcContentRoot, collection)
+    if (absolutePath !== collectionRoot && !absolutePath.startsWith(collectionRoot + path.sep)) continue
+
+    copyColocatedImages(srcContentRoot, publicRoot, collection)
+    server.ws.send({ type: 'full-reload', path: '*' })
+    return
   }
 }
 
@@ -53,9 +70,7 @@ function handleFileEvent(
   srcContentRoot: string,
   publicRoot: string,
 ) {
-  const absoluteFile = path.isAbsolute(changedFile)
-    ? changedFile
-    : path.resolve(root, changedFile)
+  const absoluteFile = path.isAbsolute(changedFile) ? changedFile : path.resolve(root, changedFile)
 
   for (const collection of COLLECTIONS) {
     const collectionRoot = path.join(srcContentRoot, collection)

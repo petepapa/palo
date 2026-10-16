@@ -78,6 +78,17 @@ export default [
     },
   },
 
+  // DOM fetch types used by Node's test runner
+  {
+    files: ['**/*.test.ts'],
+    languageOptions: {
+      globals: {
+        RequestInfo: 'readonly',
+        RequestInit: 'readonly',
+      },
+    },
+  },
+
   // JSX files (React components)
   {
     files: ['**/*.jsx'],

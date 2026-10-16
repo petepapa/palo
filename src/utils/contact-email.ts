@@ -32,6 +32,24 @@ function sanitize(value: string): string {
     .replace(/'/g, '&#39;')
 }
 
+function sanitizeHeaderValue(value: string): string {
+  let safeValue = ''
+  let previousWasControl = false
+
+  for (const character of value) {
+    const code = character.charCodeAt(0)
+    const isControl = code <= 0x1f || code === 0x7f
+    if (isControl) {
+      if (!previousWasControl) safeValue += ' '
+    } else {
+      safeValue += character
+    }
+    previousWasControl = isControl
+  }
+
+  return safeValue.trim()
+}
+
 function labelFor(value: string, options: typeof contactFormConfig.dynamicSections.identity.options): string {
   return options.find((option) => option.value === value)?.label || value
 }
@@ -48,12 +66,15 @@ export async function sendContactEmail(
     return { status: 400, body: { error: 'Name, email, and message are required.' } }
   }
 
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { status: 400, body: { error: 'Invalid email address.' } }
+  }
+
   const recipient = to?.trim()
   const siteName = brandName?.trim() || 'Website'
   const contactLabel = `${siteName} Contact`
-  const senderAddress = fromDomain?.trim() && fromLocalPart?.trim()
-    ? `${fromLocalPart.trim()}@${fromDomain.trim()}`
-    : from?.trim()
+  const senderAddress =
+    fromDomain?.trim() && fromLocalPart?.trim() ? `${fromLocalPart.trim()}@${fromDomain.trim()}` : from?.trim()
 
   if (!apiKey?.trim() || !recipient || !senderAddress) {
     return { status: 503, body: { error: 'The contact form is not configured.' } }
@@ -70,13 +91,17 @@ export async function sendContactEmail(
 
   if (contactFormConfig.dynamicSections.identity.enable) {
     const identityLabel = labelFor(identity, contactFormConfig.dynamicSections.identity.options) || 'Not specified'
-    details.push(`<p><strong>${sanitize(contactFormConfig.dynamicSections.identity.legend)}:</strong> ${sanitize(identityLabel)}</p>`)
+    details.push(
+      `<p><strong>${sanitize(contactFormConfig.dynamicSections.identity.legend)}:</strong> ${sanitize(identityLabel)}</p>`,
+    )
   }
 
   if (contactFormConfig.dynamicSections.collaboration.enable) {
     const topicLabels = topics.map((topic) => labelFor(topic, contactFormConfig.dynamicSections.collaboration.options))
     const topicsList = topicLabels.map((topic) => `&bull; ${sanitize(topic)}`).join('<br>') || '&bull; None specified'
-    details.push(`<p><strong>${sanitize(contactFormConfig.dynamicSections.collaboration.legend)}:</strong><br>${topicsList}</p>`)
+    details.push(
+      `<p><strong>${sanitize(contactFormConfig.dynamicSections.collaboration.legend)}:</strong><br>${topicsList}</p>`,
+    )
   }
 
   details.push(`<p><strong>Message:</strong><br>${sanitize(message).replace(/\n/g, '<br>')}</p>`)
@@ -95,8 +120,8 @@ export async function sendContactEmail(
     body: JSON.stringify({
       from: `${contactLabel} <${senderAddress}>`,
       to: [recipient],
-      reply_to: email,
-      subject: `[${contactLabel}] New Inquiry from ${name}`,
+      reply_to: sanitizeHeaderValue(email),
+      subject: `[${contactLabel}] New Inquiry from ${sanitizeHeaderValue(name)}`,
       html,
     }),
   })

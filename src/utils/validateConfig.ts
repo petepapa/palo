@@ -117,6 +117,10 @@ const siteConfigSchema = z
     }),
     launcher: z.enum(['default', 'compact', 'gradientBorder', 'off']),
     launcherIcon: z.string().optional(),
+    backToTop: z.boolean().optional(),
+    backToTopText: z.string().optional(),
+    enableCustomCursor: z.boolean().optional(),
+    hideScrollbar: z.boolean().optional(),
     navigationAlignment: alignmentEnum.optional(),
     desktopNavigationMenuAlignment: alignmentEnum.optional(),
   })
@@ -335,6 +339,12 @@ const paloPageHeaderConfigSchema = z
     headingLevel: z.string().optional(),
     descClass: z.string().optional(),
     divider: z.enum(['top', 'bottom', 'both', 'none']).optional(),
+    alignV: z.enum(['', 'top', 'center', 'bottom']).optional(),
+    alignH: z.enum(['', 'left', 'center', 'right']).optional(),
+    useContainer: z.boolean().optional(),
+    fullscreen: z.boolean().optional(),
+    topNavigationTheme: z.enum(['', 'dark', 'light']).optional(),
+    class: z.string().optional(),
   })
   .strip()
 

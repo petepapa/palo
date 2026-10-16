@@ -15,6 +15,9 @@
     "generate:contact-config": "node scripts/generate-contact-config.mjs",
     "test:slugify": "node --experimental-strip-types --test src/utils/slugify.test.ts",
     "test:contact": "node --experimental-strip-types --test src/utils/contact-email.test.ts",
+    "test:contact-request": "node --experimental-strip-types --test src/utils/contact-request.test.ts",
+    "test:config": "node --experimental-strip-types --test src/utils/validateConfig.test.ts",
+    "test:copy-images": "node --test scripts/copy-colocated-images.test.mjs",
     "preview": "astro preview --host 0.0.0.0"
   },
   "keywords": [

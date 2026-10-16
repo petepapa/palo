@@ -115,6 +115,7 @@ export interface SiteConfig {
   backToTop?: boolean
   backToTopText?: string
   enableCustomCursor?: boolean
+  hideScrollbar?: boolean
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }
@@ -190,6 +191,12 @@ export interface PaloPageHeaderConfig {
   headingLevel?: string
   descClass?: string
   divider?: 'bottom' | 'top' | 'none'
+  alignV?: '' | 'top' | 'center' | 'bottom'
+  alignH?: '' | 'left' | 'center' | 'right'
+  useContainer?: boolean
+  fullscreen?: boolean
+  topNavigationTheme?: '' | 'dark' | 'light'
+  class?: string
 }
 
 export interface PostHeaderConfig {

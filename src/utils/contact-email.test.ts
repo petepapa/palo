@@ -32,3 +32,30 @@ test('contact delivery uses the configured domain and local part', async (t) => 
   assert.match(String(request?.body), /Studio Example Contact/)
   assert.match(String(request?.body), /New Studio Example Contact Inquiry/)
 })
+
+test('contact delivery rejects malformed email addresses', async () => {
+  const result = await sendContactEmail(
+    { ...payload, email: 'not-an-email' },
+    { apiKey: 're_test', to: 'owner@example.com', from: 'hello@example.com' },
+  )
+
+  assert.equal(result.status, 400)
+  assert.deepEqual(result.body, { error: 'Invalid email address.' })
+})
+
+test('contact delivery removes line breaks from email headers', async (t) => {
+  let request: RequestInit | undefined
+  t.mock.method(globalThis, 'fetch', async (_url: RequestInfo | URL, init?: RequestInit) => {
+    request = init
+    return new Response('{}', { status: 200 })
+  })
+
+  await sendContactEmail(
+    { ...payload, name: 'Taylor\r\nBcc: attacker@example.com' },
+    { apiKey: 're_test', to: 'owner@example.com', from: 'hello@example.com' },
+  )
+
+  const message = JSON.parse(String(request?.body))
+  assert.equal(message.subject, '[Website Contact] New Inquiry from Taylor Bcc: attacker@example.com')
+  assert.equal(message.reply_to, payload.email)
+})
