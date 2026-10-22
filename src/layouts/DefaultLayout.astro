@@ -2,7 +2,7 @@
 import '../styles/tailwind.css'
 import '../assets/scss/index.scss'
 import { existsSync, readdirSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { extname, resolve } from 'node:path'
 import { SEO } from 'astro-seo'
 import Header from '@components/Header.astro'
 import Footer from '@components/Footer.astro'
@@ -440,21 +440,19 @@ const selectStaticFontFile = (weight: number): string | null => {
   return null
 }
 
-const variableFontFile =
-  availableFontFiles.find(
-    (filePath) =>
-      /variablefont/i.test(filePath) &&
-      !/italic/i.test(filePath) &&
-      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
-  ) ?? null
+const FONT_FORMAT_PRIORITY = ['.woff2', '.woff', '.ttf', '.otf']
+const selectVariableFontFile = (italic: boolean): string | null =>
+  FONT_FORMAT_PRIORITY.flatMap((extension) =>
+    availableFontFiles.filter(
+      (filePath) =>
+        /variablefont/i.test(filePath) &&
+        /italic/i.test(filePath) === italic &&
+        extname(filePath).toLowerCase() === extension,
+    ),
+  )[0] ?? null
 
-const variableFontItalicFile =
-  availableFontFiles.find(
-    (filePath) =>
-      /italic/i.test(filePath) &&
-      /variablefont/i.test(filePath) &&
-      /\.(woff2|woff|ttf|otf)$/i.test(filePath)
-  ) ?? null
+const variableFontFile = selectVariableFontFile(false)
+const variableFontItalicFile = selectVariableFontFile(true)
 
 const selectStaticItalicFontFile = (weight: number): string | null => {
   const hints = fontWeightFileHints[weight] ?? [String(weight)]
@@ -573,14 +571,22 @@ const buildFontFaceCss = (): string => {
 
 const fontFaceCss = buildFontFaceCss()
 
-// Preload body weight font for reduced CLS
-const bodyFontFile = variableFontFile ?? selectStaticFontFile(font.weights.body)
-const bodyFontPreloadUrl = bodyFontFile ? getPublicUrl(bodyFontFile) : null
-const bodyFontIsWoff2 = bodyFontPreloadUrl?.endsWith('.woff2') ?? false
-
-// Preload accent weight font for instant navigation text (no FOUT)
-const navFontFile = selectStaticFontFile(font.weights.accent)
-const navFontPreloadUrl = navFontFile ? getPublicUrl(navFontFile) : null
+const fontMimeTypes: Record<string, string> = {
+  '.otf': 'font/otf',
+  '.ttf': 'font/ttf',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+}
+const fontPreloadFiles = variableFontFile
+  ? [variableFontFile]
+  : [...new Set(uniqueConfiguredWeights.map(selectStaticFontFile).filter((file): file is string => file !== null))]
+const fontPreloads = fontPreloadFiles.map((filePath) => {
+  const extension = extname(filePath).toLowerCase()
+  return {
+    href: getPublicUrl(filePath),
+    type: fontMimeTypes[extension],
+  }
+})
 
 const mobileScale = typography.mobileHeadingScale
 const desktopScale = typography.desktopHeadingScale
@@ -1630,14 +1636,10 @@ ${bodyLineHeights}
 
     <!-- favicon -->
     <link rel="icon" type="image/svg+xml" href={themeConfig.metadata.favicon || '/favicon.svg'} />
-    <!-- Preload body weight font to reduce CLS -->
-    {bodyFontPreloadUrl && bodyFontIsWoff2 && (
-      <link rel="preload" as="font" type="font/woff2" crossorigin href={bodyFontPreloadUrl} />
-    )}
-    <!-- Preload navigation accent font: 抢在网络请求最前列，杜绝导航 FOUT -->
-    {navFontPreloadUrl && (
-      <link rel="preload" as="font" type="font/ttf" crossorigin href={navFontPreloadUrl} />
-    )}
+    <!-- Preload configured font files before stylesheets can trigger late font requests -->
+    {fontPreloads.map(({ href, type }) => (
+      <link rel="preload" as="font" type={type} crossorigin href={href} />
+    ))}
 
     {fontFaceCss && <style is:global set:html={`@layer base { ${fontFaceCss} }`} />}
 
