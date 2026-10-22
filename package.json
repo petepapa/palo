@@ -10,6 +10,7 @@
     "dev": "node -e \"try{require('node:fs').unlinkSync('node_modules/.astro/data-store.json')}catch(e){}\" && npm run copy-images && astro dev --host 0.0.0.0",
     "dev:legacy": "node scripts/dev-legacy-watch.mjs",
     "start": "node -e \"try{require('node:fs').unlinkSync('node_modules/.astro/data-store.json')}catch(e){}\" && npm run copy-images && astro dev --host 0.0.0.0",
+    "prebuild": "node scripts/sync-vercel-routing.mjs",
     "build": "npm run generate:contact-config && npm run copy-images && astro build",
     "copy-images": "node scripts/copy-colocated-images.mjs",
     "generate:contact-config": "node scripts/generate-contact-config.mjs",
@@ -18,6 +19,7 @@
     "test:contact-request": "node --experimental-strip-types --test src/utils/contact-request.test.ts",
     "test:config": "node --experimental-strip-types --test src/utils/validateConfig.test.ts",
     "test:copy-images": "node --test scripts/copy-colocated-images.test.mjs",
+    "test:vercel-routing": "node --test scripts/sync-vercel-routing.test.mjs",
     "preview": "astro preview --host 0.0.0.0"
   },
   "keywords": [
