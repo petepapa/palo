@@ -20,6 +20,7 @@
     "test:config": "node --experimental-strip-types --test src/utils/validateConfig.test.ts",
     "test:copy-images": "node --test scripts/copy-colocated-images.test.mjs",
     "test:vercel-routing": "node --test scripts/sync-vercel-routing.test.mjs",
+    "test:vercel": "npm run generate:contact-config && node --experimental-strip-types --test api/send-email.test.ts scripts/vercel-deployment.test.mjs",
     "preview": "astro preview --host 0.0.0.0"
   },
   "keywords": [

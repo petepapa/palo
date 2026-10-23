@@ -1,6 +1,6 @@
 import { contactDeliveryConfig } from '../.palo/contact-config.mjs'
-import { sendContactEmail, type ContactPayload } from '../src/utils/contact-email'
-import { isContactPayloadTooLarge, isContentLengthTooLarge } from '../src/utils/contact-request'
+import { sendContactEmail, type ContactPayload } from '../src/utils/contact-email.ts'
+import { isContactPayloadTooLarge, isContentLengthTooLarge } from '../src/utils/contact-request.ts'
 
 type VercelRequest = {
   body?: unknown

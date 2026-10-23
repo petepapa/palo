@@ -274,7 +274,7 @@ npm run build
 
 Production output is generated in `dist/`.
 
-Vercel's route settings are synchronized from `site.trailingSlash` in `src/config.yaml` by the `prebuild` script. When changing this setting, run `npm run build` and commit the resulting `vercel.json` together with the config change so Vercel reads matching routing settings for the deployment. Cloudflare Pages uses its clean-URL behavior for the same static output.
+Vercel runs `npm run build` so build-time generated files are available to its serverless functions. The contact function explicitly bundles `.palo/contact-config.mjs`, which is generated from `src/config.yaml` and intentionally ignored by Git. Vercel's route settings are synchronized from `site.trailingSlash` by the `prebuild` script. When changing this setting, run `npm run build` and commit the resulting `vercel.json` together with the config change so Vercel reads matching routing settings for the deployment. Cloudflare Pages uses its clean-URL behavior for the same static output.
 
 The static site output is `dist/`, so Cloudflare Pages can use its default output-directory setting. The included contact form is served by the deployment platform's serverless route: Cloudflare Pages Functions on Cloudflare and a Vercel Function on Vercel. Set your Resend key through the project environment variables:
 

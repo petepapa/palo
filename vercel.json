@@ -1,5 +1,11 @@
 {
+  "buildCommand": "npm run build",
   "cleanUrls": true,
+  "functions": {
+    "api/send-email.ts": {
+      "includeFiles": ".palo/contact-config.mjs"
+    }
+  },
   "headers": [
     {
       "source": "/_astro/(.*)",
