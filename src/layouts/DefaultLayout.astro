@@ -1,6 +1,7 @@
 ---
 import '../styles/tailwind.css'
 import '../assets/scss/index.scss'
+import 'lenis/dist/lenis.css'
 import { existsSync, readdirSync } from 'node:fs'
 import { extname, resolve } from 'node:path'
 import { SEO } from 'astro-seo'
@@ -122,6 +123,7 @@ const defaultTheme = themeConfig.site.defaultTheme ?? 'auto'
 const darkModeToggle = themeConfig.site.darkModeToggle
 const enableCustomCursor = themeConfig.site.enableCustomCursor ?? false
 const hideScrollbar = themeConfig.site.hideScrollbar ?? true
+const smoothWheelScroll = themeConfig.site.smoothWheelScroll ?? false
 
 // ──────────────────────────────────────────────
 //  Dynamic brand variables from config.yaml
@@ -3370,6 +3372,66 @@ ${bodyLineHeights}
           document.addEventListener('astro:after-swap', init)
           document.addEventListener('astro:before-swap', hideCursor)
         })()
+      </script>
+    )}
+    {smoothWheelScroll && (
+      <script>
+        import Lenis from 'lenis'
+
+        const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+        let lenis: Lenis | null = null
+        let launcherLenis: Lenis | null = null
+        let launcherContent: HTMLElement | null = null
+
+        const destroyLauncherSmoothScroll = () => {
+          launcherLenis?.destroy()
+          launcherLenis = null
+          launcherContent = null
+        }
+
+        const initLauncherSmoothScroll = () => {
+          if (motionPreference.matches) return
+
+          const content = document.querySelector<HTMLElement>('.launcher[open] .content')
+          if (!content || content === launcherContent) return
+
+          destroyLauncherSmoothScroll()
+          launcherContent = content
+          launcherLenis = new Lenis({
+            wrapper: content,
+            content,
+            autoRaf: true,
+            smoothWheel: true,
+            overscroll: false,
+          })
+          content.closest('dialog')?.addEventListener('close', destroyLauncherSmoothScroll, {
+            once: true,
+          })
+        }
+
+        const syncSmoothWheelScroll = () => {
+          if (motionPreference.matches) {
+            lenis?.destroy()
+            lenis = null
+            destroyLauncherSmoothScroll()
+            return
+          }
+
+          if (!lenis) {
+            lenis = new Lenis({
+              autoRaf: true,
+              smoothWheel: true,
+              allowNestedScroll: true,
+              prevent: (element) => Boolean(element.closest('.launcher .content')),
+              anchors: false,
+            })
+          }
+        }
+
+        syncSmoothWheelScroll()
+        document.addEventListener('launcher:open', initLauncherSmoothScroll)
+        document.addEventListener('astro:before-swap', destroyLauncherSmoothScroll)
+        motionPreference.addEventListener('change', syncSmoothWheelScroll)
       </script>
     )}
   </body>

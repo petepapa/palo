@@ -73,6 +73,7 @@ site:
   backToTopText: 'Back to Top'
   enableCustomCursor: true    # Circular inverted cursor + hover scale
   hideScrollbar: true
+  smoothWheelScroll: true     # Eased wheel scrolling; respects reduced-motion preference
 ```
 
 | Key | Values | Effect |
@@ -88,6 +89,7 @@ site:
 | `backToTopText` | string | Link label text |
 | `enableCustomCursor` | boolean | Custom circular cursor |
 | `hideScrollbar` | boolean | Hide document scrollbar |
+| `smoothWheelScroll` | boolean | Add eased inertia to mouse-wheel and trackpad scrolling |
 
 ---
 

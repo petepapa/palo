@@ -96,7 +96,7 @@ Palo is intentionally config-driven. Start with [src/config.yaml](src/config.yam
 
 | Area | What it controls |
 | --- | --- |
-| `site` | Site name, trailing slash behavior, theme mode, launcher, back-to-top, custom cursor |
+| `site` | Site name, trailing slash behavior, theme mode, launcher, back-to-top, custom cursor, smooth wheel scrolling |
 | `metadata` | SEO title, description, author, social preview image, favicon |
 | `branding` | Logos, text logo, color palette, font family, font weights |
 | `navigation` | Fixed header, dropdown style, mobile menu, active link style, nav spacing |

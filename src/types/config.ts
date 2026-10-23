@@ -116,6 +116,7 @@ export interface SiteConfig {
   backToTopText?: string
   enableCustomCursor?: boolean
   hideScrollbar?: boolean
+  smoothWheelScroll?: boolean
   navigationAlignment?: 'left' | 'center' | 'right'
   desktopNavigationMenuAlignment?: 'left' | 'center' | 'right'
 }

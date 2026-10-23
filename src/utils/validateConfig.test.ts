@@ -26,6 +26,13 @@ test('site feature flags are validated', () => {
   assert.throws(() => validateConfig(config), /site\.backToTop/)
 })
 
+test('smooth wheel scrolling setting must be boolean', () => {
+  const config = loadConfig()
+  config.site.smoothWheelScroll = 'yes'
+
+  assert.throws(() => validateConfig(config), /site\.smoothWheelScroll/)
+})
+
 test('PaloPageHeader defaults are validated', () => {
   const config = loadConfig()
   config.components.paloPageHeader.alignV = 'middle'

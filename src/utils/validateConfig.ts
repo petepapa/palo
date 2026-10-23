@@ -121,6 +121,7 @@ const siteConfigSchema = z
     backToTopText: z.string().optional(),
     enableCustomCursor: z.boolean().optional(),
     hideScrollbar: z.boolean().optional(),
+    smoothWheelScroll: z.boolean().optional(),
     navigationAlignment: alignmentEnum.optional(),
     desktopNavigationMenuAlignment: alignmentEnum.optional(),
   })
