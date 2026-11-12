@@ -3383,6 +3383,9 @@ ${bodyLineHeights}
         let launcherLenis: Lenis | null = null
         let launcherContent: HTMLElement | null = null
 
+        const isZoomed = () => (window.visualViewport?.scale ?? 1) > 1.001
+        const virtualScroll = () => !isZoomed()
+
         const destroyLauncherSmoothScroll = () => {
           launcherLenis?.destroy()
           launcherLenis = null
@@ -3402,6 +3405,7 @@ ${bodyLineHeights}
             content,
             autoRaf: true,
             smoothWheel: true,
+            virtualScroll,
             overscroll: false,
           })
           content.closest('dialog')?.addEventListener('close', destroyLauncherSmoothScroll, {
@@ -3423,15 +3427,23 @@ ${bodyLineHeights}
               smoothWheel: true,
               allowNestedScroll: true,
               prevent: (element) => Boolean(element.closest('.launcher .content')),
+              virtualScroll,
               anchors: false,
             })
           }
+        }
+
+        const syncLenisAfterZoom = () => {
+          if (isZoomed() || !lenis) return
+          lenis.resize()
+          lenis.scrollTo(window.scrollY, { immediate: true, force: true })
         }
 
         syncSmoothWheelScroll()
         document.addEventListener('launcher:open', initLauncherSmoothScroll)
         document.addEventListener('astro:before-swap', destroyLauncherSmoothScroll)
         motionPreference.addEventListener('change', syncSmoothWheelScroll)
+        window.visualViewport?.addEventListener('resize', syncLenisAfterZoom, { passive: true })
       </script>
     )}
   </body>
