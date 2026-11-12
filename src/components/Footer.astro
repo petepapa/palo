@@ -133,7 +133,7 @@ const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
     class="bg-primary py-4 sm:py-8 md:py-16"
     alignV="center"
     alignH="left"
-    divider="false"
+    divider="none"
     useContainer={false}
     bg={{
       image: "",
@@ -155,7 +155,7 @@ const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
       class="text-neutral- text-secondary uppercase text-3xl md:text-5xl lg:text-9xl"
     />
 
-    <img src="/branding/logo-text.svg" class="w-full" />
+    <img src="/branding/logo-text.svg" class="block w-full" alt="" />
 
     
   </CreativeSection>
@@ -166,7 +166,7 @@ const footerPosts = [...featuredPosts, ...regularPosts].slice(0, footerLimit)
 
 <style lang="scss">
   @layer components {
-    section {
+    section:not(.creative-section) {
       border-top: var(--border-width-divider, var(--border-width-global, 3px)) solid var(--border-color-subtle);
     }
   }

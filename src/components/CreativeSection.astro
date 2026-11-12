@@ -5,7 +5,7 @@ import { getDominantColor } from '@utils/imageColor'
 import { isPngImage } from '@utils/contentImages'
 import ContentImage from '@components/ContentImage.astro'
 
-type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none'
+type DividerPlacement = '' | 'top' | 'bottom' | 'both' | 'none' | 'false'
 
 interface BackgroundEngine {
   image?: string
@@ -76,7 +76,7 @@ const sectionContentAlignMap = {
   bottom: 'flex-end',
 } as const
 const resolveDividerPlacement = (value: DividerPlacement = 'bottom'): 'top' | 'both' | 'bottom' | 'none' => {
-  if (value === 'none' || value === '') return 'none'
+  if (value === 'none' || value === '' || value === 'false') return 'none'
   if (value === 'top') return 'top'
   if (value === 'both') return 'both'
   return 'bottom'
